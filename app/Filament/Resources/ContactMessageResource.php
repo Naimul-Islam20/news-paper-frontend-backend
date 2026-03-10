@@ -22,6 +22,8 @@ class ContactMessageResource extends Resource
 
     protected static ?string $navigationGroup = 'Contact';
 
+    protected static ?int $navigationSort = 15;
+
     protected static ?string $navigationLabel = 'Form Messages';
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
