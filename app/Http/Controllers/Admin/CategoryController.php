@@ -3,99 +3,130 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
+    /**
+     * All categories (parent ones) with their subcategories
+     */
     public function index()
     {
-        // Mock data for the view
-        $categories = [
-            [
-                'id' => 1,
-                'name' => 'National',
-                'type' => 'Main',
-                'subcategory' => 'Politics, Economy',
-                'status' => 'Active',
-                'description' => 'Breaking news from across the nation.',
-            ],
-            [
-                'id' => 2,
-                'name' => 'Sports',
-                'type' => 'Main',
-                'subcategory' => 'Football, Cricket',
-                'status' => 'Active',
-                'description' => 'Latest scores and sports highlights.',
-            ],
-            [
-                'id' => 3,
-                'name' => 'International',
-                'type' => 'Main',
-                'subcategory' => 'World News, Global Events',
-                'status' => 'Active',
-                'description' => 'Stories from around the globe.',
-            ],
-            [
-                'id' => 4,
-                'name' => 'Technology',
-                'type' => 'Special',
-                'subcategory' => 'AI, Gadgets',
-                'status' => 'Inactive',
-                'description' => 'The latest in the tech world.',
-            ],
+        // Parent categories with their children
+        $categories = Category::whereNull('parent_id')
+            ->with('children')
+            ->latest()
+            ->get();
+
+        // All parent categories for the sub-category "add" dropdown
+        $parentCategories = Category::whereNull('parent_id')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        // Category types
+        $categoryTypes = [
+            'post'    => 'Post',
+            'page'    => 'Page',
+            'gallery' => 'Gallery',
+            'video'   => 'Video',
         ];
 
-        return view('admin.category.index', compact('categories'));
+        return view('admin.category.index', compact('categories', 'parentCategories', 'categoryTypes'));
     }
 
-    public function subCategoryIndex()
+    /**
+     * Store a new category or subcategory
+     */
+    public function store(Request $request)
     {
-        // Mock data for sub-categories
-        $subCategories = [
-            [
-                'id' => 1,
-                'name' => 'Politics',
-                'parent' => 'National',
-                'serial' => 1,
-                'status' => 'Active',
-            ],
-            [
-                'id' => 2,
-                'name' => 'Economy',
-                'parent' => 'National',
-                'serial' => 2,
-                'status' => 'Active',
-            ],
-            [
-                'id' => 3,
-                'name' => 'Football',
-                'parent' => 'Sports',
-                'serial' => 1,
-                'status' => 'Active',
-            ],
-            [
-                'id' => 4,
-                'name' => 'Cricket',
-                'parent' => 'Sports',
-                'serial' => 2,
-                'status' => 'Active',
-            ],
-            [
-                'id' => 5,
-                'name' => 'World News',
-                'parent' => 'International',
-                'serial' => 1,
-                'status' => 'Active',
-            ],
-        ];
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'type'        => 'nullable|string|in:post,page,gallery,video|max:100', // Type is nullable because subcategory inherits it
+            'description' => 'nullable|string|max:500',
+            'parent_id'   => 'nullable|exists:categories,id',
+            'status'      => 'required|in:active,inactive',
+        ]);
 
-        // We also need categories for the "Add" modal
-        $categories = [
-            ['id' => 1, 'name' => 'National'],
-            ['id' => 2, 'name' => 'Sports'],
-            ['id' => 3, 'name' => 'International'],
-            ['id' => 4, 'name' => 'Technology'],
-        ];
+        // Auto-generate unique slug
+        $slug = Str::slug($request->name);
+        $originalSlug = $slug;
+        $i = 1;
+        while (Category::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $i++;
+        }
 
-        return view('admin.category.sub_index', compact('subCategories', 'categories'));
+        // Determine type: inherit from parent if it's a subcategory
+        $type = $request->type;
+        if ($request->parent_id) {
+            $parent = Category::find($request->parent_id);
+            if ($parent) {
+                $type = $parent->type;
+            }
+        }
+
+        Category::create([
+            'name'        => $request->name,
+            'type'        => $type ?? 'post',
+            'description' => $request->description,
+            'slug'        => $slug,
+            'parent_id'   => $request->parent_id ?: null,
+            'status'      => $request->status,
+        ]);
+
+        $message = $request->parent_id ? 'Sub-category added successfully!' : 'Category added successfully!';
+        $route = $request->parent_id ? 'admin.sub-categories.index' : 'admin.categories.index';
+
+        return redirect()->route($route)->with('success', $message);
+    }
+
+    /**
+     * Update an existing category
+     */
+    public function update(Request $request, $id)
+    {
+        $category = Category::findOrFail($id);
+
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'type'        => 'nullable|string|in:post,page,gallery,video|max:100', // Nullable for subcategory edit
+            'description' => 'nullable|string|max:500',
+            'status'      => 'required|in:active,inactive',
+        ]);
+
+        // Recalculate slug if name changed
+        if ($category->name !== $request->name) {
+            $slug = Str::slug($request->name);
+            $originalSlug = $slug;
+            $i = 1;
+            while (Category::where('slug', $slug)->where('id', '!=', $id)->exists()) {
+                $slug = $originalSlug . '-' . $i++;
+            }
+            $category->slug = $slug;
+        }
+
+        $category->name        = $request->name;
+        // Only update type if it's a parent category or provided
+        if (!$category->parent_id && $request->filled('type')) {
+            $category->type = $request->type;
+        }
+        $category->description = $request->description;
+        $category->status      = $request->status;
+        $category->save();
+
+        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully!');
+    }
+
+    /**
+     * Delete a category (and its subcategories cascade)
+     */
+    public function destroy($id)
+    {
+        $category = Category::findOrFail($id);
+        $category->delete();
+
+        return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully!');
     }
 }

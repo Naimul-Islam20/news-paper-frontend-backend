@@ -5,47 +5,92 @@
 
 @section('content')
 <div class="py-1 w-full mx-auto">
-    <form action="#" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-        
-        <div class="max-w-4xl mx-auto space-y-6">
-            {{-- Section 1: Video Info --}}
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 uppercase tracking-wider">
-                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Video Information
-                    </h3>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="max-w-6xl mx-auto">
+        <form action="{{ route('admin.videos.update', $video->id) }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            @csrf
+            @method('PUT')
+            
+            <div class="p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    {{-- Left Column: Settings --}}
+                    <div class="lg:col-span-4 space-y-6">
+                        
+                        {{-- Title --}}
                         <div>
-                            <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Video Title <span class="text-rose-500">*</span></label>
-                            <input type="text" name="title" value="Election Banner 2024" placeholder="Enter video title..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Video Title <span class="text-rose-500">*</span></label>
+                            <input type="text" name="title" required value="{{ old('title', $video->title) }}" placeholder="Enter video title..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            @error('title') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Category --}}
+                        <div>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Category <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <select name="category_id" required class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 cursor-pointer text-sm bg-white">
+                                    <option value="" disabled>Select Category</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ old('category_id', $video->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
+                            @error('category_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- YouTube Link --}}
+                        <div>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">YouTube Video Link <span class="text-rose-500">*</span></label>
+                            <input type="url" name="youtube_link" required value="{{ old('youtube_link', $video->youtube_link) }}" placeholder="https://www.youtube.com/watch?v=..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            @error('youtube_link') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Video Thumbnail/Image --}}
+                        <div>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Video Thumbnail</label>
+                            <div class="relative h-28 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-1.5 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-xs shadow-sm">
+                                @if($video->image)
+                                    <img id="imagePreview" src="{{ Storage::url($video->image) }}" class="absolute inset-0 w-full h-full object-cover">
+                                    <div id="imagePlaceholder" class="hidden flex-col items-center justify-center gap-1.5">
+                                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span>Choose Image</span>
+                                    </div>
+                                @else
+                                    <img id="imagePreview" class="absolute inset-0 w-full h-full object-cover hidden">
+                                    <div id="imagePlaceholder" class="flex flex-col items-center justify-center gap-1.5">
+                                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span>Choose Image</span>
+                                    </div>
+                                @endif
+                                <input type="file" name="image" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImage(this)">
+                            </div>
+                            @error('image') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
+                            {{-- Status --}}
                             <div>
-                                <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Category <span class="text-rose-500">*</span></label>
+                                <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Status</label>
                                 <div class="relative">
-                                    <select name="category" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer text-black">
-                                        <option value="politics" selected>Politics</option>
-                                        <option value="sports">Sports</option>
-                                        <option value="entertainment">Entertainment</option>
+                                    <select name="status" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 cursor-pointer text-sm">
+                                        <option value="active" {{ old('status', $video->status) == 'active' ? 'selected' : '' }}>Active</option>
+                                        <option value="inactive" {{ old('status', $video->status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                     </select>
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </div>
                                 </div>
                             </div>
+
+                            {{-- Main Video --}}
                             <div>
-                                <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Status</label>
+                                <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Main Video?</label>
                                 <div class="relative">
-                                    <select name="status" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer text-black">
-                                        <option value="active" selected>Active</option>
-                                        <option value="inactive">Inactive</option>
+                                    <select name="is_main_video" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 cursor-pointer text-sm">
+                                        <option value="no" {{ old('is_main_video', $video->is_main_video) == 'no' ? 'selected' : '' }}>No</option>
+                                        <option value="yes" {{ old('is_main_video', $video->is_main_video) == 'yes' ? 'selected' : '' }}>Yes</option>
                                     </select>
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -53,86 +98,71 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            {{-- Section 2: Video List --}}
-            <div id="video-list" class="space-y-4">
-                {{-- Existing Video Item 1 --}}
-                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 relative group">
-                    <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 p-1 bg-rose-500 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all" title="Remove Video">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </div>
+
+                    {{-- Right Column: Video Description --}}
+                    <div class="lg:col-span-8 flex flex-col">
+                        <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Video Description</label>
+                        <div class="flex-1 min-h-[400px]">
+                            <div class="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-white shadow-sm h-full">
+                                <textarea id="editor" name="description" placeholder="Write video description here...">{{ old('description', $video->description) }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- Form Actions --}}
+                <div class="flex items-center justify-end gap-3 pt-20 border-t border-slate-100 dark:border-slate-800 mt-12">
+                    <a href="{{ route('admin.videos.index') }}" class="px-6 py-2 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-400 font-normal rounded-lg hover:bg-slate-50 transition-all text-sm">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-8 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-normal rounded-lg transition-all shadow-md text-sm">
+                        Update Video
                     </button>
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                        <div class="md:col-span-4">
-                            <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Video <span class="text-rose-500">*</span></label>
-                            
-                            {{-- Current Video Preview --}}
-                            <div class="relative h-32 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden mb-2 group/preview">
-                                {{-- Placeholder for actual video --}}
-                                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                <div class="absolute inset-0 bg-black/50 hidden group-hover/preview:flex items-center justify-center transition-all cursor-pointer">
-                                    <span class="text-white text-xs font-bold uppercase tracking-wider">Change Video</span>
-                                    <input type="file" name="videos[]" class="absolute inset-0 opacity-0 cursor-pointer z-10">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="md:col-span-8 flex flex-col justify-center">
-                            <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Video Description</label>
-                            <textarea name="video_desc[]" rows="4" placeholder="Enter video description..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black resize-none h-[128px]">A banner showing the upcoming election events and campaigns.</textarea>
-                        </div>
-                    </div>
                 </div>
             </div>
-
-            {{-- Add More Button --}}
-            <div class="flex justify-center">
-                <button type="button" onclick="addVideoRow()" class="flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">
-                    <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                    Another Video & Desc
-                </button>
-            </div>
-
-            {{-- Form Actions --}}
-            <div class="flex items-center justify-end gap-3 pt-6 pb-12">
-                <a href="{{ route('admin.videos.index') }}" class="px-8 py-2.5 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm">
-                    Cancel
-                </a>
-                <button type="submit" class="px-8 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-100 dark:shadow-none text-sm font-normal">
-                    Save Changes
-                </button>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 <script>
-    function addVideoRow() {
-        const container = document.getElementById('video-list');
-        const newRow = document.createElement('div');
-        newRow.className = "bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 relative group animate-in fade-in zoom-in duration-300";
-        
-        newRow.innerHTML = `
-            <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 p-1 bg-rose-500 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                <div class="md:col-span-4">
-                    <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Video <span class="text-rose-500">*</span></label>
-                    <div class="relative h-32 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center gap-1.5 group/box hover:bg-slate-100 transition-all cursor-pointer overflow-hidden shadow-inner font-normal text-black uppercase tracking-widest text-[10px]">
-                        <input type="file" name="videos[]" class="absolute inset-0 opacity-0 cursor-pointer z-10">
-                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        <span>Choose Video</span>
-                    </div>
-                </div>
-                <div class="md:col-span-8 flex flex-col justify-center">
-                    <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Video Description</label>
-                    <textarea name="video_desc[]" rows="4" placeholder="Enter video description..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black resize-none h-[128px]"></textarea>
-                </div>
-            </div>
-        `;
-        container.appendChild(newRow);
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagePreview');
+                const placeholder = document.getElementById('imagePlaceholder');
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 </script>
+
+@push('scripts')
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+<script>
+    function initCKEditor() {
+        if (typeof CKEDITOR !== 'undefined' && document.getElementById('editor')) {
+            CKEDITOR.replace('editor', {
+                height: 320, 
+                width: '100%',
+                removeButtons: 'PasteFromWord',
+                versionCheck: false,
+            });
+        }
+    }
+
+    if (document.readyState === 'complete') {
+        initCKEditor();
+    } else {
+        window.addEventListener('load', initCKEditor);
+    }
+</script>
+@endpush
+
 @endsection

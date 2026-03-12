@@ -34,6 +34,18 @@
             const arrow = document.getElementById(id + '-arrow');
             const isOpen = el.classList.contains('grid-rows-[1fr]');
             
+            // Close all other open submenus
+            if (!isOpen) {
+                document.querySelectorAll('[id$="-menu"]').forEach(menu => {
+                    if (menu.id !== id) {
+                        menu.classList.replace('grid-rows-[1fr]', 'grid-rows-[0fr]');
+                        const otherArrow = document.getElementById(menu.id + '-arrow');
+                        if (otherArrow) otherArrow.classList.remove('rotate-180');
+                    }
+                });
+            }
+
+            // Toggle current submenu
             if (isOpen) {
                 el.classList.replace('grid-rows-[1fr]', 'grid-rows-[0fr]');
                 if (arrow) arrow.classList.remove('rotate-180');
@@ -42,6 +54,13 @@
                 if (arrow) arrow.classList.add('rotate-180');
             }
         };
+
+        // Heartbeat to keep session alive while working
+        setInterval(function() {
+            fetch('{{ route('admin.heartbeat') }}')
+                .then(response => response.json())
+                .catch(error => console.error('Heartbeat failed:', error));
+        }, 5 * 60 * 1000); // Ping every 5 minutes
     </script>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
@@ -95,7 +114,7 @@
                                     <svg class="w-6 h-6 text-slate-200 dark:text-slate-800 -ml-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 12h10m0 0l-4-4m4 4l-4 4"></path></svg>
                                     <span class="ml-1">New Post</span>
                                 </a>
-                                <a href="#" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative">
+                                <a href="{{ route('admin.posts.index') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative">
                                     {{-- L-shaped connector --}}
                                     <svg class="w-6 h-6 text-slate-200 dark:text-slate-800 -ml-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 12h10m0 0l-4-4m4 4l-4 4"></path></svg>
                                     <span class="ml-1">All Post</span>
@@ -238,6 +257,7 @@
                     <span class="font-medium">Manage Roles</span>
                 </a>
 
+
                 {{-- Statistics --}}
                 <div class="space-y-1">
                     <button type="button" onclick="toggleSubmenu('statistics-menu')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->is('admin/statistics*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
@@ -314,20 +334,46 @@
                     </div>
                 </div>
 
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all">
-                    <svg class="w-5 h-5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"></path></svg>
+                <a href="{{ route('admin.subscribes.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.subscribes.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
+                    <svg class="w-5 h-5 {{ request()->routeIs('admin.subscribes.*') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"></path></svg>
                     <span class="font-medium">Subscribers</span>
                 </a>
 
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all">
-                    <svg class="w-5 h-5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a5.97 5.97 0 00-.942 3.197M12 10.5a3.375 3.375 0 100-6.75 3.375 3.375 0 000 6.75zM1.5 18.72a3 3 0 013.741-.479 3 3 0 01-4.104 3.012 3.01 3.01 0 01-.137-.666M5.25 8.25a2.625 2.625 0 115.25 0 2.625 2.625 0 01-5.25 0z"></path></svg>
-                    <span class="font-medium">User Accounts</span>
-                </a>
+                {{-- Users --}}
+                @if(auth()->user()->role !== 'sub editor')
+                <div class="space-y-1">
+                    <button type="button" onclick="toggleSubmenu('users-menu')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.users.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 {{ request()->routeIs('admin.users.*') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            <span class="font-medium">Users</span>
+                        </div>
+                        <svg id="users-menu-arrow" class="w-3.5 h-3.5 transition-transform duration-300 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="users-menu" class="{{ request()->routeIs('admin.users.*') ? 'grid grid-rows-[1fr]' : 'grid grid-rows-[0fr]' }} transition-all duration-300 ease-in-out">
+                        <div class="overflow-hidden">
+                            <div class="ml-4 pl-0 border-l border-slate-200 dark:border-slate-800 space-y-0 py-1">
+                                <a href="{{ route('admin.users.create') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative {{ request()->routeIs('admin.users.create') ? 'text-indigo-600 dark:text-indigo-400' : '' }}">
+                                    {{-- L-shaped connector --}}
+                                    <svg class="w-6 h-6 text-slate-200 dark:text-slate-800 -ml-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 12h10m0 0l-4-4m4 4l-4 4"></path></svg>
+                                    <span class="ml-1">Add User</span>
+                                </a>
+                                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative {{ request()->routeIs('admin.users.index') ? 'text-indigo-600 dark:text-indigo-400' : '' }}">
+                                    {{-- L-shaped connector --}}
+                                    <svg class="w-6 h-6 text-slate-200 dark:text-slate-800 -ml-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 12h10m0 0l-4-4m4 4l-4 4"></path></svg>
+                                    <span class="ml-1">All User</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
 
 
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all">
-                    <svg class="w-5 h-5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"></path></svg>
+
+
+                <a href="{{ route('admin.meta.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.meta.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
+                    <svg class="w-5 h-5 {{ request()->routeIs('admin.meta.*') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"></path></svg>
                     <span class="font-medium">SEO & Meta</span>
                 </a>
 
@@ -345,7 +391,7 @@
         <main class="flex-1 flex flex-col ml-64">
             <header class="h-20 bg-white/80 border-b border-slate-200 dark:bg-slate-950/80 dark:border-slate-800 backdrop-blur-xl sticky top-0 z-30 flex items-center justify-between px-6">
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    <h1 class="text-xl font-normal tracking-tight text-slate-900 dark:text-white">
                         @yield('header_title', 'Dashboard')
                     </h1>
                     <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
@@ -380,6 +426,21 @@
             </header>
 
             <section class="p-6 flex-1">
+                {{-- Global Alert Messages --}}
+                @if(session('success'))
+                    <div class="max-w-7xl mx-auto mb-6 flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="text-sm font-medium">{{ session('success') }}</p>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="max-w-7xl mx-auto mb-6 flex items-center gap-3 px-4 py-3 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="text-sm font-medium">{{ session('error') }}</p>
+                    </div>
+                @endif
+
                 @yield('content')
             </section>
         </main>

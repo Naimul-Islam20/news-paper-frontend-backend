@@ -4,135 +4,79 @@
 @section('header_title', 'Edit Advertisement')
 
 @section('content')
-<div class="py-1 w-full mx-auto">
-    <form action="#" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-        
-        <div class="max-w-4xl mx-auto space-y-6">
-            {{-- Section 1: Advertisement Info --}}
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 uppercase tracking-wider">
-                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Advertisement Information
-                    </h3>
+<div class="py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-sm rounded-lg border border-slate-200 dark:border-slate-800">
+            <div class="p-6">
+                <div class="mb-6 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <h2 class="text-xl font-semibold text-slate-800 dark:text-white">Edit Advertisement</h2>
                 </div>
-                
-                <div class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <form action="#" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- Name --}}
                         <div>
-                            <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Advertisement Title <span class="text-rose-500">*</span></label>
-                            <input type="text" name="title" value="Election Banner 2024" placeholder="Enter advertisement title..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
+                            <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Advertisement Name <span class="text-rose-500">*</span></label>
+                            <input type="text" name="name" id="name" value="Election Banner 2024" placeholder="Summer Sale Banner" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Category <span class="text-rose-500">*</span></label>
-                                <div class="relative">
-                                    <select name="category" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer text-black">
-                                        <option value="politics" selected>Politics</option>
-                                        <option value="sports">Sports</option>
-                                        <option value="entertainment">Entertainment</option>
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </div>
+                        {{-- URL --}}
+                        <div>
+                            <label for="url" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Target URL <span class="text-rose-500">*</span></label>
+                            <input type="url" name="url" id="url" value="https://example.com/promo" placeholder="https://example.com/promo" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
+                        </div>
+
+                        {{-- Location --}}
+                        <div>
+                            <label for="location" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Ad Location</label>
+                            <select name="location" id="location" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
+                                <option value="home_top" selected>Home Top</option>
+                                <option value="home_sidebar">Home Sidebar</option>
+                                <option value="category_top">Category Top</option>
+                                <option value="post_detail_sidebar">Post Detail Sidebar</option>
+                                <option value="footer_above">Above Footer</option>
+                            </select>
+                        </div>
+
+                        {{-- Status --}}
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
+                            <select name="status" id="status" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
+                                <option value="1" selected>Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+
+                        {{-- Image --}}
+                        <div class="md:col-span-2">
+                            <label for="image" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Ad Image</label>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-12 bg-slate-100 rounded border border-slate-200 dark:bg-slate-800 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                                     <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 </div>
+                                <input type="file" name="image" id="image" class="flex-1 text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
                             </div>
-                            <div>
-                                <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Status</label>
-                                <div class="relative">
-                                    <select name="status" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer text-black">
-                                        <option value="active" selected>Active</option>
-                                        <option value="inactive">Inactive</option>
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </div>
-                                </div>
-                            </div>
+                        </div>
+
+                        {{-- Custom Ad Code --}}
+                        <div class="md:col-span-2">
+                            <label for="custom_add_code" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Custom Ad Code (HTML/Script)</label>
+                            <textarea name="custom_add_code" id="custom_add_code" rows="5" placeholder="Paste your code here..." class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm font-mono"></textarea>
+                            <p class="mt-1 text-xs text-slate-500">* If custom code is provided, it will override the uploaded image.</p>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            {{-- Section 2: Advertisement List --}}
-            <div id="advertisement-list" class="space-y-4">
-                {{-- Existing Advertisement Item 1 --}}
-                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 relative group">
-                    <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 p-1 bg-rose-500 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all" title="Remove Advertisement">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                        <div class="md:col-span-4">
-                            <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Advertisement <span class="text-rose-500">*</span></label>
-                            
-                            {{-- Current Advertisement Preview --}}
-                            <div class="relative h-32 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden mb-2 group/preview">
-                                {{-- Placeholder for actual advertisement --}}
-                                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                <div class="absolute inset-0 bg-black/50 hidden group-hover/preview:flex items-center justify-center transition-all cursor-pointer">
-                                    <span class="text-white text-xs font-bold uppercase tracking-wider">Change Advertisement</span>
-                                    <input type="file" name="advertisements[]" class="absolute inset-0 opacity-0 cursor-pointer z-10">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="md:col-span-8 flex flex-col justify-center">
-                            <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Advertisement Description</label>
-                            <textarea name="advertisement_desc[]" rows="4" placeholder="Enter advertisement description..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black resize-none h-[128px]">A banner showing the upcoming election events and campaigns.</textarea>
-                        </div>
+                    <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                        <a href="{{ route('admin.advertisements.index') }}" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Cancel</a>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">Save Changes</button>
                     </div>
-                </div>
-            </div>
-
-            {{-- Add More Button --}}
-            <div class="flex justify-center">
-                <button type="button" onclick="addAdvertisementRow()" class="flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">
-                    <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                    Another Advertisement & Desc
-                </button>
-            </div>
-
-            {{-- Form Actions --}}
-            <div class="flex items-center justify-end gap-3 pt-6 pb-12">
-                <a href="{{ route('admin.advertisements.index') }}" class="px-8 py-2.5 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm">
-                    Cancel
-                </a>
-                <button type="submit" class="px-8 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-100 dark:shadow-none text-sm font-normal">
-                    Save Changes
-                </button>
+                </form>
             </div>
         </div>
-    </form>
+    </div>
 </div>
-
-<script>
-    function addAdvertisementRow() {
-        const container = document.getElementById('advertisement-list');
-        const newRow = document.createElement('div');
-        newRow.className = "bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 relative group animate-in fade-in zoom-in duration-300";
-        
-        newRow.innerHTML = `
-            <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 p-1 bg-rose-500 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
-                <div class="md:col-span-4">
-                    <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Advertisement <span class="text-rose-500">*</span></label>
-                    <div class="relative h-32 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center gap-1.5 group/box hover:bg-slate-100 transition-all cursor-pointer overflow-hidden shadow-inner font-normal text-black uppercase tracking-widest text-[10px]">
-                        <input type="file" name="advertisements[]" class="absolute inset-0 opacity-0 cursor-pointer z-10">
-                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        <span>Choose Advertisement</span>
-                    </div>
-                </div>
-                <div class="md:col-span-8 flex flex-col justify-center">
-                    <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Advertisement Description</label>
-                    <textarea name="advertisement_desc[]" rows="4" placeholder="Enter advertisement description..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black resize-none h-[128px]"></textarea>
-                </div>
-            </div>
-        `;
-        container.appendChild(newRow);
-    }
-</script>
 @endsection
+

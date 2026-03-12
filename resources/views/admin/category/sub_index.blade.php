@@ -30,6 +30,8 @@
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">ID</th>
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Name</th>
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Parent Category</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Type</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Description</th>
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">Serial</th>
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status</th>
                         <th class="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Actions</th>
@@ -47,6 +49,16 @@
                                 {{ $sub['parent'] }}
                             </span>
                         </td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2 py-1 text-[11px] font-semibold rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                                {{ $sub['type'] ?? 'general' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 max-w-xs">
+                            <span class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                                {{ $sub['description'] ?? '—' }}
+                            </span>
+                        </td>
                         <td class="px-6 py-4 text-center">
                             <span class="text-sm font-bold text-black">{{ $sub['serial'] }}</span>
                         </td>
@@ -57,9 +69,16 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <button onclick="openEditSubModal({{ $counts[$sub['parent']] ?? 1 }})" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all" title="Edit">
+                                <button onclick="openEditSubModal({{ $sub['id'] }}, {{ $sub['parent_id'] }}, '{{ addslashes($sub['name']) }}', '{{ addslashes($sub['description'] ?? '') }}', '{{ $sub['rawStatus'] }}')" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all" title="Edit">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                 </button>
+                                <form action="{{ route('admin.categories.destroy', $sub['id']) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this sub category?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors" title="Delete">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
@@ -99,15 +118,15 @@
             </div>
 
             {{-- Modal Body --}}
-            <form action="#" method="POST" class="p-6 space-y-5">
+            <form action="{{ route('admin.categories.store') }}" method="POST" class="p-6 space-y-5">
                 @csrf
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Parent Category</label>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Parent Category <span class="text-rose-500">*</span></label>
                     <div class="relative">
-                        <select required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer">
+                        <select name="parent_id" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer">
                             <option value="" disabled selected>Select Parent Category</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category['id'] }}">{{ $category['name'] }}</option>
+                                <option value="{{ $category['id'] }}" {{ old('parent_id') == $category['id'] ? 'selected' : '' }}>{{ $category['name'] }}</option>
                             @endforeach
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
@@ -117,17 +136,22 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Sub Category Name</label>
-                    <input type="text" placeholder="e.g. AI & Robotics" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none">
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Sub Category Name <span class="text-rose-500">*</span></label>
+                    <input type="text" name="name" required value="{{ old('name') }}" placeholder="e.g. AI & Robotics" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Description</label>
+                    <textarea name="description" rows="3" placeholder="Short description" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white">{{ old('description') }}</textarea>
                 </div>
 
                 <div class="grid grid-cols-1 gap-4">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Status</label>
                         <div class="relative">
-                            <select class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer">
-                                <option>Active</option>
-                                <option>Inactive</option>
+                            <select name="status" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer">
+                                <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -164,15 +188,15 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <form action="#" method="POST" class="p-6 space-y-5">
+            <form id="editSubCategoryForm" action="" method="POST" class="p-6 space-y-5">
                 @csrf
                 @method('PUT')
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Parent Category</label>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Parent Category <span class="text-rose-500">*</span></label>
                     <div class="relative">
-                        <select required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer">
+                        <select name="parent_id" id="editSubParentId" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer">
                             @foreach($categories as $category)
-                                <option value="{{ $category['id'] }}" {{ $category['name'] == 'National' ? 'selected' : '' }}>{{ $category['name'] }}</option>
+                                <option value="{{ $category['id'] }}">{{ $category['name'] }}</option>
                             @endforeach
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
@@ -181,27 +205,20 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Sub Category Name</label>
-                    <input type="text" value="Politics" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none">
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Sub Category Name <span class="text-rose-500">*</span></label>
+                    <input type="text" name="name" id="editSubName" required class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Serial / Order</label>
-                        <div class="relative">
-                            <select id="editSerialSelect" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer">
-                                {{-- Options will be populated via JS --}}
-                            </select>
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
-                    </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Description</label>
+                    <textarea name="description" id="editSubDescription" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white"></textarea>
+                </div>
+                <div class="grid grid-cols-1 gap-4">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Status</label>
                         <div class="relative">
-                            <select class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer">
-                                <option selected>Active</option>
-                                <option>Inactive</option>
+                            <select name="status" id="editSubStatus" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -240,17 +257,20 @@
     function openSubModal() { toggleModal('addSubCategoryModal', 'subModalContainer', 'open'); }
     function closeSubModal() { toggleModal('addSubCategoryModal', 'subModalContainer', 'close'); }
 
-    function openEditSubModal(siblingCount) { 
-        const select = document.getElementById('editSerialSelect');
-        select.innerHTML = '';
-        for(let i = 1; i <= siblingCount; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.text = i;
-            select.appendChild(option);
-        }
+    function openEditSubModal(id, parent_id, name, description, status) { 
+        document.getElementById('editSubParentId').value = parent_id;
+        document.getElementById('editSubName').value = name;
+        document.getElementById('editSubDescription').value = description;
+        document.getElementById('editSubStatus').value = status;
+        document.getElementById('editSubCategoryForm').action = '/admin/categories/' + id;
         toggleModal('editSubCategoryModal', 'editSubModalContainer', 'open'); 
     }
     function closeEditSubModal() { toggleModal('editSubCategoryModal', 'editSubModalContainer', 'close'); }
+
+    @if($errors->any())
+        document.addEventListener('DOMContentLoaded', function () {
+            openSubModal();
+        });
+    @endif
 </script>
 @endsection

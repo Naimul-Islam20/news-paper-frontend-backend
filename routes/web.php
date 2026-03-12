@@ -5,11 +5,15 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserSettingsController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\Admin\ReporterController;
+use App\Http\Controllers\Admin\SubscribeController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\MetaController;
 
 // Default redirect to admin dashboard (will go to login if not authenticated)
 Route::get('/', function () {
@@ -49,42 +53,86 @@ Route::prefix('admin')
 
             Route::get('/categories', [CategoryController::class, 'index'])
                 ->name('categories.index');
+            Route::post('/categories', [CategoryController::class, 'store'])
+                ->name('categories.store');
+            Route::put('/categories/{id}', [CategoryController::class, 'update'])
+                ->name('categories.update');
+            Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])
+                ->name('categories.destroy');
 
-            Route::get('/sub-categories', [CategoryController::class, 'subCategoryIndex'])
+            Route::get('/sub-categories', [SubCategoryController::class, 'index'])
                 ->name('sub-categories.index');
 
             Route::get('/posts', [PostController::class, 'index'])
                 ->name('posts.index');
             Route::get('/posts/create', [PostController::class, 'create'])
                 ->name('posts.create');
+            Route::post('/posts', [PostController::class, 'store'])
+                ->name('posts.store');
+            Route::get('/posts/{id}/edit', [PostController::class, 'edit'])
+                ->name('posts.edit');
+            Route::put('/posts/{id}', [PostController::class, 'update'])
+                ->name('posts.update');
+            Route::delete('/posts/{id}', [PostController::class, 'destroy'])
+                ->name('posts.destroy');
 
             // Pages
             Route::get('/pages', [PageController::class, 'index'])
                 ->name('pages.index');
             Route::get('/pages/create', [PageController::class, 'create'])
                 ->name('pages.create');
+            Route::post('/pages', [PageController::class, 'store'])
+                ->name('pages.store');
+            Route::get('/pages/{id}/edit', [PageController::class, 'edit'])
+                ->name('pages.edit');
+            Route::put('/pages/{id}', [PageController::class, 'update'])
+                ->name('pages.update');
+            Route::delete('/pages/{id}', [PageController::class, 'destroy'])
+                ->name('pages.destroy');
 
             // Galleries
             Route::get('/galleries', [GalleryController::class, 'index'])
                 ->name('galleries.index');
             Route::get('/galleries/create', [GalleryController::class, 'create'])
                 ->name('galleries.create');
-            Route::get('/galleries/edit', [GalleryController::class, 'edit'])
+            Route::post('/galleries', [GalleryController::class, 'store'])
+                ->name('galleries.store');
+            Route::get('/galleries/{id}/edit', [GalleryController::class, 'edit'])
                 ->name('galleries.edit');
+            Route::put('/galleries/{id}', [GalleryController::class, 'update'])
+                ->name('galleries.update');
+            Route::delete('/galleries/{id}', [GalleryController::class, 'destroy'])
+                ->name('galleries.destroy');
+            Route::delete('/gallery-images/{imageId}', [GalleryController::class, 'destroyImage'])
+                ->name('galleries.images.destroy');
 
             // Videos
             Route::get('/videos', [VideoController::class, 'index'])
                 ->name('videos.index');
             Route::get('/videos/create', [VideoController::class, 'create'])
                 ->name('videos.create');
-            Route::get('/videos/edit', [VideoController::class, 'edit'])
+            Route::post('/videos', [VideoController::class, 'store'])
+                ->name('videos.store');
+            Route::get('/videos/{id}/edit', [VideoController::class, 'edit'])
                 ->name('videos.edit');
+            Route::put('/videos/{id}', [VideoController::class, 'update'])
+                ->name('videos.update');
+            Route::delete('/videos/{id}', [VideoController::class, 'destroy'])
+                ->name('videos.destroy');
 
             // Reporters
             Route::get('/reporters', [ReporterController::class, 'index'])
                 ->name('reporters.index');
             Route::get('/reporters/create', [ReporterController::class, 'create'])
                 ->name('reporters.create');
+            Route::post('/reporters', [ReporterController::class, 'store'])
+                ->name('reporters.store');
+            Route::get('/reporters/{id}/edit', [ReporterController::class, 'edit'])
+                ->name('reporters.edit');
+            Route::put('/reporters/{id}', [ReporterController::class, 'update'])
+                ->name('reporters.update');
+            Route::delete('/reporters/{id}', [ReporterController::class, 'destroy'])
+                ->name('reporters.destroy');
             // Advertisement
             Route::get('/advertisements', [App\Http\Controllers\Admin\AdvertisementController::class, 'index'])
                 ->name('advertisements.index');
@@ -96,5 +144,35 @@ Route::prefix('admin')
             // Statistics
             Route::get('/statistics/visitors', [App\Http\Controllers\Admin\StatisticsController::class, 'visitors'])
                 ->name('statistics.visitors');
+
+            // Subscribes
+            Route::get('/subscribes', [SubscribeController::class, 'index'])
+                ->name('subscribes.index');
+            Route::post('/subscribes', [SubscribeController::class, 'store'])
+                ->name('subscribes.store');
+
+            // Users
+            Route::get('/users', [UserController::class, 'index'])
+                ->name('users.index');
+            Route::get('/users/create', [UserController::class, 'create'])
+                ->name('users.create');
+            Route::post('/users', [UserController::class, 'store'])
+                ->name('users.store');
+            Route::get('/users/{id}/edit', [UserController::class, 'edit'])
+                ->name('users.edit');
+            Route::put('/users/{id}', [UserController::class, 'update'])
+                ->name('users.update');
+            Route::delete('/users/{id}', [UserController::class, 'destroy'])
+                ->name('users.destroy');
+
+            // Meta Settings
+            Route::get('/meta', [MetaController::class, 'index'])
+                ->name('meta.index');
+            Route::post('/meta', [MetaController::class, 'update'])
+                ->name('meta.update');
+            // Heartbeat
+            Route::get('/heartbeat', function() {
+                return response()->json(['status' => 'ok']);
+            })->name('heartbeat');
         });
     });

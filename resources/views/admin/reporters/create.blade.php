@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="py-1 w-full mx-auto">
-    <form action="#" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.reporters.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
         {{-- Unified Form Container --}}
@@ -15,25 +15,31 @@
                 {{-- Name --}}
                 <div>
                     <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Reporter Name <span class="text-rose-500">*</span></label>
-                    <input type="text" name="name" placeholder="Enter reporter name..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
+                    <input type="text" name="name" value="{{ old('name') }}" placeholder="Enter reporter name..." class="w-full px-4 py-2.5 rounded-xl border @error('name') border-rose-500 @else border-slate-200 dark:border-slate-800 @enderror bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
+                    @error('name')
+                        <p class="mt-1 text-xs text-rose-500 font-normal ml-0.5">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 {{-- Email --}}
                 <div>
                     <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Email Address <span class="text-rose-500">*</span></label>
-                    <input type="email" name="email" placeholder="reporer@example.com" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
+                    <input type="email" name="email" value="{{ old('email') }}" placeholder="reporer@example.com" class="w-full px-4 py-2.5 rounded-xl border @error('email') border-rose-500 @else border-slate-200 dark:border-slate-800 @enderror bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
+                    @error('email')
+                        <p class="mt-1 text-xs text-rose-500 font-normal ml-0.5">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 {{-- Number --}}
                 <div>
                     <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Phone Number</label>
-                    <input type="text" name="phone" placeholder="+880 1xxx xxxxxx" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
+                    <input type="text" name="phone" value="{{ old('phone') }}" placeholder="+880 1xxx xxxxxx" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
                 </div>
 
                 {{-- Address --}}
                 <div>
                     <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Address</label>
-                    <input type="text" name="address" placeholder="Enter full address..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
+                    <input type="text" name="address" value="{{ old('address') }}" placeholder="Enter full address..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
                 </div>
 
                 {{-- Reporter Image --}}
@@ -51,8 +57,8 @@
                     <label class="block text-[11px] font-normal text-black uppercase tracking-widest mb-1.5 ml-1">Account Status</label>
                     <div class="relative">
                         <select name="status" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-black cursor-pointer">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
+                            <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>

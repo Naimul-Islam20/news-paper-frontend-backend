@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="py-1 w-full mx-auto">
-    <form action="#" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.galleries.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
         <div class="max-w-4xl mx-auto space-y-6">
@@ -18,37 +18,47 @@
                 
                 <div class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Gallery Title <span class="text-rose-500">*</span></label>
-                            <input type="text" name="title" placeholder="Enter gallery title..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Gallery Title <span class="text-rose-500">*</span></label>
+                                <input type="text" name="title" required value="{{ old('title') }}" placeholder="Enter gallery title..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black">
+                                @error('title') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Gallery Description</label>
+                                <textarea name="description" rows="4" placeholder="Enter gallery description..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none font-normal text-black resize-none">{{ old('description') }}</textarea>
+                                @error('description') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Category <span class="text-rose-500">*</span></label>
                                 <div class="relative">
-                                    <select name="category" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer text-black">
-                                        <option value="" disabled selected>Select</option>
-                                        <option value="politics">Politics</option>
-                                        <option value="sports">Sports</option>
-                                        <option value="entertainment">Entertainment</option>
+                                    <select name="category_id" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer text-black">
+                                        <option value="" disabled selected>Select Category</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                        @endforeach
                                     </select>
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </div>
                                 </div>
+                                @error('category_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Status</label>
                                 <div class="relative">
                                     <select name="status" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer text-black">
-                                        <option value="active" selected>Active</option>
-                                        <option value="inactive">Inactive</option>
+                                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                     </select>
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </div>
                                 </div>
+                                @error('status') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                             </div>
                         </div>
                     </div>
@@ -62,11 +72,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
                         <div class="md:col-span-4">
                             <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Image <span class="text-rose-500">*</span></label>
-                            <div class="relative h-32 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center gap-1.5 group hover:bg-slate-100 transition-all cursor-pointer overflow-hidden shadow-inner font-normal text-black uppercase tracking-widest text-[10px]">
-                                <input type="file" name="images[]" class="absolute inset-0 opacity-0 cursor-pointer z-10">
-                                <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                <span>Choose Image</span>
+                            <div class="relative h-32 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center gap-1.5 group/box hover:bg-slate-100 transition-all cursor-pointer overflow-hidden shadow-inner font-normal text-black uppercase tracking-widest text-[10px]">
+                                <input type="file" required name="images[]" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImage(this)">
+                                <img src="" class="absolute inset-0 w-full h-full object-cover hidden preview-img">
+                                <div class="placeholder flex flex-col items-center justify-center gap-1.5">
+                                    <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                    <span>Choose Image</span>
+                                </div>
                             </div>
+                            @error('images.*') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
                         <div class="md:col-span-8 flex flex-col justify-center">
                             <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Image Description</label>
@@ -98,6 +112,22 @@
 </div>
 
 <script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const parent = input.closest('.relative');
+                const preview = parent.querySelector('.preview-img');
+                const placeholder = parent.querySelector('.placeholder');
+                
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     function addImageRow() {
         const container = document.getElementById('image-list');
         const newRow = document.createElement('div');
@@ -111,9 +141,12 @@
                 <div class="md:col-span-4">
                     <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Image <span class="text-rose-500">*</span></label>
                     <div class="relative h-32 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center gap-1.5 group/box hover:bg-slate-100 transition-all cursor-pointer overflow-hidden shadow-inner font-normal text-black uppercase tracking-widest text-[10px]">
-                        <input type="file" name="images[]" class="absolute inset-0 opacity-0 cursor-pointer z-10">
-                        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        <span>Choose Image</span>
+                        <input type="file" required name="images[]" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImage(this)">
+                        <img src="" class="absolute inset-0 w-full h-full object-cover hidden preview-img">
+                        <div class="placeholder flex flex-col items-center justify-center gap-1.5">
+                            <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span>Choose Image</span>
+                        </div>
                     </div>
                 </div>
                 <div class="md:col-span-8 flex flex-col justify-center">

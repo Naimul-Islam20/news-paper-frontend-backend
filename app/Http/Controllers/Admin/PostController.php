@@ -3,115 +3,140 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
+use App\Models\Category;
+use App\Models\Post;
+use App\Models\Reporter;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(): View
     {
-        return view('admin.posts.index');
+        $posts = Post::with(['categories', 'reporter'])->latest()->paginate(10);
+        return view('admin.posts.index', compact('posts'));
     }
 
-    public function create()
+    public function create(): View
     {
-        // Hierarchical Categories for the selection box
-        $categories = [
-            [
-                'id' => 1, 
-                'name' => 'National',
-                'sub_categories' => [
-                    ['id' => 101, 'name' => 'Politics'],
-                    ['id' => 102, 'name' => 'Economy'],
-                    ['id' => 103, 'name' => 'Education'],
-                ]
-            ],
-            [
-                'id' => 2, 
-                'name' => 'Sports',
-                'sub_categories' => [
-                    ['id' => 201, 'name' => 'Cricket'],
-                    ['id' => 202, 'name' => 'Football'],
-                ]
-            ],
-            [
-                'id' => 3, 
-                'name' => 'International',
-                'sub_categories' => [
-                    ['id' => 301, 'name' => 'Middle East'],
-                    ['id' => 302, 'name' => 'Europe'],
-                ]
-            ],
-            [
-                'id' => 4, 
-                'name' => 'Technology',
-                'sub_categories' => [
-                    ['id' => 401, 'name' => 'Mobile'],
-                    ['id' => 402, 'name' => 'AI & Robotics'],
-                    ['id' => 403, 'name' => 'Gadgets'],
-                ]
-            ],
-            [
-                'id' => 5, 
-                'name' => 'Economy',
-                'sub_categories' => [
-                    ['id' => 501, 'name' => 'Stock Market'],
-                    ['id' => 502, 'name' => 'Banking'],
-                ]
-            ],
-            [
-                'id' => 6, 
-                'name' => 'Entertainment',
-                'sub_categories' => [
-                    ['id' => 601, 'name' => 'Movie'],
-                    ['id' => 602, 'name' => 'Music'],
-                    ['id' => 603, 'name' => 'Television'],
-                ]
-            ],
-            [
-                'id' => 7, 
-                'name' => 'Health',
-                'sub_categories' => [
-                    ['id' => 701, 'name' => 'Fitness'],
-                    ['id' => 702, 'name' => 'Nutrition'],
-                ]
-            ],
-            [
-                'id' => 8, 
-                'name' => 'Education',
-                'sub_categories' => [
-                    ['id' => 801, 'name' => 'Admission'],
-                    ['id' => 802, 'name' => 'Scholarship'],
-                ]
-            ],
-            [
-                'id' => 9, 
-                'name' => 'Lifestyle',
-                'sub_categories' => [
-                    ['id' => 901, 'name' => 'Food'],
-                    ['id' => 902, 'name' => 'Travel'],
-                    ['id' => 903, 'name' => 'Fashion'],
-                ]
-            ],
-            [
-                'id' => 10, 
-                'name' => 'Environment',
-                'sub_categories' => []
-            ],
-            [
-                'id' => 11, 
-                'name' => 'Crime',
-                'sub_categories' => []
-            ],
-            [
-                'id' => 12, 
-                'name' => 'Archive',
-                'sub_categories' => []
-            ],
-        ];
+        // Get only root categories with their sub-categories where type is 'post'
+        $categories = Category::whereNull('parent_id')
+            ->where('status', 'active')
+            ->where('type', 'post')
+            ->with(['subCategories' => function($query) {
+                $query->where('status', 'active')->where('type', 'post');
+            }])
+            ->get();
 
-        $divisions = ['Dhaka', 'Chittagong', 'Rajshahi', 'Khulna', 'Barisal', 'Sylhet', 'Rangpur', 'Mymensingh'];
-        $districts = ['Dhaka', 'Gazipur', 'Narayanganj', 'Chittagong', 'Cox\'s Bazar', 'Sylhet'];
+        $reporters = Reporter::where('status', 'active')->orderBy('name')->get();
 
-        return view('admin.posts.create', compact('categories', 'divisions', 'districts'));
+        return view('admin.posts.create', compact('categories', 'reporters'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title'              => 'required|string|max:255',
+            'sub_title'          => 'nullable|string|max:255',
+            'categories'         => 'nullable|array',
+            'categories.*'       => 'exists:categories,id',
+            'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'image_caption'      => 'nullable|string',
+            'description'        => 'nullable|string',
+            'reporter_id'        => 'nullable|exists:reporters,id',
+            'seo_keywords'       => 'nullable|string',
+            'status'             => 'required|in:published,draft,pending',
+            'main_section_layer' => 'nullable|string',
+        ]);
+
+        $data = $request->only([
+            'title', 'sub_title', 'description', 'image_caption',
+            'reporter_id', 'seo_keywords', 'status', 'main_section_layer'
+        ]);
+
+        // Generate slug from SEO Keywords. If user emptied it, fallback to title.
+        $slugBase = $request->seo_keywords ?: $request->title;
+        $data['slug'] = Str::slug($slugBase);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('posts', 'public');
+        }
+
+        $post = Post::create($data);
+
+        if ($request->categories) {
+            $post->categories()->attach($request->categories);
+        }
+
+        return redirect()->route('admin.posts.index')->with('success', 'Post published successfully!');
+    }
+
+    public function edit($id): View
+    {
+        $post = Post::with('categories')->findOrFail($id);
+        
+        $categories = Category::whereNull('parent_id')
+            ->where('status', 'active')
+            ->where('type', 'post')
+            ->with(['subCategories' => function($query) {
+                $query->where('status', 'active')->where('type', 'post');
+            }])
+            ->get();
+
+        $reporters = Reporter::where('status', 'active')->orderBy('name')->get();
+
+        return view('admin.posts.edit', compact('post', 'categories', 'reporters'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $post = Post::findOrFail($id);
+
+        $request->validate([
+            'title'              => 'required|string|max:255',
+            'sub_title'          => 'nullable|string|max:255',
+            'categories'         => 'nullable|array',
+            'categories.*'       => 'exists:categories,id',
+            'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'image_caption'      => 'nullable|string',
+            'description'        => 'nullable|string',
+            'reporter_id'        => 'nullable|exists:reporters,id',
+            'seo_keywords'       => 'nullable|string',
+            'status'             => 'required|in:published,draft,pending',
+            'main_section_layer' => 'nullable|string',
+        ]);
+
+        $data = $request->only([
+            'title', 'sub_title', 'description', 'image_caption',
+            'reporter_id', 'seo_keywords', 'status', 'main_section_layer'
+        ]);
+
+        $slugBase = $request->seo_keywords ?: $request->title;
+        $data['slug'] = Str::slug($slugBase);
+
+        if ($request->hasFile('image')) {
+            if ($post->image) {
+                Storage::disk('public')->delete($post->image);
+            }
+            $data['image'] = $request->file('image')->store('posts', 'public');
+        }
+
+        $post->update($data);
+
+        $post->categories()->sync($request->categories ?? []);
+
+        return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $post = Post::findOrFail($id);
+        if ($post->image) {
+            Storage::disk('public')->delete($post->image);
+        }
+        $post->delete();
+        return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully!');
     }
 }
