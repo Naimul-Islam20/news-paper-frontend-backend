@@ -1,13 +1,118 @@
+@import url('https://fonts.maateen.me/solaiman-lipi/font.css');
 @import 'tailwindcss';
 
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../../app/**/*.php";
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@custom-variant dark (&:where(.dark &));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'SolaimanLipi', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-serif: 'SolaimanLipi', ui-serif, Georgia, serif;
+    
+    --container-max: 1300px;
 }
+
+@utility container {
+    display: block;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+@media (width >= 640px) {
+    .container {
+        max-width: 640px;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+@media (width >= 768px) {
+    .container {
+        max-width: 768px;
+    }
+}
+
+@media (width >= 1024px) {
+    .container {
+        max-width: 1024px;
+    }
+}
+
+@media (width >= 1280px) {
+    .container {
+        max-width: 1280px;
+    }
+}
+
+@media (width >= 1380px) {
+    .container {
+        max-width: var(--container-max);
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+@utility no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@utility text-desc {
+    color: #666666;
+}
+
+@utility text-title {
+    color: #212121;
+}
+
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+@utility img-placeholder {
+    background: #f1f5f9;
+    background-image: linear-gradient(to right, #f1f5f9 0%, #e2e8f0 20%, #f1f5f9 40%, #f1f5f9 100%);
+    background-repeat: no-repeat;
+    background-size: 1000px 100%;
+    animation: shimmer 2.5s infinite linear forwards;
+    position: relative;
+    border-radius: 0 !important;
+    overflow: hidden;
+
+    &::after {
+        content: "দ্য ডেইলি নিউজ";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #cbd5e1;
+        opacity: 0.5;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        pointer-events: none;
+    }
+}
+
+@utility border-custom {
+    border-color: var(--color-gray-400, #ffff);
+}
+
+img {
+    border: none !important;
+    outline: none !important;
+}
+

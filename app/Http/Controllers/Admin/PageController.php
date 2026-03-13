@@ -20,7 +20,21 @@ class PageController extends Controller
 
     public function create(): View
     {
-        $categories = Category::where('type', 'page')->where('status', 'active')->orderBy('name')->get();
+        // For new pages, only show page-type categories that don't already
+        // have a page assigned, so one category => one static page.
+        $usedCategoryIds = Page::pluck('category_id')
+            ->filter()
+            ->unique()
+            ->toArray();
+
+        $categories = Category::where('type', 'page')
+            ->where('status', 'active')
+            ->when(!empty($usedCategoryIds), function ($query) use ($usedCategoryIds) {
+                $query->whereNotIn('id', $usedCategoryIds);
+            })
+            ->orderBy('name')
+            ->get();
+
         return view('admin.pages.create', compact('categories'));
     }
 
@@ -28,23 +42,21 @@ class PageController extends Controller
     {
         $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'title'       => 'required|string|max:255',
+            'title'       => 'nullable|string|max:255',
             'content'     => 'nullable|string',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'status'      => 'required|in:active,inactive',
         ]);
 
-        // Unique slug
-        $slug = Str::slug($request->title);
-        $base = $slug;
-        $i = 1;
-        while (Page::where('slug', $slug)->exists()) {
-            $slug = $base . '-' . $i++;
-        }
+        // Slug will be based on the selected category (page-type category),
+        // so that each page URL matches its category.
+        $category = Category::findOrFail($request->category_id);
+        $slug = $category->slug ?: Str::slug($category->name);
 
         $data = [
             'category_id' => $request->category_id,
-            'title'       => $request->title,
+            // If title is not provided, fall back to category name
+            'title'       => $request->title ?: $category->name,
             'slug'        => $slug,
             'content'     => $request->content,
             'status'      => $request->status,
@@ -72,16 +84,22 @@ class PageController extends Controller
 
         $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'title'       => 'required|string|max:255',
+            'title'       => 'nullable|string|max:255',
             'content'     => 'nullable|string',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'status'      => 'required|in:active,inactive',
         ]);
 
         $page->category_id = $request->category_id;
-        $page->title       = $request->title;
         $page->content     = $request->content;
         $page->status      = $request->status;
+
+        // Keep slug in sync with page category so that
+        // /page/{slug} always matches the category slug.
+        $category = Category::findOrFail($request->category_id);
+        $page->slug = $category->slug ?: Str::slug($category->name);
+        // If title left empty, fall back to category name
+        $page->title = $request->title ?: $category->name;
 
         if ($request->hasFile('image')) {
             if ($page->image) {

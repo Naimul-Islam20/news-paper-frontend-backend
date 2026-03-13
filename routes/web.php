@@ -14,11 +14,32 @@ use App\Http\Controllers\Admin\ReporterController;
 use App\Http\Controllers\Admin\SubscribeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\MetaController;
+use App\Http\Controllers\Admin\LayoutController;
+use App\Http\Controllers\Frontend\HomeController as FrontendHomeController;
+use App\Http\Controllers\Frontend\PostController as FrontendPostController;
+use App\Http\Controllers\Frontend\CategoryController as FrontendCategoryController;
+use App\Http\Controllers\Frontend\PageController as FrontendPageController;
+use App\Http\Controllers\Frontend\GalleryController as FrontendGalleryController;
+use App\Http\Controllers\Frontend\VideoController as FrontendVideoController;
 
-// Default redirect to admin dashboard (will go to login if not authenticated)
-Route::get('/', function () {
-    return redirect()->route('admin.dashboard');
-});
+// Public frontend routes (all non-admin, non-API pages)
+Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
+Route::get('/news/{slug}', [FrontendPostController::class, 'show'])->name('news.show');
+Route::get('/category/{slug}', [FrontendCategoryController::class, 'show'])->name('category.show');
+Route::get('/page/{slug}', [FrontendPageController::class, 'show'])->name('page.show');
+Route::get('/gallery/{slug}', [FrontendGalleryController::class, 'show'])->name('gallery.show');
+Route::get('/video/{slug}', [FrontendVideoController::class, 'show'])->name('videos.show');
+
+// Static pages copied from the news-paper frontend project
+Route::view('/national', 'national');
+Route::view('/special-news', 'special-news');
+Route::view('/news-details', 'news-details');
+Route::view('/gallery', 'gallery')->name('gallery.index');
+Route::view('/gallery-details', 'gallery-details');
+Route::view('/videos', 'videos')->name('videos.index');
+Route::view('/video-details', 'video-details');
+Route::view('/terms', 'terms')->name('terms');
+Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 
 // Fallback login route name that Laravel's auth middleware expects
 Route::get('/login', function () {
@@ -170,8 +191,16 @@ Route::prefix('admin')
                 ->name('meta.index');
             Route::post('/meta', [MetaController::class, 'update'])
                 ->name('meta.update');
+
+            // Layout Settings
+            Route::get('/layout/frontend', [LayoutController::class, 'frontend'])
+                ->name('layout.frontend');
+            Route::post('/layout/frontend', [LayoutController::class, 'saveFrontend'])
+                ->name('layout.frontend.save');
+            Route::get('/layout/home', [LayoutController::class, 'home'])
+                ->name('layout.home');
             // Heartbeat
-            Route::get('/heartbeat', function() {
+            Route::get('/heartbeat', function () {
                 return response()->json(['status' => 'ok']);
             })->name('heartbeat');
         });

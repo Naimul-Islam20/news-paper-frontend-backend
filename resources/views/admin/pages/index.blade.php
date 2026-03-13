@@ -16,13 +16,6 @@
             </a>
         </div>
 
-        {{-- Success Message --}}
-        @if(session('success'))
-            <div class="mb-4 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-lg text-sm text-emerald-700 dark:text-emerald-400">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse border-x border-slate-200 dark:border-slate-700">
                 <thead class="bg-slate-50 dark:bg-slate-900/50">

@@ -15,10 +15,10 @@ class Category extends Model
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
-    // Sub-categories
+    // Sub-categories (no recursive eager loading)
     public function children()
     {
-        return $this->hasMany(Category::class, 'parent_id')->with('children');
+        return $this->hasMany(Category::class, 'parent_id');
     }
 
     public function subCategories()

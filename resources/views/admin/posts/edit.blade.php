@@ -34,29 +34,18 @@
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Categories</label>
                             <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 max-h-[300px] overflow-y-auto shadow-inner">
                                 <div class="columns-1 md:columns-2 gap-x-12">
-                                    @php
-                                        $selectedCategories = $post->categories->pluck('id')->toArray();
-                                    @endphp
+                                    @php $selectedCategories = $post->categories->pluck('id')->toArray(); @endphp
                                     @forelse($categories as $category)
-                                        <div class="break-inside-avoid mb-4">
-                                            <label class="flex items-center gap-2 cursor-pointer group py-0.5">
-                                                <input type="checkbox" name="categories[]" value="{{ $category->id }}" {{ in_array($category->id, $selectedCategories) ? 'checked' : '' }} class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
-                                                <span class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-all">{{ $category->name }}</span>
+                                        <div class="break-inside-avoid mb-2">
+                                            <label class="flex items-center gap-2 cursor-pointer group py-1 px-2 rounded hover:bg-indigo-50 transition-all">
+                                                <input type="checkbox" name="categories[]" value="{{ $category->id }}"
+                                                    {{ in_array($category->id, $selectedCategories) ? 'checked' : '' }}
+                                                    class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                                <span class="text-sm font-medium text-slate-900 dark:text-white group-hover:text-indigo-600 transition-all">{{ $category->name }}</span>
                                             </label>
-
-                                            @if($category->subCategories->count() > 0)
-                                                <div class="ml-6 space-y-1 mt-1 border-l-2 border-slate-200 pl-3">
-                                                    @foreach($category->subCategories as $sub)
-                                                        <label class="flex items-center gap-2 cursor-pointer group py-0.5">
-                                                            <input type="checkbox" name="categories[]" value="{{ $sub->id }}" {{ in_array($sub->id, $selectedCategories) ? 'checked' : '' }} class="w-3.5 h-3.5 rounded border-slate-300 text-indigo-500 focus:ring-indigo-400">
-                                                            <span class="text-xs font-normal text-slate-600 dark:text-slate-400 group-hover:text-indigo-500 transition-all">{{ $sub->name }}</span>
-                                                        </label>
-                                                    @endforeach
-                                                </div>
-                                            @endif
                                         </div>
                                     @empty
-                                        <p class="text-xs text-slate-400">No categories found.</p>
+                                        <p class="text-xs text-slate-400">No post-type categories found. Please add categories with type "Post" first.</p>
                                     @endforelse
                                 </div>
                             </div>

@@ -16,10 +16,10 @@
                     {{-- Left Column: Settings --}}
                     <div class="lg:col-span-4 space-y-6">
 
-                        {{-- Title --}}
+                        {{-- Title (optional, falls back to category name) --}}
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 dark:text-white mb-2 ml-0.5">Page Title <span class="text-rose-500">*</span></label>
-                            <input type="text" name="title" required value="{{ old('title', $page->title) }}" placeholder="Enter page title..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 dark:text-white dark:bg-slate-950 text-sm">
+                            <label class="block text-sm font-normal text-slate-900 dark:text-white mb-2 ml-0.5">Page Title</label>
+                            <input type="text" name="title" value="{{ old('title', $page->title) }}" placeholder="Optional; if empty, category name will be used" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 dark:text-white dark:bg-slate-950 text-sm">
                             @error('title') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 

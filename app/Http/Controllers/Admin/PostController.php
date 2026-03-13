@@ -21,13 +21,9 @@ class PostController extends Controller
 
     public function create(): View
     {
-        // Get only root categories with their sub-categories where type is 'post'
-        $categories = Category::whereNull('parent_id')
+        $categories = Category::where('type', 'post')
             ->where('status', 'active')
-            ->where('type', 'post')
-            ->with(['subCategories' => function($query) {
-                $query->where('status', 'active')->where('type', 'post');
-            }])
+            ->orderBy('name')
             ->get();
 
         $reporters = Reporter::where('status', 'active')->orderBy('name')->get();
@@ -76,13 +72,10 @@ class PostController extends Controller
     public function edit($id): View
     {
         $post = Post::with('categories')->findOrFail($id);
-        
-        $categories = Category::whereNull('parent_id')
+
+        $categories = Category::where('type', 'post')
             ->where('status', 'active')
-            ->where('type', 'post')
-            ->with(['subCategories' => function($query) {
-                $query->where('status', 'active')->where('type', 'post');
-            }])
+            ->orderBy('name')
             ->get();
 
         $reporters = Reporter::where('status', 'active')->orderBy('name')->get();

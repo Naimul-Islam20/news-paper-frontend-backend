@@ -71,8 +71,16 @@
                         <td class="py-3 px-4 text-right">
                             <div class="flex items-center justify-end gap-1">
                                 <button
-                                    onclick="openEditModal({{ $category->id }}, '{{ addslashes($category->name) }}', '{{ $category->type ?? 'post' }}', '{{ addslashes($category->description ?? '') }}', '{{ $category->status }}')"
-                                    class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-colors" title="Edit">
+                                    type="button"
+                                    class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-colors category-edit-btn"
+                                    title="Edit"
+                                    data-id="{{ $category->id }}"
+                                    data-name="{{ $category->name }}"
+                                    data-type="{{ $category->type ?? 'post' }}"
+                                    data-description="{{ $category->description ?? '' }}"
+                                    data-status="{{ $category->status }}"
+                                    data-slug="{{ $category->slug }}"
+                                >
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                 </button>
                                 <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this category and all its sub categories?')">
@@ -119,7 +127,11 @@
                 @csrf
                 <div>
                     <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Category Name <span class="text-rose-500">*</span></label>
-                    <input type="text" name="name" required placeholder="e.g. National" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white">
+                    <input type="text" name="name" id="addCategoryName" required placeholder="e.g. National" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Slug</label>
+                    <input type="text" name="slug" id="addCategorySlug" placeholder="auto-generated from name if left empty" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-500 dark:text-slate-400">
                 </div>
                 <div>
                     <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Category Type <span class="text-rose-500">*</span></label>
@@ -184,6 +196,10 @@
                     <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Category Name <span class="text-rose-500">*</span></label>
                     <input type="text" name="name" id="editCategoryName" required class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white">
                 </div>
+                <div>
+                    <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Slug</label>
+                    <input type="text" name="slug" id="editCategorySlug" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-500 dark:text-slate-400">
+                </div>
                 <div id="editCategoryTypeBlock">
                     <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Category Type <span class="text-rose-500">*</span></label>
                     <div class="relative">
@@ -237,11 +253,12 @@
         setTimeout(() => { modal.classList.add('hidden'); }, 300);
     }
 
-    function openEditModal(id, name, type, description, status, isSubCategory = false) {
+    function openEditModal(id, name, type, description, status, isSubCategory = false, slug = '') {
         document.getElementById('editCategoryName').value = name;
         document.getElementById('editCategoryType').value = type;
         document.getElementById('editCategoryDescription').value = description;
         document.getElementById('editCategoryStatus').value = status;
+        document.getElementById('editCategorySlug').value = slug || '';
         document.getElementById('editCategoryForm').action = '/admin/categories/' + id;
         
         // Hide type selector if it's a sub category (inherits from parent)
@@ -257,6 +274,51 @@
 
         openModal('editCategoryModal', 'editModalContainer');
     }
+
+    // Simple slugify helper (Unicode-friendly: keeps Bangla chars)
+    function slugify(str) {
+        return str
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+
+    // Auto-generate slug on create modal
+    (function () {
+        const nameInput = document.getElementById('addCategoryName');
+        const slugInput = document.getElementById('addCategorySlug');
+        if (!nameInput || !slugInput) return;
+
+        let slugManuallyChanged = false;
+        slugInput.addEventListener('input', function () {
+            slugManuallyChanged = this.value.length > 0;
+        });
+
+        nameInput.addEventListener('input', function () {
+            if (!slugManuallyChanged || slugInput.value.length === 0) {
+                slugInput.value = slugify(nameInput.value);
+            }
+        });
+    })();
+
+    // Attach click handlers to edit buttons (using data-* attributes)
+    (function () {
+        const buttons = document.querySelectorAll('.category-edit-btn');
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const name = this.dataset.name || '';
+                const type = this.dataset.type || 'post';
+                const description = this.dataset.description || '';
+                const status = this.dataset.status || 'active';
+                const slug = this.dataset.slug || '';
+                openEditModal(id, name, type, description, status, false, slug);
+            });
+        });
+    })();
 </script>
 
 

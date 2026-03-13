@@ -68,23 +68,7 @@ class HomepageController extends Controller
             ->where('status', 'active')
             ->latest()
             ->take(5)
-            ->get()
-            ->map(function (Gallery $gallery) {
-                return [
-                    'id' => $gallery->id,
-                    'title' => $gallery->title,
-                    'slug' => $gallery->slug,
-                    'category' => optional($gallery->category)->name,
-                    'description' => $gallery->description,
-                    'images' => $gallery->images->take(6)->map(function ($image) {
-                        return [
-                            'id' => $image->id,
-                            'url' => $image->image,
-                            'caption' => $image->description,
-                        ];
-                    })->values(),
-                ];
-            })->values();
+            ->get();
 
         // Videos: one main and a list
         $mainVideo = Video::with('category')
@@ -102,9 +86,7 @@ class HomepageController extends Controller
         // Simple advertisements list (schema is minimal for now)
         $ads = Advertisement::query()
             ->orderBy('id')
-            ->get()
-            ->map(fn ($ad) => ['id' => $ad->id])
-            ->values();
+            ->get();
 
         $payload = [
             'meta' => [

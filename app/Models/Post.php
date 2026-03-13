@@ -7,9 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
     protected $fillable = [
-        'title', 'sub_title', 'slug', 'description', 
-        'image', 'image_caption', 'reporter_id', 
-        'seo_keywords', 'status', 'main_section_layer'
+        'title',
+        'sub_title',
+        'slug',
+        'description',
+        'image',
+        'image_caption',
+        'reporter_id',
+        'seo_keywords',
+        'status',
+        'main_section_layer',
+        'views',
+    ];
+
+    protected $casts = [
+        'views' => 'integer',
     ];
 
     public function reporter()
