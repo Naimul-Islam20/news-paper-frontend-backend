@@ -12,7 +12,7 @@ class AdminAuthController extends Controller
 {
     public function showLoginForm()
     {
-        if (Auth::check() && in_array(Auth::user()->role, ['admin', 'editor', 'reporter'], true)) {
+        if (Auth::check() && in_array(Auth::user()->role, ['admin', 'senior editor', 'sub editor'], true)) {
             return redirect()->route('admin.dashboard');
         }
 
@@ -36,7 +36,7 @@ class AdminAuthController extends Controller
 
         $request->session()->regenerate();
 
-        if (! in_array(Auth::user()->role, ['admin', 'editor', 'reporter'], true)) {
+        if (! in_array(Auth::user()->role, ['admin', 'senior editor', 'sub editor'], true)) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();

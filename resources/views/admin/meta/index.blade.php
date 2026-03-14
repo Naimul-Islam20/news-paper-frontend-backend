@@ -6,6 +6,20 @@
 @section('content')
 <div class="py-1 w-full mx-auto">
     <div class="max-w-6xl mx-auto">
+        @if(session('success'))
+        <div class="mb-4 p-4 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 font-medium">
+            {{ session('success') }}
+        </div>
+        @endif
+        @if($errors->any())
+        <div class="mb-4 p-4 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 font-medium">
+            <ul class="list-disc list-inside space-y-1 text-sm">
+                @foreach($errors->all() as $err)
+                <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
         <form action="{{ route('admin.meta.update') }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             @csrf
             
@@ -22,23 +36,23 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Website Name</label>
-                            <input type="text" name="site_name" placeholder="E.g. My Newspaper" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="site_name" value="{{ old('site_name', $meta->site_name ?? '') }}" placeholder="E.g. My Newspaper" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Website Title</label>
-                            <input type="text" name="site_title" placeholder="SEO Title" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="site_title" value="{{ old('site_title', $meta->site_title ?? '') }}" placeholder="SEO Title" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Website Keywords</label>
-                            <input type="text" name="site_keywords" placeholder="Keyword1, Keyword2, Keyword3" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="site_keywords" value="{{ old('site_keywords', $meta->site_keywords ?? '') }}" placeholder="Keyword1, Keyword2, Keyword3" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Email</label>
-                            <input type="email" name="site_email" placeholder="info@example.com" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="email" name="site_email" value="{{ old('site_email', $meta->site_email ?? '') }}" placeholder="info@example.com" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Contact Number</label>
-                            <input type="text" name="site_number" placeholder="+880123456789" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="site_number" value="{{ old('site_number', $meta->site_number ?? '') }}" placeholder="+880123456789" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
 
                         {{-- Logo & Icon --}}
@@ -46,24 +60,30 @@
                             <div>
                                 <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Website Logo</label>
                                 <div class="relative h-24 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center gap-1.5 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-[10px] shadow-sm">
-                                    <input type="file" name="site_logo" class="absolute inset-0 opacity-0 cursor-pointer z-10">
-                                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    <span>Upload Logo</span>
+                                    <input type="file" name="site_logo" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10">
+                                    @if(!empty($meta->site_logo))
+                                    <img src="{{ asset('storage/'.$meta->site_logo) }}" alt="Logo" class="absolute inset-0 w-full h-full object-contain p-1">
+                                    @endif
+                                    <svg class="w-5 h-5 text-indigo-500 {{ !empty($meta->site_logo) ? 'opacity-50' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <span>{{ !empty($meta->site_logo) ? 'Change Logo' : 'Upload Logo' }}</span>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Website Icon (Favicon)</label>
                                 <div class="relative h-24 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center gap-1.5 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-[10px] shadow-sm">
-                                    <input type="file" name="site_icon" class="absolute inset-0 opacity-0 cursor-pointer z-10">
-                                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    <span>Upload Icon</span>
+                                    <input type="file" name="site_icon" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10">
+                                    @if(!empty($meta->site_icon))
+                                    <img src="{{ asset('storage/'.$meta->site_icon) }}" alt="Favicon" class="absolute inset-0 w-full h-full object-contain p-1">
+                                    @endif
+                                    <svg class="w-5 h-5 text-indigo-500 {{ !empty($meta->site_icon) ? 'opacity-50' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <span>{{ !empty($meta->site_icon) ? 'Change Icon' : 'Upload Icon' }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="md:col-span-2">
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Website Description</label>
-                            <textarea name="site_description" rows="3" placeholder="Brief website description..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm"></textarea>
+                            <textarea name="site_description" rows="3" placeholder="Brief website description..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">{{ old('site_description', $meta->site_description ?? '') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -80,19 +100,19 @@
                     <div id="social-links-container" class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Facebook Link</label>
-                            <input type="text" name="facebook_link" placeholder="https://facebook.com/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="facebook_link" value="{{ old('facebook_link', $meta->facebook_link ?? '') }}" placeholder="https://facebook.com/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Twitter Link</label>
-                            <input type="text" name="twitter_link" placeholder="https://twitter.com/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="twitter_link" value="{{ old('twitter_link', $meta->twitter_link ?? '') }}" placeholder="https://twitter.com/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Instagram Link</label>
-                            <input type="text" name="instagram_link" placeholder="https://instagram.com/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="instagram_link" value="{{ old('instagram_link', $meta->instagram_link ?? '') }}" placeholder="https://instagram.com/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">YouTube Link</label>
-                            <input type="text" name="youtube_link" placeholder="https://youtube.com/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="youtube_link" value="{{ old('youtube_link', $meta->youtube_link ?? '') }}" placeholder="https://youtube.com/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                     </div>
                     
@@ -116,11 +136,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Map Link</label>
-                            <input type="text" name="map_link" placeholder="https://google.com/maps/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="map_link" value="{{ old('map_link', $meta->map_link ?? '') }}" placeholder="https://google.com/maps/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Map Description</label>
-                            <input type="text" name="map_desc" placeholder="Location description..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="map_desc" value="{{ old('map_desc', $meta->map_desc ?? '') }}" placeholder="Location description..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                     </div>
                 </div>
@@ -137,7 +157,7 @@
                     <div class="space-y-4">
                         <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Address 1</label>
                         <div class="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-white shadow-sm">
-                            <textarea id="editor" name="address_1" placeholder="Enter full address here..."></textarea>
+                            <textarea id="editor" name="address_1" placeholder="Enter full address here...">{{ old('address_1', $meta->address_1 ?? '') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -154,11 +174,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">সম্পাদক (Editor Name)</label>
-                            <input type="text" name="editor_name" placeholder="সম্পাদকের নাম লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="editor_name" value="{{ old('editor_name', $meta->editor_name ?? '') }}" placeholder="সম্পাদকের নাম লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">প্রকাশক (Publisher Name)</label>
-                            <input type="text" name="publisher_name" placeholder="প্রকাশকের নাম লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <input type="text" name="publisher_name" value="{{ old('publisher_name', $meta->publisher_name ?? '') }}" placeholder="প্রকাশকের নাম লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                     </div>
                 </div>

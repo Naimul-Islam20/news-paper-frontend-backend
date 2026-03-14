@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Gallery;
+use App\Models\HomeLayoutSection;
+use App\Models\Post;
+use App\Models\Video;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -12,8 +16,149 @@ class HomeController extends Controller
      */
     public function index(): View
     {
-        // Use the imported frontend homepage from the original news-paper project.
-        return view('welcome');
+        $slotConfig = config('home_layout.slots', []);
+
+        // Hero layers 1-4
+        $heroLayers = [];
+        for ($layer = 1; $layer <= 4; $layer++) {
+            $key   = "hero_layer_{$layer}";
+            $limit = $slotConfig[$key] ?? 1;
+
+            $heroLayers[$key] = Post::query()
+                ->with('categories.parent')
+                ->where('status', 'published')
+                ->where('hero_layer', $layer)
+                ->latest('updated_at')
+                ->limit($limit)
+                ->get();
+        }
+
+        // Mini section (category-based, using HomeLayoutSection)
+        $miniSection = HomeLayoutSection::where('key', 'section-mini')->first();
+        $miniPosts   = collect();
+
+        if ($miniSection && $miniSection->category_id) {
+            $miniLimit = $slotConfig['mini_section'] ?? 3;
+
+            $miniPosts = Post::with('categories.parent')
+                ->whereHas('categories', function ($q) use ($miniSection) {
+                    $q->where('categories.id', $miniSection->category_id);
+                })
+                ->where('status', 'published')
+                ->latest('created_at')
+                ->limit($miniLimit)
+                ->get();
+        }
+
+        // Post-based section keys (ভিডিও ও গ্যালারি আলাদা সিস্টেম, এখানে নাই)
+        $postSectionKeys = [
+            'section-politics',
+            'section-national',
+            'section-capital',
+            'section-sports',
+            'section-countrywide',
+            'section-world',
+            'section-entertainment',
+            'section-lifestyle',
+            'section-tech',
+            'section-different-eye',
+            'section-generation',
+            'section-campus',
+            'section-job',
+        ];
+
+        $sectionKeys = array_merge($postSectionKeys, ['section-video', 'section-gallery']);
+        $sections = HomeLayoutSection::with(['category.parent', 'category.subCategories'])
+            ->whereIn('key', $sectionKeys)
+            ->get()
+            ->keyBy('key');
+
+        $sectionPosts = [];
+
+        foreach ($sections as $key => $section) {
+            // ভিডিও ও গ্যালারি আলাদা মডেল থেকে লোড হবে, পোস্ট লুপে নাই
+            if ($key === 'section-video' || $key === 'section-gallery') {
+                $sectionPosts[$key] = collect();
+                continue;
+            }
+
+            if (! $section->category_id) {
+                $sectionPosts[$key] = collect();
+                continue;
+            }
+
+            $categoryIds = [$section->category_id];
+            if ($section->category && $section->category->subCategories->isNotEmpty()) {
+                $categoryIds = array_merge(
+                    $categoryIds,
+                    $section->category->subCategories->pluck('id')->all()
+                );
+            }
+
+            $limit = $slotConfig[$key] ?? 4;
+
+            $sectionPosts[$key] = Post::with('categories.parent')
+                ->whereHas('categories', function ($q) use ($categoryIds) {
+                    $q->whereIn('categories.id', $categoryIds);
+                })
+                ->where('status', 'published')
+                ->latest('created_at')
+                ->limit($limit)
+                ->get();
+        }
+
+        // section-video: ভিডিও টাইপের ডেটা শুধু Video মডেল থেকে (যে ক্যাটাগরি লেআউটে সিলেক্ট করা)
+        $sectionVideos = collect();
+        $videoSection = $sections->get('section-video');
+        if ($videoSection && $videoSection->category_id) {
+            $videoLimit = $slotConfig['section-video'] ?? 4;
+            $sectionVideos = Video::with('category')
+                ->where('category_id', $videoSection->category_id)
+                ->where('status', 'active')
+                ->latest('created_at')
+                ->limit($videoLimit)
+                ->get();
+        }
+
+        // section-gallery: গ্যালারি টাইপের ডেটা শুধু Gallery মডেল থেকে (যে ক্যাটাগরি লেআউটে সিলেক্ট করা)
+        $sectionGalleries = collect();
+        $gallerySection = $sections->get('section-gallery');
+        if ($gallerySection && $gallerySection->category_id) {
+            $galleryLimit = $slotConfig['section-gallery'] ?? 4;
+            $sectionGalleries = Gallery::with('images')
+                ->where('category_id', $gallerySection->category_id)
+                ->where('status', 'active')
+                ->latest('created_at')
+                ->limit($galleryLimit)
+                ->get();
+        }
+
+        // ২ নং সেকশনের শেষ কলাম: সর্বশেষ (লেটেস্ট ৬ পোস্ট, পোস্ট-টাইপ ক্যাটাগরি) ও পঠিত (ভিউ অনুযায়ী টপ ৬)
+        $latestSidebarPosts = Post::with('categories.parent')
+            ->where('status', 'published')
+            ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
+            ->latest('created_at')
+            ->limit(6)
+            ->get();
+        $popularSidebarPosts = Post::with('categories.parent')
+            ->where('status', 'published')
+            ->orderByDesc('views')
+            ->limit(6)
+            ->get();
+
+        return view('welcome', [
+            'hero_layer_1_posts' => $heroLayers['hero_layer_1'] ?? collect(),
+            'hero_layer_2_posts' => $heroLayers['hero_layer_2'] ?? collect(),
+            'hero_layer_3_posts' => $heroLayers['hero_layer_3'] ?? collect(),
+            'hero_layer_4_posts' => $heroLayers['hero_layer_4'] ?? collect(),
+            'mini_posts'         => $miniPosts,
+            'sectionPosts'       => $sectionPosts,
+            'sectionVideos'       => $sectionVideos,
+            'sectionGalleries'    => $sectionGalleries,
+            'layoutSections'      => $sections,
+            'latestSidebarPosts'  => $latestSidebarPosts,
+            'popularSidebarPosts' => $popularSidebarPosts,
+        ]);
     }
 }
 

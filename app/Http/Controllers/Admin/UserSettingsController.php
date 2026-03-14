@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class UserSettingsController extends Controller
@@ -32,20 +32,26 @@ class UserSettingsController extends Controller
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'current_password' => ['required', 'current_password'],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'remove_image' => ['nullable', 'boolean'],
         ]);
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
 
-        if (! empty($validated['password'])) {
-            $user->password = Hash::make($validated['password']);
+        if (! empty($validated['remove_image']) && $user->image) {
+            if (Storage::disk('public')->exists($user->image)) {
+                Storage::disk('public')->delete($user->image);
+            }
+            $user->image = null;
+        } elseif ($request->hasFile('image')) {
+            if ($user->image && Storage::disk('public')->exists($user->image)) {
+                Storage::disk('public')->delete($user->image);
+            }
+            $user->image = $request->file('image')->store('users', 'public');
         }
 
         $user->save();
-
-        $request->session()->regenerate();
 
         return redirect()
             ->route('admin.user-settings.edit')

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Category;
 use App\Models\Setting;
+use App\Models\SiteMeta;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,6 +14,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Share site meta (SEO/Meta settings) with ALL views so frontend always gets it
+        try {
+            View::share('siteMeta', SiteMeta::first());
+        } catch (\Throwable) {
+            View::share('siteMeta', null);
+        }
+
         // Share header/footer categories with all frontend layout views
         View::composer(
             ['components.header', 'components.footer', 'components.layout'],
@@ -34,7 +42,13 @@ class AppServiceProvider extends ServiceProvider
                     $footerCategories = collect();
                 }
 
-                $view->with(compact('headerCategories', 'footerCategories'));
+                try {
+                    $siteMeta = SiteMeta::first();
+                } catch (\Throwable) {
+                    $siteMeta = null;
+                }
+
+                $view->with(compact('headerCategories', 'footerCategories', 'siteMeta'));
             }
         );
     }

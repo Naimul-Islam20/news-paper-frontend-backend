@@ -9,12 +9,16 @@
                 <div class="mb-4 md:mb-10 text-left">
                     <h1 class="text-4xl md:text-3xl font-semibold serif text-title mb-3">{{ $category->name }}</h1>
 
-                    {{-- Subcategories row (only if this category has children) --}}
-                    @if($category->subCategories && $category->subCategories->isNotEmpty())
+                    {{-- Subcategories row (parent + child দুটো পেজেই দেখাতে চাই --}}
+                    @if(isset($subCategorySource) && $subCategorySource->subCategories && $subCategorySource->subCategories->isNotEmpty())
                         <div class="flex flex-wrap gap-2 mb-3">
-                            @foreach($category->subCategories as $child)
-                                <a href="{{ route('category.show', $child->slug) }}"
-                                   class="px-3 py-1 text-xs md:text-sm font-semibold border border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-500 bg-white">
+                            @foreach($subCategorySource->subCategories as $child)
+                                @php
+                                    $isActive = $category->id === $child->id;
+                                    $parentSlugForChild = $subCategorySource->slug;
+                                @endphp
+                                <a href="{{ route('category.show.child', [$parentSlugForChild, $child->slug]) }}"
+                                   class="px-3 py-1 text-xs md:text-sm font-semibold border {{ $isActive ? 'border-rose-500 text-rose-600' : 'border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-500' }} bg-white">
                                     {{ $child->name }}
                                 </a>
                             @endforeach
@@ -29,8 +33,25 @@
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
                         </a>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="m9 18 6-6-6-6"/></svg>
-                        <span class="text-black font-bold">{{ $category->name }}</span>
+
+                        {{-- Breadcrumb: Category > Subcategory --}}
+                        @if($category->parent)
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                            <a href="{{ route('category.show', $category->parent->slug) }}" class="text-black hover:text-rose-600 transition-colors">
+                                {{ $category->parent->name }}
+                            </a>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                            <span class="text-black font-bold">{{ $category->name }}</span>
+                        @else
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                            <span class="text-black font-bold">{{ $category->name }}</span>
+                        @endif
                     </div>
 
                     <div class="w-full border-b border-slate-300 relative mb-4 md:mb-8">
@@ -61,9 +82,20 @@
                     <div class="bg-white p-0 md:p-4 flex flex-col gap-3 md:gap-5">
 
                         @forelse($posts as $post)
+                        @php
+                            $primaryCategory = $post->categories->first();
+                            $parentCategory  = optional($primaryCategory)->parent;
+                            $categorySlug    = $parentCategory ? $parentCategory->slug : optional($primaryCategory)->slug;
+                            $subCategorySlug = $parentCategory ? $primaryCategory->slug : null;
+                        @endphp
                         <article class="flex flex-col md:flex-row gap-2 md:gap-4 last:pb-0">
                             {{-- ছবি --}}
-                            <a href="{{ route('news.show', $post->slug) }}" class="w-full md:w-auto flex-shrink-0">
+                            <a
+                                href="{{ $subCategorySlug
+                                    ? route('news.show.sub', [$categorySlug, $subCategorySlug, $post->slug])
+                                    : route('news.show', [$categorySlug, $post->slug]) }}"
+                                class="w-full md:w-auto flex-shrink-0"
+                            >
                                 <div class="img-placeholder w-full md:w-[305px] h-[200px] md:h-[170px] overflow-hidden">
                                     <img src="{{ $post->image ? asset('storage/'.$post->image) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600' }}"
                                          alt="{{ $post->title }}"
@@ -73,7 +105,11 @@
                             </a>
                             {{-- টাইটেল + বিবরণ --}}
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
-                                <a href="{{ route('news.show', $post->slug) }}">
+                                <a
+                                    href="{{ $subCategorySlug
+                                        ? route('news.show.sub', [$categorySlug, $subCategorySlug, $post->slug])
+                                        : route('news.show', [$categorySlug, $post->slug]) }}"
+                                >
                                     <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
                                         {{ $post->title }}
                                     </h3>

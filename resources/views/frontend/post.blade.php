@@ -5,16 +5,38 @@
         <div class="container">
             @php
                 \Carbon\Carbon::setLocale('bn');
-                $category = $post->categories->first();
-                $categoryName = $category?->name ?? 'সংবাদ';
+                $primaryCategory = $post->categories->first();
+                $parentCategory  = optional($primaryCategory)->parent;
+                $categoryName    = $parentCategory ? $parentCategory->name : ($primaryCategory->name ?? 'সংবাদ');
             @endphp
 
             <!-- Header + Breadcrumbs -->
             <div class="mb-4 md:mb-10 text-left">
-                <!-- বড় header: category name -->
+                <!-- বড় header: category / parent name -->
                 <h1 class="text-4xl md:text-3xl font-semibold serif text-title mb-3">
                     {{ $categoryName }}
                 </h1>
+
+                {{-- Subcategory strip (same style as category page) --}}
+                @php
+                    $subCategorySource = $parentCategory ?: $primaryCategory;
+                @endphp
+                @if($subCategorySource && $subCategorySource->subCategories && $subCategorySource->subCategories->isNotEmpty())
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        @foreach($subCategorySource->subCategories as $child)
+                            @php
+                                $isActive = $primaryCategory && $primaryCategory->id === $child->id;
+                                $parentSlugForChild = $parentCategory
+                                    ? $parentCategory->slug
+                                    : $subCategorySource->slug;
+                            @endphp
+                            <a href="{{ route('category.show.child', [$parentSlugForChild, $child->slug]) }}"
+                               class="px-3 py-1 text-xs md:text-sm font-semibold border {{ $isActive ? 'border-rose-500 text-rose-600' : 'border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-500' }} bg-white">
+                                {{ $child->name }}
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
 
                 <!-- Breadcrumb line -->
                 <div class="flex flex-wrap items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
@@ -24,10 +46,29 @@
                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
                     </a>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="m9 18 6-6-6-6"/></svg>
-                    <span class="text-black font-bold">
-                        {{ $categoryName }}
-                    </span>
+                    @if($parentCategory)
+                        {{-- Home > Parent Category > Subcategory --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="m9 18 6-6-6-6"/></svg>
+                        <a href="{{ route('category.show', $parentCategory->slug) }}" class="text-black hover:text-rose-600 transition-colors">
+                            {{ $parentCategory->name }}
+                        </a>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="m9 18 6-6-6-6"/></svg>
+                        <a href="{{ route('category.show.child', [$parentCategory->slug, $primaryCategory->slug]) }}" class="text-black font-bold hover:text-rose-600 transition-colors">
+                            {{ $primaryCategory->name }}
+                        </a>
+                    @elseif($primaryCategory)
+                        {{-- Home > Single Category --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="m9 18 6-6-6-6"/></svg>
+                        <a href="{{ route('category.show', $primaryCategory->slug) }}" class="text-black font-bold hover:text-rose-600 transition-colors">
+                            {{ $primaryCategory->name }}
+                        </a>
+                    @else
+                        {{-- Home > Generic label --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="m9 18 6-6-6-6"/></svg>
+                        <span class="text-black font-bold">
+                            সংবাদ
+                        </span>
+                    @endif
                 </div>
                 
                 <div class="w-full border-b border-slate-300 relative mb-8">
@@ -64,7 +105,7 @@
                         </span>
                         <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-4">
                             <span class="text-sm md:text-base text-desc">
-                                প্রকাশ : {{ $post->created_at->translatedFormat('d F Y, H:i') }}
+                                প্রকাশ : {{ published_at($post->created_at) }}
                             </span>
                             
                             <!-- সোশ্যাল শেয়ার আইকনসমূহ -->
@@ -96,7 +137,7 @@
                     <!-- ফিচারড ইমেজ -->
                     <div class="w-full">
                         <div class="img-placeholder w-full aspect-[3/2] overflow-hidden shadow-md">
-                            <img src="{{ $post->image ?: 'https://loremflickr.com/1200/800/parliament,building?lock=1' }}" 
+                            <img src="{{ storage_image_url($post->image) ?: 'https://loremflickr.com/1200/800/parliament,building?lock=1' }}" 
                                  alt="{{ $post->title }}" 
                                  class="w-full h-auto"
                                  onload="this.parentElement.classList.remove('img-placeholder')">
@@ -152,9 +193,20 @@
                         </div>
 
                         @foreach($related->take(2) as $rel)
-                        <a href="{{ route('news.show', $rel->slug) }}" class="group cursor-pointer flex flex-col gap-2">
+                        @php
+                            $primaryCategory = $rel->categories->first();
+                            $parentCategory  = optional($primaryCategory)->parent;
+                            $categorySlug    = $parentCategory ? $parentCategory->slug : optional($primaryCategory)->slug;
+                            $subCategorySlug = $parentCategory ? $primaryCategory->slug : null;
+                        @endphp
+                        <a
+                            href="{{ $subCategorySlug
+                                ? route('news.show.sub', [$categorySlug, $subCategorySlug, $rel->slug])
+                                : route('news.show', [$categorySlug, $rel->slug]) }}"
+                            class="group cursor-pointer flex flex-col gap-2"
+                        >
                             <div class="img-placeholder aspect-[16/9] overflow-hidden">
-                                <img src="{{ $rel->image ?: 'https://loremflickr.com/600/400/law?lock='.$rel->id }}" 
+                                <img src="{{ storage_image_url($rel->image) ?: 'https://loremflickr.com/600/400/law?lock='.$rel->id }}" 
                                      alt="{{ $rel->title }}" 
                                      class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                      onload="this.parentElement.classList.remove('img-placeholder')">
@@ -181,9 +233,20 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach($related as $rel)
-                    <a href="{{ route('news.show', $rel->slug) }}" class="group cursor-pointer flex flex-row md:flex-col gap-2 md:gap-3 pb-3 border-b border-gray-100 md:border-0 md:pb-0 last:border-0 last:pb-0">
+                    @php
+                        $primaryCategory = $rel->categories->first();
+                        $parentCategory  = optional($primaryCategory)->parent;
+                        $categorySlug    = $parentCategory ? $parentCategory->slug : optional($primaryCategory)->slug;
+                        $subCategorySlug = $parentCategory ? $primaryCategory->slug : null;
+                    @endphp
+                    <a
+                        href="{{ $subCategorySlug
+                            ? route('news.show.sub', [$categorySlug, $subCategorySlug, $rel->slug])
+                            : route('news.show', [$categorySlug, $rel->slug]) }}"
+                        class="group cursor-pointer flex flex-row md:flex-col gap-2 md:gap-3 pb-3 border-b border-gray-100 md:border-0 md:pb-0 last:border-0 last:pb-0"
+                    >
                         <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
-                            <img src="{{ $rel->image ?: 'https://loremflickr.com/600/400/news?lock='.$rel->id }}" 
+                            <img src="{{ storage_image_url($rel->image) ?: 'https://loremflickr.com/600/400/news?lock='.$rel->id }}" 
                                  alt="{{ $rel->title }}" 
                                  class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                  onload="this.parentElement.classList.remove('img-placeholder')">

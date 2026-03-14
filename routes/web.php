@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SubscribeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\MetaController;
 use App\Http\Controllers\Admin\LayoutController;
+use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Frontend\HomeController as FrontendHomeController;
 use App\Http\Controllers\Frontend\PostController as FrontendPostController;
 use App\Http\Controllers\Frontend\CategoryController as FrontendCategoryController;
@@ -24,8 +25,11 @@ use App\Http\Controllers\Frontend\VideoController as FrontendVideoController;
 
 // Public frontend routes (all non-admin, non-API pages)
 Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
-Route::get('/news/{slug}', [FrontendPostController::class, 'show'])->name('news.show');
+
+// Category listing routes
 Route::get('/category/{slug}', [FrontendCategoryController::class, 'show'])->name('category.show');
+Route::get('/category/{parentSlug}/{childSlug}', [FrontendCategoryController::class, 'showChild'])
+    ->name('category.show.child');
 Route::get('/page/{slug}', [FrontendPageController::class, 'show'])->name('page.show');
 Route::get('/gallery/{slug}', [FrontendGalleryController::class, 'show'])->name('gallery.show');
 Route::get('/video/{slug}', [FrontendVideoController::class, 'show'])->name('videos.show');
@@ -63,145 +67,126 @@ Route::prefix('admin')
             ->middleware('auth')
             ->name('logout');
 
-        Route::middleware(['auth', 'role:admin,editor,reporter'])->group(function (): void {
+        Route::middleware(['auth', 'role:admin,senior editor,sub editor'])->group(function (): void {
             Route::get('/', DashboardController::class)->name('dashboard');
-
             Route::get('/user-settings', [UserSettingsController::class, 'edit'])
                 ->name('user-settings.edit');
-
             Route::put('/user-settings', [UserSettingsController::class, 'update'])
                 ->name('user-settings.update');
 
-            Route::get('/categories', [CategoryController::class, 'index'])
-                ->name('categories.index');
-            Route::post('/categories', [CategoryController::class, 'store'])
-                ->name('categories.store');
-            Route::put('/categories/{id}', [CategoryController::class, 'update'])
-                ->name('categories.update');
-            Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])
-                ->name('categories.destroy');
+            Route::middleware('feature:categories.manage')->group(function (): void {
+                Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+                Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+                Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
+                Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+                Route::get('/sub-categories', [SubCategoryController::class, 'index'])->name('sub-categories.index');
+            });
 
-            Route::get('/sub-categories', [SubCategoryController::class, 'index'])
-                ->name('sub-categories.index');
+            Route::middleware('feature:posts.view')->group(function (): void {
+                Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+            });
+            Route::middleware('feature:posts.manage')->group(function (): void {
+                Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+                Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+                Route::get('/posts/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');
+                Route::put('/posts/{id}', [PostController::class, 'update'])->name('posts.update');
+                Route::delete('/posts/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
+            });
 
-            Route::get('/posts', [PostController::class, 'index'])
-                ->name('posts.index');
-            Route::get('/posts/create', [PostController::class, 'create'])
-                ->name('posts.create');
-            Route::post('/posts', [PostController::class, 'store'])
-                ->name('posts.store');
-            Route::get('/posts/{id}/edit', [PostController::class, 'edit'])
-                ->name('posts.edit');
-            Route::put('/posts/{id}', [PostController::class, 'update'])
-                ->name('posts.update');
-            Route::delete('/posts/{id}', [PostController::class, 'destroy'])
-                ->name('posts.destroy');
+            Route::middleware('feature:pages.manage')->group(function (): void {
+                Route::get('/pages', [PageController::class, 'index'])->name('pages.index');
+                Route::get('/pages/create', [PageController::class, 'create'])->name('pages.create');
+                Route::post('/pages', [PageController::class, 'store'])->name('pages.store');
+                Route::get('/pages/{id}/edit', [PageController::class, 'edit'])->name('pages.edit');
+                Route::put('/pages/{id}', [PageController::class, 'update'])->name('pages.update');
+                Route::delete('/pages/{id}', [PageController::class, 'destroy'])->name('pages.destroy');
+            });
 
-            // Pages
-            Route::get('/pages', [PageController::class, 'index'])
-                ->name('pages.index');
-            Route::get('/pages/create', [PageController::class, 'create'])
-                ->name('pages.create');
-            Route::post('/pages', [PageController::class, 'store'])
-                ->name('pages.store');
-            Route::get('/pages/{id}/edit', [PageController::class, 'edit'])
-                ->name('pages.edit');
-            Route::put('/pages/{id}', [PageController::class, 'update'])
-                ->name('pages.update');
-            Route::delete('/pages/{id}', [PageController::class, 'destroy'])
-                ->name('pages.destroy');
+            Route::middleware('feature:galleries.manage')->group(function (): void {
+                Route::get('/galleries', [GalleryController::class, 'index'])->name('galleries.index');
+                Route::get('/galleries/create', [GalleryController::class, 'create'])->name('galleries.create');
+                Route::post('/galleries', [GalleryController::class, 'store'])->name('galleries.store');
+                Route::get('/galleries/{id}/edit', [GalleryController::class, 'edit'])->name('galleries.edit');
+                Route::put('/galleries/{id}', [GalleryController::class, 'update'])->name('galleries.update');
+                Route::delete('/galleries/{id}', [GalleryController::class, 'destroy'])->name('galleries.destroy');
+                Route::delete('/gallery-images/{imageId}', [GalleryController::class, 'destroyImage'])->name('galleries.images.destroy');
+            });
 
-            // Galleries
-            Route::get('/galleries', [GalleryController::class, 'index'])
-                ->name('galleries.index');
-            Route::get('/galleries/create', [GalleryController::class, 'create'])
-                ->name('galleries.create');
-            Route::post('/galleries', [GalleryController::class, 'store'])
-                ->name('galleries.store');
-            Route::get('/galleries/{id}/edit', [GalleryController::class, 'edit'])
-                ->name('galleries.edit');
-            Route::put('/galleries/{id}', [GalleryController::class, 'update'])
-                ->name('galleries.update');
-            Route::delete('/galleries/{id}', [GalleryController::class, 'destroy'])
-                ->name('galleries.destroy');
-            Route::delete('/gallery-images/{imageId}', [GalleryController::class, 'destroyImage'])
-                ->name('galleries.images.destroy');
+            Route::middleware('feature:videos.manage')->group(function (): void {
+                Route::get('/videos', [VideoController::class, 'index'])->name('videos.index');
+                Route::get('/videos/create', [VideoController::class, 'create'])->name('videos.create');
+                Route::post('/videos', [VideoController::class, 'store'])->name('videos.store');
+                Route::get('/videos/{id}/edit', [VideoController::class, 'edit'])->name('videos.edit');
+                Route::put('/videos/{id}', [VideoController::class, 'update'])->name('videos.update');
+                Route::delete('/videos/{id}', [VideoController::class, 'destroy'])->name('videos.destroy');
+            });
 
-            // Videos
-            Route::get('/videos', [VideoController::class, 'index'])
-                ->name('videos.index');
-            Route::get('/videos/create', [VideoController::class, 'create'])
-                ->name('videos.create');
-            Route::post('/videos', [VideoController::class, 'store'])
-                ->name('videos.store');
-            Route::get('/videos/{id}/edit', [VideoController::class, 'edit'])
-                ->name('videos.edit');
-            Route::put('/videos/{id}', [VideoController::class, 'update'])
-                ->name('videos.update');
-            Route::delete('/videos/{id}', [VideoController::class, 'destroy'])
-                ->name('videos.destroy');
+            Route::middleware('feature:reporters.manage')->group(function (): void {
+                Route::get('/reporters', [ReporterController::class, 'index'])->name('reporters.index');
+                Route::get('/reporters/create', [ReporterController::class, 'create'])->name('reporters.create');
+                Route::post('/reporters', [ReporterController::class, 'store'])->name('reporters.store');
+                Route::get('/reporters/{id}/edit', [ReporterController::class, 'edit'])->name('reporters.edit');
+                Route::put('/reporters/{id}', [ReporterController::class, 'update'])->name('reporters.update');
+                Route::delete('/reporters/{id}', [ReporterController::class, 'destroy'])->name('reporters.destroy');
+            });
 
-            // Reporters
-            Route::get('/reporters', [ReporterController::class, 'index'])
-                ->name('reporters.index');
-            Route::get('/reporters/create', [ReporterController::class, 'create'])
-                ->name('reporters.create');
-            Route::post('/reporters', [ReporterController::class, 'store'])
-                ->name('reporters.store');
-            Route::get('/reporters/{id}/edit', [ReporterController::class, 'edit'])
-                ->name('reporters.edit');
-            Route::put('/reporters/{id}', [ReporterController::class, 'update'])
-                ->name('reporters.update');
-            Route::delete('/reporters/{id}', [ReporterController::class, 'destroy'])
-                ->name('reporters.destroy');
-            // Advertisement
-            Route::get('/advertisements', [App\Http\Controllers\Admin\AdvertisementController::class, 'index'])
-                ->name('advertisements.index');
-            Route::get('/advertisements/create', [App\Http\Controllers\Admin\AdvertisementController::class, 'create'])
-                ->name('advertisements.create');
-            Route::get('/advertisements/edit', [App\Http\Controllers\Admin\AdvertisementController::class, 'edit'])
-                ->name('advertisements.edit');
+            Route::middleware('feature:advertisements.manage')->group(function (): void {
+                Route::get('/advertisements', [App\Http\Controllers\Admin\AdvertisementController::class, 'index'])->name('advertisements.index');
+                Route::get('/advertisements/create', [App\Http\Controllers\Admin\AdvertisementController::class, 'create'])->name('advertisements.create');
+                Route::get('/advertisements/edit', [App\Http\Controllers\Admin\AdvertisementController::class, 'edit'])->name('advertisements.edit');
+            });
 
-            // Statistics
-            Route::get('/statistics/visitors', [App\Http\Controllers\Admin\StatisticsController::class, 'visitors'])
-                ->name('statistics.visitors');
+            Route::middleware('feature:statistics.view')->group(function (): void {
+                Route::get('/statistics/visitors', [App\Http\Controllers\Admin\StatisticsController::class, 'visitors'])->name('statistics.visitors');
+            });
 
-            // Subscribes
-            Route::get('/subscribes', [SubscribeController::class, 'index'])
-                ->name('subscribes.index');
-            Route::post('/subscribes', [SubscribeController::class, 'store'])
-                ->name('subscribes.store');
+            Route::middleware('feature:subscribes.view')->group(function (): void {
+                Route::get('/subscribes', [SubscribeController::class, 'index'])->name('subscribes.index');
+                Route::post('/subscribes', [SubscribeController::class, 'store'])->name('subscribes.store');
+            });
 
-            // Users
-            Route::get('/users', [UserController::class, 'index'])
-                ->name('users.index');
-            Route::get('/users/create', [UserController::class, 'create'])
-                ->name('users.create');
-            Route::post('/users', [UserController::class, 'store'])
-                ->name('users.store');
-            Route::get('/users/{id}/edit', [UserController::class, 'edit'])
-                ->name('users.edit');
-            Route::put('/users/{id}', [UserController::class, 'update'])
-                ->name('users.update');
-            Route::delete('/users/{id}', [UserController::class, 'destroy'])
-                ->name('users.destroy');
+            Route::middleware('feature:users.manage')->group(function (): void {
+                Route::get('/users', [UserController::class, 'index'])->name('users.index');
+                Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+                Route::post('/users', [UserController::class, 'store'])->name('users.store');
+                Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+                Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+                Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+            });
 
-            // Meta Settings
-            Route::get('/meta', [MetaController::class, 'index'])
-                ->name('meta.index');
-            Route::post('/meta', [MetaController::class, 'update'])
-                ->name('meta.update');
+            Route::middleware('feature:role_permissions.manage')->group(function (): void {
+                Route::get('/role-permissions', [RolePermissionController::class, 'index'])->name('role-permissions.index');
+                Route::put('/role-permissions', [RolePermissionController::class, 'update'])->name('role-permissions.update');
+            });
 
-            // Layout Settings
-            Route::get('/layout/frontend', [LayoutController::class, 'frontend'])
-                ->name('layout.frontend');
-            Route::post('/layout/frontend', [LayoutController::class, 'saveFrontend'])
-                ->name('layout.frontend.save');
-            Route::get('/layout/home', [LayoutController::class, 'home'])
-                ->name('layout.home');
-            // Heartbeat
+            Route::middleware('feature:settings.meta')->group(function (): void {
+                Route::get('/meta', [MetaController::class, 'index'])->name('meta.index');
+                Route::post('/meta', [MetaController::class, 'update'])->name('meta.update');
+            });
+
+            Route::middleware('feature:settings.layout')->group(function (): void {
+                Route::get('/layout/frontend', [LayoutController::class, 'frontend'])->name('layout.frontend');
+                Route::post('/layout/frontend', [LayoutController::class, 'saveFrontend'])->name('layout.frontend.save');
+                Route::get('/layout/home', [LayoutController::class, 'home'])->name('layout.home');
+                Route::post('/layout/home', [LayoutController::class, 'saveHome'])->name('layout.home.save');
+            });
+
             Route::get('/heartbeat', function () {
                 return response()->json(['status' => 'ok']);
             })->name('heartbeat');
         });
     });
+
+// News detail routes with SEO-friendly category/subcategory slugs
+// Placed AFTER admin routes so that /admin/... is never captured here.
+Route::get('/{categorySlug}/{postSlug}', [FrontendPostController::class, 'showWithPath'])
+    ->where('categorySlug', '^(?!admin$|category$|page$|gallery$|video$|login$).+')
+    ->name('news.show');
+
+Route::get('/{categorySlug}/{subCategorySlug}/{postSlug}', [FrontendPostController::class, 'showWithPath'])
+    ->where('categorySlug', '^(?!admin$|category$|page$|gallery$|video$|login$).+')
+    ->name('news.show.sub');
+
+// Legacy detail URL (for old links): /news/{slug}
+Route::get('/news/{slug}', [FrontendPostController::class, 'showLegacy'])
+    ->name('news.legacy');

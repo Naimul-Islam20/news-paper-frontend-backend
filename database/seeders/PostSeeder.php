@@ -7,14 +7,22 @@ use App\Models\Post;
 use App\Models\Reporter;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class PostSeeder extends Seeder
 {
     public function run(): void
     {
+        // Wipe existing demo data so we can reseed cleanly
+        Schema::disableForeignKeyConstraints();
+        DB::table('category_post')->truncate();
+        Post::truncate();
+        Schema::enableForeignKeyConstraints();
+
         $reporterIds = Reporter::pluck('id')->all();
-        $categories = Category::where('status', 'active')->get();
+        $categories  = Category::where('status', 'active')->get();
 
         if ($categories->isEmpty()) {
             return;
@@ -42,12 +50,13 @@ class PostSeeder extends Seeder
                         'reporter_id' => ! empty($reporterIds) ? Arr::random($reporterIds) : null,
                         'seo_keywords' => $title,
                         'status' => 'published',
-                        'main_section_layer' => (string) $layer,
+                        'hero_layer' => (int) $layer,
                     ],
                 );
 
-                $attachCategories = $categories->random(min(3, $categories->count()))->pluck('id')->all();
-                $post->categories()->syncWithoutDetaching($attachCategories);
+                // Attach exactly ONE category to this post
+                $singleCategoryId = $categories->random()->id;
+                $post->categories()->sync([$singleCategoryId]);
             }
         }
 
@@ -79,17 +88,12 @@ class PostSeeder extends Seeder
                         'reporter_id' => ! empty($reporterIds) ? Arr::random($reporterIds) : null,
                         'seo_keywords' => $title,
                         'status' => 'published',
-                        'main_section_layer' => null,
+                        'hero_layer' => null,
                     ],
                 );
 
-                $extraCategories = $categories
-                    ->where('id', '!=', $category->id)
-                    ->random(min(2, max(1, $categories->count() - 1)))
-                    ->pluck('id')
-                    ->all();
-
-                $post->categories()->syncWithoutDetaching(array_merge([$category->id], $extraCategories));
+                // Ensure the post belongs to ONLY this category
+                $post->categories()->sync([$category->id]);
             }
         }
     }

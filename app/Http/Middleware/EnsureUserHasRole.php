@@ -22,7 +22,18 @@ class EnsureUserHasRole
 
         $userRole = Auth::user()->role;
 
-        if ($userRole === null || (! empty($roles) && ! in_array($userRole, $roles, true))) {
+        // Laravel may pass "admin,senior editor,sub editor" as one string; normalize to array
+        $allowed = [];
+        foreach ($roles as $r) {
+            foreach (array_map('trim', explode(',', $r)) as $part) {
+                if ($part !== '') {
+                    $allowed[] = $part;
+                }
+            }
+        }
+        $allowed = array_unique($allowed);
+
+        if ($userRole === null || (! empty($allowed) && ! in_array($userRole, $allowed, true))) {
             abort(403);
         }
 

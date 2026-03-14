@@ -28,15 +28,21 @@
                             @error('sub_title') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
-                        {{-- Categories --}}
+                        {{-- Category (single) --}}
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Categories</label>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Category</label>
                             <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 max-h-[300px] overflow-y-auto shadow-inner">
                                 <div class="columns-1 md:columns-2 gap-x-12">
                                     @forelse($categories as $category)
                                         <div class="break-inside-avoid mb-2">
                                             <label class="flex items-center gap-2 cursor-pointer group py-1 px-2 rounded hover:bg-indigo-50 transition-all">
-                                                <input type="checkbox" name="categories[]" value="{{ $category->id }}" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                                <input
+                                                    type="radio"
+                                                    name="category_id"
+                                                    value="{{ $category->id }}"
+                                                    class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                                    {{ old('category_id') == $category->id ? 'checked' : '' }}
+                                                >
                                                 <span class="text-sm font-medium text-slate-900 dark:text-white group-hover:text-indigo-600 transition-all">{{ $category->name }}</span>
                                             </label>
                                         </div>
@@ -45,7 +51,7 @@
                                     @endforelse
                                 </div>
                             </div>
-                            @error('categories') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                            @error('category_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Image & Caption --}}
@@ -101,26 +107,22 @@
                         {{-- Division & District (Commented Out) --}}
                         {{-- <div class="grid grid-cols-2 gap-4">...</div> --}}
 
-                        {{-- Main Section Layers --}}
+                        {{-- Hero Layer --}}
                         <div>
-                            <label class="block text-sm font-bold text-slate-900 mb-2 ml-0.5 uppercase tracking-wider">Main Section</label>
-                            <div class="rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 divide-y divide-slate-100 dark:divide-slate-800">
-                                @foreach([
-                                    ['value' => '1', 'label' => '1st Layer'],
-                                    ['value' => '2', 'label' => '2nd Layer'],
-                                    ['value' => '3', 'label' => '3rd Layer'],
-                                    ['value' => '4', 'label' => '4th Layer']
-                                ] as $layer)
-                                <div class="flex items-center justify-between px-4 py-3">
-                                    <span class="text-xs font-medium text-slate-600">{{ $layer['label'] }}</span>
-                                    <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" name="main_section_layer" value="{{ $layer['value'] }}" {{ old('main_section_layer') == $layer['value'] ? 'checked' : '' }} class="sr-only peer layer-checkbox">
-                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
-                                    </label>
+                            <label class="block text-sm font-bold text-slate-900 mb-2 ml-0.5 uppercase tracking-wider">Hero Layer</label>
+                            <div class="relative">
+                                <select name="hero_layer" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 text-sm outline-none font-normal text-slate-900 cursor-pointer">
+                                    <option value="" {{ old('hero_layer') ? '' : 'selected' }}>None (Not in hero)</option>
+                                    <option value="1" {{ old('hero_layer') == '1' ? 'selected' : '' }}>1st Layer</option>
+                                    <option value="2" {{ old('hero_layer') == '2' ? 'selected' : '' }}>2nd Layer</option>
+                                    <option value="3" {{ old('hero_layer') == '3' ? 'selected' : '' }}>3rd Layer</option>
+                                    <option value="4" {{ old('hero_layer') == '4' ? 'selected' : '' }}>4th Layer</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
-                                @endforeach
                             </div>
-                            <p class="mt-2 text-[10px] text-slate-400 italic">* You can select only one layer or none.</p>
+                            <p class="mt-2 text-[10px] text-slate-400 italic">* Select which hero layer this post will appear in, or choose None.</p>
                         </div>
 
                         {{-- Status --}}
@@ -181,17 +183,6 @@
             }
         });
 
-        // Handle Mutually Exclusive Layers
-        const checkboxes = document.querySelectorAll('.layer-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                if (this.checked) {
-                    checkboxes.forEach(c => {
-                        if (c !== this) c.checked = false;
-                    });
-                }
-            });
-        });
     });
 
     function previewMainImage(input) {

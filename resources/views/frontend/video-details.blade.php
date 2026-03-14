@@ -61,7 +61,7 @@
                         <span class="text-lg font-bold text-title">ডিজিটাল ভিডিও ডেস্ক</span>
                         <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-4">
                             <span class="text-sm md:text-base text-desc">
-                                প্রকাশ : {{ $video->created_at->format('d M Y, H:i') }}
+                                প্রকাশ : {{ published_at($video->created_at) }}
                             </span>
                             <div class="flex items-center gap-3">
                                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank"
@@ -78,20 +78,36 @@
                     </div>
                     @endif
 
-                    <!-- ভিডিও প্লেয়ার -->
-                    <div class="w-full bg-black aspect-video relative overflow-hidden shadow-2xl">
-                        @if($youtubeId)
-                            <iframe
-                                src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=0&rel=0"
-                                title="{{ $video->title }}"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen
-                                class="w-full h-full absolute inset-0">
-                            </iframe>
+                    <!-- ভিডিও প্লেয়ার: থাম্বনেইল থাকলে উপরে দেখাবে, ক্লিকে ভিডিও চালু -->
+                    @php
+                        $videoThumbUrl = $video->image ? storage_image_url($video->image) : null;
+                        $hasYoutube = (bool) $youtubeId;
+                    @endphp
+                    <div class="w-full bg-black aspect-video relative overflow-hidden shadow-2xl" id="video-player-wrap">
+                        @if($hasYoutube && $videoThumbUrl)
+                            {{-- ইউটিউব + কাস্টম থাম্বনেইল: থাম্বনেইল পোস্টার, ক্লিকে ইফ্রেম চালু --}}
+                            <div id="video-poster" class="absolute inset-0 cursor-pointer flex items-center justify-center bg-black">
+                                <img src="{{ $videoThumbUrl }}" alt="{{ $video->title }}" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
+                                    <div class="w-20 h-20 bg-rose-600/90 text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <iframe id="video-iframe" src="about:blank" data-src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=1&rel=0" title="{{ $video->title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full absolute inset-0 hidden"></iframe>
+                            <script>
+                                document.getElementById('video-poster').addEventListener('click', function() {
+                                    var iframe = document.getElementById('video-iframe');
+                                    iframe.src = iframe.getAttribute('data-src');
+                                    iframe.classList.remove('hidden');
+                                    this.classList.add('hidden');
+                                });
+                            </script>
+                        @elseif($hasYoutube)
+                            <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?autoplay=0&rel=0" title="{{ $video->title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full absolute inset-0"></iframe>
                         @elseif($video->image)
                             <div class="absolute inset-0 flex items-center justify-center">
-                                <img src="{{ $video->image }}" alt="{{ $video->title }}" class="w-full h-full object-cover opacity-60">
+                                <img src="{{ $videoThumbUrl }}" alt="{{ $video->title }}" class="w-full h-full object-cover opacity-60">
                                 <div class="absolute inset-0 flex items-center justify-center">
                                     <div class="w-20 h-20 bg-rose-600/90 text-white rounded-full flex items-center justify-center shadow-2xl">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
@@ -129,7 +145,7 @@
                             <div class="w-1.5 h-6 bg-rose-600"></div>
                             <h3 class="text-xl font-bold serif text-title">আরও ভিডিও</h3>
                         </div>
-                        @foreach($related->take(5) as $rel)
+                        @foreach($related->take(2) as $rel)
                         @php
                             $relYoutubeId = null;
                             if ($rel->youtube_link) {
@@ -138,7 +154,7 @@
                             }
                             $relThumb = $relYoutubeId
                                 ? "https://img.youtube.com/vi/{$relYoutubeId}/mqdefault.jpg"
-                                : ($rel->image ?? 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400');
+                                : ($rel->image ? storage_image_url($rel->image) : 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400');
                         @endphp
                         <a href="{{ route('videos.show', $rel->slug) }}" class="group flex flex-col gap-2">
                             <div class="relative aspect-video overflow-hidden">

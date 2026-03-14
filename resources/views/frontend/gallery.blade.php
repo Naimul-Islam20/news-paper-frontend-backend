@@ -53,7 +53,7 @@
                             {{-- ছবি --}}
                             <a href="{{ route('gallery.show', $gallery->slug) }}" class="w-full md:w-auto flex-shrink-0">
                                 <div class="img-placeholder w-full md:w-[305px] h-[200px] md:h-[170px] overflow-hidden">
-                                    <img src="{{ $thumb ? $thumb->image : 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=600' }}"
+                                    <img src="{{ $thumb ? storage_image_url($thumb->image) : 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=600' }}"
                                          alt="{{ $gallery->title }}"
                                          class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                 </div>

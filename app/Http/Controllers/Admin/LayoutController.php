@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\HomeLayoutSection;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,7 +36,63 @@ class LayoutController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('admin.layout.home', compact('categories'));
+        $sections = HomeLayoutSection::with('category')->get()->keyBy('key');
+
+        return view('admin.layout.home', compact('categories', 'sections'));
+    }
+
+    /**
+     * Section key => allowed category type. Video section = only video type, Gallery = only gallery, rest = only post.
+     */
+    private function sectionAllowedType(string $sectionId): string
+    {
+        return match ($sectionId) {
+            'section-video'  => 'video',
+            'section-gallery' => 'gallery',
+            default           => 'post',
+        };
+    }
+
+    public function saveHome(Request $request)
+    {
+        $data = $request->validate([
+            'section_id'  => ['required', 'string', 'max:255'],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+        ]);
+
+        $categoryId = $data['category_id'] ?? null;
+        $allowedType = $this->sectionAllowedType($data['section_id']);
+
+        if ($categoryId) {
+            $category = Category::find($categoryId);
+            if (! $category || $category->type !== $allowedType) {
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "এই সেকশনে শুধুমাত্র {$allowedType} type এর category সিলেক্ট করতে পারবেন।",
+                    ], 422);
+                }
+                return back()->with('error', "এই সেকশনে শুধুমাত্র {$allowedType} type এর category সিলেক্ট করতে পারবেন।");
+            }
+
+            // Ensure one category is used in only one section at a time
+            HomeLayoutSection::where('category_id', $categoryId)
+                ->where('key', '!=', $data['section_id'])
+                ->update(['category_id' => null]);
+        }
+
+        $section = HomeLayoutSection::firstOrCreate(
+            ['key' => $data['section_id']],
+            ['label' => $data['section_id']]
+        );
+        $section->category_id = $categoryId;
+        $section->save();
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return back()->with('success', 'Home layout updated.');
     }
 
     public function saveFrontend(Request $request): RedirectResponse

@@ -51,7 +51,7 @@
                     <div class="flex flex-col gap-1 pb-2 mb-2">
                         <span class="text-lg font-bold text-title leading-tight">ফটো ডেস্ক</span>
                         <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-4">
-                            <span class="text-sm md:text-base text-desc">প্রকাশ : {{ $gallery->created_at->format('d M Y, H:i') }}</span>
+                            <span class="text-sm md:text-base text-desc">প্রকাশ : {{ published_at($gallery->created_at) }}</span>
 
                             <!-- সোশ্যাল শেয়ার আইকনসমূহ -->
                             <div class="flex items-center gap-3">
@@ -79,7 +79,7 @@
                     @if($firstImage)
                     <div class="w-full">
                         <div class="img-placeholder w-full aspect-[3/2] overflow-hidden shadow-md">
-                            <img src="{{ $firstImage->image }}"
+                            <img src="{{ storage_image_url($firstImage->image) }}"
                                  alt="{{ $gallery->title }}"
                                  class="w-full h-auto"
                                  onload="this.parentElement.classList.remove('img-placeholder')">
@@ -142,7 +142,7 @@
                         @foreach($gallery->images->skip(1) as $image)
                         <div class="flex flex-col gap-2">
                             <div class="img-placeholder w-full aspect-[4/3] overflow-hidden shadow-md">
-                                <img src="{{ $image->image }}"
+                                <img src="{{ storage_image_url($image->image) }}"
                                      alt="{{ $image->description ?? $gallery->title }}"
                                      class="w-full h-full object-cover"
                                      onload="this.parentElement.classList.remove('img-placeholder')">
@@ -184,7 +184,7 @@
                         @php $otherThumb = $other->images->first(); @endphp
                         <a href="{{ route('gallery.show', $other->slug) }}" class="group cursor-pointer flex flex-col gap-2">
                             <div class="img-placeholder aspect-[16/9] overflow-hidden">
-                                <img src="{{ $otherThumb ? $otherThumb->image : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400' }}"
+                                <img src="{{ $otherThumb ? storage_image_url($otherThumb->image) : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400' }}"
                                      alt="{{ $other->title }}"
                                      class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                      onload="this.parentElement.classList.remove('img-placeholder')">
@@ -213,7 +213,7 @@
                     @php $t = $other->images->first(); @endphp
                     <a href="{{ route('gallery.show', $other->slug) }}" class="group cursor-pointer flex flex-row md:flex-col gap-2 md:gap-3 pb-3 border-b border-gray-100 md:border-0 md:pb-0 last:border-0 last:pb-0">
                         <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
-                            <img src="{{ $t ? $t->image : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400' }}"
+                            <img src="{{ $t ? storage_image_url($t->image) : 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400' }}"
                                  alt="{{ $other->title }}"
                                  class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                  onload="this.parentElement.classList.remove('img-placeholder')">

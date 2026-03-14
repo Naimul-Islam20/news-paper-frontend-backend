@@ -36,20 +36,19 @@ class PostController extends Controller
         $request->validate([
             'title'              => 'required|string|max:255',
             'sub_title'          => 'nullable|string|max:255',
-            'categories'         => 'nullable|array',
-            'categories.*'       => 'exists:categories,id',
+            'category_id'        => 'nullable|exists:categories,id',
             'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'image_caption'      => 'nullable|string',
             'description'        => 'nullable|string',
             'reporter_id'        => 'nullable|exists:reporters,id',
             'seo_keywords'       => 'nullable|string',
             'status'             => 'required|in:published,draft,pending',
-            'main_section_layer' => 'nullable|string',
+            'hero_layer'         => 'nullable|in:1,2,3,4',
         ]);
 
         $data = $request->only([
             'title', 'sub_title', 'description', 'image_caption',
-            'reporter_id', 'seo_keywords', 'status', 'main_section_layer'
+            'reporter_id', 'seo_keywords', 'status', 'hero_layer'
         ]);
 
         // Generate slug from SEO Keywords. If user emptied it, fallback to title.
@@ -62,8 +61,9 @@ class PostController extends Controller
 
         $post = Post::create($data);
 
-        if ($request->categories) {
-            $post->categories()->attach($request->categories);
+        // Ensure a post belongs to at most one category
+        if ($request->filled('category_id')) {
+            $post->categories()->sync([$request->category_id]);
         }
 
         return redirect()->route('admin.posts.index')->with('success', 'Post published successfully!');
@@ -90,20 +90,19 @@ class PostController extends Controller
         $request->validate([
             'title'              => 'required|string|max:255',
             'sub_title'          => 'nullable|string|max:255',
-            'categories'         => 'nullable|array',
-            'categories.*'       => 'exists:categories,id',
+            'category_id'        => 'nullable|exists:categories,id',
             'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'image_caption'      => 'nullable|string',
             'description'        => 'nullable|string',
             'reporter_id'        => 'nullable|exists:reporters,id',
             'seo_keywords'       => 'nullable|string',
             'status'             => 'required|in:published,draft,pending',
-            'main_section_layer' => 'nullable|string',
+            'hero_layer'         => 'nullable|in:1,2,3,4',
         ]);
 
         $data = $request->only([
             'title', 'sub_title', 'description', 'image_caption',
-            'reporter_id', 'seo_keywords', 'status', 'main_section_layer'
+            'reporter_id', 'seo_keywords', 'status', 'hero_layer'
         ]);
 
         $slugBase = $request->seo_keywords ?: $request->title;
@@ -118,7 +117,12 @@ class PostController extends Controller
 
         $post->update($data);
 
-        $post->categories()->sync($request->categories ?? []);
+        // Ensure a post belongs to at most one category
+        if ($request->filled('category_id')) {
+            $post->categories()->sync([$request->category_id]);
+        } else {
+            $post->categories()->sync([]);
+        }
 
         return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully!');
     }

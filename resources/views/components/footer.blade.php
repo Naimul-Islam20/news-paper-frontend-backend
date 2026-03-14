@@ -4,9 +4,16 @@
         <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-4 pb-4 border-b border-gray-300">
             <!-- Logo (Left) -->
             <a href="/" class="shrink-0 text-left">
-                <h2 class="text-4xl md:text-5xl font-black serif tracking-tighter uppercase underline decoration-rose-500 underline-offset-8 decoration-4">
-                    দ্য ডেইলি নিউজ
+                @if(!empty(optional($siteMeta)->site_logo))
+                <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="{{ optional($siteMeta)->site_name ?? 'Logo' }}" class="h-14 md:h-20 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling && this.nextElementSibling.classList.remove('hidden');">
+                <h2 class="text-4xl md:text-5xl font-black serif tracking-tighter uppercase underline decoration-rose-500 underline-offset-8 decoration-4 hidden">
+                    {{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}
                 </h2>
+                @else
+                <h2 class="text-4xl md:text-5xl font-black serif tracking-tighter uppercase underline decoration-rose-500 underline-offset-8 decoration-4">
+                    {{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}
+                </h2>
+                @endif
             </a>
 
             <!-- App Links (Right) -->
@@ -33,12 +40,18 @@
             <!-- Column 1: Info and Copyright (Span 3) -->
             <div class="col-span-2 md:col-span-3 space-y-6 md:border-r border-slate-200 md:pr-4">
                 <div class="text-base font-md space-y-1">
-                    <p>সম্পাদক: তাসমিমা হোসেন</p>
-                    <p>প্রকাশক: তারিন হোসেন</p>
+                    @if(!empty(optional($siteMeta)->editor_name))
+                    <p>সম্পাদক: {{ $siteMeta->editor_name }}</p>
+                    @endif
+                    @if(!empty(optional($siteMeta)->publisher_name))
+                    <p>প্রকাশক: {{ $siteMeta->publisher_name }}</p>
+                    @endif
                 </div>
-                <p class="text-sm text-gray-900 leading-relaxed font-md">
-                    ইত্তেফাক গ্রুপ অব পাবলিকেশন্স লিঃ-এর পক্ষে তারিন হোসেন কর্তৃক ৪০, কাওরান বাজার, ঢাকা-১২১৫ থেকে প্রকাশিত ও মুহিবুল আহসান কর্তৃক নিউ নেশন প্রিন্টিং প্রেস, কাজলারপাড়, ডেমরা রোড, ঢাকা-১২৩২ থেকে মুদ্রিত।
-                </p>
+                @if(!empty(optional($siteMeta)->address_1))
+                <div class="text-sm text-gray-900 leading-relaxed font-md prose prose-sm max-w-none">
+                    {!! $siteMeta->address_1 !!}
+                </div>
+                @endif
                 <p class="text-xs font-md text-gray-900 uppercase tracking-widest pt-4">
                     © প্রকাশক কর্তৃক সর্বস্বত্ব সংরক্ষিত
                 </p>
@@ -75,9 +88,25 @@
             <!-- Column 4: Social Links (Span 2) -->
             <div class="md:col-span-2">
                 <ul class="space-y-4 text-base font-semibold">
-                    <li><a href="#" class="hover:text-rose-600 transition-colors">Twitter</a></li>
-                    <li><a href="#" class="hover:text-rose-600 transition-colors">YouTube</a></li>
-                    <li><a href="#" class="hover:text-rose-600 transition-colors">Instagram</a></li>
+                    @if(!empty(optional($siteMeta)->facebook_link))
+                    <li><a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener" class="hover:text-rose-600 transition-colors">Facebook</a></li>
+                    @endif
+                    @if(!empty(optional($siteMeta)->twitter_link))
+                    <li><a href="{{ $siteMeta->twitter_link }}" target="_blank" rel="noopener" class="hover:text-rose-600 transition-colors">Twitter</a></li>
+                    @endif
+                    @if(!empty(optional($siteMeta)->instagram_link))
+                    <li><a href="{{ $siteMeta->instagram_link }}" target="_blank" rel="noopener" class="hover:text-rose-600 transition-colors">Instagram</a></li>
+                    @endif
+                    @if(!empty(optional($siteMeta)->youtube_link))
+                    <li><a href="{{ $siteMeta->youtube_link }}" target="_blank" rel="noopener" class="hover:text-rose-600 transition-colors">YouTube</a></li>
+                    @endif
+                    @if(!empty(optional($siteMeta)->extra_social_links) && is_array($siteMeta->extra_social_links))
+                    @foreach($siteMeta->extra_social_links as $extraLink)
+                    @if(!empty($extraLink))
+                    <li><a href="{{ $extraLink }}" target="_blank" rel="noopener" class="hover:text-rose-600 transition-colors">লিংক</a></li>
+                    @endif
+                    @endforeach
+                    @endif
                 </ul>
             </div>
         </div>

@@ -32,6 +32,7 @@
 
         window.toggleSubmenu = function(id) {
             const el = document.getElementById(id);
+            if (!el) return;
             const arrow = document.getElementById(id + '-arrow');
             const isOpen = el.classList.contains('grid-rows-[1fr]');
 
@@ -55,6 +56,16 @@
                 if (arrow) arrow.classList.add('rotate-180');
             }
         };
+
+        // Sync submenu arrows on load (e.g. when Users menu is open on role-permissions page)
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[id$="-menu"]').forEach(menu => {
+                const arrow = document.getElementById(menu.id + '-arrow');
+                if (arrow && menu.classList.contains('grid-rows-[1fr]')) {
+                    arrow.classList.add('rotate-180');
+                }
+            });
+        });
 
         // Heartbeat to keep session alive while working
         setInterval(function() {
@@ -97,6 +108,7 @@
                 </a>
 
                 {{-- Smooth Dropdown Posts --}}
+                @if(auth()->user()->canFeature('posts.view') || auth()->user()->canFeature('posts.manage'))
                 <div class="relative">
                     <button
                         type="button"
@@ -133,8 +145,10 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 {{-- Smooth Dropdown Category --}}
+                @if(auth()->user()->canFeature('categories.manage'))
                 <div class="relative">
                     <button
                         type="button"
@@ -172,6 +186,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all">
                     <svg class="w-5 h-5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,6 +195,7 @@
                     <span class="font-medium">Menus</span>
                 </a>
 
+                @if(auth()->user()->canFeature('pages.manage'))
                 <div class="mb-1">
                     <button
                         type="button"
@@ -216,9 +232,11 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
 
                 {{-- Gallery --}}
+                @if(auth()->user()->canFeature('galleries.manage'))
                 <div class="space-y-1">
                     <button type="button" onclick="toggleSubmenu('gallery-menu')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.galleries.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                         <div class="flex items-center gap-3">
@@ -252,8 +270,10 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 {{-- Videos --}}
+                @if(auth()->user()->canFeature('videos.manage'))
                 <div class="space-y-1">
                     <button type="button" onclick="toggleSubmenu('video-menu')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.videos.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                         <div class="flex items-center gap-3">
@@ -287,6 +307,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all">
                     <svg class="w-5 h-5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -306,6 +327,7 @@
 
 
                 {{-- Statistics --}}
+                @if(auth()->user()->canFeature('statistics.view'))
                 <div class="space-y-1">
                     <button type="button" onclick="toggleSubmenu('statistics-menu')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->is('admin/statistics*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                         <div class="flex items-center gap-3">
@@ -332,8 +354,10 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 {{-- Reporters --}}
+                @if(auth()->user()->canFeature('reporters.manage'))
                 <div class="space-y-1">
                     <button type="button" onclick="toggleSubmenu('reporter-menu')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.reporters.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                         <div class="flex items-center gap-3">
@@ -367,8 +391,10 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 {{-- Advertisement --}}
+                @if(auth()->user()->canFeature('advertisements.manage'))
                 <div class="space-y-1">
                     <button type="button" onclick="toggleSubmenu('advertisement-menu')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.advertisements.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                         <div class="flex items-center gap-3">
@@ -402,29 +428,32 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
+                @if(auth()->user()->canFeature('subscribes.view'))
                 <a href="{{ route('admin.subscribes.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.subscribes.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                     <svg class="w-5 h-5 {{ request()->routeIs('admin.subscribes.*') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"></path>
                     </svg>
                     <span class="font-medium">Subscribers</span>
                 </a>
+                @endif
 
                 {{-- Users --}}
-                @if(auth()->user()->role !== 'sub editor')
+                @if(auth()->user()->canFeature('users.manage'))
                 <div class="space-y-1">
-                    <button type="button" onclick="toggleSubmenu('users-menu')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.users.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
+                    <button type="button" onclick="toggleSubmenu('users-menu')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.role-permissions.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 {{ request()->routeIs('admin.users.*') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.role-permissions.*') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                             </svg>
                             <span class="font-medium">Users</span>
                         </div>
-                        <svg id="users-menu-arrow" class="w-3.5 h-3.5 transition-transform duration-300 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="users-menu-arrow" class="w-3.5 h-3.5 transition-transform duration-300 text-slate-400 {{ request()->routeIs('admin.users.*') || request()->routeIs('admin.role-permissions.*') ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="users-menu" class="{{ request()->routeIs('admin.users.*') ? 'grid grid-rows-[1fr]' : 'grid grid-rows-[0fr]' }} transition-all duration-300 ease-in-out">
+                    <div id="users-menu" class="{{ request()->routeIs('admin.users.*') || request()->routeIs('admin.role-permissions.*') ? 'grid grid-rows-[1fr]' : 'grid grid-rows-[0fr]' }} transition-all duration-300 ease-in-out">
                         <div class="overflow-hidden">
                             <div class="ml-4 pl-0 border-l border-slate-200 dark:border-slate-800 space-y-0 py-1">
                                 <a href="{{ route('admin.users.create') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative {{ request()->routeIs('admin.users.create') ? 'text-indigo-600 dark:text-indigo-400' : '' }}">
@@ -441,24 +470,32 @@
                                     </svg>
                                     <span class="ml-1">All User</span>
                                 </a>
+                                @if(auth()->user()->canFeature('role_permissions.manage'))
+                                <a href="{{ route('admin.role-permissions.index') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative {{ request()->routeIs('admin.role-permissions.*') ? 'text-indigo-600 dark:text-indigo-400' : '' }}">
+                                    {{-- L-shaped connector --}}
+                                    <svg class="w-6 h-6 text-slate-200 dark:text-slate-800 -ml-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 12h10m0 0l-4-4m4 4l-4 4"></path>
+                                    </svg>
+                                    <span class="ml-1">Manage Role</span>
+                                </a>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
                 @endif
 
-
-
-
-
+                @if(auth()->user()->canFeature('settings.meta'))
                 <a href="{{ route('admin.meta.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.meta.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                     <svg class="w-5 h-5 {{ request()->routeIs('admin.meta.*') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"></path>
                     </svg>
                     <span class="font-medium">SEO & Meta</span>
                 </a>
+                @endif
 
                 {{-- Layout --}}
+                @if(auth()->user()->canFeature('settings.layout'))
                 <div class="space-y-1">
                     <button type="button" onclick="toggleSubmenu('layout-menu')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.layout.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
                         <div class="flex items-center gap-3">
@@ -490,6 +527,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 <a
                     href="{{ route('admin.user-settings.edit') }}"

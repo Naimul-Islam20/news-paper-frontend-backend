@@ -24,16 +24,34 @@ class CategoryController extends Controller
         };
     }
 
+    /**
+     * Child category listing with parent + child slug:
+     * /category/{parentSlug}/{childSlug}
+     */
+    public function showChild(string $parentSlug, string $childSlug): View
+    {
+        $parent = Category::where('slug', $parentSlug)->firstOrFail();
+
+        $category = Category::where('slug', $childSlug)
+            ->where('parent_id', $parent->id)
+            ->firstOrFail();
+
+        return $this->postCategory($category);
+    }
+
     // post type → national.blade.php design
     private function postCategory(Category $category): View
     {
-        $posts = Post::with(['reporter', 'categories'])
+        $posts = Post::with(['reporter', 'categories.parent'])
             ->whereHas('categories', fn($q) => $q->where('categories.id', $category->id))
             ->where('status', 'published')
             ->latest()
             ->paginate(10);
 
-        return view('frontend.category', compact('category', 'posts'));
+        // Submenu তে দেখানোর জন্য: এই category-র নিজের subCategories, আর যদি নিজে subcategory হয় তাহলে তার parent-এর subCategories
+        $subCategorySource = $category->parent ?? $category;
+
+        return view('frontend.category', compact('category', 'posts', 'subCategorySource'));
     }
 
     // gallery type → gallery.blade.php design

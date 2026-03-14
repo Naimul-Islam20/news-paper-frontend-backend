@@ -13,8 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role' => \App\Http\Middleware\EnsureUserHasRole::class,
+            'role'           => \App\Http\Middleware\EnsureUserHasRole::class,
+            'track.visitors' => \App\Http\Middleware\TrackVisitorStats::class,
+            'feature'        => \App\Http\Middleware\EnsureUserCanFeature::class,
         ]);
+
+        // Track visitors on all web routes (frontend only; middleware itself skips /admin)
+        $middleware->appendToGroup('web', \App\Http\Middleware\TrackVisitorStats::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

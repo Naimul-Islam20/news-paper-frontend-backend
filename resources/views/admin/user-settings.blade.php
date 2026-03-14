@@ -4,7 +4,7 @@
 
 @section('header_title', 'Account Settings')
 
-@section('header_subtitle', 'Update your personal information and security preferences.')
+@section('header_subtitle', 'Update your personal information and profile image.')
 
 @section('content')
     <div class="max-w-4xl mx-auto space-y-8">
@@ -29,7 +29,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('admin.user-settings.update') }}" class="space-y-8">
+        <form method="POST" action="{{ route('admin.user-settings.update') }}" enctype="multipart/form-data" class="space-y-8">
             @csrf
             @method('PUT')
 
@@ -46,6 +46,46 @@
                 </div>
                 
                 <div class="p-8 space-y-6">
+                    {{-- Profile Image (centered, click to add/edit, delete option) --}}
+                    <div class="flex flex-col items-center justify-center pb-8 border-b border-slate-100 dark:border-slate-800">
+                        <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/gif" class="hidden">
+                        <div
+                            role="button"
+                            tabindex="0"
+                            onclick="document.getElementById('image').click()"
+                            onkeydown="if(event.key==='Enter') document.getElementById('image').click()"
+                            class="relative w-28 h-28 rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer group focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                        >
+                            @if($user->image)
+                                <img src="{{ asset('storage/' . $user->image) }}" alt="Profile" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-slate-900/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span class="w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/90 flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7v2a2 2 0 01-2 2H7a2 2 0 01-2-2V7"></path></svg>
+                                    </span>
+                                </div>
+                            @else
+                                <div class="w-full h-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                    <span class="w-14 h-14 rounded-full bg-slate-300 dark:bg-slate-600 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-colors">
+                                        <svg class="w-7 h-7 text-slate-500 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                    </span>
+                                </div>
+                            @endif
+                        </div>
+                        <p class="mt-3 text-xs text-slate-500 dark:text-slate-400 text-center">
+                            @if($user->image)
+                                Click to change · JPG, PNG or GIF, max 2MB
+                            @else
+                                Click to add profile image
+                            @endif
+                        </p>
+                        @if($user->image)
+                            <label class="mt-2 flex items-center gap-2 text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 cursor-pointer">
+                                <input type="checkbox" name="remove_image" value="1" class="rounded border-slate-300 text-rose-600 focus:ring-rose-500">
+                                <span>Remove profile image</span>
+                            </label>
+                        @endif
+                    </div>
+
                     <div class="grid gap-8 md:grid-cols-2">
                         <div class="space-y-2">
                             <label for="name" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">
@@ -72,64 +112,6 @@
                                 value="{{ old('email', $user->email) }}"
                                 required
                                 class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3.5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder-slate-400"
-                            >
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Security Section --}}
-            <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                <div class="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
-                    <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                        <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                        Security & authentication
-                    </h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 ml-9">
-                        Update your password and manage session security.
-                    </p>
-                </div>
-
-                <div class="p-8 space-y-8">
-                    <div class="pb-8 border-b border-slate-100 dark:border-slate-800">
-                        <label for="current_password" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1 mb-2">
-                            Current Password
-                        </label>
-                        <input
-                            id="current_password"
-                            type="password"
-                            name="current_password"
-                            required
-                            placeholder="Required to authorize changes"
-                            class="w-full md:w-1/2 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3.5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder-slate-400"
-                        >
-                    </div>
-
-                    <div class="grid gap-8 md:grid-cols-2">
-                        <div class="space-y-2">
-                            <label for="password" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">
-                                New Password
-                            </label>
-                            <input
-                                id="password"
-                                type="password"
-                                name="password"
-                                class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3.5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder-slate-400"
-                                autocomplete="new-password"
-                            >
-                            <p class="text-[10px] text-slate-400 ml-1">Leave blank to keep your current password.</p>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label for="password_confirmation" class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">
-                                Confirm New Password
-                            </label>
-                            <input
-                                id="password_confirmation"
-                                type="password"
-                                name="password_confirmation"
-                                class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3.5 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder-slate-400"
-                                autocomplete="new-password"
                             >
                         </div>
                     </div>

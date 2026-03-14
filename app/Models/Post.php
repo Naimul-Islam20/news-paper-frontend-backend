@@ -17,11 +17,13 @@ class Post extends Model
         'seo_keywords',
         'status',
         'main_section_layer',
+        'hero_layer',
         'views',
     ];
 
     protected $casts = [
-        'views' => 'integer',
+        'views'      => 'integer',
+        'hero_layer' => 'integer',
     ];
 
     public function reporter()

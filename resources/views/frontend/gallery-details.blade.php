@@ -55,7 +55,7 @@
                         <span class="text-lg font-bold text-title leading-tight">ফটো ডেস্ক</span>
                         <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-4">
                             <span class="text-sm md:text-base text-desc">
-                                প্রকাশ : {{ $gallery->created_at->format('d M Y, H:i') }}
+                                প্রকাশ : {{ published_at($gallery->created_at) }}
                             </span>
                             <div class="flex items-center gap-3">
                                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank"
@@ -82,7 +82,7 @@
                         @php $firstImage = $gallery->images->first(); @endphp
                         <!-- প্রধান ছবি -->
                         <div class="img-placeholder w-full aspect-[3/2] overflow-hidden shadow-md mb-3">
-                            <img src="{{ $firstImage->image }}"
+                            <img src="{{ storage_image_url($firstImage->image) }}"
                                  alt="{{ $gallery->title }}"
                                  class="w-full h-auto"
                                  onload="this.parentElement.classList.remove('img-placeholder')">
@@ -94,7 +94,7 @@
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
                             @foreach($gallery->images->skip(1) as $image)
                             <div class="img-placeholder aspect-[4/3] overflow-hidden shadow-sm">
-                                <img src="{{ $image->image }}"
+                                <img src="{{ storage_image_url($image->image) }}"
                                      alt="{{ $gallery->title }}"
                                      class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                      onload="this.parentElement.classList.remove('img-placeholder')">
@@ -128,7 +128,7 @@
                         @php $relThumb = $rel->images->first(); @endphp
                         <a href="{{ route('gallery.show', $rel->slug) }}" class="group cursor-pointer flex flex-col gap-2">
                             <div class="img-placeholder aspect-[16/9] overflow-hidden">
-                                <img src="{{ $relThumb ? $relThumb->image : 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400' }}"
+                                <img src="{{ $relThumb ? storage_image_url($relThumb->image) : 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400' }}"
                                      alt="{{ $rel->title }}"
                                      class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                      onload="this.parentElement.classList.remove('img-placeholder')">
