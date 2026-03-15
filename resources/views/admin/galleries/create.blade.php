@@ -7,15 +7,17 @@
 <div class="py-1 w-full mx-auto">
     <form action="{{ route('admin.galleries.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        
+
         <div class="max-w-4xl mx-auto space-y-6">
             {{-- Section 1: Gallery Info --}}
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                 <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2 uppercase tracking-wider">
-                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
                     Gallery Information
                 </h3>
-                
+
                 <div class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-4">
@@ -31,21 +33,40 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Category <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <select name="category_id" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer text-black">
                                         <option value="" disabled selected>Select Category</option>
                                         @foreach($categories as $category)
-                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                         @endforeach
                                     </select>
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
                                     </div>
                                 </div>
                                 @error('category_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Reporter ধরন/ডেস্ক <span class="text-rose-500">*</span></label>
+                                <div class="relative">
+                                    <select name="reporter_id" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer text-black">
+                                        <option value="" disabled selected>-- Reporter ধরন / ডেস্ক নির্বাচন করুন --</option>
+                                        @foreach($reporters as $reporter)
+                                        <option value="{{ $reporter->id }}" {{ old('reporter_id') == $reporter->id ? 'selected' : '' }}>{{ $reporter->desk ?: $reporter->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                @error('reporter_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Status</label>
@@ -55,7 +76,9 @@
                                         <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                     </select>
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
                                     </div>
                                 </div>
                                 @error('status') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
@@ -76,7 +99,9 @@
                                 <input type="file" required name="images[]" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImage(this)">
                                 <img src="" class="absolute inset-0 w-full h-full object-cover hidden preview-img">
                                 <div class="placeholder flex flex-col items-center justify-center gap-1.5">
-                                    <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                    <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
                                     <span>Choose Image</span>
                                 </div>
                             </div>
@@ -93,7 +118,9 @@
             {{-- Add More Button --}}
             <div class="flex justify-center">
                 <button type="button" onclick="addImageRow()" class="flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">
-                    <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                    <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
+                    </svg>
                     Another Image & Desc
                 </button>
             </div>
@@ -109,6 +136,18 @@
             </div>
         </div>
     </form>
+
+    {{-- Delete row confirmation modal --}}
+    <div id="deleteRowModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 p-4" aria-hidden="true">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full p-6 text-center">
+            <p class="text-lg font-semibold text-slate-800 dark:text-white mb-2">আপনি কি সত্যিই মুছতে চান?</p>
+            <p class="text-sm text-slate-600 dark:text-slate-300 mb-6">এই ইমেজ ও বর্ণনা রিমুভ হয়ে যাবে।</p>
+            <div class="flex gap-3 justify-center">
+                <button type="button" onclick="closeDeleteRowModal()" class="px-5 py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-700 dark:text-slate-200 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition">বাতিল</button>
+                <button type="button" id="confirmDeleteRowBtn" class="px-5 py-2.5 bg-rose-600 text-white rounded-xl font-medium hover:bg-rose-700 transition">হ্যাঁ, মুছুন</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -119,7 +158,7 @@
                 const parent = input.closest('.relative');
                 const preview = parent.querySelector('.preview-img');
                 const placeholder = parent.querySelector('.placeholder');
-                
+
                 preview.src = e.target.result;
                 preview.classList.remove('hidden');
                 placeholder.classList.add('hidden');
@@ -132,11 +171,13 @@
         const container = document.getElementById('image-list');
         const newRow = document.createElement('div');
         newRow.className = "bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 relative group animate-in fade-in zoom-in duration-300";
-        
+
         newRow.innerHTML = `
-            <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 p-1 bg-rose-500 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+            <div class="absolute z-10 opacity-0 group-hover:opacity-100 transition-all" style="top: 0; right: 0.5rem; left: auto; direction: ltr;">
+                <button type="button" class="p-1.5 bg-rose-500 text-white rounded-full shadow-lg hover:bg-rose-600 transition-colors delete-row-btn">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
                 <div class="md:col-span-4">
                     <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Image <span class="text-rose-500">*</span></label>
@@ -156,6 +197,34 @@
             </div>
         `;
         container.appendChild(newRow);
+        var btn = newRow.querySelector('.delete-row-btn');
+        if (btn) btn.addEventListener('click', function() {
+            showDeleteRowModal(newRow);
+        });
     }
+
+    var rowToDelete = null;
+
+    function showDeleteRowModal(row) {
+        rowToDelete = row;
+        var modal = document.getElementById('deleteRowModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    function closeDeleteRowModal() {
+        rowToDelete = null;
+        var modal = document.getElementById('deleteRowModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+    document.getElementById('confirmDeleteRowBtn').addEventListener('click', function() {
+        if (rowToDelete) rowToDelete.remove();
+        closeDeleteRowModal();
+    });
 </script>
 @endsection

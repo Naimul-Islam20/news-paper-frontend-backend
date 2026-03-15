@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Subscriber;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -13,7 +14,13 @@ class SubscribeController extends Controller
      */
     public function index(): View
     {
-        return view('admin.subscribes.index');
+        $subscribers = Subscriber::query()
+            ->orderByDesc('created_at')
+            ->paginate(20);
+
+        return view('admin.subscribes.index', [
+            'subscribers' => $subscribers,
+        ]);
     }
 
     /**

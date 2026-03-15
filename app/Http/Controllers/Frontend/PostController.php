@@ -32,7 +32,7 @@ class PostController extends Controller
                 });
             })
             ->latest()
-            ->take(4)
+            ->take(6)
             ->get();
 
         // Refresh the model instance to get the latest views value

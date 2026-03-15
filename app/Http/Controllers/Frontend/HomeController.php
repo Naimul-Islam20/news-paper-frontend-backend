@@ -12,6 +12,33 @@ use Illuminate\View\View;
 class HomeController extends Controller
 {
     /**
+     * বিশেষ সংবাদ পেজ – is_special_news পোস্টগুলো, নতুন প্রথমে।
+     */
+    public function specialNews(): View
+    {
+        $posts = Post::with(['reporter', 'categories.parent'])
+            ->where('is_special_news', true)
+            ->where('status', 'published')
+            ->latest()
+            ->paginate(10);
+
+        // হোম পেজের মতোই সর্বশেষ ও পঠিত – সব পোস্ট থেকে, একই ডাটা
+        $latestSidebarPosts = Post::with('categories.parent')
+            ->where('status', 'published')
+            ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
+            ->latest('created_at')
+            ->limit(6)
+            ->get();
+        $popularSidebarPosts = Post::with('categories.parent')
+            ->where('status', 'published')
+            ->orderByDesc('views')
+            ->limit(6)
+            ->get();
+
+        return view('special-news', compact('posts', 'latestSidebarPosts', 'popularSidebarPosts'));
+    }
+
+    /**
      * Public homepage.
      */
     public function index(): View

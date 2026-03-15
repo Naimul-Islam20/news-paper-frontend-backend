@@ -81,20 +81,18 @@
         {{-- Sidebar --}}
         <aside class="w-64 bg-white border-r border-slate-200 dark:bg-slate-900/90 dark:border-slate-800/80 backdrop-blur fixed top-0 left-0 bottom-0 z-40 h-screen flex flex-col">
             <div class="h-20 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/50">
-                <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-none">
-                        <span class="text-sm font-black italic">DN</span>
-                    </div>
-                    <div>
-                        <div class="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
-                            The Daily News
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
+                    @if(!empty(optional($siteMeta)->site_logo))
+                        <img src="{{ storage_image_url($siteMeta->site_logo) }}"
+                             alt="{{ optional($siteMeta)->site_name ?? 'Logo' }}"
+                             class="h-10 w-auto object-contain"
+                             onerror="this.onerror=null;this.style.display='none';">
+                    @else
+                        <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-none">
+                            <span class="text-sm font-black italic">DN</span>
                         </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>
-                            <span class="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-bold tracking-widest">Admin</span>
-                        </div>
-                    </div>
-                </div>
+                    @endif
+                </a>
             </div>
 
             <nav class="p-4 space-y-1 text-sm overflow-y-auto flex-1 custom-scrollbar">
@@ -318,12 +316,14 @@
 
 
 
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all">
-                    <svg class="w-5 h-5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                @if(auth()->user()->canFeature('role_permissions.manage'))
+                <a href="{{ route('admin.role-permissions.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.role-permissions.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
+                    <svg class="w-5 h-5 {{ request()->routeIs('admin.role-permissions.*') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751A11.959 11.959 0 0112 2.714z"></path>
                     </svg>
                     <span class="font-medium">Manage Roles</span>
                 </a>
+                @endif
 
 
                 {{-- Statistics --}}
@@ -410,13 +410,6 @@
                     <div id="advertisement-menu" class="{{ request()->routeIs('admin.advertisements.*') ? 'grid grid-rows-[1fr]' : 'grid grid-rows-[0fr]' }} transition-all duration-300 ease-in-out">
                         <div class="overflow-hidden">
                             <div class="ml-4 pl-0 border-l border-slate-200 dark:border-slate-800 space-y-0 py-1">
-                                <a href="{{ route('admin.advertisements.create') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative {{ request()->routeIs('admin.advertisements.create') ? 'text-indigo-600 dark:text-indigo-400' : '' }}">
-                                    {{-- L-shaped connector --}}
-                                    <svg class="w-6 h-6 text-slate-200 dark:text-slate-800 -ml-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 12h10m0 0l-4-4m4 4l-4 4"></path>
-                                    </svg>
-                                    <span class="ml-1">Add Advertisement</span>
-                                </a>
                                 <a href="{{ route('admin.advertisements.index') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative {{ request()->routeIs('admin.advertisements.index') ? 'text-indigo-600 dark:text-indigo-400' : '' }}">
                                     {{-- L-shaped connector --}}
                                     <svg class="w-6 h-6 text-slate-200 dark:text-slate-800 -ml-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -470,15 +463,6 @@
                                     </svg>
                                     <span class="ml-1">All User</span>
                                 </a>
-                                @if(auth()->user()->canFeature('role_permissions.manage'))
-                                <a href="{{ route('admin.role-permissions.index') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative {{ request()->routeIs('admin.role-permissions.*') ? 'text-indigo-600 dark:text-indigo-400' : '' }}">
-                                    {{-- L-shaped connector --}}
-                                    <svg class="w-6 h-6 text-slate-200 dark:text-slate-800 -ml-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 12h10m0 0l-4-4m4 4l-4 4"></path>
-                                    </svg>
-                                    <span class="ml-1">Manage Role</span>
-                                </a>
-                                @endif
                             </div>
                         </div>
                     </div>

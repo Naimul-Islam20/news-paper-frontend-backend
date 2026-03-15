@@ -18,12 +18,14 @@ class Post extends Model
         'status',
         'main_section_layer',
         'hero_layer',
+        'is_special_news',
         'views',
     ];
 
     protected $casts = [
-        'views'      => 'integer',
-        'hero_layer' => 'integer',
+        'views'          => 'integer',
+        'hero_layer'     => 'integer',
+        'is_special_news' => 'boolean',
     ];
 
     public function reporter()

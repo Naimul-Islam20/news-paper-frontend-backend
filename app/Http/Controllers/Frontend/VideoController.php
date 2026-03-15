@@ -10,7 +10,7 @@ class VideoController extends Controller
 {
     public function show(string $slug): View
     {
-        $video = Video::with('category')
+        $video = Video::with(['category', 'reporter'])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();

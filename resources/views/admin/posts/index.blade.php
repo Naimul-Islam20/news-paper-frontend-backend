@@ -88,7 +88,7 @@
                             <div class="text-[10px] text-slate-400">{{ $post->created_at->format('h:i A') }}</div>
                         </td>
                         <td class="py-3 px-4">
-                            <span class="text-xs font-normal text-slate-600 dark:text-slate-300">{{ optional($post->reporter)->name ?? 'N/A' }}</span>
+                            <span class="text-xs font-normal text-slate-600 dark:text-slate-300">{{ optional($post->reporter)->desk ?? optional($post->reporter)->name ?? 'N/A' }}</span>
                         </td>
                         <td class="py-3 px-4 text-right">
                             <div class="flex items-center justify-end gap-1">

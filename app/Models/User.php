@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'reporter_id',
         'phone',
         'image',
         'status',
@@ -66,6 +67,16 @@ class User extends Authenticatable
         return $this->role === 'sub editor';
     }
 
+    public function isReporter(): bool
+    {
+        return $this->role === 'reporter';
+    }
+
+    public function reporter()
+    {
+        return $this->belongsTo(Reporter::class);
+    }
+
     /**
      * Check if user has access to a given feature key using role_permissions table.
      */
@@ -86,7 +97,7 @@ class User extends Authenticatable
                 ->where('can_access', true)
                 ->get();
 
-            $cache[$role] = $rolePerms->pluck('can_access', 'feature_key')->map(fn () => true);
+            $cache[$role] = $rolePerms->pluck('can_access', 'feature_key')->map(fn() => true);
         }
 
         return (bool) ($cache[$role][$featureKey] ?? false);

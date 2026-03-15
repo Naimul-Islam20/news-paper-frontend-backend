@@ -10,7 +10,7 @@ class GalleryController extends Controller
 {
     public function show(string $slug): View
     {
-        $gallery = Gallery::with(['images', 'category'])
+        $gallery = Gallery::with(['images', 'category', 'reporter'])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();

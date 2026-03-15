@@ -1,6 +1,6 @@
 <footer class="bg-white border-t border-black/10 text-black pt-16 pb-8">
     <div class="container overflow-visible px-4 md:px-0">
-        <!-- Logo and App Links Row -->
+        <!-- Logo + Email Subscribe Row -->
         <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-4 pb-4 border-b border-gray-300">
             <!-- Logo (Left) -->
             <a href="/" class="shrink-0 text-left">
@@ -16,22 +16,18 @@
                 @endif
             </a>
 
-            <!-- App Links (Right) -->
-            <div class="flex flex-wrap justify-center md:justify-end gap-4">
-                <a href="#" class="flex items-center gap-2 bg-black text-white px-6 py-2  hover:bg-slate-800 transition-all shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.1 2.48-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.11-1.09-3.13-2.58C3.84 16.29 2.29 10.74 4.35 7.17c1.02-1.77 2.84-2.89 4.82-2.92 1.49-.03 2.9.99 3.81.99.9 0 2.59-1.21 4.38-1.03 1.62.06 2.85.65 3.6 1.47-3.17 1.89-2.66 6.32 1.05 8.16-.72 1.83-1.63 3.66-2.3 4.74M13 3.5c.81-1 1.35-2.4 1.2-3.5-1.04.05-2.29.74-3 1.62-.71.82-1.33 2.27-1.18 3.33 1.16.08 2.27-.61 2.98-1.45z"/></svg>
-                    <div class="text-left leading-none">
-                        <span class="text-[10px] uppercase font-bold text-slate-400">Download on the</span>
-                        <div class="text-sm font-black">App Store</div>
-                    </div>
-                </a>
-                <a href="#" class="flex items-center gap-2 bg-black text-white px-6 py-2  hover:bg-slate-800 transition-all shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5V3.5C3 2.91 3.34 2.39 3.84 2.15L13.69 12L3.84 21.85C3.34 21.61 3 21.09 3 20.5M16.81 15.12L18.81 17.12C19.34 17.65 19.34 18.5 18.81 19.04C18.28 19.57 17.43 19.57 16.9 19.04L14.9 17.04L16.81 15.12M4.92 2L14.39 11.41L17.5 8.3L6.44 2.1C6.04 1.87 5.56 1.84 5.14 2.01L4.92 2M14.39 12.59L4.92 22L5.14 21.99C5.56 22.16 6.04 22.13 6.44 21.9L17.5 15.7L14.39 12.59Z"/></svg>
-                    <div class="text-left leading-none">
-                        <span class="text-[10px] uppercase font-bold text-slate-400">Get it on</span>
-                        <div class="text-sm font-black">Google Play</div>
-                    </div>
-                </a>
+            <!-- Email Subscribe (Right, replacing app links) -->
+            <div class="w-full md:w-auto md:max-w-sm flex-shrink-0">
+                @if(session('subscribe_success'))
+                <p class="text-sm text-green-600 font-medium mb-2">{{ session('subscribe_success') }}</p>
+                @endif
+                <form action="{{ route('frontend.subscribe') }}" method="POST" class="flex gap-2">
+                    @csrf
+                    <input type="email" name="email" required placeholder="ইমেইল লিখুন" class="flex-1 min-w-[220px] px-4 py-2.5 border border-gray-300 bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 text-sm">
+                    <button type="submit" class="shrink-0 px-5 py-2.5 bg-black text-white font-semibold text-sm hover:bg-slate-800 transition-colors">
+                        সাবস্ক্রাইব
+                    </button>
+                </form>
             </div>
         </div>
 

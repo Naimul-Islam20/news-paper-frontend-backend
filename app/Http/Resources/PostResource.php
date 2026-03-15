@@ -21,7 +21,7 @@ class PostResource extends JsonResource
             'slug' => $this->slug,
             'image' => $this->image,
             'image_caption' => $this->image_caption,
-            'reporter' => optional($this->whenLoaded('reporter') ?? $this->reporter)->name,
+            'reporter' => optional($this->whenLoaded('reporter') ?? $this->reporter)->desk ?? optional($this->whenLoaded('reporter') ?? $this->reporter)->name,
             'categories' => CategoryResource::collection($this->whenLoaded('categories') ?? $this->categories),
             'status' => $this->status,
             'main_section_layer' => $this->main_section_layer,

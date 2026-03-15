@@ -95,7 +95,7 @@
                         <div class="img-placeholder w-full aspect-[3/2] overflow-hidden shadow-md">
                             <img src="https://loremflickr.com/1200/800/nature,mountain?lock=10" 
                                  alt="প্রকৃতি" 
-                                 class="w-full h-auto"
+                                 class="w-full h-full object-cover"
                                  onload="this.parentElement.classList.remove('img-placeholder')">
                         </div>
                         <p class="text-base md:text-lg font-medium text-desc mt-3 leading-relaxed">
@@ -179,10 +179,10 @@
                     <div class="w-full bg-slate-50 overflow-hidden border border-slate-100 shadow-sm">
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest p-2 block bg-white/50 text-center">বিজ্ঞাপন</span>
                         <a href="#" class="block hover:opacity-95 transition-opacity">
-                            <div class="img-placeholder w-full aspect-[2/3]">
+                            <div class="img-placeholder w-full aspect-[2/3] overflow-hidden">
                                 <img src="https://loremflickr.com/400/600/advertising,product?lock=100" 
                                      alt="Advertisement" 
-                                     class="w-full h-auto"
+                                     class="w-full h-full object-cover"
                                      onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
                         </a>

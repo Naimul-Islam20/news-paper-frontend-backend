@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\Admin\ReporterController;
 use App\Http\Controllers\Admin\SubscribeController;
+use App\Models\Subscriber;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\MetaController;
 use App\Http\Controllers\Admin\LayoutController;
@@ -26,6 +27,9 @@ use App\Http\Controllers\Frontend\VideoController as FrontendVideoController;
 // Public frontend routes (all non-admin, non-API pages)
 Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
 
+// সর্বশেষ – সব নতুন পোস্ট, ক্যাটাগরি পেজের মতো UI
+Route::get('/latest', [FrontendCategoryController::class, 'latest'])->name('latest');
+
 // Category listing routes
 Route::get('/category/{slug}', [FrontendCategoryController::class, 'show'])->name('category.show');
 Route::get('/category/{parentSlug}/{childSlug}', [FrontendCategoryController::class, 'showChild'])
@@ -34,9 +38,18 @@ Route::get('/page/{slug}', [FrontendPageController::class, 'show'])->name('page.
 Route::get('/gallery/{slug}', [FrontendGalleryController::class, 'show'])->name('gallery.show');
 Route::get('/video/{slug}', [FrontendVideoController::class, 'show'])->name('videos.show');
 
+// Simple public newsletter subscribe endpoint (footer form)
+Route::post('/subscribe', function (\Illuminate\Http\Request $request) {
+    $data = $request->validate(['email' => 'required|email']);
+
+    Subscriber::firstOrCreate(['email' => $data['email']]);
+
+    return back()->with('subscribe_success', 'সাবস্ক্রাইব করার জন্য ধন্যবাদ।');
+})->name('frontend.subscribe');
+
 // Static pages copied from the news-paper frontend project
 Route::view('/national', 'national');
-Route::view('/special-news', 'special-news');
+Route::get('/special-news', [FrontendHomeController::class, 'specialNews'])->name('special-news');
 Route::view('/news-details', 'news-details');
 Route::view('/gallery', 'gallery')->name('gallery.index');
 Route::view('/gallery-details', 'gallery-details');
@@ -132,8 +145,8 @@ Route::prefix('admin')
 
             Route::middleware('feature:advertisements.manage')->group(function (): void {
                 Route::get('/advertisements', [App\Http\Controllers\Admin\AdvertisementController::class, 'index'])->name('advertisements.index');
-                Route::get('/advertisements/create', [App\Http\Controllers\Admin\AdvertisementController::class, 'create'])->name('advertisements.create');
-                Route::get('/advertisements/edit', [App\Http\Controllers\Admin\AdvertisementController::class, 'edit'])->name('advertisements.edit');
+                Route::get('/advertisements/{id}/edit', [App\Http\Controllers\Admin\AdvertisementController::class, 'edit'])->name('advertisements.edit');
+                Route::put('/advertisements/{id}', [App\Http\Controllers\Admin\AdvertisementController::class, 'update'])->name('advertisements.update');
             });
 
             Route::middleware('feature:statistics.view')->group(function (): void {

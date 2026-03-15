@@ -77,7 +77,7 @@
                     <div>
                         <label class="block text-sm font-normal text-slate-900 dark:text-white mb-2 ml-0.5">Assigned Role</label>
                         <div class="relative">
-                            <select name="role" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 dark:text-white dark:bg-slate-950 cursor-pointer text-sm">
+                            <select name="role" id="user-role" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 dark:text-white dark:bg-slate-950 cursor-pointer text-sm">
                                 @foreach($allowedRoles as $value => $label)
                                     <option value="{{ $value }}" {{ old('role', $user->role) == $value ? 'selected' : '' }}>{{ $label }}</option>
                                 @endforeach

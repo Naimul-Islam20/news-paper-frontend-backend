@@ -39,6 +39,23 @@
                             @error('category_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
+                        {{-- Reporter ধরন / ডেস্ক --}}
+                        <div>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Reporter ধরন/ডেস্ক <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <select name="reporter_id" required class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 cursor-pointer text-sm bg-white">
+                                    <option value="" disabled selected>-- Reporter ধরন / ডেস্ক নির্বাচন করুন --</option>
+                                    @foreach($reporters as $reporter)
+                                        <option value="{{ $reporter->id }}" {{ old('reporter_id') == $reporter->id ? 'selected' : '' }}>{{ $reporter->desk ?: $reporter->name }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
+                            @error('reporter_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                        </div>
+
                         {{-- YouTube Link --}}
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">YouTube Video Link <span class="text-rose-500">*</span></label>

@@ -3,42 +3,50 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
 use App\Models\Reporter;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ReporterController extends Controller
 {
     public function index()
     {
-        $reporters = Reporter::with('creator')->latest()->paginate(10);
+        $reporters = Reporter::with(['creator', 'subEditor'])->latest()->paginate(10);
         return view('admin.reporters.index', compact('reporters'));
     }
 
     public function create()
     {
-        return view('admin.reporters.create');
+        $subEditors = User::where('role', 'sub editor')
+            ->where('name', '!=', 'Sub Editor')
+            ->orderBy('name')
+            ->get();
+        return view('admin.reporters.create', compact('subEditors'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:reporters',
-            'phone' => 'nullable',
-            'address' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'status' => 'required|in:active,inactive',
+            'sub_editor_id' => 'required|exists:users,id',
+            'desk' => 'required|string|max:255',
+            'status' => 'nullable|in:active,inactive',
+        ], [
+            'sub_editor_id.required' => 'ইউজার নির্বাচন করুন।',
+            'sub_editor_id.exists' => 'অবৈধ ইউজার।',
+            'desk.required' => 'রিপোর্টার ধরন/ডেস্ক অবশ্যই লিখতে হবে। পোস্টে রিপোর্টার এই ডেস্ক অনুযায়ী দেখাবে।',
         ]);
 
-        $data = $request->except('image');
-        $data['created_by'] = auth()->id();
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('reporters', 'public');
-            $data['image'] = $imagePath;
-        }
+        $subEditor = User::findOrFail($request->sub_editor_id);
+        $data = [
+            'name' => $subEditor->name,
+            'email' => $subEditor->email,
+            'phone' => $subEditor->phone ?? null,
+            'desk' => $request->input('desk'),
+            'sub_editor_id' => $subEditor->id,
+            'created_by' => auth()->id(),
+            'status' => $request->input('status', 'active'),
+        ];
 
         Reporter::create($data);
 
@@ -48,7 +56,11 @@ class ReporterController extends Controller
     public function edit($id)
     {
         $reporter = Reporter::findOrFail($id);
-        return view('admin.reporters.edit', compact('reporter'));
+        $subEditors = User::where('role', 'sub editor')
+            ->where('name', '!=', 'Sub Editor')
+            ->orderBy('name')
+            ->get();
+        return view('admin.reporters.edit', compact('reporter', 'subEditors'));
     }
 
     public function update(Request $request, $id)
@@ -56,24 +68,23 @@ class ReporterController extends Controller
         $reporter = Reporter::findOrFail($id);
 
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:reporters,email,' . $id,
-            'phone' => 'nullable',
-            'address' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'sub_editor_id' => 'nullable|exists:users,id',
+            'desk' => 'required|string|max:255',
             'status' => 'required|in:active,inactive',
+        ], [
+            'desk.required' => 'রিপোর্টার ধরন/ডেস্ক অবশ্যই লিখতে হবে। পোস্টে রিপোর্টার এই ডেস্ক অনুযায়ী দেখাবে।',
         ]);
 
-        $data = $request->except('image');
-
-        if ($request->hasFile('image')) {
-            // Delete old image
-            if ($reporter->image) {
-                Storage::disk('public')->delete($reporter->image);
-            }
-            
-            $imagePath = $request->file('image')->store('reporters', 'public');
-            $data['image'] = $imagePath;
+        $data = [
+            'desk' => $request->input('desk'),
+            'sub_editor_id' => $request->input('sub_editor_id') ?: null,
+            'status' => $request->input('status'),
+        ];
+        if ($request->filled('sub_editor_id')) {
+            $subEditor = User::findOrFail($request->sub_editor_id);
+            $data['name'] = $subEditor->name;
+            $data['email'] = $subEditor->email;
+            $data['phone'] = $subEditor->phone ?? null;
         }
 
         $reporter->update($data);

@@ -26,7 +26,7 @@ class PostController extends Controller
             ->orderBy('name')
             ->get();
 
-        $reporters = Reporter::where('status', 'active')->orderBy('name')->get();
+        $reporters = $this->reportersForCurrentUser();
 
         return view('admin.posts.create', compact('categories', 'reporters'));
     }
@@ -35,25 +35,33 @@ class PostController extends Controller
     {
         $request->validate([
             'title'              => 'required|string|max:255',
-            'sub_title'          => 'nullable|string|max:255',
-            'category_id'        => 'nullable|exists:categories,id',
-            'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'sub_title'          => 'nullable|string|max:1000',
+            'category_id'        => 'required|exists:categories,id',
+            'image'              => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'image_caption'      => 'nullable|string',
-            'description'        => 'nullable|string',
-            'reporter_id'        => 'nullable|exists:reporters,id',
+            'description'        => 'required|string',
+            'reporter_id'        => 'required|exists:reporters,id',
             'seo_keywords'       => 'nullable|string',
             'status'             => 'required|in:published,draft,pending',
             'hero_layer'         => 'nullable|in:1,2,3,4',
+        ], [
+            'title.required'       => 'শিরোনাম অবশ্যই দিতে হবে।',
+            'category_id.required' => 'ক্যাটাগরি নির্বাচন করুন।',
+            'image.required'       => 'ছবি আপলোড করুন।',
+            'description.required' => 'বিবরণ লিখুন।',
+            'reporter_id.required' => 'রিপোর্টার নির্বাচন করুন।',
         ]);
 
         $data = $request->only([
             'title', 'sub_title', 'description', 'image_caption',
-            'reporter_id', 'seo_keywords', 'status', 'hero_layer'
+            'seo_keywords', 'status', 'hero_layer'
         ]);
+        $data['reporter_id'] = $this->resolveReporterId($request->reporter_id);
+        $data['is_special_news'] = $request->boolean('is_special_news');
 
-        // Generate slug from SEO Keywords. If user emptied it, fallback to title.
-        $slugBase = $request->seo_keywords ?: $request->title;
-        $data['slug'] = Str::slug($slugBase);
+        // Slug: from SEO keywords (auto = title) or title. Title Bangla হলে slug ও Bangla থাকবে (slugifyUnicode).
+        $slugSource = $request->seo_keywords ?: $request->title;
+        $data['slug'] = $this->makePostSlug($slugSource);
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('posts', 'public');
@@ -78,7 +86,7 @@ class PostController extends Controller
             ->orderBy('name')
             ->get();
 
-        $reporters = Reporter::where('status', 'active')->orderBy('name')->get();
+        $reporters = $this->reportersForCurrentUser();
 
         return view('admin.posts.edit', compact('post', 'categories', 'reporters'));
     }
@@ -89,24 +97,32 @@ class PostController extends Controller
 
         $request->validate([
             'title'              => 'required|string|max:255',
-            'sub_title'          => 'nullable|string|max:255',
-            'category_id'        => 'nullable|exists:categories,id',
+            'sub_title'          => 'nullable|string|max:1000',
+            'category_id'        => 'required|exists:categories,id',
             'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'image_caption'      => 'nullable|string',
-            'description'        => 'nullable|string',
-            'reporter_id'        => 'nullable|exists:reporters,id',
+            'description'        => 'required|string',
+            'reporter_id'        => 'required|exists:reporters,id',
             'seo_keywords'       => 'nullable|string',
             'status'             => 'required|in:published,draft,pending',
             'hero_layer'         => 'nullable|in:1,2,3,4',
+        ], [
+            'title.required'       => 'শিরোনাম অবশ্যই দিতে হবে।',
+            'category_id.required' => 'ক্যাটাগরি নির্বাচন করুন।',
+            'description.required' => 'বিবরণ লিখুন।',
+            'reporter_id.required' => 'রিপোর্টার নির্বাচন করুন।',
         ]);
 
         $data = $request->only([
             'title', 'sub_title', 'description', 'image_caption',
-            'reporter_id', 'seo_keywords', 'status', 'hero_layer'
+            'seo_keywords', 'status', 'hero_layer'
         ]);
+        $data['reporter_id'] = $this->resolveReporterId($request->reporter_id);
+        $data['is_special_news'] = $request->boolean('is_special_news');
 
-        $slugBase = $request->seo_keywords ?: $request->title;
-        $data['slug'] = Str::slug($slugBase);
+        // Slug: from SEO keywords (auto = title) or title. Title Bangla হলে slug ও Bangla থাকবে (slugifyUnicode).
+        $slugSource = $request->seo_keywords ?: $request->title;
+        $data['slug'] = $this->makePostSlug($slugSource, $post->id);
 
         if ($request->hasFile('image')) {
             if ($post->image) {
@@ -127,6 +143,57 @@ class PostController extends Controller
         return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully!');
     }
 
+    /**
+     * Build a unique slug for posts.
+     *
+     * - Keeps Bangla characters (and other Unicode letters) intact
+     * - Converts spaces/underscores to single hyphens
+     * - Ensures uniqueness in posts.slug column
+     */
+    protected function makePostSlug(string $source, ?int $ignoreId = null): string
+    {
+        $slug = $this->slugifyUnicode($source);
+
+        if ($slug === '') {
+            $slug = 'post';
+        }
+
+        $original = $slug;
+        $i = 2;
+
+        while (
+            Post::where('slug', $slug)
+                ->when($ignoreId, function ($query, $id) {
+                    return $query->where('id', '!=', $id);
+                })
+                ->exists()
+        ) {
+            $slug = $original . '-' . $i++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Slugify but keep Unicode letters + marks (e.g. Bangla যুক্তাক্ষর/কার). Title যেমন লিখা তেমন slug; ASCII ফোর্স করা হয় না।
+     */
+    protected function slugifyUnicode(string $value): string
+    {
+        $value = trim($value);
+
+        // Keep letters, numbers, marks (বাংলা কার/মাত্রা), spaces, underscores, hyphens. Strip only punctuation/symbols.
+        $value = preg_replace('/[^\pL\pN\pM\s_-]+/u', '', $value);
+
+        // Replace spaces/underscores with single hyphen
+        $value = preg_replace('/[\s_-]+/u', '-', $value);
+
+        // Trim hyphens from both ends
+        $value = trim($value, '-');
+
+        // Lowercase (supports multibyte)
+        return function_exists('mb_strtolower') ? mb_strtolower($value, 'UTF-8') : strtolower($value);
+    }
+
     public function destroy($id)
     {
         $post = Post::findOrFail($id);
@@ -135,5 +202,25 @@ class PostController extends Controller
         }
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully!');
+    }
+
+    /** Reporter লগইন থাকলে শুধু ওই রিপোর্টার; নাহলে সব active reporter */
+    protected function reportersForCurrentUser()
+    {
+        $user = auth()->user();
+        if ($user && $user->role === 'reporter' && $user->reporter_id) {
+            return Reporter::where('id', $user->reporter_id)->get();
+        }
+        return Reporter::where('status', 'active')->orderBy('name')->get();
+    }
+
+    /** Reporter role থাকলে শুধু নিজের id সেট হয়; অন্যথায় request থেকে */
+    protected function resolveReporterId($requestReporterId)
+    {
+        $user = auth()->user();
+        if ($user && $user->role === 'reporter' && $user->reporter_id) {
+            return $user->reporter_id;
+        }
+        return $requestReporterId;
     }
 }

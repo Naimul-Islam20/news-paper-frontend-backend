@@ -16,7 +16,9 @@
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
                         </a>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="m9 18 6-6-6-6"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                            <path d="m9 18 6-6-6-6" />
+                        </svg>
                         <span class="text-black font-bold">{{ $category->name }}</span>
                     </div>
 
@@ -31,6 +33,7 @@
                         gap: 0rem;
                         grid-template-columns: 1fr;
                     }
+
                     @media (min-width: 768px) {
                         .national-grid {
                             grid-template-columns: 1.7fr 7.4fr 2.9fr;
@@ -50,9 +53,9 @@
                             <a href="{{ route('gallery.show', $gallery->slug) }}" class="w-full md:w-auto flex-shrink-0">
                                 <div class="img-placeholder w-full md:w-[305px] h-[200px] md:h-[170px] overflow-hidden">
                                     <img src="{{ $thumb ? storage_image_url($thumb->image) : 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=600' }}"
-                                         alt="{{ $gallery->title }}"
-                                         class="w-full h-full object-cover"
-                                         onload="this.parentElement.classList.remove('img-placeholder')">
+                                        alt="{{ $gallery->title }}"
+                                        class="w-full h-full object-cover"
+                                        onload="this.parentElement.classList.remove('img-placeholder')">
                                 </div>
                             </a>
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
@@ -67,7 +70,10 @@
                                 </p>
                                 @endif
                                 <div class="flex items-center gap-1.5 mt-auto text-gray-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <polyline points="12 6 12 12 16 14" />
+                                    </svg>
                                     <span class="text-xs font-medium text-gray-500">
                                         {{ $gallery->created_at->diffForHumans() }}
                                     </span>
@@ -83,30 +89,21 @@
                         @endif
                     </div>
 
-                    <!-- ডান পাশের কলাম: বিজ্ঞাপন -->
-                    <div class="flex flex-col gap-4">
+                    @php $adSidebarList = ad_slot('sidebar_list'); @endphp
+                    @if($adSidebarList && $adSidebarList->image)
+                    <div class="flex flex-col gap-4 w-full max-w-[280px]">
                         <div class="flex items-center gap-2 mb-1">
                             <div class="h-px flex-1 bg-slate-200"></div>
                             <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">বিজ্ঞাপন</span>
                             <div class="h-px flex-1 bg-slate-200"></div>
                         </div>
-                        <div class="block overflow-hidden border border-slate-200 shadow-sm">
-                            <div class="relative h-[250px] w-full bg-gradient-to-br from-[#1e3a5f] to-[#0f172a] flex flex-col items-center justify-center p-8 text-center overflow-hidden">
-                                <div class="absolute inset-0 opacity-10 pointer-events-none">
-                                    <svg width="100%" height="100%"><pattern id="pattern-cat-gal" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="white"/></pattern><rect width="100%" height="100%" fill="url(#pattern-cat-gal)"/></svg>
-                                </div>
-                                <h4 class="text-white font-bold text-xl leading-tight mb-4 relative z-10">আপনার ব্যবসার প্রসারে<br>আমাদের সাথে নামুন</h4>
-                                <a href="#" class="px-6 py-2.5 bg-rose-600 text-white text-sm font-bold hover:bg-rose-700 transition-all shadow-xl relative z-10">বিজ্ঞাপন দিন →</a>
+                        <a href="{{ $adSidebarList->link ?? '#' }}" target="_blank" rel="noopener" class="block overflow-hidden border border-slate-200 shadow-sm transition-all group">
+                            <div class="img-placeholder aspect-[4/3] w-full overflow-hidden">
+                                <img src="{{ storage_image_url($adSidebarList->image) }}" alt="{{ $adSidebarList->caption ?? 'বিজ্ঞাপন' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
-                        </div>
-                        <div class="block overflow-hidden border border-slate-200 shadow-sm mt-4">
-                            <div class="relative h-[180px] w-full bg-gradient-to-br from-[#7c3aed] to-[#4338ca] flex flex-col items-center justify-center p-6 text-center overflow-hidden">
-                                <h4 class="text-white font-bold text-lg leading-tight mb-2">স্পনসরড পোস্ট</h4>
-                                <p class="text-indigo-100 text-xs mb-4">সবচেয়ে কম মূল্যে আপনার পণ্যটি প্রচার করুন</p>
-                                <span class="px-4 py-1.5 bg-white/20 text-white text-[11px] font-bold border border-white/30">বিস্তারিত দেখুন</span>
-                            </div>
-                        </div>
+                        </a>
                     </div>
+                    @endif
                 </section>
             </div>
         </div>

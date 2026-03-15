@@ -53,6 +53,8 @@ class TrackVisitorStats
 
         $date = now()->toDateString();
         $path = '/' . ltrim($request->path(), '/');
+        // DB path column is varchar(255); long Bangla/encoded URLs can exceed it
+        $path = mb_strlen($path) > 255 ? mb_substr($path, 0, 255) : $path;
 
         // Page view: every reload / back / new visit = +1. Unique visitor: only first time per path per day.
         DB::transaction(function () use ($date, $path, $visitorId): void {

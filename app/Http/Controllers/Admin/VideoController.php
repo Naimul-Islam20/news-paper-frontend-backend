@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Reporter;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -21,13 +22,15 @@ class VideoController extends Controller
     public function create(): View
     {
         $categories = Category::where('type', 'video')->where('status', 'active')->orderBy('name')->get();
-        return view('admin.videos.create', compact('categories'));
+        $reporters = $this->reportersForCurrentUser();
+        return view('admin.videos.create', compact('categories', 'reporters'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'category_id'  => 'required|exists:categories,id',
+            'reporter_id'  => 'required|exists:reporters,id',
             'title'        => 'required|string|max:255',
             'youtube_link' => 'required|url',
             'image'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
@@ -38,6 +41,7 @@ class VideoController extends Controller
 
         $data = [
             'category_id'   => $request->category_id,
+            'reporter_id'   => $this->resolveReporterId($request->reporter_id),
             'title'         => $request->title,
             'slug'          => Str::slug($request->title),
             'youtube_link'  => $request->youtube_link,
@@ -59,7 +63,8 @@ class VideoController extends Controller
     {
         $video = Video::findOrFail($id);
         $categories = Category::where('type', 'video')->where('status', 'active')->orderBy('name')->get();
-        return view('admin.videos.edit', compact('video', 'categories'));
+        $reporters = Reporter::where('status', 'active')->orderBy('name')->get();
+        return view('admin.videos.edit', compact('video', 'categories', 'reporters'));
     }
 
     public function update(Request $request, $id)
@@ -68,6 +73,7 @@ class VideoController extends Controller
 
         $request->validate([
             'category_id'  => 'required|exists:categories,id',
+            'reporter_id'  => 'required|exists:reporters,id',
             'title'        => 'required|string|max:255',
             'youtube_link' => 'required|url',
             'image'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
@@ -77,6 +83,7 @@ class VideoController extends Controller
         ]);
 
         $video->category_id   = $request->category_id;
+        $video->reporter_id   = $this->resolveReporterId($request->reporter_id);
         $video->title         = $request->title;
         $video->slug          = Str::slug($request->title);
         $video->youtube_link  = $request->youtube_link;
@@ -107,5 +114,23 @@ class VideoController extends Controller
         $video->delete();
 
         return redirect()->route('admin.videos.index')->with('success', 'Video deleted successfully!');
+    }
+
+    protected function reportersForCurrentUser()
+    {
+        $user = auth()->user();
+        if ($user && $user->role === 'reporter' && $user->reporter_id) {
+            return Reporter::where('id', $user->reporter_id)->get();
+        }
+        return Reporter::where('status', 'active')->orderBy('name')->get();
+    }
+
+    protected function resolveReporterId($requestReporterId)
+    {
+        $user = auth()->user();
+        if ($user && $user->role === 'reporter' && $user->reporter_id) {
+            return $user->reporter_id;
+        }
+        return $requestReporterId;
     }
 }

@@ -47,6 +47,17 @@ if (!function_exists('category_url')) {
     }
 }
 
+if (!function_exists('ad_slot')) {
+    /**
+     * Get ad slot by slug for frontend display.
+     * Returns the Advertisement model or null.
+     */
+    function ad_slot(string $slug): ?\App\Models\Advertisement
+    {
+        return \App\Models\Advertisement::getBySlug($slug);
+    }
+}
+
 if (!function_exists('news_url')) {
     /**
      * Build news post URL from category slugs, or fallback to home when missing.

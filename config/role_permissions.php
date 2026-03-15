@@ -5,6 +5,7 @@ return [
         'admin'         => 'Admin',
         'senior editor' => 'Senior Editor',
         'sub editor'    => 'Sub Editor',
+        'reporter'      => 'Reporter',
     ],
 
     'feature_keys' => [

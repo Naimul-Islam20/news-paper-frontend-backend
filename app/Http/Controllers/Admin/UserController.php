@@ -72,7 +72,7 @@ class UserController extends Controller
 
         $authUser = auth()->user();
 
-        // Senior Editor শুধু Sub Editor বানাতে পারবে
+        // Admin সব রোল (Reporter ছাড়া); Senior Editor শুধু Sub Editor বানাতে পারবে
         $allowedRoles = $authUser->role === 'admin'
             ? ['admin' => 'Admin', 'senior editor' => 'Senior Editor', 'sub editor' => 'Sub Editor']
             : ['sub editor' => 'Sub Editor'];
@@ -94,18 +94,20 @@ class UserController extends Controller
             ? 'admin,senior editor,sub editor'
             : 'sub editor';
 
-        $request->validate([
+        $rules = [
             'name'     => 'required',
             'email'    => 'required|email|unique:users',
             'password' => 'required|min:8',
             'role'     => 'required|in:' . $allowedRoleValues,
             'phone'    => 'nullable',
             'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
+        ];
+        $request->validate($rules);
 
-        $data = $request->all();
+        $data = $request->except('password', 'image');
         $data['password'] = Hash::make($request->password);
         $data['status'] = $request->has('status');
+        $data['reporter_id'] = null;
 
         // Admin সবসময় active
         if ($data['role'] === 'admin') {
@@ -157,16 +159,18 @@ class UserController extends Controller
             ? 'admin,senior editor,sub editor'
             : 'sub editor';
 
-        $request->validate([
+        $rules = [
             'name'     => 'required',
             'email'    => 'required|email|unique:users,email,' . $id,
             'password' => 'nullable|min:8',
             'role'     => 'required|in:' . $allowedRoleValues,
             'phone'    => 'nullable',
             'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
+        ];
+        $request->validate($rules);
 
         $data = $request->except('password', 'image');
+        $data['reporter_id'] = null;
 
         if ($request->password) {
             $data['password'] = Hash::make($request->password);

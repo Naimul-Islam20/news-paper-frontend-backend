@@ -26,6 +26,8 @@
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider w-16 text-center">ID</th>
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider w-20">Photo</th>
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">Name</th>
+                        <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">ডেস্ক/ধরন</th>
+                        <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">User</th>
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">Email</th>
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">Phone</th>
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">Created By</th>
@@ -50,6 +52,12 @@
                         </td>
                         <td class="py-1 px-2">
                             <div class="text-sm font-normal text-black dark:text-white group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{{ $reporter->name }}</div>
+                        </td>
+                        <td class="py-1 px-2">
+                            <span class="text-xs text-black dark:text-white">{{ $reporter->desk ?? '—' }}</span>
+                        </td>
+                        <td class="py-1 px-2">
+                            <span class="text-xs text-black dark:text-white">{{ $reporter->subEditor->name ?? '—' }}</span>
                         </td>
                         <td class="py-1 px-2">
                             <span class="text-xs text-black dark:text-white">{{ $reporter->email }}</span>
@@ -90,7 +98,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="py-8 text-center text-slate-500 dark:text-slate-400">No reporters found.</td>
+                        <td colspan="10" class="py-8 text-center text-slate-500 dark:text-slate-400">No reporters found.</td>
                     </tr>
                     @endforelse
                 </tbody>

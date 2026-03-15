@@ -44,6 +44,9 @@
                                     </svg>
                                     হোম
                                 </a></li>
+                            {{-- সর্বশেষ সর্বদা বাম পাশের প্রথম মেনু (স্থান পরিবর্তন হবে না) --}}
+                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('latest') }}" class="block text-xl font-semibold hover:text-rose-600 transition-colors">সর্বশেষ</a></li>
+                            <li class="border-b border-gray-400 pb-1"><a href="/special-news" class="block text-xl font-semibold hover:text-rose-600 transition-colors">বিশেষ সংবাদ</a></li>
                             @if(isset($headerCategories) && $headerCategories->isNotEmpty())
                             @foreach($headerCategories as $cat)
                             <li class="border-b border-gray-400 pb-1">
@@ -52,9 +55,6 @@
                                 </a>
                             </li>
                             @endforeach
-                            @else
-                            <li class="border-b border-gray-400 pb-1"><a href="/national" class="block text-xl font-semibold hover:text-rose-600 transition-colors">সর্বশেষ</a></li>
-                            <li class="border-b border-gray-400 pb-1"><a href="/special-news" class="block text-xl font-semibold hover:text-rose-600 transition-colors">বিশেষ সংবাদ</a></li>
                             @endif
                             <li class="border-b border-gray-400 pb-1"><a href="/videos" class="block text-xl font-semibold hover:text-rose-600 transition-colors">ভিডিও</a></li>
                             <li class="border-b border-gray-400 pb-1"><a href="/gallery" class="block text-xl font-semibold hover:text-rose-600 transition-colors">গ্যালারি</a></li>
@@ -62,6 +62,19 @@
                     </div>
                 </div>
             </template>
+
+            @php $adHeader = ad_slot('header'); @endphp
+            @if($adHeader && $adHeader->image)
+            <div class="w-full py-2 md:py-3 flex justify-center bg-white px-2">
+                <div class="container flex justify-center overflow-hidden">
+                    <a href="{{ $adHeader->link ?? '#' }}" class="w-full flex justify-center max-w-[1000px]" target="_blank" rel="noopener">
+                        <div class="img-placeholder w-full max-w-[1000px] h-[70px] md:h-[90px] overflow-hidden bg-slate-50 flex items-center justify-center shrink-0">
+                            <img src="{{ storage_image_url($adHeader->image) }}" alt="{{ $adHeader->caption ?? 'বিজ্ঞাপন' }}" class="max-w-full max-h-full w-auto h-full object-contain shadow-sm" onload="this.parentElement.classList.remove('img-placeholder')">
+                        </div>
+                    </a>
+                </div>
+            </div>
+            @endif
 
             <div class="container pt-2 pb-0 text-center">
                 <div class="flex items-center justify-between mb-1 md:mb-4">
@@ -261,6 +274,9 @@
 
                     <div class="flex-1 overflow-x-auto overflow-y-hidden no-scrollbar py-0 flex items-center justify-between">
                         <ul class="flex justify-start items-center gap-3 md:gap-5 text-sm md:text-lg font-semibold uppercase whitespace-nowrap pt-1 pb-1">
+                            {{-- সর্বশেষ সর্বদা হেডার মেনুর বাম পাশের প্রথম আইটেম (স্থান অপরিবর্তিত) --}}
+                            <li><a href="{{ route('latest') }}" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all {{ request()->is('latest') ? 'text-rose-600 border-rose-600' : '' }}">সর্বশেষ</a></li>
+                            <li><a href="/special-news" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all {{ request()->is('special-news') ? 'text-rose-600 border-rose-600' : '' }}">বিশেষ সংবাদ</a></li>
                             @if(isset($headerCategories) && $headerCategories->isNotEmpty())
                             @foreach($headerCategories as $cat)
                             <li>
@@ -270,12 +286,9 @@
                                 </a>
                             </li>
                             @endforeach
-                            @else
-                            <li><a href="/national" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all">সর্বশেষ</a></li>
-                            <li><a href="/special-news" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all">বিশেষ সংবাদ</a></li>
                             @endif
                             <li><a href="/videos" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all">ভিডিও</a></li>
-                            <li><a href="/gallery" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all">গ্যালারি</a></li>
+                            <li><a href="/gallery" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all {{ request()->is('gallery') ? 'text-rose-600 border-rose-600' : '' }}">গ্যালারি</a></li>
                         </ul>
 
                         <!-- Mobile Menu Icon (Far Right of Categories) -->

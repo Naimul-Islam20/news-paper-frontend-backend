@@ -6,7 +6,7 @@
 @section('content')
 <div class="py-1 w-full mx-auto">
     <div class="max-w-6xl mx-auto space-y-8">
-        
+
         {{-- Section 1: Send Subscription Email Form --}}
         <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div class="p-6">
@@ -50,7 +50,9 @@
 
                     <div class="flex items-center justify-end">
                         <button type="submit" class="px-8 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-normal rounded-lg transition-all shadow-md text-sm flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
                             Send Email
                         </button>
                     </div>
@@ -64,10 +66,12 @@
                 <h3 class="text-sm font-medium text-slate-900 dark:text-white">Subscriber List</h3>
                 <div class="relative w-full max-w-xs">
                     <input type="text" placeholder="Search subscribers..." class="w-full pl-9 pr-4 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-xs text-sm">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
                 </div>
             </div>
-            
+
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-slate-50 dark:bg-slate-900/50">
@@ -79,42 +83,47 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                        {{-- Dummy Row 1 --}}
+                        @forelse($subscribers as $index => $subscriber)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-200 dark:border-slate-700">
-                            <td class="py-3.5 px-4 text-center text-sm text-slate-500 border-r border-slate-200 dark:border-slate-700">1</td>
+                            <td class="py-3.5 px-4 text-center text-sm text-slate-500 border-r border-slate-200 dark:border-slate-700">
+                                {{ $subscribers->firstItem() + $index }}
+                            </td>
                             <td class="py-3.5 px-4 border-r border-slate-200 dark:border-slate-700">
-                                <div class="text-sm font-normal text-slate-900 dark:text-white">user@example.com</div>
+                                <div class="text-sm font-normal text-slate-900 dark:text-white">{{ $subscriber->email }}</div>
                             </td>
                             <td class="py-3.5 px-4 text-center border-r border-slate-200 dark:border-slate-700">
-                                <div class="text-xs text-slate-600 dark:text-slate-400">Mar 11, 2024</div>
+                                <div class="text-xs text-slate-600 dark:text-slate-400">
+                                    {{ $subscriber->created_at?->format('M d, Y') }}
+                                </div>
                             </td>
                             <td class="py-3.5 px-4 text-center">
-                                <div class="text-xs text-slate-600 dark:text-slate-400 font-medium">10:45 AM</div>
+                                <div class="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                                    {{ $subscriber->created_at?->format('h:i A') }}
+                                </div>
                             </td>
                         </tr>
-                        {{-- Dummy Row 2 --}}
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-200 dark:border-slate-700">
-                            <td class="py-3.5 px-4 text-center text-sm text-slate-500 border-r border-slate-200 dark:border-slate-700">2</td>
-                            <td class="py-3.5 px-4 border-r border-slate-200 dark:border-slate-700">
-                                <div class="text-sm font-normal text-slate-900 dark:text-white">subscriber@gmail.com</div>
-                            </td>
-                            <td class="py-3.5 px-4 text-center border-r border-slate-200 dark:border-slate-700">
-                                <div class="text-xs text-slate-600 dark:text-slate-400">Feb 28, 2024</div>
-                            </td>
-                            <td class="py-3.5 px-4 text-center">
-                                <div class="text-xs text-slate-600 dark:text-slate-400 font-medium">02:15 PM</div>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="py-6 px-4 text-center text-sm text-slate-500">
+                                No subscribers found yet.
                             </td>
                         </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-            
+
             {{-- Pagination Placeholder --}}
             <div class="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <p class="text-xs text-slate-500">Showing 1 to 2 of 150 subscribers</p>
-                <div class="flex gap-2">
-                    <button class="px-3 py-1 border border-slate-200 dark:border-slate-800 rounded text-xs text-slate-500 hover:bg-slate-50">Previous</button>
-                    <button class="px-3 py-1 border border-slate-200 dark:border-slate-800 rounded text-xs text-slate-500 hover:bg-slate-50">Next</button>
+                <p class="text-xs text-slate-500">
+                    @if($subscribers->total())
+                    Showing {{ $subscribers->firstItem() }} to {{ $subscribers->lastItem() }} of {{ $subscribers->total() }} subscribers
+                    @else
+                    No subscribers to show
+                    @endif
+                </p>
+                <div class="flex gap-2 text-xs">
+                    {{ $subscribers->onEachSide(1)->links() }}
                 </div>
             </div>
         </div>

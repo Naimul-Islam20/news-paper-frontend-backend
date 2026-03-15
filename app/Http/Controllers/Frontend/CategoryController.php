@@ -12,6 +12,31 @@ use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
+    /**
+     * সর্বশেষ পেজ – সব ধরনের পোস্ট (post type), নতুন প্রথমে, ক্যাটাগরি পেজের মতোই UI।
+     */
+    public function latest(): View
+    {
+        $posts = Post::with(['reporter', 'categories.parent'])
+            ->where('status', 'published')
+            ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
+            ->latest()
+            ->paginate(10);
+
+        $category = (object) [
+            'name'   => 'সর্বশেষ',
+            'parent' => null,
+            'id'     => 0,
+        ];
+
+        $subCategorySource = (object) [
+            'subCategories' => collect(),
+            'slug'          => 'latest',
+        ];
+
+        return view('frontend.category', compact('category', 'posts', 'subCategorySource'));
+    }
+
     public function show(string $slug): View
     {
         $category = Category::where('slug', $slug)->firstOrFail();

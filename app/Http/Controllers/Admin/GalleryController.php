@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Gallery;
 use App\Models\GalleryImage;
+use App\Models\Reporter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -22,13 +23,15 @@ class GalleryController extends Controller
     public function create(): View
     {
         $categories = Category::where('type', 'gallery')->where('status', 'active')->orderBy('name')->get();
-        return view('admin.galleries.create', compact('categories'));
+        $reporters = $this->reportersForCurrentUser();
+        return view('admin.galleries.create', compact('categories', 'reporters'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'category_id' => 'required|exists:categories,id',
+            'reporter_id' => 'required|exists:reporters,id',
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
             'images'      => 'required|array|min:1',
@@ -41,6 +44,7 @@ class GalleryController extends Controller
         // Create the Gallery
         $gallery = Gallery::create([
             'category_id' => $request->category_id,
+            'reporter_id' => $this->resolveReporterId($request->reporter_id),
             'title'       => $request->title,
             'slug'        => Str::slug($request->title),
             'description' => $request->description,
@@ -66,12 +70,13 @@ class GalleryController extends Controller
     {
         $gallery = Gallery::with('images')->findOrFail($id);
         $categories = Category::where('type', 'gallery')->where('status', 'active')->orderBy('name')->get();
-        return view('admin.galleries.edit', compact('gallery', 'categories'));
+        $reporters = $this->reportersForCurrentUser();
+        return view('admin.galleries.edit', compact('gallery', 'categories', 'reporters'));
     }
 
     public function update(Request $request, $id)
     {
-        $gallery = Gallery::findOrFail($id);
+        $gallery = Gallery::with('images')->findOrFail($id);
 
         $request->validate([
             'category_id' => 'required|exists:categories,id',
@@ -81,15 +86,37 @@ class GalleryController extends Controller
             'images.*'    => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'image_desc'  => 'nullable|array',
             'image_desc.*'=> 'nullable|string',
+            'existing_image_desc' => 'nullable|array',
+            'existing_image_desc.*' => 'nullable|string',
+            'existing_image' => 'nullable|array',
+            'existing_image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'reporter_id' => 'required|exists:reporters,id',
             'status'      => 'required|in:active,inactive',
         ]);
 
         $gallery->category_id = $request->category_id;
+        $gallery->reporter_id = $this->resolveReporterId($request->reporter_id);
         $gallery->title       = $request->title;
         $gallery->slug        = Str::slug($request->title);
         $gallery->description = $request->description;
         $gallery->status      = $request->status;
         $gallery->save();
+
+        // Update existing images: description + optional image replace
+        $existingDescs = $request->input('existing_image_desc', []);
+        $existingFiles = $request->file('existing_image', []);
+
+        foreach ($gallery->images as $img) {
+            $id = $img->id;
+            if (array_key_exists($id, $existingDescs)) {
+                $img->description = $existingDescs[$id] ?: null;
+            }
+            if (!empty($existingFiles[$id])) {
+                Storage::disk('public')->delete($img->image);
+                $img->image = $existingFiles[$id]->store('galleries', 'public');
+            }
+            $img->save();
+        }
 
         // Add new images if uploaded
         if ($request->hasFile('images')) {
@@ -129,5 +156,23 @@ class GalleryController extends Controller
         $image->delete();
 
         return back()->with('success', 'Image removed successfully!');
+    }
+
+    protected function reportersForCurrentUser()
+    {
+        $user = auth()->user();
+        if ($user && $user->role === 'reporter' && $user->reporter_id) {
+            return Reporter::where('id', $user->reporter_id)->get();
+        }
+        return Reporter::where('status', 'active')->orderBy('name')->get();
+    }
+
+    protected function resolveReporterId($requestReporterId)
+    {
+        $user = auth()->user();
+        if ($user && $user->role === 'reporter' && $user->reporter_id) {
+            return $user->reporter_id;
+        }
+        return $requestReporterId;
     }
 }

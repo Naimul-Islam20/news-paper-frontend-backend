@@ -57,6 +57,8 @@
                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-normal bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400 border border-violet-100 dark:border-violet-500/20">Senior Editor</span>
                             @elseif($user->role == 'sub editor')
                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-normal bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400 border border-sky-100 dark:border-sky-500/20">Sub Editor</span>
+                            @elseif($user->role == 'reporter')
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-normal bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20">Reporter</span>
                             @else
                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-normal bg-slate-50 text-slate-600 dark:bg-slate-500/10 dark:text-slate-400 border border-slate-100 dark:border-slate-500/20">{{ ucfirst($user->role) }}</span>
                             @endif

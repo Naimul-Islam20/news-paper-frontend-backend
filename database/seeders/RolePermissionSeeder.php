@@ -46,6 +46,22 @@ class RolePermissionSeeder extends Seeder
                 'subscribes.view' => false,
                 'role_permissions.manage' => false,
             ],
+            'reporter' => [
+                'users.manage' => false,
+                'posts.view' => true,
+                'posts.manage' => true,
+                'categories.manage' => false,
+                'galleries.manage' => true,
+                'videos.manage' => true,
+                'reporters.manage' => false,
+                'pages.manage' => false,
+                'advertisements.manage' => false,
+                'settings.meta' => false,
+                'settings.layout' => false,
+                'statistics.view' => false,
+                'subscribes.view' => false,
+                'role_permissions.manage' => false,
+            ],
         ];
 
         foreach (array_keys($roles) as $role) {

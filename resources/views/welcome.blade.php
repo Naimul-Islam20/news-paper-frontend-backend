@@ -3,19 +3,21 @@
         দ্য ডেইলি নিউজ | প্রিমিয়াম নিউজপেপার টেমপ্লেট
         </x-slot>
 
-        <!-- Top Advertisement Section -->
-        <div class="py-4 md:py-8 flex justify-center bg-transparent px-4">
+        @php $adBelowMenu = ad_slot('below_menu'); @endphp
+        @if($adBelowMenu && $adBelowMenu->image)
+        <div class="py-4 md:py-8 flex justify-center bg-transparent px-0 md:px-4">
             <div class="container flex justify-center overflow-hidden">
-                <a href="#" class="w-full flex justify-center">
-                    <div class="img-placeholder w-full max-w-[1000px]">
-                        <img src="/top-banner.gif"
-                            alt="Advertisement"
-                            class="w-full h-auto shadow-sm object-contain"
+                <a href="{{ $adBelowMenu->link ?? '#' }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
+                    <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[120px] overflow-hidden shrink-0">
+                        <img src="{{ storage_image_url($adBelowMenu->image) }}"
+                            alt="{{ $adBelowMenu->caption ?? 'Advertisement' }}"
+                            class="w-full h-full object-cover object-center shadow-sm"
                             onload="this.parentElement.classList.remove('img-placeholder')">
                     </div>
                 </a>
             </div>
         </div>
+        @endif
 
         <div class="container">
             <!-- Hero Section -->
@@ -26,7 +28,7 @@
                     @forelse($hero_layer_4_posts as $index => $post)
                     <a
                         href="{{ news_url($post) }}"
-                        class="block group mb-5 last:mb-0 cursor-pointer text-left{{ $index > 0 ? ' border-t border-custom pt-5' : '' }}">
+                        class="block group mb-3 lg:mb-2 cursor-pointer text-left lg:pt-0 lg:pb-1{{ $index > 0 ? ' border-t border-custom pt-5' : '' }}">
                         <div class="img-placeholder overflow-hidden aspect-video mb-3 lg:hidden">
                             @if($post->image)
                             <img
@@ -53,7 +55,7 @@
                 </div>
 
                 <!-- Center: Featured News (Order 1 on mobile, Order 2 on Desktop) -->
-                <div class="order-1 lg:order-2 px-0 lg:px-2">
+                <div class="order-1 lg:order-2 px-0 lg:px-0">
                     {{-- 1st layer: বড় মেইন লিড --}}
                     @php $lead = $hero_layer_1_posts->first(); @endphp
                     @if($lead)
@@ -136,30 +138,23 @@
 
                 </div>
 
-                <!-- Right: Trending / Newsletter / Ads (Order 3 on Mobile) -->
-                <div class="md:border-l border-custom px-4 md:pl-3 md:px-0 text-left order-3 lg:order-3">
-                    <!-- Advertisement Section -->
-                    <div class="mb-4">
-                        <div class="space-y-4">
-                            <!-- Ad 1 -->
-                            <div class="img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/5] max-w-[280px] md:max-w-none mx-auto"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" onload="this.parentElement.classList.remove('img-placeholder')">
-                                <div class="absolute inset-0 flex items-center justify-center bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span class="bg-white/90 backdrop-blur-sm text-black text-[10px] font-bold px-3 py-1  uppercase">Shop Now</span>
-                                </div>
-                            </div>
-
-                            <!-- Ad 2 (Square/Horizontal) -->
-                            <div class="img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-video max-w-[280px] md:max-w-none mx-auto"><img src="https://images.unsplash.com/photo-1491933382434-500287f9b54b?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" onload="this.parentElement.classList.remove('img-placeholder')">
-                                <div class="absolute inset-0 flex items-center justify-center bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span class="bg-white/90 backdrop-blur-sm text-black text-[10px] font-bold px-3 py-1  uppercase">Learn More</span>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Right: উপরে ১ অ্যাড, মাঝে মিনি সেকশন, নিচে ১ অ্যাড -->
+                <div class="md:border-l border-custom px-0 md:pl-3 md:px-0 text-left order-3 lg:order-3 flex flex-col h-full min-h-0">
+                    @php
+                    $adHeroRight1 = ad_slot('hero_right_1');
+                    $adHeroRight2 = ad_slot('hero_right_2');
+                    @endphp
+                    @if($adHeroRight1 && $adHeroRight1->image)
+                    <div class="shrink-0 mb-4 flex justify-center md:justify-start">
+                        <a href="{{ $adHeroRight1->link ?? '#' }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-[280px]">
+                            <img src="{{ storage_image_url($adHeroRight1->image) }}" alt="{{ $adHeroRight1->caption ?? 'বিজ্ঞাপন' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" onload="this.parentElement.classList.remove('img-placeholder')">
+                        </a>
                     </div>
+                    @endif
 
-                    <!-- Opinion / Mini Section (Directly under Ads) -->
-                    <div class="mt-4">
-                        <div class="space-y-4">
+                    <!-- Opinion / Mini Section (মাঝখানে) -->
+                    <div class="flex-1 flex flex-col justify-center min-h-0 py-2">
+                        <div class="space-y-4 w-full">
                             @forelse($mini_posts as $post)
                             <div class="group cursor-pointer{{ !$loop->first ? ' pt-4 border-t border-custom' : '' }}">
                                 <a
@@ -178,13 +173,13 @@
                                         {{ $post->title }}
                                     </h4>
                                 </a>
-                                @if(optional($post->reporter)->name)
+                                @if(optional($post->reporter)->desk || optional($post->reporter)->name)
                                 <div class="flex items-center gap-1.5 pt-1">
                                     <svg class="w-3.5 h-3.5 text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
                                     <span class="text-[12px] text-desc font-bold text-left ml-0 leading-none">
-                                        {{ $post->reporter->name }}
+                                        {{ $post->reporter->desk ?? $post->reporter->name }}
                                     </span>
                                 </div>
                                 @endif
@@ -245,9 +240,32 @@
                         </div>
                     </div>
 
-                </div>
-            </section>
+                    @if($adHeroRight2 && $adHeroRight2->image)
+                    <div class="shrink-0 mt-4 flex justify-center md:justify-start">
+                        <a href="{{ $adHeroRight2->link ?? '#' }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-[280px]">
+                            <img src="{{ storage_image_url($adHeroRight2->image) }}" alt="{{ $adHeroRight2->caption ?? 'বিজ্ঞাপন' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" onload="this.parentElement.classList.remove('img-placeholder')">
+                        </a>
+                    </div>
+                    @endif
 
+                </div>
+
+            </section>
+            @php $adHeroBelow = ad_slot('hero_below'); @endphp
+            @if($adHeroBelow && $adHeroBelow->image)
+            <div class="py-4 md:py-8 flex justify-center bg-transparent px-0 md:px-4">
+                <div class="container flex justify-center overflow-hidden">
+                    <a href="{{ $adHeroBelow->link ?? '#' }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
+                        <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[120px] overflow-hidden shrink-0">
+                            <img src="{{ storage_image_url($adHeroBelow->image) }}"
+                                alt="{{ $adHeroBelow->caption ?? 'Advertisement' }}"
+                                class="w-full h-full object-cover object-center shadow-sm"
+                                onload="this.parentElement.classList.remove('img-placeholder')">
+                        </div>
+                    </a>
+                </div>
+            </div>
+            @endif
             <!-- Section: Politics (রাজনীতি) -->
             @php
             $politicsSection = $layoutSections['section-politics'] ?? null;
@@ -303,6 +321,96 @@
                     <!-- fallback: আগের static ৪টা item চাইলে এখানে কপি করো -->
                     @endforelse
                 </div>
+
+                @php $adHomeVideo = ad_slot('home_video'); @endphp
+                @if($adHomeVideo && $adHomeVideo->video_youtube_id)
+                <!-- ভিডিও: ভিউপোর্টে এলে অটো অন; ক্লিক করলে URL-এ যাবে -->
+                <div id="home-video-container" class="mt-8 pt-8 border-t border-custom flex justify-center">
+                    <div class="rounded-lg overflow-hidden shadow-md w-full max-w-[600px] aspect-video relative">
+                        <div id="home-video-player" class="w-full h-full"></div>
+                        @if(!empty($adHomeVideo->link))
+                        <a href="{{ $adHomeVideo->link }}" target="_blank" rel="noopener noreferrer" class="absolute inset-0 z-10 block" aria-label="ভিডিওতে ক্লিক করে লিংকে যান"></a>
+                        @endif
+                    </div>
+                </div>
+                <script>
+                    (function() {
+                        var videoId = {
+                            {
+                                json_encode($adHomeVideo - > video_youtube_id)
+                            }
+                        };
+                        var homeVideoPlayer = null;
+
+                        function initHomeVideo() {
+                            if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+                                window.onYouTubeIframeAPIReady = function() {
+                                    homeVideoPlayer = new YT.Player('home-video-player', {
+                                        videoId: videoId,
+                                        width: '100%',
+                                        height: '100%',
+                                        playerVars: {
+                                            enablejsapi: 1,
+                                            autoplay: 0,
+                                            rel: 0
+                                        },
+                                        events: {
+                                            onReady: onHomeVideoReady
+                                        }
+                                    });
+                                };
+                                var tag = document.createElement('script');
+                                tag.src = 'https://www.youtube.com/iframe_api';
+                                var first = document.getElementsByTagName('script')[0];
+                                first.parentNode.insertBefore(tag, first);
+                            } else {
+                                homeVideoPlayer = new YT.Player('home-video-player', {
+                                    videoId: videoId,
+                                    width: '100%',
+                                    height: '100%',
+                                    playerVars: {
+                                        enablejsapi: 1,
+                                        autoplay: 0,
+                                        rel: 0
+                                    },
+                                    events: {
+                                        onReady: onHomeVideoReady
+                                    }
+                                });
+                            }
+                        }
+
+                        function onHomeVideoReady(event) {
+                            var player = event.target;
+                            var container = document.getElementById('home-video-container');
+                            if (!container) return;
+                            var observer = new IntersectionObserver(function(entries) {
+                                if (!player || !player.getPlayerState) return;
+                                var entry = entries[0];
+                                if (entry.isIntersecting) {
+                                    try {
+                                        player.playVideo();
+                                    } catch (e) {}
+                                } else {
+                                    try {
+                                        player.pauseVideo();
+                                    } catch (e) {}
+                                }
+                            }, {
+                                threshold: 0.4,
+                                rootMargin: '0px'
+                            });
+                            observer.observe(container);
+                        }
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', initHomeVideo);
+                        } else {
+                            initHomeVideo();
+                        }
+                    })();
+                </script>
+                @endif
+
                 <!-- Section: National (জাতীয়) -->
                 @php
                 $nationalSection = $layoutSections['section-national'] ?? null;
@@ -1305,23 +1413,11 @@
                 $jobCol3_4 = $jobPosts->get(8);
                 @endphp
                 <section class="mt-12 border-t border-custom pt-8">
-                    <!-- Tabs Header -->
+                    <!-- Tabs Header (শুধু ট্যাব, ক্যাটাগরি পেজে নেয় না) -->
                     <div class="flex items-center gap-8 border-b border-custom mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                        @if($genCategory)
-                        <a href="{{ category_url($genCategory) }}" id="tab-projonmo" class="text-xl font-bold serif pb-3 border-b-2 border-rose-600 text-rose-600 transition-all duration-300 hover:opacity-90">{{ $genTitle ?: 'প্রজন্ম' }}</a>
-                        @else
-                        <button onclick="switchTopicTab('projonmo')" id="tab-projonmo" class="text-xl font-bold serif pb-3 border-b-2 border-rose-600 text-rose-600 transition-all duration-300">{{ $genTitle ?: 'প্রজন্ম' }}</button>
-                        @endif
-                        @if($campusCategory)
-                        <a href="{{ category_url($campusCategory) }}" id="tab-campus" class="text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-300">{{ $campusTitle ?: 'ক্যাম্পাস' }}</a>
-                        @else
-                        <button onclick="switchTopicTab('campus')" id="tab-campus" class="text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-300">{{ $campusTitle ?: 'ক্যাম্পাস' }}</button>
-                        @endif
-                        @if($jobCategory)
-                        <a href="{{ category_url($jobCategory) }}" id="tab-chakri" class="text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-300">{{ $jobTitle ?: 'চাকরি' }}</a>
-                        @else
-                        <button onclick="switchTopicTab('chakri')" id="tab-chakri" class="text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-300">{{ $jobTitle ?: 'চাকরি' }}</button>
-                        @endif
+                        <button type="button" onclick="switchTopicTab('projonmo')" id="tab-projonmo" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-rose-600 text-rose-600 transition-all duration-300">{{ $genTitle ?: 'প্রজন্ম' }}</button>
+                        <button type="button" onclick="switchTopicTab('campus')" id="tab-campus" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-300">{{ $campusTitle ?: 'ক্যাম্পাস' }}</button>
+                        <button type="button" onclick="switchTopicTab('chakri')" id="tab-chakri" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-300">{{ $jobTitle ?: 'চাকরি' }}</button>
                     </div>
 
                     <!-- Tab Panels Container -->

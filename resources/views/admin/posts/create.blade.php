@@ -21,16 +21,16 @@
                             @error('title') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
-                        {{-- Sub Title --}}
+                        {{-- Sub Title (২–৩ লাইন) --}}
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Sub Title</label>
-                            <input type="text" name="sub_title" value="{{ old('sub_title') }}" placeholder="Enter sub title..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <textarea name="sub_title" rows="3" placeholder="সাবটাইটেল ২–৩ লাইন লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm resize-y min-h-[4.5rem]">{{ old('sub_title') }}</textarea>
                             @error('sub_title') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Category (single) --}}
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Category</label>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Category <span class="text-rose-500">*</span></label>
                             <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 max-h-[300px] overflow-y-auto shadow-inner">
                                 <div class="columns-1 md:columns-2 gap-x-12">
                                     @forelse($categories as $category)
@@ -57,7 +57,7 @@
                         {{-- Image & Caption --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Featured Image</label>
+                                <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Featured Image <span class="text-rose-500">*</span></label>
                                 <div class="relative h-32 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-1.5 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-xs shadow-sm bg-white dark:bg-slate-900">
                                     <input type="file" name="image" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewMainImage(this)">
                                     <img id="mainImagePreview" class="absolute inset-0 w-full h-full object-cover hidden">
@@ -77,7 +77,7 @@
 
                         {{-- Post Content --}}
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Description</label>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Description <span class="text-rose-500">*</span></label>
                             <div class="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-white shadow-sm">
                                 <textarea id="editor" name="description">{{ old('description') }}</textarea>
                             </div>
@@ -90,12 +90,12 @@
 
                         {{-- Reporter --}}
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Reporter</label>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Reporter <span class="text-rose-500">*</span></label>
                             <div class="relative">
                                 <select name="reporter_id" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 cursor-pointer text-sm">
-                                    <option value="" disabled selected>-- Select Reporter --</option>
+                                    <option value="" disabled selected>-- Reporter ধরন / ডেস্ক নির্বাচন করুন --</option>
                                     @foreach($reporters as $reporter)
-                                        <option value="{{ $reporter->id }}" {{ old('reporter_id') == $reporter->id ? 'selected' : '' }}>{{ $reporter->name }}</option>
+                                        <option value="{{ $reporter->id }}" {{ old('reporter_id') == $reporter->id ? 'selected' : '' }}>{{ $reporter->desk ?: $reporter->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
@@ -107,22 +107,34 @@
                         {{-- Division & District (Commented Out) --}}
                         {{-- <div class="grid grid-cols-2 gap-4">...</div> --}}
 
-                        {{-- Hero Layer --}}
+                        {{-- Hero Layer – 4 টা চেকবক্স, যেকোনো একটা সিলেক্ট করলে বাকি ৩টা সিলেক্ট করা যাবে না --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-900 mb-2 ml-0.5 uppercase tracking-wider">Hero Layer</label>
-                            <div class="relative">
-                                <select name="hero_layer" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 text-sm outline-none font-normal text-slate-900 cursor-pointer">
-                                    <option value="" {{ old('hero_layer') ? '' : 'selected' }}>None (Not in hero)</option>
-                                    <option value="1" {{ old('hero_layer') == '1' ? 'selected' : '' }}>1st Layer</option>
-                                    <option value="2" {{ old('hero_layer') == '2' ? 'selected' : '' }}>2nd Layer</option>
-                                    <option value="3" {{ old('hero_layer') == '3' ? 'selected' : '' }}>3rd Layer</option>
-                                    <option value="4" {{ old('hero_layer') == '4' ? 'selected' : '' }}>4th Layer</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
+                            <input type="hidden" name="hero_layer" id="hero_layer_value" value="{{ old('hero_layer') }}">
+                            <div class="flex flex-wrap items-center gap-6">
+                                @foreach([1 => '1st Layer', 2 => '2nd Layer', 3 => '3rd Layer', 4 => '4th Layer'] as $num => $label)
+                                    <div class="flex items-center gap-2">
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="hero-layer-checkbox sr-only peer" data-value="{{ $num }}" {{ old('hero_layer') == (string)$num ? 'checked' : '' }}>
+                                            <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                        </label>
+                                        <span class="text-sm font-normal text-slate-900">{{ $label }}</span>
+                                    </div>
+                                @endforeach
                             </div>
-                            <p class="mt-2 text-[10px] text-slate-400 italic">* Select which hero layer this post will appear in, or choose None.</p>
+                            <p class="mt-2 text-[10px] text-slate-400 italic">* যেকোনো একটা সিলেক্ট করুন; একটা সিলেক্ট করলে বাকিগুলো অটো বন্ধ হয়ে যাবে।</p>
+                        </div>
+
+                        {{-- বিশেষ সংবাদ – সিলেক্ট করলে এই পোস্ট বিশেষ সংবাদ পেজে দেখাবে, নতুন ডাটা প্রথমে --}}
+                        <div>
+                            <label class="block text-sm font-bold text-slate-900 mb-2 ml-0.5 uppercase tracking-wider">বিশেষ সংবাদ</label>
+                            <div class="flex items-center gap-2">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="is_special_news" value="1" class="sr-only peer" {{ old('is_special_news') ? 'checked' : '' }}>
+                                    <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                </label>
+                                <span class="text-sm font-normal text-slate-900">সিলেক্ট করলে এই পোস্ট বিশেষ সংবাদ পেজে দেখাবে (নতুন প্রথমে)</span>
+                            </div>
                         </div>
 
                         {{-- Status --}}
@@ -184,6 +196,28 @@
         });
 
     });
+
+    // Hero Layer: একটাই সিলেক্ট থাকবে, বাকি ৩টা অটো আনচেক
+    function initHeroLayerCheckboxes() {
+        document.querySelectorAll('.hero-layer-checkbox').forEach(function(cb) {
+            cb.addEventListener('change', function() {
+                var hidden = document.getElementById('hero_layer_value');
+                if (this.checked) {
+                    hidden.value = this.getAttribute('data-value');
+                    document.querySelectorAll('.hero-layer-checkbox').forEach(function(other) {
+                        if (other !== cb) other.checked = false;
+                    });
+                } else {
+                    hidden.value = '';
+                }
+            });
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeroLayerCheckboxes);
+    } else {
+        initHeroLayerCheckboxes();
+    }
 
     function previewMainImage(input) {
         if (input.files && input.files[0]) {
