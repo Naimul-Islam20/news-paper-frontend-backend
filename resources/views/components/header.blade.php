@@ -81,7 +81,7 @@
                     <div class="flex-1 text-left">
                         <div class="hidden md:flex items-center gap-2">
                             <!-- Menu Icon -->
-                            <button @click="showSidebar = true" class="p-2 hover:bg-slate-100  transition-colors">
+                            <button @click="showSidebar = true" class="  transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="4" x2="20" y1="12" y2="12"></line>
                                     <line x1="4" x2="20" y1="6" y2="6"></line>
@@ -259,7 +259,7 @@
                     <div
                         class="hidden md:flex items-center gap-2 overflow-hidden transition-all duration-500 ease-in-out"
                         :class="isSticky ? 'md:w-20 md:opacity-100 md:mr-2' : 'md:w-0 md:opacity-0 md:mr-0'">
-                        <button @click="showSidebar = true" class="p-1.5 hover:bg-slate-100  transition-all text-black hover:text-rose-600 shrink-0">
+                        <button @click="showSidebar = true" class="  transition-all text-black hover:text-rose-600 shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="4" x2="20" y1="12" y2="12"></line>
                                 <line x1="4" x2="20" y1="6" y2="6"></line>
