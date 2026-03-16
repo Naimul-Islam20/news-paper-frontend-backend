@@ -10,7 +10,7 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
 
 @section('content')
 <style>
-    @media (max-width: 639px) {
+    @media (max-width: 839px) {
         .month-label-short {
             display: inline;
         }
@@ -370,6 +370,10 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
                 </div>
                 <div class="space-y-3">
                     @forelse($topPosts as $post)
+                    @php
+                    $primaryCategory = $post->categories->first();
+                    $parentCategory = $primaryCategory?->parent;
+                    @endphp
                     <div class="flex items-center justify-between">
                         <div class="min-w-0">
                             <p class="text-sm font-bold text-slate-900 truncate">
@@ -377,6 +381,13 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
                             </p>
                             <p class="text-[11px] text-slate-500">
                                 {{ number_format($post->views ?? 0) }} views ·
+                                @if($primaryCategory)
+                                @if($parentCategory)
+                                {{ $parentCategory->name }} / {{ $primaryCategory->name }} ·
+                                @else
+                                {{ $primaryCategory->name }} ·
+                                @endif
+                                @endif
                                 {{ \Carbon\Carbon::parse($post->created_at)->diffForHumans(null, true) }} ago
                             </p>
                         </div>

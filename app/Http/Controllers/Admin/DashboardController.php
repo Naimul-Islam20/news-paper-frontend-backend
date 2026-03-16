@@ -53,10 +53,12 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Top 5 latest posts in last 10 days
+        // Top 5 viewed posts in last 10 days
         $topPosts = Post::query()
+            ->with(['categories.parent', 'reporter'])
             ->where('status', 'published')
             ->whereBetween('created_at', [$tenDaysAgo, $todayEnd])
+            ->orderByDesc('views')
             ->orderByDesc('created_at')
             ->limit(5)
             ->get();
