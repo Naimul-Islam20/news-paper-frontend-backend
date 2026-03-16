@@ -9,8 +9,8 @@
 
         {{-- Section 1: Send Subscription Email Form --}}
         <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-            <div class="p-6">
-                <div class="pb-6 border-b border-slate-100 dark:border-slate-800 mb-8">
+            <div class="p-4 sm:p-6">
+                <div class="pb-6 border-b border-slate-100 dark:border-slate-800 mb-6 sm:mb-8">
                     <h3 class="text-lg font-medium text-slate-900 dark:text-white">Send Email to Subscribers</h3>
                 </div>
 

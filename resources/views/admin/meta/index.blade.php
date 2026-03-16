@@ -23,9 +23,9 @@
         <form action="{{ route('admin.meta.update') }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             @csrf
             
-            <div class="p-8 space-y-12">
+            <div class="p-4 sm:p-8 space-y-8 sm:space-y-12">
                 {{-- 1. Site Info --}}
-                <div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
                     <div class="pb-4 border-b border-slate-200 dark:border-slate-800">
                         <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
                             <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -89,7 +89,7 @@
                 </div>
 
                 {{-- 2. Social Info --}}
-                <div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
                     <div class="pb-4 border-b border-slate-200 dark:border-slate-800">
                         <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
                             <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.826a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
@@ -125,7 +125,7 @@
                 </div>
 
                 {{-- 3. Google Map --}}
-                <div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
                     <div class="pb-4 border-b border-slate-200 dark:border-slate-800">
                         <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
                             <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -146,7 +146,7 @@
                 </div>
 
                 {{-- 4. Address --}}
-                <div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
                     <div class="pb-4 border-b border-slate-200 dark:border-slate-800">
                         <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
                             <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
@@ -163,7 +163,7 @@
                 </div>
 
                 {{-- 5. Editor & Publisher Information --}}
-                <div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
                     <div class="pb-4 border-b border-slate-200 dark:border-slate-800">
                         <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
                             <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>

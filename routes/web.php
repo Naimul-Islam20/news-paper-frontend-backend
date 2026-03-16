@@ -23,9 +23,13 @@ use App\Http\Controllers\Frontend\CategoryController as FrontendCategoryControll
 use App\Http\Controllers\Frontend\PageController as FrontendPageController;
 use App\Http\Controllers\Frontend\GalleryController as FrontendGalleryController;
 use App\Http\Controllers\Frontend\VideoController as FrontendVideoController;
+use App\Http\Controllers\Frontend\SearchController as FrontendSearchController;
 
 // Public frontend routes (all non-admin, non-API pages)
 Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
+
+// Search (post, gallery, video – one list, category-style)
+Route::get('/search', [FrontendSearchController::class, 'index'])->name('search');
 
 // সর্বশেষ – সব নতুন পোস্ট, ক্যাটাগরি পেজের মতো UI
 Route::get('/latest', [FrontendCategoryController::class, 'latest'])->name('latest');

@@ -6,8 +6,8 @@
 @section('content')
 <div class="py-1 w-full mx-auto">
     <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm p-4">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-4">
-            <div class="relative w-full max-w-sm flex items-center">
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4 justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-4">
+            <div class="relative w-full min-w-0 max-w-full sm:max-w-sm flex items-center">
                 <input type="text" placeholder="Search pages..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                 <svg class="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>

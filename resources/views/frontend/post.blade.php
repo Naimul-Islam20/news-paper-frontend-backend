@@ -1,5 +1,16 @@
+@php
+    $postShareTitle = $post->title . ' - দ্য ডেইলি নিউজ';
+    $postShareDesc = \Illuminate\Support\Str::limit(strip_tags($post->description ?? ''), 160);
+    // শেয়ার প্রিভিউতে ইমেজ দেখাতে পূর্ণ absolute URL দরকার (Facebook/WhatsApp/Twitter)
+    $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : null;
+@endphp
 <x-layout>
-    <x-slot:title>{{ $post->title }} - দ্য ডেইলি নিউজ</x-slot>
+    <x-slot:title>{{ $postShareTitle }}</x-slot>
+    @if($postShareImage)
+    <x-slot:metaImage>{{ $postShareImage }}</x-slot>
+    @endif
+    <x-slot:metaDescription>{{ $postShareDesc }}</x-slot>
+    <x-slot:ogTitle>{{ $post->title }}</x-slot>
 
         <div class="py-4 md:py-10 min-h-screen bg-white">
             <div class="container">

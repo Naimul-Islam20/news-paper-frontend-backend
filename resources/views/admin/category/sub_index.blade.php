@@ -6,11 +6,11 @@
 @php
     $counts = collect($subCategories)->groupBy('parent')->map->count();
 @endphp
-<div class="px-8 py-8">
+<div class="px-4 sm:px-8 py-4 sm:py-8">
     {{-- Page Header --}}
-    <div class="flex items-center justify-between mb-8">
-        <div>
-            <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Sub Category List</h2>
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6 sm:mb-8">
+        <div class="min-w-0">
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Sub Category List</h2>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and organize your news sub-categories.</p>
         </div>
         <div class="flex items-center gap-3">

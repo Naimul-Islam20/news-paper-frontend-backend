@@ -56,8 +56,6 @@
                             </li>
                             @endforeach
                             @endif
-                            <li class="border-b border-gray-400 pb-1"><a href="/videos" class="block text-xl font-semibold hover:text-rose-600 transition-colors">ভিডিও</a></li>
-                            <li class="border-b border-gray-400 pb-1"><a href="/gallery" class="block text-xl font-semibold hover:text-rose-600 transition-colors">গ্যালারি</a></li>
                         </ul>
                     </div>
                 </div>
@@ -102,7 +100,7 @@
                                     </svg>
                                 </button>
 
-                                <div
+                                <form action="{{ route('search') }}" method="GET" class="ml-2"
                                     x-show="showSearch"
                                     x-transition:enter="transition ease-out duration-300 transform"
                                     x-transition:enter-start="opacity-0 -translate-x-4 scale-95"
@@ -110,10 +108,9 @@
                                     x-transition:leave="transition ease-in duration-200 transform"
                                     x-transition:leave-start="opacity-100 translate-x-0 scale-100"
                                     x-transition:leave-end="opacity-0 -translate-x-4 scale-95"
-                                    class="ml-2"
                                     x-cloak>
-                                    <input type="text" placeholder="অনুসন্ধান করুন..." class="bg-slate-100 border-0  px-4 py-2 text-sm focus:ring-2 focus:ring-rose-500 w-48 md:w-64 outline-none transition-all">
-                                </div>
+                                    <input type="text" name="q" value="{{ request('q') }}" placeholder="অনুসন্ধান করুন..." class="bg-slate-100 border-0  px-4 py-2 text-sm focus:ring-2 focus:ring-rose-500 w-48 md:w-64 outline-none transition-all">
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -138,7 +135,7 @@
                 </div>
 
                 <!-- Full Width Mobile Search Overlay (Covers Logo Section) -->
-                <div
+                <form action="{{ route('search') }}" method="GET"
                     x-show="showSearch"
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-[-100%]"
@@ -149,24 +146,26 @@
                     class="md:hidden fixed inset-x-0 top-0 h-[68px] md:h-[120px] bg-white z-[150] flex items-center px-4 shadow-xl border-b-2 border-rose-500"
                     x-cloak>
                     <div class="flex-1 flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-rose-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-rose-600 shrink-0">
                             <circle cx="11" cy="11" r="8"></circle>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
                         <input
                             type="text"
+                            name="q"
+                            value="{{ request('q') }}"
                             placeholder="অনুসন্ধান করুন..."
-                            class="flex-1 bg-transparent border-0 py-2 text-lg font-bold focus:ring-0 outline-none placeholder:text-slate-400"
+                            class="flex-1 bg-transparent border-0 py-2 text-lg font-bold focus:ring-0 outline-none placeholder:text-slate-400 min-w-0"
                             @keydown.escape="showSearch = false"
                             x-init="$watch('showSearch', value => value && $nextTick(() => $el.focus()))">
-                        <button @click="showSearch = false" class="p-2 text-slate-400 hover:text-rose-600 transition-colors">
+                        <button type="button" @click="showSearch = false" class="p-2 text-slate-400 hover:text-rose-600 transition-colors shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
                             </svg>
                         </button>
                     </div>
-                </div>
+                </form>
 
                 <!-- Top Utility Bar -->
                 <div class="flex justify-between items-center text-slate-700 text-sm uppercase font-bold tracking-widest mb-2 hidden md:flex">
@@ -237,9 +236,21 @@
                             <span>{{ $d }}, {{ $dn }} {{ $m }} {{ $yn }}, {{ $bangla_date }} বঙ্গাব্দ</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <a href="#" class="hover:text-rose-600 transition-colors">ডিজিটাল সংস্করণ</a>
-                        <span class="w-px h-3 bg-black"></span>
-                        <a href="#" class="hover:text-rose-600 transition-colors">সাবস্ক্রাইব</a>
+                        @if(!empty(optional($siteMeta)->facebook_link))
+                        <a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-rose-600 transition-colors" title="Facebook" aria-label="Facebook">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        @endif
+                        @if(!empty(optional($siteMeta)->twitter_link))
+                        <a href="{{ $siteMeta->twitter_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-rose-600 transition-colors" title="Twitter" aria-label="Twitter">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        @endif
+                        @if(!empty(optional($siteMeta)->instagram_link))
+                        <a href="{{ $siteMeta->instagram_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-rose-600 transition-colors" title="Instagram" aria-label="Instagram">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -287,8 +298,6 @@
                             </li>
                             @endforeach
                             @endif
-                            <li><a href="/videos" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all">ভিডিও</a></li>
-                            <li><a href="/gallery" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all {{ request()->is('gallery') ? 'text-rose-600 border-rose-600' : '' }}">গ্যালারি</a></li>
                         </ul>
 
                         <!-- Mobile Menu Icon (Far Right of Categories) -->

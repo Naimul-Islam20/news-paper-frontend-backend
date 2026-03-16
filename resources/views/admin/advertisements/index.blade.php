@@ -11,8 +11,8 @@
                 {{ session('success') }}
             </div>
         @endif
-        <div class="flex items-center justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-8">
-            <p class="text-sm text-slate-600 dark:text-slate-400">ফিক্সড অ্যাড স্লটগুলো এখানে তালিকাভুক্ত। নতুন অ্যাড যোগ করা যাবে না; শুধু প্রতিটি স্লটের ইমেজ/লিংক আপডেট করুন।</p>
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-100 dark:border-slate-800 mb-6 sm:mb-8">
+            <p class="text-sm text-slate-600 dark:text-slate-400 min-w-0">ফিক্সড অ্যাড স্লটগুলো এখানে তালিকাভুক্ত। নতুন অ্যাড যোগ করা যাবে না; শুধু প্রতিটি স্লটের ইমেজ/লিংক আপডেট করুন।</p>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse border-x border-slate-200 dark:border-slate-700">

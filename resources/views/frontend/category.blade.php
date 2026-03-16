@@ -81,67 +81,110 @@
 
                     <!-- মাঝের কলাম: সংবাদ তালিকা -->
                     <div class="bg-white p-0 md:p-4 flex flex-col gap-3 md:gap-5">
-
-                        @forelse($posts as $post)
-                        @php
-                        $primaryCategory = $post->categories->first();
-                        $parentCategory = optional($primaryCategory)->parent;
-                        $categorySlug = $parentCategory ? $parentCategory->slug : optional($primaryCategory)->slug;
-                        $subCategorySlug = $parentCategory ? $primaryCategory->slug : null;
-                        @endphp
-                        <article class="flex flex-col md:flex-row gap-2 md:gap-4 last:pb-0">
-                            {{-- ছবি --}}
-                            <a
-                                href="{{ $subCategorySlug
-                                    ? route('news.show.sub', [$categorySlug, $subCategorySlug, $post->slug])
-                                    : route('news.show', [$categorySlug, $post->slug]) }}"
-                                class="w-full md:w-auto flex-shrink-0">
-                                <div class="img-placeholder w-full md:w-[305px] h-[200px] md:h-[170px] overflow-hidden">
-                                    <img src="{{ $post->image ? asset('storage/'.$post->image) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600' }}"
-                                        alt="{{ $post->title }}"
-                                        class="w-full h-full object-cover"
-                                        onload="this.parentElement.classList.remove('img-placeholder')">
-                                </div>
-                            </a>
-                            {{-- টাইটেল + বিবরণ --}}
-                            <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
+                        <div id="category-posts-list" class="flex flex-col gap-3 md:gap-5">
+                            @forelse($posts as $post)
+                            @php
+                            $primaryCategory = $post->categories->first();
+                            $parentCategory = optional($primaryCategory)->parent;
+                            $categorySlug = $parentCategory ? $parentCategory->slug : optional($primaryCategory)->slug;
+                            $subCategorySlug = $parentCategory ? $primaryCategory->slug : null;
+                            @endphp
+                            <article class="flex flex-col md:flex-row gap-2 md:gap-4 last:pb-0 category-post-item">
+                                {{-- ছবি --}}
                                 <a
                                     href="{{ $subCategorySlug
                                         ? route('news.show.sub', [$categorySlug, $subCategorySlug, $post->slug])
-                                        : route('news.show', [$categorySlug, $post->slug]) }}">
-                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
-                                        {{ $post->title }}
-                                    </h3>
+                                        : route('news.show', [$categorySlug, $post->slug]) }}"
+                                    class="w-full md:w-auto flex-shrink-0">
+                                    <div class="img-placeholder w-full md:w-[305px] h-[200px] md:h-[170px] overflow-hidden">
+                                        <img src="{{ $post->image ? asset('storage/'.$post->image) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600' }}"
+                                            alt="{{ $post->title }}"
+                                            class="w-full h-full object-cover"
+                                            onload="this.parentElement.classList.remove('img-placeholder')">
+                                    </div>
                                 </a>
-                                @if($post->sub_title)
-                                <p class="hidden md:block text-sm font-semibold text-desc leading-relaxed line-clamp-2">
-                                    {{ $post->sub_title }}
-                                </p>
-                                @elseif($post->description)
-                                <p class="hidden md:block text-sm font-semibold text-desc leading-relaxed line-clamp-2">
-                                    {{ Str::limit(strip_tags($post->description), 160) }}
-                                </p>
-                                @endif
-                                <div class="flex items-center gap-1.5 mt-auto text-gray-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <polyline points="12 6 12 12 16 14" />
-                                    </svg>
-                                    <span class="text-xs font-medium text-gray-500">
-                                        {{ $post->created_at->diffForHumans() }}
-                                    </span>
+                                {{-- টাইটেল + বিবরণ --}}
+                                <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
+                                    <a
+                                        href="{{ $subCategorySlug
+                                            ? route('news.show.sub', [$categorySlug, $subCategorySlug, $post->slug])
+                                            : route('news.show', [$categorySlug, $post->slug]) }}">
+                                        <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                            {{ $post->title }}
+                                        </h3>
+                                    </a>
+                                    @if($post->sub_title)
+                                    <p class="hidden md:block text-sm font-semibold text-desc leading-relaxed line-clamp-2">
+                                        {{ $post->sub_title }}
+                                    </p>
+                                    @elseif($post->description)
+                                    <p class="hidden md:block text-sm font-semibold text-desc leading-relaxed line-clamp-2">
+                                        {{ Str::limit(strip_tags($post->description), 160) }}
+                                    </p>
+                                    @endif
+                                    <div class="flex items-center gap-1.5 mt-auto text-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <polyline points="12 6 12 12 16 14" />
+                                        </svg>
+                                        <span class="text-xs font-medium text-gray-500">
+                                            {{ $post->created_at->diffForHumans() }}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </article>
-                        @empty
-                        <p class="text-desc text-center py-10">এই category-তে কোনো সংবাদ পাওয়া যায়নি।</p>
-                        @endforelse
+                            </article>
+                            @empty
+                            <p class="text-desc text-center py-10">এই category-তে কোনো সংবাদ পাওয়া যায়নি।</p>
+                            @endforelse
+                        </div>
 
-                        {{-- Pagination --}}
-                        @if($posts->hasPages())
-                        <div class="mt-4">{{ $posts->links() }}</div>
+                        {{-- আরও বাটন (প্রথমে ১০টি, ক্লিক করলে ২০টি করে) --}}
+                        @if(!empty($hasMore) && !empty($nextPageUrl))
+                        <div class="mt-6 flex justify-center" id="load-more-wrap">
+                            <button type="button" id="load-more-btn" data-next-url="{{ $nextPageUrl }}"
+                                class="px-8 py-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg transition-colors shadow-sm">
+                                আরও
+                            </button>
+                        </div>
+                        <script>
+                        (function() {
+                            var btn = document.getElementById('load-more-btn');
+                            var list = document.getElementById('category-posts-list');
+                            var wrap = document.getElementById('load-more-wrap');
+                            if (!btn || !list) return;
+                            btn.addEventListener('click', function() {
+                                var url = btn.getAttribute('data-next-url');
+                                if (!url) return;
+                                btn.disabled = true;
+                                btn.textContent = 'লোড হচ্ছে...';
+                                var xhr = new XMLHttpRequest();
+                                xhr.open('GET', url, true);
+                                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                                xhr.setRequestHeader('Accept', 'application/json');
+                                xhr.onload = function() {
+                                    btn.disabled = false;
+                                    btn.textContent = 'আরও';
+                                    if (xhr.status !== 200) return;
+                                    try {
+                                        var res = JSON.parse(xhr.responseText);
+                                        if (res.html) {
+                                            var div = document.createElement('div');
+                                            div.innerHTML = res.html.trim();
+                                            while (div.firstChild) list.appendChild(div.firstChild);
+                                        }
+                                        if (res.next_page_url) {
+                                            btn.setAttribute('data-next-url', res.next_page_url);
+                                        } else {
+                                            wrap.style.display = 'none';
+                                        }
+                                    } catch (e) {}
+                                };
+                                xhr.onerror = function() { btn.disabled = false; btn.textContent = 'আরও'; };
+                                xhr.send();
+                            });
+                        })();
+                        </script>
                         @endif
-
                     </div>
 
                     @php $adSidebarList = ad_slot('sidebar_list'); @endphp

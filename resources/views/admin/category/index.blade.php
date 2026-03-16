@@ -7,15 +7,11 @@
 <div class="py-1 w-full mx-auto">
 
     {{-- Page Header --}}
-    <div class="flex items-center justify-between mb-6">
-        <div></div>
-        <div class="flex items-center gap-3">
-
-            <button onclick="openModal('addCategoryModal', 'modalContainer')" class="flex items-center gap-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-normal text-sm transition-all shadow-md">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Add Category
-            </button>
-        </div>
+    <div class="flex flex-wrap items-center justify-end gap-3 mb-6">
+        <button onclick="openModal('addCategoryModal', 'modalContainer')" class="flex items-center gap-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-normal text-sm transition-all shadow-md">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Add Category
+        </button>
     </div>
 
     {{-- Table --}}

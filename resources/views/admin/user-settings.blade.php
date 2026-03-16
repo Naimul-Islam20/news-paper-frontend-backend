@@ -7,16 +7,16 @@
 @section('header_subtitle', 'Update your personal information and profile image.')
 
 @section('content')
-    <div class="max-w-4xl mx-auto space-y-8">
+    <div class="max-w-4xl mx-auto space-y-6 sm:space-y-8">
         @if (session('status'))
-            <div class="rounded-3xl bg-emerald-500/10 border border-emerald-500/20 px-6 py-4 text-sm text-emerald-700 dark:text-emerald-400 shadow-sm flex items-center gap-3">
+            <div class="rounded-3xl bg-emerald-500/10 border border-emerald-500/20 px-4 sm:px-6 py-4 text-sm text-emerald-700 dark:text-emerald-400 shadow-sm flex items-center gap-3">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 {{ session('status') }}
             </div>
         @endif
 
         @if ($errors->any())
-            <div class="rounded-3xl bg-rose-500/10 border border-rose-500/20 px-6 py-4 text-sm text-rose-700 dark:text-rose-400 shadow-sm">
+            <div class="rounded-3xl bg-rose-500/10 border border-rose-500/20 px-4 sm:px-6 py-4 text-sm text-rose-700 dark:text-rose-400 shadow-sm">
                 <div class="flex items-center gap-3 mb-2 font-bold uppercase tracking-wider text-xs">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span>Please correct the following:</span>

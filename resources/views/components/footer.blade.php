@@ -81,7 +81,7 @@
                 </ul>
             </div>
 
-            <!-- Column 4: Social Links (Span 2) -->
+            <!-- Column 4: Social Links – backend (site meta) থেকে ডাইনামিক -->
             <div class="md:col-span-2">
                 <ul class="space-y-4 text-base font-semibold">
                     @if(!empty(optional($siteMeta)->facebook_link))

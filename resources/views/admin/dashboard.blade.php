@@ -9,21 +9,44 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
 @endsection
 
 @section('content')
-<div class="max-w-7xl mx-auto space-y-8">
+<style>
+    @media (max-width: 639px) {
+        .month-label-short { display: inline; }
+        .month-label-full { display: none; }
+    }
+    @media (min-width: 640px) {
+        .month-label-short { display: none; }
+        .month-label-full { display: inline; }
+    }
+</style>
+<div class="max-w-7xl mx-auto space-y-3 md:space-y-8">
     {{-- Stat Cards --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {{-- Today's Stories --}}
-        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 transition-all hover:shadow-md group">
-            <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-indigo-50 dark:bg-indigo-950/30 rounded-full transition-transform group-hover:scale-110"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+        {{-- Today's Posts --}}
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+            <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-indigo-50 dark:bg-indigo-950/30 rounded-full"></div>
             <div class="relative flex items-start justify-between">
                 <div>
-                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Today's Stories</p>
-                    <h3 class="text-3xl font-bold mt-2 text-slate-900 dark:text-white">12</h3>
-                    <p class="text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1">
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Today's Posts</p>
+                    <h3 class="text-3xl font-bold mt-2 text-slate-900 dark:text-white">{{ $todayPosts ?? 0 }}</h3>
+                    @php
+                    $yesterday = $yesterdayPosts ?? 0;
+                    $today = $todayPosts ?? 0;
+                    $todayStoriesSub = 'Published today';
+                    if ($yesterday > 0 && $today != $yesterday) {
+                    $pct = (int) round((($today - $yesterday) / $yesterday) * 100);
+                    $todayStoriesSub = $pct >= 0 ? "+{$pct}% from yesterday" : "{$pct}% from yesterday";
+                    } elseif ($yesterday > 0 || $today > 0) {
+                    $todayStoriesSub = $today === $yesterday ? 'Same as yesterday' : 'Published today';
+                    }
+                    @endphp
+                    <p class="text-xs {{ ($yesterday > 0 && $today > $yesterday) ? 'text-emerald-600' : (($yesterday > 0 && $today < $yesterday) ? 'text-amber-600' : 'text-slate-400') }} font-medium mt-1 flex items-center gap-1">
+                        @if($yesterday > 0 && $today > $yesterday)
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
                         </svg>
-                        +20% from yesterday
+                        @endif
+                        {{ $todayStoriesSub }}
                     </p>
                 </div>
                 <div class="p-3 bg-indigo-500 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none">
@@ -36,12 +59,12 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
         </div>
 
         {{-- Total Articles --}}
-        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 transition-all hover:shadow-md group">
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-800 transition-all hover:shadow-md group">
             <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-blue-50 dark:bg-blue-950/30 rounded-full transition-transform group-hover:scale-110"></div>
             <div class="relative flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Total Articles</p>
-                    <h3 class="text-3xl font-bold mt-2 text-slate-900 dark:text-white">1,284</h3>
+                    <h3 class="text-3xl font-bold mt-2 text-slate-900 dark:text-white">{{ $totalPublishedPosts ?? 0 }}</h3>
                     <p class="text-xs text-slate-400 font-medium mt-1">Across all categories</p>
                 </div>
                 <div class="p-3 bg-blue-500 rounded-2xl shadow-lg shadow-blue-200 dark:shadow-none">
@@ -52,19 +75,34 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
             </div>
         </div>
 
-        {{-- Live Readers --}}
-        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 transition-all hover:shadow-md group">
-            <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-emerald-50 dark:bg-emerald-950/30 rounded-full transition-transform group-hover:scale-110"></div>
+        {{-- Today's Visitors --}}
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+            <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-emerald-50 dark:bg-emerald-950/30 rounded-full"></div>
             <div class="relative flex items-start justify-between">
                 <div>
-                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Live Readers</p>
-                    <h3 class="text-3xl font-bold mt-2 text-slate-900 dark:text-white">452</h3>
-                    <div class="flex items-center gap-2 mt-1">
-                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                        <p class="text-xs text-emerald-600 font-medium tracking-wide">Currently active</p>
-                    </div>
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Today's Visitors</p>
+                    <h3 class="text-3xl font-bold mt-2 text-slate-900 dark:text-white">{{ $todayVisitors ?? 0 }}</h3>
+                    @php
+                    $yv = $yesterdayVisitors ?? 0;
+                    $tv = $todayVisitors ?? 0;
+                    $visitorsSub = 'Unique visitors today';
+                    if ($yv > 0 && $tv != $yv) {
+                    $pctV = (int) round((($tv - $yv) / $yv) * 100);
+                    $visitorsSub = $pctV >= 0 ? "+{$pctV}% from yesterday" : "{$pctV}% from yesterday";
+                    } elseif ($yv > 0 || $tv > 0) {
+                    $visitorsSub = $tv === $yv ? 'Same as yesterday' : 'Unique visitors today';
+                    }
+                    @endphp
+                    <p class="text-xs {{ ($yv > 0 && $tv > $yv) ? 'text-emerald-600' : (($yv > 0 && $tv < $yv) ? 'text-amber-600' : 'text-slate-400') }} font-medium mt-1 flex items-center gap-1">
+                        @if($yv > 0 && $tv > $yv)
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                        </svg>
+                        @endif
+                        {{ $visitorsSub }}
+                    </p>
                 </div>
-                <div class="p-3 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-200 dark:shadow-none">
+                <div class="p-3 bg-emerald-500 rounded-2xl shadow-xl shadow-emerald-200 dark:shadow-none">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -74,12 +112,12 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
         </div>
 
         {{-- Pending Review --}}
-        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 transition-all hover:shadow-md group">
-            <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-amber-50 dark:bg-amber-950/30 rounded-full transition-transform group-hover:scale-110"></div>
+        <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+            <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-amber-50 dark:bg-amber-950/30 rounded-full"></div>
             <div class="relative flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Pending Review</p>
-                    <h3 class="text-3xl font-bold mt-2 text-slate-900 dark:text-white">7</h3>
+                    <h3 class="text-3xl font-bold mt-2 text-slate-900 dark:text-white">{{ $draftPendingCount ?? 0 }}</h3>
                     <p class="text-xs text-amber-600 font-medium mt-1">Needs attention</p>
                 </div>
                 <div class="p-3 bg-amber-500 rounded-2xl shadow-lg shadow-amber-200 dark:shadow-none">
@@ -91,14 +129,14 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
         {{-- Performance Chart Area --}}
-        <div class="lg:col-span-2 space-y-8">
+        <div class="lg:col-span-2 space-y-3 md:space-y-8">
             {{-- Weekly Visitors --}}
-            <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Site Visitors (Weekly)</h3>
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 sm:p-8">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                    <div class="min-w-0">
+                        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Site Visitors (Weekly)</h3>
                         <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Last 7 days unique visitors (daily)</p>
                     </div>
                 </div>
@@ -116,15 +154,19 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
                 0,
                 ];
 
-                // Chart: baseline at bottom (y=44) so it aligns with left "0" (justify-between = bottom)
+                // Chart: line/dots end a bit above baseline so dots don't sit on the border
                 $chartBottom = 44;
+                $dotBottom = 43;
                 $chartTop = 8;
-                $chartHeight = $chartBottom - $chartTop;
+                $chartHeight = $dotBottom - $chartTop;
+                $chartLeft = 1;
+                $chartRight = 98;
+                $chartWidth = $chartRight - $chartLeft;
 
                 $weeklyPoints = [];
                 foreach ($weeklyVisitors as $i => $item) {
-                $x = 8 + ($i * (84 / max(1, $weeklyCount - 1)));
-                $y = $chartBottom - (($item['value'] / max(1, $weeklyScaleMax)) * $chartHeight);
+                $x = $chartLeft + ($i * ($chartWidth / max(1, $weeklyCount - 1)));
+                $y = $dotBottom - (($item['value'] / max(1, $weeklyScaleMax)) * $chartHeight);
                 $weeklyPoints[] = $x . ',' . $y;
                 }
                 @endphp
@@ -147,89 +189,143 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
                             <line x1="0" y1="44" x2="100" y2="44" stroke="#e5e7eb" stroke-width="0.5" />
                             @if(count($weeklyPoints))
                             <polygon fill="url(#weeklyGradient)" opacity="0.7"
-                                points="{{ '0,44 ' . implode(' ', $weeklyPoints) . ' 100,44' }}" />
+                                points="{{ $chartLeft . ',' . $dotBottom . ' ' . implode(' ', $weeklyPoints) . ' ' . $chartRight . ',' . $dotBottom }}" />
                             <polyline fill="none" stroke="#4f46e5" stroke-width="0.8"
                                 stroke-linecap="round" stroke-linejoin="round"
                                 points="{{ implode(' ', $weeklyPoints) }}" />
                             @foreach($weeklyVisitors as $i => $item)
                             @php
-                            $x = 8 + ($i * (84 / max(1, $weeklyCount - 1)));
-                            $y = $chartBottom - (($item['value'] / max(1, $weeklyScaleMax)) * $chartHeight);
+                            $x = $chartLeft + ($i * ($chartWidth / max(1, $weeklyCount - 1)));
+                            $y = $dotBottom - (($item['value'] / max(1, $weeklyScaleMax)) * $chartHeight);
+                            $textY = $y - 2.5;
                             @endphp
                             <circle cx="{{ $x }}" cy="{{ $y }}" r="0.9" fill="#4f46e5" />
-                            <text x="{{ $x }}" y="41" text-anchor="middle" font-size="2.1" fill="#4b5563">{{ $item['value'] }}</text>
+                            <text x="{{ $x }}" y="{{ $textY }}" text-anchor="middle" font-size="2.1" fill="#4b5563">{{ $item['value'] }}</text>
                             @endforeach
                             @endif
                         </svg>
                     </div>
                 </div>
-                {{-- Tarikh: niche alada (chart rekha te hat nei) --}}
-                <div class="flex gap-3 mt-1">
+                {{-- Tarikh: dot er thik niche, slight left offset --}}
+                <div class="flex gap-0 mt-1">
                     <div class="w-8 shrink-0"></div>
-                    <div class="flex-1 flex justify-between text-[10px] font-medium text-slate-400">
-                        @foreach($weeklyVisitors as $item)
-                        <span>{{ $item['label'] }}</span>
+                    <div class="flex-1 relative min-h-[1.25rem] text-[10px] font-medium text-slate-400">
+                        @foreach($weeklyVisitors as $i => $item)
+                        @php $labelX = $chartLeft + ($i * ($chartWidth / max(1, $weeklyCount - 1))) - 0.5; @endphp
+                        <span class="absolute -translate-x-1/2 whitespace-nowrap" style="left: {{ $labelX }}%;">{{ $item['label'] }}</span>
                         @endforeach
                     </div>
                 </div>
             </div>
 
-            {{-- Monthly Visitors --}}
-            <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Site Visitors (Monthly)</h3>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Last 30 days unique visitors (daily)</p>
+            {{-- Monthly Visitors (last 12 months, same style as Weekly) --}}
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 sm:p-8">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+                    <div class="min-w-0">
+                        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Site Visitors (Monthly)</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Last 12 months unique visitors (monthly)</p>
                     </div>
                 </div>
                 @php
                 $monthlyValues = collect($monthlyVisitors)->pluck('value');
                 $monthlyMax = max(1, $monthlyValues->max() ?? 0);
                 $monthlyCount = max(1, count($monthlyVisitors));
+                $monthlyBaseScales = [10, 50, 100, 500, 1000, 5000, 10000];
+                $monthlyScaleMax = collect($monthlyBaseScales)->first(fn ($v) => $v >= $monthlyMax) ?? $monthlyMax;
+                $monthlyScaleLabels = [
+                $monthlyScaleMax,
+                (int) round($monthlyScaleMax * 0.5),
+                (int) round($monthlyScaleMax * 0.25),
+                0,
+                ];
+                $mChartBottom = 44;
+                $mDotBottom = 43;
+                $mChartTop = 8;
+                $mChartHeight = $mDotBottom - $mChartTop;
+                $mChartLeft = 1;
+                $mChartRight = 98;
+                $mChartWidth = $mChartRight - $mChartLeft;
                 $monthlyPoints = [];
                 foreach ($monthlyVisitors as $i => $item) {
-                $x = 8 + ($i * (84 / max(1, $monthlyCount - 1)));
-                $y = 36 - (($item['value'] / $monthlyMax) * 28);
-                $monthlyPoints[] = $x . ',' . $y;
+                $mx = $mChartLeft + ($i * ($mChartWidth / max(1, $monthlyCount - 1)));
+                $my = $mDotBottom - (($item['value'] / max(1, $monthlyScaleMax)) * $mChartHeight);
+                $monthlyPoints[] = $mx . ',' . $my;
                 }
                 @endphp
-                <div class="h-40 relative">
-                    <svg viewBox="0 0 100 40" class="w-full h-full">
-                        <defs>
-                            <linearGradient id="monthlyGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.5" />
-                                <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0" />
-                            </linearGradient>
-                        </defs>
-                        <line x1="4" y1="36" x2="96" y2="36" stroke="#e5e7eb" stroke-width="0.5" />
-                        @if(count($monthlyPoints))
-                        <polygon fill="url(#monthlyGradient)" opacity="0.5"
-                            points="{{ '4,36 ' . implode(' ', $monthlyPoints) . ' 96,36' }}" />
-                        <polyline fill="none" stroke="#0ea5e9" stroke-width="1.5"
-                            points="{{ implode(' ', $monthlyPoints) }}" />
+                <div class="h-44 flex gap-3 items-stretch">
+                    <div class="flex flex-col justify-between text-[10px] font-medium text-slate-400 py-0">
+                        @foreach($monthlyScaleLabels as $label)
+                        <span>{{ $label }}</span>
+                        @endforeach
+                    </div>
+                    <div class="flex-1 relative min-h-0">
+                        <svg viewBox="0 0 100 44" class="w-full h-full block">
+                            <defs>
+                                <linearGradient id="monthlyGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.55" />
+                                    <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0" />
+                                </linearGradient>
+                            </defs>
+                            <line x1="0" y1="44" x2="100" y2="44" stroke="#e5e7eb" stroke-width="0.5" />
+                            @if(count($monthlyPoints))
+                            <polygon fill="url(#monthlyGradient)" opacity="0.7"
+                                points="{{ $mChartLeft . ',' . $mDotBottom . ' ' . implode(' ', $monthlyPoints) . ' ' . $mChartRight . ',' . $mDotBottom }}" />
+                            <polyline fill="none" stroke="#0ea5e9" stroke-width="0.8"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                points="{{ implode(' ', $monthlyPoints) }}" />
+                            @foreach($monthlyVisitors as $i => $item)
+                            @php
+                            $mx = $mChartLeft + ($i * ($mChartWidth / max(1, $monthlyCount - 1)));
+                            $my = $mDotBottom - (($item['value'] / max(1, $monthlyScaleMax)) * $mChartHeight);
+                            $mTextY = $my - 2.5;
+                            @endphp
+                            <circle cx="{{ $mx }}" cy="{{ $my }}" r="0.9" fill="#0ea5e9" />
+                            <text x="{{ $mx }}" y="{{ $mTextY }}" text-anchor="middle" font-size="2.1" fill="#4b5563">{{ $item['value'] }}</text>
+                            @endforeach
+                            @endif
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex gap-0 mt-1">
+                    <div class="w-8 shrink-0"></div>
+                    <div class="flex-1 relative min-h-[1.25rem] text-[10px] font-medium text-slate-400">
+                        @php
+                            $mobileMonthShort = [
+                                'January' => 'Ja',
+                                'February' => 'Fe',
+                                'March' => 'Ma',
+                                'April' => 'Ap',
+                                'May' => 'Ma',
+                                'June' => 'Ju',
+                                'July' => 'Ju',
+                                'August' => 'Au',
+                                'September' => 'Se',
+                                'October' => 'Oc',
+                                'November' => 'No',
+                                'December' => 'De',
+                            ];
+                        @endphp
                         @foreach($monthlyVisitors as $i => $item)
                         @php
-                        $x = 8 + ($i * (84 / max(1, $monthlyCount - 1)));
-                        $y = 36 - (($item['value'] / $monthlyMax) * 28);
+                            $mLabelX = $mChartLeft + ($i * ($mChartWidth / max(1, $monthlyCount - 1))) - 1;
+                            $label = $item['label'];
+                            $short = $mobileMonthShort[$label] ?? \Illuminate\Support\Str::substr($label, 0, 2);
                         @endphp
-                        <circle cx="{{ $x }}" cy="{{ $y }}" r="1.0" fill="#0ea5e9" />
-                        @endforeach
-                        @endif
-                    </svg>
-                    <div class="mt-3 flex justify-between text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                        @foreach($monthlyVisitors as $i => $item)
-                        @if($i % 5 === 0 || $i === count($monthlyVisitors) - 1)
-                        <span>{{ $item['label'] }}</span>
-                        @else
-                        <span></span>
-                        @endif
+                        <span class="absolute -translate-x-1/2 whitespace-nowrap" style="left: {{ $mLabelX }}%;">
+                            <span class="month-label-short px-0.5">
+                                {{ $short }}
+                            </span>
+                            <span class="month-label-full">
+                                {{ $label }}
+                            </span>
+                        </span>
                         @endforeach
                     </div>
                 </div>
             </div>
 
             {{-- Recent Articles Table --}}
-            <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                 <div class="p-8 pb-0 flex items-center justify-between">
                     <div>
                         <h3 class="text-xl font-bold text-slate-900 dark:text-white">Newsroom Activity</h3>
@@ -279,9 +375,9 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
         </div>
 
         {{-- Sidebar Widgets --}}
-        <div class="space-y-8">
+        <div class="space-y-3 md:space-y-8">
             {{-- Quick Actions --}}
-            <div class="bg-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200 dark:shadow-none bg-linear-to-br from-indigo-600 to-indigo-800 relative overflow-hidden">
+            <div class="bg-indigo-600 rounded-xl p-8 text-white shadow-xl shadow-indigo-200 dark:shadow-none bg-linear-to-br from-indigo-600 to-indigo-800 relative overflow-hidden">
                 <svg class="absolute -right-4 -bottom-4 w-32 h-32 text-indigo-500 opacity-20 transform -rotate-12" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                 </svg>

@@ -25,7 +25,7 @@
             @csrf
             @method('PUT')
 
-            <div class="p-6 border-b border-slate-200 dark:border-slate-800">
+            <div class="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800">
                 <p class="text-sm text-slate-600 dark:text-slate-400">
                     কোন রোলের কোন পেজ/ফিচারে অ্যাক্সেস থাকবে সেটা নিচের চেকবক্স দিয়ে সেট করুন। Admin এর সব অ্যাক্সেস থাকে; অন্যান্য রোলের জন্য চেক করে সেভ করুন।
                 </p>

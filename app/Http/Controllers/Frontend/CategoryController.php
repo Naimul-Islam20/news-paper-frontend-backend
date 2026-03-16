@@ -8,6 +8,7 @@ use App\Models\Gallery;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Video;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class CategoryController extends Controller
@@ -15,13 +16,12 @@ class CategoryController extends Controller
     /**
      * সর্বশেষ পেজ – সব ধরনের পোস্ট (post type), নতুন প্রথমে, ক্যাটাগরি পেজের মতোই UI।
      */
-    public function latest(): View
+    public function latest(): View|JsonResponse
     {
-        $posts = Post::with(['reporter', 'categories.parent'])
+        $baseQuery = Post::with(['reporter', 'categories.parent'])
             ->where('status', 'published')
             ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
-            ->latest()
-            ->paginate(10);
+            ->latest();
 
         $category = (object) [
             'name'   => 'সর্বশেষ',
@@ -34,10 +34,10 @@ class CategoryController extends Controller
             'slug'          => 'latest',
         ];
 
-        return view('frontend.category', compact('category', 'posts', 'subCategorySource'));
+        return $this->categoryPostsWithLoadMore($baseQuery, 10, 20, compact('category', 'subCategorySource'), 'frontend.category');
     }
 
-    public function show(string $slug): View
+    public function show(string $slug): View|JsonResponse
     {
         $category = Category::where('slug', $slug)->firstOrFail();
 
@@ -65,41 +65,77 @@ class CategoryController extends Controller
     }
 
     // post type → national.blade.php design
-    private function postCategory(Category $category): View
+    private function postCategory(Category $category): View|JsonResponse
     {
-        $posts = Post::with(['reporter', 'categories.parent'])
+        $baseQuery = Post::with(['reporter', 'categories.parent'])
             ->whereHas('categories', fn($q) => $q->where('categories.id', $category->id))
             ->where('status', 'published')
-            ->latest()
-            ->paginate(10);
+            ->latest();
 
-        // Submenu তে দেখানোর জন্য: এই category-র নিজের subCategories, আর যদি নিজে subcategory হয় তাহলে তার parent-এর subCategories
         $subCategorySource = $category->parent ?? $category;
 
-        return view('frontend.category', compact('category', 'posts', 'subCategorySource'));
+        return $this->categoryPostsWithLoadMore($baseQuery, 10, 20, compact('category', 'subCategorySource'), 'frontend.category');
     }
 
-    // gallery type → gallery.blade.php design
-    private function galleryCategory(Category $category): View
+    /**
+     * প্রথমে ১০টি খবর, আরও ক্লিক করলে ২০টি করে লোড। AJAX এ more_page প্যারামিটার ব্যবহার।
+     */
+    private function categoryPostsWithLoadMore($baseQuery, int $initialCount, int $moreCount, array $viewData, string $viewName): View|JsonResponse
     {
-        $galleries = Gallery::with('images')
+        return $this->categoryLoadMore($baseQuery, $initialCount, $moreCount, $viewData, $viewName, 'frontend.partials.category-posts', 'posts');
+    }
+
+    /**
+     * যেকোনো টাইপ (পোস্ট/গ্যালারি/ভিডিও): প্রথমে ১০টি, আরও ক্লিক করলে ২০টি করে।
+     */
+    private function categoryLoadMore($baseQuery, int $initialCount, int $moreCount, array $viewData, string $viewName, string $partialView, string $variableName): View|JsonResponse
+    {
+        $total = (clone $baseQuery)->count();
+        $morePage = (int) request()->input('more_page', 0);
+
+        if (request()->ajax() && $morePage >= 1) {
+            $offset = $initialCount + ($morePage - 1) * $moreCount;
+            $items = (clone $baseQuery)->skip($offset)->take($moreCount)->get();
+            $hasMore = $total > $initialCount + $morePage * $moreCount;
+            $nextUrl = $hasMore ? request()->url() . '?more_page=' . ($morePage + 1) : null;
+
+            return response()->json([
+                'html'          => view($partialView, [$variableName => $items])->render(),
+                'next_page_url' => $nextUrl,
+                'has_more'      => $hasMore,
+            ]);
+        }
+
+        $items = (clone $baseQuery)->take($initialCount)->get();
+        $hasMore = $total > $initialCount;
+        $nextPageUrl = $hasMore ? request()->url() . '?more_page=1' : null;
+
+        $viewData[$variableName] = $items;
+        $viewData['hasMore'] = $hasMore;
+        $viewData['nextPageUrl'] = $nextPageUrl;
+
+        return view($viewName, $viewData);
+    }
+
+    // gallery type → gallery.blade.php design (প্রথমে ১০, আরও এ ২০টি)
+    private function galleryCategory(Category $category): View|JsonResponse
+    {
+        $baseQuery = Gallery::with('images')
             ->where('category_id', $category->id)
             ->where('status', 'active')
-            ->latest()
-            ->paginate(10);
+            ->latest();
 
-        return view('frontend.category-gallery', compact('category', 'galleries'));
+        return $this->categoryLoadMore($baseQuery, 10, 20, compact('category'), 'frontend.category-gallery', 'frontend.partials.category-galleries', 'galleries');
     }
 
-    // video type → videos.blade.php design
-    private function videoCategory(Category $category): View
+    // video type → videos.blade.php design (প্রথমে ১০, আরও এ ২০টি)
+    private function videoCategory(Category $category): View|JsonResponse
     {
-        $videos = Video::where('category_id', $category->id)
+        $baseQuery = Video::where('category_id', $category->id)
             ->where('status', 'active')
-            ->latest()
-            ->paginate(10);
+            ->latest();
 
-        return view('frontend.category-video', compact('category', 'videos'));
+        return $this->categoryLoadMore($baseQuery, 10, 20, compact('category'), 'frontend.category-video', 'frontend.partials.category-videos', 'videos');
     }
 
     // page type → single page (privacy-policy style), not a list

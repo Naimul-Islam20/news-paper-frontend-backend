@@ -6,6 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Panel')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        /* মোবাইলে সাইডবার লুকানো; মেনু খুললে .sidebar-open দিয়ে দেখানো। টেইলউইন্ডের ওপর নির্ভর না করে নিশ্চিত কাজের জন্য। */
+        @media (max-width: 767px) {
+            #admin-sidebar { transform: translateX(-100%); }
+            #admin-sidebar.sidebar-open { transform: translateX(0); }
+            #admin-sidebar-toggle { display: flex !important; align-items: center; justify-content: center; }
+        }
+        @media (min-width: 768px) {
+            #admin-sidebar { transform: translateX(0); }
+            #admin-sidebar-toggle { display: none !important; }
+            #admin-sidebar-backdrop { display: none !important; }
+        }
+    </style>
     <script>
         // Theme bootstrap: read stored preference
         (function() {
@@ -65,6 +78,15 @@
                     arrow.classList.add('rotate-180');
                 }
             });
+            // Close mobile sidebar when a sidebar link is clicked (navigation)
+            var sidebar = document.getElementById('admin-sidebar');
+            if (sidebar) {
+                sidebar.addEventListener('click', function(e) {
+                    if (window.matchMedia('(max-width: 767px)').matches && e.target.closest('a[href]')) {
+                        window.closeAdminSidebar();
+                    }
+                });
+            }
         });
 
         // Heartbeat to keep session alive while working
@@ -73,14 +95,54 @@
                 .then(response => response.json())
                 .catch(error => console.error('Heartbeat failed:', error));
         }, 5 * 60 * 1000); // Ping every 5 minutes
+
+        // Mobile sidebar: মোবাইলে লুকানো, মেনু আইকনে ক্লিক করলে খুলবে; বন্ধ করলে আবার লুকাবে
+        window.toggleAdminSidebar = function() {
+            var sidebar = document.getElementById('admin-sidebar');
+            var backdrop = document.getElementById('admin-sidebar-backdrop');
+            var toggle = document.getElementById('admin-sidebar-toggle');
+            if (!sidebar || !backdrop) return;
+            var isOpen = sidebar.classList.contains('sidebar-open');
+            if (isOpen) {
+                sidebar.classList.remove('sidebar-open');
+                sidebar.setAttribute('data-sidebar-open', 'false');
+                sidebar.setAttribute('aria-hidden', 'true');
+                backdrop.classList.add('opacity-0', 'pointer-events-none');
+                backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+                if (toggle) { toggle.setAttribute('aria-expanded', 'false'); }
+                document.body.classList.remove('overflow-hidden');
+            } else {
+                sidebar.classList.add('sidebar-open');
+                sidebar.setAttribute('data-sidebar-open', 'true');
+                sidebar.setAttribute('aria-hidden', 'false');
+                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+                backdrop.classList.add('opacity-100', 'pointer-events-auto');
+                if (toggle) { toggle.setAttribute('aria-expanded', 'true'); }
+                document.body.classList.add('overflow-hidden');
+            }
+        };
+        window.closeAdminSidebar = function() {
+            var sidebar = document.getElementById('admin-sidebar');
+            var backdrop = document.getElementById('admin-sidebar-backdrop');
+            var toggle = document.getElementById('admin-sidebar-toggle');
+            if (!sidebar || !backdrop) return;
+            sidebar.classList.remove('sidebar-open');
+            sidebar.setAttribute('data-sidebar-open', 'false');
+            sidebar.setAttribute('aria-hidden', 'true');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
+            backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+            if (toggle) { toggle.setAttribute('aria-expanded', 'false'); }
+            document.body.classList.remove('overflow-hidden');
+        };
     </script>
 </head>
 
 <body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
     <div class="flex min-h-screen">
-        {{-- Sidebar --}}
-        <aside class="w-64 bg-white border-r border-slate-200 dark:bg-slate-900/90 dark:border-slate-800/80 backdrop-blur fixed top-0 left-0 bottom-0 z-40 h-screen flex flex-col">
-            <div class="h-20 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/50">
+        {{-- Sidebar: ডেস্কটপে সবসময় দৃশ্যমান। মোবাইলে লুকানো, হেডারের মেনু (☰) আইকনে ক্লিক করলে .sidebar-open দিয়ে খুলে (উপরের style ব্লক দিয়ে নিয়ন্ত্রণ) --}}
+        <aside id="admin-sidebar" aria-hidden="true" data-sidebar-open="false"
+            class="admin-sidebar-drawer w-64 bg-white border-r border-slate-200 dark:bg-slate-900/90 dark:border-slate-800/80 backdrop-blur fixed top-0 left-0 bottom-0 z-50 h-screen flex flex-col transition-transform duration-300 ease-out">
+            <div class="h-20 flex items-center px-3 md:px-6 border-b border-slate-200 dark:border-slate-800/50">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
                     @if(!empty(optional($siteMeta)->site_logo))
                         <img src="{{ storage_image_url($siteMeta->site_logo) }}"
@@ -95,7 +157,7 @@
                 </a>
             </div>
 
-            <nav class="p-4 space-y-1 text-sm overflow-y-auto flex-1 custom-scrollbar">
+            <nav class="px-3 py-4 md:px-4 md:py-4 space-y-1 text-sm overflow-y-auto flex-1 custom-scrollbar">
                 <a
                     href="{{ route('admin.dashboard') }}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
@@ -511,24 +573,49 @@
             </nav>
         </aside>
 
+        {{-- Mobile backdrop: visible when sidebar open, click to close --}}
+        <div id="admin-sidebar-backdrop"
+            role="button"
+            tabindex="0"
+            aria-label="Close menu"
+            class="fixed inset-0 z-40 bg-black/50 md:hidden opacity-0 pointer-events-none transition-opacity duration-300"
+            onclick="window.closeAdminSidebar()"
+            onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); window.closeAdminSidebar(); }"></div>
+
+        {{-- ডেস্কটপে সাইডবারের জায়গা রাখে, যাতে মেইন কন্টেন্ট সাইডবারের ভেতরে না ঢোকে --}}
+        <div class="hidden md:block w-64 shrink-0" aria-hidden="true"></div>
+
         {{-- Main --}}
-        <main class="flex-1 flex flex-col ml-64">
-            <header class="h-20 bg-white/80 border-b border-slate-200 dark:bg-slate-950/80 dark:border-slate-800 backdrop-blur-xl sticky top-0 z-30 flex items-center justify-between px-6">
-                <div>
-                    <h1 class="text-xl font-normal tracking-tight text-slate-900 dark:text-white">
-                        @yield('header_title', 'Dashboard')
-                    </h1>
-                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
-                        @yield('header_subtitle')
-                    </p>
+        <main class="flex-1 flex flex-col min-w-0 w-full">
+            <header class="h-20 min-h-[4rem] bg-white/80 border-b border-slate-200 dark:bg-slate-950/80 dark:border-slate-800 backdrop-blur-xl sticky top-0 z-30 flex items-center justify-between gap-3 px-4 md:px-6">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <button type="button"
+                        onclick="window.toggleAdminSidebar()"
+                        class="md:hidden p-2.5 -ml-1 rounded-xl text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors touch-manipulation shrink-0"
+                        aria-label="Toggle menu"
+                        aria-expanded="false"
+                        id="admin-sidebar-toggle">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg md:text-xl font-normal tracking-tight text-slate-900 dark:text-white truncate">
+                            @yield('header_title', 'Dashboard')
+                        </h1>
+                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                            @yield('header_subtitle')
+                        </p>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 md:gap-4 shrink-0">
                     <button
                         type="button"
                         onclick="window.toggleTheme()"
-                        class="p-2.5 rounded-xl text-slate-500 bg-slate-50 border border-slate-200 hover:bg-slate-100 dark:text-slate-400 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-800 transition-all shadow-sm"
-                        title="Toggle Theme">
+                        class="p-2.5 min-h-[44px] min-w-[44px] rounded-xl text-slate-500 bg-slate-50 border border-slate-200 hover:bg-slate-100 dark:text-slate-400 dark:bg-slate-900 dark:border-slate-800 dark:hover:bg-slate-800 transition-all shadow-sm touch-manipulation"
+                        title="Toggle Theme"
+                        aria-label="Toggle theme">
                         <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"></path>
                         </svg>
@@ -543,17 +630,17 @@
                         @csrf
                         <button
                             type="submit"
-                            class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 dark:text-red-400 dark:bg-red-500/10 dark:border-red-500/20 dark:hover:bg-red-500/20 transition-all">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 dark:text-red-400 dark:bg-red-500/10 dark:border-red-500/20 dark:hover:bg-red-500/20 transition-all touch-manipulation">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                             </svg>
-                            <span>Logout</span>
+                            <span class="hidden sm:inline">Logout</span>
                         </button>
                     </form>
                 </div>
             </header>
 
-            <section class="p-6 flex-1">
+            <section class="px-2 py-4 md:px-4 md:py-6 flex-1">
                 @yield('content')
             </section>
         </main>

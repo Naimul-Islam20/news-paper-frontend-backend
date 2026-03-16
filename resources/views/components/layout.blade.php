@@ -14,6 +14,58 @@
         <link rel="icon" href="{{ storage_image_url($siteMeta->site_icon) }}" type="image/png">
         @endif
 
+        {{-- Open Graph & Twitter Card: শেয়ার করলে পোস্টের ইমেজ, টাইটেল, ডিসক্রিপশন প্রিভিউ দেখাবে --}}
+        @php $hasShareMeta = (isset($metaImage) && $metaImage !== '') || (isset($metaDescription) && $metaDescription !== ''); @endphp
+        @if($hasShareMeta)
+        <meta property="og:type" content="article">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="{{ $ogTitle ?? $title ?? (optional($siteMeta)->site_name ?? 'The Daily News') }}">
+        @if(isset($metaDescription) && $metaDescription !== '')
+        <meta property="og:description" content="{{ $metaDescription }}">
+        @endif
+        @if(isset($metaImage) && trim($metaImage) !== '')
+        @php
+            $shareImageUrl = trim($metaImage);
+            $shareImageUrl = (str_starts_with($shareImageUrl, 'http://') || str_starts_with($shareImageUrl, 'https://')) ? $shareImageUrl : url($shareImageUrl);
+            $shareImageUrlHttps = str_replace('http://', 'https://', $shareImageUrl);
+        @endphp
+        <meta property="og:image" content="{{ $shareImageUrlHttps }}">
+        <meta property="og:image:secure_url" content="{{ $shareImageUrlHttps }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta name="twitter:image" content="{{ $shareImageUrlHttps }}">
+        @endif
+        <meta property="og:site_name" content="{{ optional($siteMeta)->site_name ?? 'The Daily News' }}">
+        <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="{{ url()->current() }}">
+        <meta name="twitter:title" content="{{ $ogTitle ?? $title ?? (optional($siteMeta)->site_name ?? 'The Daily News') }}">
+        @if(isset($metaDescription) && $metaDescription !== '')
+        <meta name="twitter:description" content="{{ $metaDescription }}">
+        @endif
+        @else
+        {{-- সাধারণ পেজ: শেয়ার করলে সাইটের ডিফল্ট --}}
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="{{ $title ?? (optional($siteMeta)->site_name ?? 'The Daily News') }}">
+        @if(!empty(optional($siteMeta)->site_description))
+        <meta property="og:description" content="{{ $siteMeta->site_description }}">
+        @endif
+        @if(!empty(optional($siteMeta)->site_logo))
+        <meta property="og:image" content="{{ storage_image_url($siteMeta->site_logo) }}">
+        @endif
+        <meta property="og:site_name" content="{{ optional($siteMeta)->site_name ?? 'The Daily News' }}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="{{ url()->current() }}">
+        <meta name="twitter:title" content="{{ $title ?? (optional($siteMeta)->site_name ?? 'The Daily News') }}">
+        @if(!empty(optional($siteMeta)->site_description))
+        <meta name="twitter:description" content="{{ $siteMeta->site_description }}">
+        @endif
+        @if(!empty(optional($siteMeta)->site_logo))
+        <meta name="twitter:image" content="{{ storage_image_url($siteMeta->site_logo) }}">
+        @endif
+        @endif
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
