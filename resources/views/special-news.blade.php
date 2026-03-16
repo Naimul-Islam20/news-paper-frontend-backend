@@ -86,7 +86,7 @@
                             </div>
                             <div class="flex-shrink-0 group overflow-hidden w-full md:w-auto">
                                 <a href="{{ url('/news/' . $featured->slug) }}">
-                                    <div class="img-placeholder w-full md:w-[625px] aspect-video md:aspect-auto">
+                                    <div class="img-placeholder w-full aspect-video md:aspect-auto md:w-[625px] md:h-[355px]">
                                         <img
                                             src="{{ Storage::url($featured->image) }}"
                                             alt="{{ $featured->title }}"

@@ -55,7 +55,8 @@ class HomeController extends Controller
                 ->with('categories.parent')
                 ->where('status', 'published')
                 ->where('hero_layer', $layer)
-                ->latest('updated_at')
+                // Order by publish time, so editing a post doesn't make it "new"
+                ->latest('created_at')
                 ->limit($limit)
                 ->get();
         }
