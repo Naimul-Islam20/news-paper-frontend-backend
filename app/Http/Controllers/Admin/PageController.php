@@ -12,9 +12,40 @@ use Illuminate\View\View;
 
 class PageController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $pages = Page::latest()->paginate(10);
+        $baseQuery = Page::latest();
+
+        $query = clone $baseQuery;
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            if ($search !== '' && ctype_digit($search)) {
+                $serial = (int) $search;
+
+                if ($serial > 0) {
+                    $target = (clone $baseQuery)
+                        ->skip($serial - 1)
+                        ->take(1)
+                        ->first();
+
+                    if ($target) {
+                        $query->whereKey($target->id);
+                    } else {
+                        $query->whereRaw('1 = 0');
+                    }
+                }
+            } else {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', '%' . $search . '%')
+                      ->orWhere('slug', 'like', '%' . $search . '%');
+                });
+            }
+        }
+
+        $pages = $query->paginate(10)->withQueryString();
+
         return view('admin.pages.index', compact('pages'));
     }
 

@@ -13,9 +13,37 @@ use Illuminate\View\View;
 
 class VideoController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $videos = Video::with('category')->latest()->paginate(10);
+        $baseQuery = Video::with('category')->latest();
+
+        $query = clone $baseQuery;
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            if ($search !== '' && ctype_digit($search)) {
+                $serial = (int) $search;
+
+                if ($serial > 0) {
+                    $target = (clone $baseQuery)
+                        ->skip($serial - 1)
+                        ->take(1)
+                        ->first();
+
+                    if ($target) {
+                        $query->whereKey($target->id);
+                    } else {
+                        $query->whereRaw('1 = 0');
+                    }
+                }
+            } else {
+                $query->where('title', 'like', '%' . $search . '%');
+            }
+        }
+
+        $videos = $query->paginate(10)->withQueryString();
+
         return view('admin.videos.index', compact('videos'));
     }
 

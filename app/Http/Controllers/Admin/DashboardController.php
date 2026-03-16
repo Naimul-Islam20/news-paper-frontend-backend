@@ -110,7 +110,11 @@ class DashboardController extends Controller
     }
 
     /**
-     * Build a monthly unique visitors series for the last N months (including current month).
+     * Build a monthly visitors series for the last N months (including current month).
+     *
+     * এখানে প্রতি মাসের value হচ্ছে:
+     * ঐ মাসের প্রতিদিনের site-wide unique_visitors এর যোগফল
+     * (sum of daily uniques), range-wide DISTINCT না।
      *
      * @return array<array{label:string,value:int}>
      */
@@ -119,21 +123,30 @@ class DashboardController extends Controller
         $end = Carbon::today()->endOfMonth();
         $start = (clone $end)->subMonths($monthsBack)->startOfMonth();
 
+        // প্রতিদিনের site-wide unique visitors (একই visitor এক দিনে একবার)
         $raw = VisitorDailyVisitor::query()
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
-            ->selectRaw('DATE_FORMAT(date, "%Y-%m-01") as month_start, COUNT(DISTINCT visitor_id) as unique_visitors')
-            ->groupBy('month_start')
-            ->orderBy('month_start')
-            ->get()
-            ->keyBy('month_start');
+            ->selectRaw('date, COUNT(DISTINCT visitor_id) as unique_visitors')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
 
         $series = collect();
         $cursor = $start->copy();
         while ($cursor->lte($end)) {
-            $key = $cursor->format('Y-m-01');
+            $monthStart = $cursor->copy()->startOfMonth();
+            $monthEnd   = $cursor->copy()->endOfMonth();
+
+            // এই মাসের সব দিনের unique_visitors sum করছি
+            $monthlyTotal = (int) $raw
+                ->filter(function ($row) use ($monthStart, $monthEnd) {
+                    return $row->date->betweenIncluded($monthStart, $monthEnd);
+                })
+                ->sum('unique_visitors');
+
             $series->push([
                 'label' => $cursor->format('F'),
-                'value' => (int) ($raw->get($key)->unique_visitors ?? 0),
+                'value' => $monthlyTotal,
             ]);
             $cursor->addMonthNoOverflow()->startOfMonth();
         }

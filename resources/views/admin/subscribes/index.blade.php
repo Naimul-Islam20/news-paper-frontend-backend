@@ -64,12 +64,18 @@
         <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <h3 class="text-sm font-medium text-slate-900 dark:text-white">Subscriber List</h3>
-                <div class="relative w-full max-w-xs">
-                    <input type="text" placeholder="Search subscribers..." class="w-full pl-9 pr-4 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-xs text-sm">
+                <form method="GET" action="{{ route('admin.subscribes.index') }}" class="relative w-full max-w-xs">
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Search subscribers (SL or email)..."
+                        class="w-full pl-9 pr-4 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-xs text-sm"
+                    >
                     <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                </div>
+                </form>
             </div>
 
             <div class="overflow-x-auto">

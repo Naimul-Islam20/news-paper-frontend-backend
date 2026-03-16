@@ -48,11 +48,10 @@ class StatisticsController extends Controller
             ];
         });
 
-        $totalPageViews     = $daily->sum('page_views');
-        $totalUniqueVisitors = (int) VisitorDailyVisitor::query()
-            ->whereBetween('date', [$dateFrom, $dateTo])
-            ->selectRaw('COUNT(DISTINCT visitor_id) as c')
-            ->value('c');
+        $totalPageViews      = $daily->sum('page_views');
+        // এখানে আমরা এখন range-wide DISTINCT না নিয়ে
+        // প্রতিদিনের unique_visitors এর যোগফল নিচ্ছি (sum of daily uniques)
+        $totalUniqueVisitors = $daily->sum('unique_visitors');
 
         return view('admin.statistics.visitors', [
             'dateFrom'            => $dateFrom,

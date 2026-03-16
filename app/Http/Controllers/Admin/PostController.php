@@ -13,10 +13,56 @@ use Illuminate\View\View;
 
 class PostController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $posts = Post::with(['categories', 'reporter'])->latest()->paginate(10);
-        return view('admin.posts.index', compact('posts'));
+        // Base query with relationships and default ordering (latest first)
+        $baseQuery = Post::with(['categories', 'reporter'])->latest();
+
+        // Filter by category (if selected)
+        if ($request->filled('category_id') && $request->category_id !== 'all') {
+            $baseQuery->whereHas('categories', function ($q) use ($request) {
+                $q->where('categories.id', $request->category_id);
+            });
+        }
+
+        // Clone for applying search / serial logic on top of the same base query
+        $query = clone $baseQuery;
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            // If only digits given, treat as serial number (SL)
+            if ($search !== '' && ctype_digit($search)) {
+                $serial = (int) $search;
+
+                if ($serial > 0) {
+                    // Find the N-th post (respecting filters + ordering), then filter by that id
+                    $targetPost = (clone $baseQuery)
+                        ->skip($serial - 1)
+                        ->take(1)
+                        ->first();
+
+                    if ($targetPost) {
+                        $query->whereKey($targetPost->id);
+                    } else {
+                        // No such serial exists in current filtered list
+                        $query->whereRaw('1 = 0');
+                    }
+                }
+            } else {
+                // Text search: match by title
+                $query->where('title', 'like', '%' . $search . '%');
+            }
+        }
+
+        $posts = $query->paginate(10)->withQueryString();
+
+        $categories = Category::where('type', 'post')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.posts.index', compact('posts', 'categories'));
     }
 
     public function create(): View

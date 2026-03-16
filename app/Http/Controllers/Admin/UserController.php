@@ -41,7 +41,7 @@ class UserController extends Controller
     /**
      * Display a listing of the users.
      */
-    public function index()
+    public function index(Request $request)
     {
         $authUser = auth()->user();
 
@@ -52,11 +52,42 @@ class UserController extends Controller
 
         // Senior Editor - শুধু Sub Editor দেখবে
         if ($authUser->role === 'senior editor') {
-            $users = User::where('role', 'sub editor')->latest()->paginate(10);
+            $baseQuery = User::where('role', 'sub editor')->latest();
         } else {
             // Admin - সবাইকে দেখবে
-            $users = User::latest()->paginate(10);
+            $baseQuery = User::latest();
         }
+
+        $query = clone $baseQuery;
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            if ($search !== '' && ctype_digit($search)) {
+                $serial = (int) $search;
+
+                if ($serial > 0) {
+                    $target = (clone $baseQuery)
+                        ->skip($serial - 1)
+                        ->take(1)
+                        ->first();
+
+                    if ($target) {
+                        $query->whereKey($target->id);
+                    } else {
+                        $query->whereRaw('1 = 0');
+                    }
+                }
+            } else {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('email', 'like', '%' . $search . '%')
+                      ->orWhere('phone', 'like', '%' . $search . '%');
+                });
+            }
+        }
+
+        $users = $query->paginate(10)->withQueryString();
 
         return view('admin.users.index', compact('users'));
     }
