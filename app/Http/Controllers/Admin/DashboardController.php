@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Post;
 use App\Models\VisitorDailyVisitor;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -30,6 +32,35 @@ class DashboardController extends Controller
             ->selectRaw('COUNT(DISTINCT visitor_id) as c')
             ->value('c');
 
+        // Last 10 days window
+        $tenDaysAgo = Carbon::today()->subDays(9)->startOfDay();
+        $todayEnd   = Carbon::today()->endOfDay();
+
+        // Top 5 categories by views in last 10 days
+        $topCategories = Category::query()
+            ->select([
+                'categories.id',
+                'categories.name',
+                DB::raw('COUNT(DISTINCT posts.id) as posts_count'),
+                DB::raw('SUM(posts.views) as views_sum'),
+            ])
+            ->join('category_post', 'categories.id', '=', 'category_post.category_id')
+            ->join('posts', 'posts.id', '=', 'category_post.post_id')
+            ->where('posts.status', 'published')
+            ->whereBetween('posts.created_at', [$tenDaysAgo, $todayEnd])
+            ->groupBy('categories.id', 'categories.name')
+            ->orderByDesc('views_sum')
+            ->limit(5)
+            ->get();
+
+        // Top 5 latest posts in last 10 days
+        $topPosts = Post::query()
+            ->where('status', 'published')
+            ->whereBetween('created_at', [$tenDaysAgo, $todayEnd])
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get();
+
         return view('admin.dashboard', [
             'weeklyVisitors'       => $weeklyVisitors,
             'monthlyVisitors'      => $monthlyVisitors,
@@ -39,6 +70,8 @@ class DashboardController extends Controller
             'draftPendingCount'    => $draftPendingCount,
             'todayVisitors'        => $todayVisitors,
             'yesterdayVisitors'    => $yesterdayVisitors,
+            'topCategories'        => $topCategories,
+            'topPosts'             => $topPosts,
         ]);
     }
 
@@ -58,7 +91,7 @@ class DashboardController extends Controller
             ->groupBy('date')
             ->orderBy('date')
             ->get()
-            ->keyBy(fn ($r) => $r->date->format('Y-m-d'));
+            ->keyBy(fn($r) => $r->date->format('Y-m-d'));
 
         $series = collect();
         $cursor = $start->copy();
@@ -106,4 +139,3 @@ class DashboardController extends Controller
         return $series->all();
     }
 }
-
