@@ -1,5 +1,5 @@
-@import url('https://fonts.maateen.me/solaiman-lipi/font.css');
-@import 'tailwindcss';
+@import url("https://fonts.maateen.me/solaiman-lipi/font.css");
+@import "tailwindcss";
 
 @source "../**/*.blade.php";
 @source "../**/*.js";
@@ -8,10 +8,12 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'SolaimanLipi', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-serif: 'SolaimanLipi', ui-serif, Georgia, serif;
-    
+    --font-sans:
+        "SolaimanLipi", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+    --font-serif: "SolaimanLipi", ui-serif, Georgia, serif;
+
     --container-max: 1300px;
 }
 
@@ -20,8 +22,8 @@
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
 }
 
 @media (width >= 640px) {
@@ -75,13 +77,23 @@
 }
 
 @keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
 }
 
 @utility img-placeholder {
     background: #f1f5f9;
-    background-image: linear-gradient(to right, #f1f5f9 0%, #e2e8f0 20%, #f1f5f9 40%, #f1f5f9 100%);
+    background-image: linear-gradient(
+        to right,
+        #f1f5f9 0%,
+        #e2e8f0 20%,
+        #f1f5f9 40%,
+        #f1f5f9 100%
+    );
     background-repeat: no-repeat;
     background-size: 1000px 100%;
     animation: shimmer 2.5s infinite linear forwards;
@@ -115,4 +127,3 @@ img {
     border: none !important;
     outline: none !important;
 }
-

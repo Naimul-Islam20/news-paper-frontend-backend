@@ -84,9 +84,15 @@
                                     <span class="text-xs font-medium">{{ $featured->created_at->diffForHumans() }}</span>
                                 </div>
                             </div>
-                            <div class="flex-shrink-0 group overflow-hidden">
+                            <div class="flex-shrink-0 group overflow-hidden w-full md:w-auto">
                                 <a href="{{ url('/news/' . $featured->slug) }}">
-                                    <div class="img-placeholder"><img src="{{ Storage::url($featured->image) }}" alt="{{ $featured->title }}" style="width: 625px; height: 355px;" class="object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')"></div>
+                                    <div class="img-placeholder w-full md:w-[625px] aspect-video md:aspect-auto">
+                                        <img
+                                            src="{{ Storage::url($featured->image) }}"
+                                            alt="{{ $featured->title }}"
+                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            onload="this.parentElement.classList.remove('img-placeholder')">
+                                    </div>
                                 </a>
                             </div>
                         </article>
