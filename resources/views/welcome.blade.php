@@ -1,7 +1,7 @@
 <x-layout>
     <x-slot:title>
-        দ্য ডেইলি নিউজ | প্রিমিয়াম নিউজপেপার টেমপ্লেট
-        </x-slot>
+        {{ optional($siteMeta)->site_title ?? optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ | প্রিমিয়াম নিউজপেপার সাইট' }}
+    </x-slot>
 
         @php $adBelowMenu = ad_slot('below_menu'); @endphp
         @if($adBelowMenu && $adBelowMenu->image)
