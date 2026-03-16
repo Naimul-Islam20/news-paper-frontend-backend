@@ -18,7 +18,7 @@
             <table class="w-full text-left border-collapse border-x border-slate-200 dark:border-slate-700">
                 <thead class="bg-slate-50 dark:bg-slate-900/50">
                     <tr class="border-y border-slate-200 dark:border-slate-700 divide-x divide-slate-200 dark:divide-slate-700">
-                        <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider w-16 text-center">ID</th>
+                        <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider w-16 text-center">SL</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider w-24">Banner</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">Name</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">Location (slug)</th>
@@ -30,7 +30,9 @@
                     @forelse($advertisements as $ad)
                     <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-200 dark:border-slate-700 divide-x divide-slate-200 dark:divide-slate-700">
                         <td class="py-3 px-4 text-center">
-                            <span class="text-sm font-medium text-slate-500">{{ $ad->id }}</span>
+                            <span class="text-sm font-medium text-slate-500">
+                                {{ $loop->iteration }}
+                            </span>
                         </td>
                         <td class="py-3 px-4">
                             <div class="h-10 w-20 rounded-lg bg-slate-100 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">

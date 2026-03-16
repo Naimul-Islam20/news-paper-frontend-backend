@@ -9,14 +9,33 @@
     <style>
         /* মোবাইলে সাইডবার লুকানো; মেনু খুললে .sidebar-open দিয়ে দেখানো। টেইলউইন্ডের ওপর নির্ভর না করে নিশ্চিত কাজের জন্য। */
         @media (max-width: 767px) {
-            #admin-sidebar { transform: translateX(-100%); }
-            #admin-sidebar.sidebar-open { transform: translateX(0); }
-            #admin-sidebar-toggle { display: flex !important; align-items: center; justify-content: center; }
+            #admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            #admin-sidebar.sidebar-open {
+                transform: translateX(0);
+            }
+
+            #admin-sidebar-toggle {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+            }
         }
+
         @media (min-width: 768px) {
-            #admin-sidebar { transform: translateX(0); }
-            #admin-sidebar-toggle { display: none !important; }
-            #admin-sidebar-backdrop { display: none !important; }
+            #admin-sidebar {
+                transform: translateX(0);
+            }
+
+            #admin-sidebar-toggle {
+                display: none !important;
+            }
+
+            #admin-sidebar-backdrop {
+                display: none !important;
+            }
         }
     </style>
     <script>
@@ -89,12 +108,12 @@
             }
         });
 
-        // Heartbeat to keep session alive while working
-        setInterval(function() {
-            fetch('{{ route('admin.heartbeat') }}')
-                .then(response => response.json())
-                .catch(error => console.error('Heartbeat failed:', error));
-        }, 5 * 60 * 1000); // Ping every 5 minutes
+        // Heartbeat to keep session alive while working (disabled)
+        // setInterval(function() {
+        //     fetch('{{ route('admin.heartbeat') }}')
+        //         .then(response => response.json())
+        //         .catch(error => console.error('Heartbeat failed:', error));
+        // }, 5 * 60 * 1000); // Ping every 5 minutes
 
         // Mobile sidebar: মোবাইলে লুকানো, মেনু আইকনে ক্লিক করলে খুলবে; বন্ধ করলে আবার লুকাবে
         window.toggleAdminSidebar = function() {
@@ -109,7 +128,9 @@
                 sidebar.setAttribute('aria-hidden', 'true');
                 backdrop.classList.add('opacity-0', 'pointer-events-none');
                 backdrop.classList.remove('opacity-100', 'pointer-events-auto');
-                if (toggle) { toggle.setAttribute('aria-expanded', 'false'); }
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
                 document.body.classList.remove('overflow-hidden');
             } else {
                 sidebar.classList.add('sidebar-open');
@@ -117,7 +138,9 @@
                 sidebar.setAttribute('aria-hidden', 'false');
                 backdrop.classList.remove('opacity-0', 'pointer-events-none');
                 backdrop.classList.add('opacity-100', 'pointer-events-auto');
-                if (toggle) { toggle.setAttribute('aria-expanded', 'true'); }
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', 'true');
+                }
                 document.body.classList.add('overflow-hidden');
             }
         };
@@ -131,7 +154,9 @@
             sidebar.setAttribute('aria-hidden', 'true');
             backdrop.classList.add('opacity-0', 'pointer-events-none');
             backdrop.classList.remove('opacity-100', 'pointer-events-auto');
-            if (toggle) { toggle.setAttribute('aria-expanded', 'false'); }
+            if (toggle) {
+                toggle.setAttribute('aria-expanded', 'false');
+            }
             document.body.classList.remove('overflow-hidden');
         };
     </script>
@@ -145,14 +170,14 @@
             <div class="h-20 flex items-center px-3 md:px-6 border-b border-slate-200 dark:border-slate-800/50">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
                     @if(!empty(optional($siteMeta)->site_logo))
-                        <img src="{{ storage_image_url($siteMeta->site_logo) }}"
-                             alt="{{ optional($siteMeta)->site_name ?? 'Logo' }}"
-                             class="h-10 w-auto object-contain"
-                             onerror="this.onerror=null;this.style.display='none';">
+                    <img src="{{ storage_image_url($siteMeta->site_logo) }}"
+                        alt="{{ optional($siteMeta)->site_name ?? 'Logo' }}"
+                        class="h-10 w-auto object-contain"
+                        onerror="this.onerror=null;this.style.display='none';">
                     @else
-                        <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-none">
-                            <span class="text-sm font-black italic">DN</span>
-                        </div>
+                    <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-none">
+                        <span class="text-sm font-black italic">DN</span>
+                    </div>
                     @endif
                 </a>
             </div>
@@ -248,7 +273,7 @@
                 </div>
                 @endif
 
-               
+
 
                 @if(auth()->user()->canFeature('pages.manage'))
                 <div class="mb-1">

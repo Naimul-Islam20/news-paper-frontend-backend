@@ -21,7 +21,7 @@
             <table class="w-full text-left border-collapse border-x border-slate-200 dark:border-slate-700">
                 <thead class="bg-slate-50 dark:bg-slate-900/50">
                     <tr class="border-y border-slate-200 dark:border-slate-700 divide-x divide-slate-200 dark:divide-slate-700">
-                        <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-16 text-center">ID</th>
+                        <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-16 text-center">SL</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100">User Details</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100">Role</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-28">Status</th>
@@ -33,7 +33,9 @@
                     @forelse($users as $user)
                     <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-200 dark:border-slate-700 divide-x divide-slate-200 dark:divide-slate-700">
                         <td class="py-3 px-4 text-center">
-                            <span class="text-sm font-normal text-black dark:text-white">{{ $user->id }}</span>
+                            <span class="text-sm font-normal text-black dark:text-white">
+                                {{ $users->firstItem() + $loop->index }}
+                            </span>
                         </td>
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-3">

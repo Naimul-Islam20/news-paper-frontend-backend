@@ -20,7 +20,7 @@
             <table class="w-full text-left border-collapse border-x border-slate-200 dark:border-slate-700">
                 <thead class="bg-slate-50 dark:bg-slate-900/50">
                     <tr class="border-y border-slate-200 dark:border-slate-700 divide-x divide-slate-200 dark:divide-slate-700">
-                        <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-16 text-center">#</th>
+                        <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-16 text-center">SL</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100">Category Name</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100">Type</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100">Description</th>
@@ -34,7 +34,9 @@
                     {{-- Parent Row --}}
                     <tr class="border-b border-slate-200 dark:border-slate-700 divide-x divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                         <td class="py-3 px-4 text-center">
-                            <span class="text-xs font-normal text-black dark:text-white">{{ $category->id }}</span>
+                            <span class="text-xs font-normal text-black dark:text-white">
+                                {{ $loop->iteration }}
+                            </span>
                         </td>
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-2">

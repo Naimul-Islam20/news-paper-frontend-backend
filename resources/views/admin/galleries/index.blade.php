@@ -26,7 +26,7 @@
             <table class="w-full text-left border-collapse border-x border-slate-200 dark:border-slate-700">
                 <thead class="bg-slate-50 dark:bg-slate-900/50">
                     <tr class="border-y border-slate-200 dark:border-slate-700 divide-x divide-slate-200 dark:divide-slate-700">
-                        <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-12 text-center">#</th>
+                        <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-12 text-center">SL</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100">Cover</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100">Title & Description</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100">Category</th>
@@ -40,7 +40,9 @@
                     @forelse($galleries as $gallery)
                     @php $firstImage = $gallery->images->first(); @endphp
                     <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors divide-x divide-slate-200 dark:divide-slate-700">
-                        <td class="py-3 px-4 text-center text-xs text-slate-500">{{ $gallery->id }}</td>
+                        <td class="py-3 px-4 text-center text-xs text-slate-500">
+                            {{ $galleries->firstItem() + $loop->index }}
+                        </td>
                         <td class="py-3 px-4">
                             <div class="h-10 w-14 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-50 flex items-center justify-center">
                                 @if($firstImage)
