@@ -225,7 +225,7 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
 
         <div class="p-4 sm:p-6 pt-2">
             <div class="divide-y divide-slate-100 dark:divide-slate-800">
-                @forelse($topPosts as $post)
+                @forelse($recentPosts as $post)
                 <div class="py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-2xl px-3 sm:px-4 transition-colors">
                     <div class="flex items-center gap-3 sm:gap-4">
                         <div class="w-11 h-11 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">

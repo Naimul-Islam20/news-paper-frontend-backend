@@ -19,23 +19,34 @@
                     >
                     <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
-                <div class="flex items-stretch">
+                <div class="flex items-stretch gap-2">
                     <div class="w-28 sm:w-40">
-                    <select
-                        name="category_id"
-                        class="w-full pl-3 pr-8 py-2 rounded-l-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs sm:text-sm focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-700 dark:text-slate-200"
-                    >
-                        <option value="all">{{ __('All Categories') }}</option>
-                        @isset($categories)
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}" @selected(request('category_id') == $category->id)>{{ $category->name }}</option>
-                            @endforeach
-                        @endisset
-                    </select>
+                        <select
+                            name="category_id"
+                            class="w-full pl-3 pr-8 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs sm:text-sm focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-700 dark:text-slate-200"
+                        >
+                            <option value="all">{{ __('All Categories') }}</option>
+                            @isset($categories)
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" @selected(request('category_id') == $category->id)>{{ $category->name }}</option>
+                                @endforeach
+                            @endisset
+                        </select>
+                    </div>
+                    <div class="w-28 sm:w-32">
+                        <select
+                            name="status"
+                            class="w-full pl-3 pr-8 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs sm:text-sm focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-700 dark:text-slate-200"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="published" @selected(request('status') === 'published')>Published</option>
+                            <option value="draft" @selected(request('status') === 'draft')>Draft</option>
+                            <option value="pending" @selected(request('status') === 'pending')>Pending</option>
+                        </select>
                     </div>
                     <button
                         type="submit"
-                        class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-normal rounded-r-lg border border-l-0 border-slate-200 dark:border-slate-800 transition-all shadow-sm"
+                        class="px-3 sm:px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-normal rounded-lg border border-slate-200 dark:border-slate-800 transition-all shadow-sm"
                     >
                         Filter
                     </button>

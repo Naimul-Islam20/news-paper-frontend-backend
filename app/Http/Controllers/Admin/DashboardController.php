@@ -53,7 +53,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Top 5 viewed posts in last 10 days
+        // Top 5 viewed posts in last 10 days (for "Top 5 viewed Posts" card)
         $topPosts = Post::query()
             ->with(['categories.parent', 'reporter'])
             ->where('status', 'published')
@@ -61,6 +61,14 @@ class DashboardController extends Controller
             ->orderByDesc('views')
             ->orderByDesc('created_at')
             ->limit(5)
+            ->get();
+
+        // Latest posts (post-type only) for Newsroom Activity
+        $recentPosts = Post::query()
+            ->with(['categories.parent', 'reporter'])
+            ->where('status', 'published')
+            ->orderByDesc('created_at')
+            ->limit(10)
             ->get();
 
         return view('admin.dashboard', [
@@ -74,6 +82,7 @@ class DashboardController extends Controller
             'yesterdayVisitors'    => $yesterdayVisitors,
             'topCategories'        => $topCategories,
             'topPosts'             => $topPosts,
+            'recentPosts'          => $recentPosts,
         ]);
     }
 

@@ -25,6 +25,11 @@ class PostController extends Controller
             });
         }
 
+        // Filter by status (if selected)
+        if ($request->filled('status') && $request->status !== 'all') {
+            $baseQuery->where('status', $request->status);
+        }
+
         // Clone for applying search / serial logic on top of the same base query
         $query = clone $baseQuery;
 
