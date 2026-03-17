@@ -250,23 +250,56 @@ class PostController extends Controller
         return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully!');
     }
 
-    /** Reporter লগইন থাকলে শুধু ওই রিপোর্টার; নাহলে সব active reporter */
+    /** Reporter লগইন থাকলে শুধু ওই রিপোর্টার; Sub Editor হলে শুধু নিজের reporter desk; নাহলে সব active reporter */
     protected function reportersForCurrentUser()
     {
         $user = auth()->user();
-        if ($user && $user->role === 'reporter' && $user->reporter_id) {
+        if (!$user) {
+            return Reporter::where('status', 'active')->orderBy('name')->get();
+        }
+
+        // Reporter role হলে: শুধু নিজের reporter row
+        if ($user->role === 'reporter' && $user->reporter_id) {
             return Reporter::where('id', $user->reporter_id)->get();
         }
+
+        // Sub Editor হলে: শুধুমাত্র তার sub_editor_id মেলা reporter desk গুলো
+        if ($user->role === 'sub editor') {
+            return Reporter::where('status', 'active')
+                ->where('sub_editor_id', $user->id)
+                ->orderBy('name')
+                ->get();
+        }
+
+        // Admin / Senior editor ইত্যাদি: সব active reporter
         return Reporter::where('status', 'active')->orderBy('name')->get();
     }
 
-    /** Reporter role থাকলে শুধু নিজের id সেট হয়; অন্যথায় request থেকে */
+    /** Reporter/Sub Editor role থাকলে শুধু নিজের desk-এর id সেট হয়; অন্যথায় request থেকে */
     protected function resolveReporterId($requestReporterId)
     {
         $user = auth()->user();
+        if (!$user) {
+            return $requestReporterId;
+        }
+
+        // Reporter role: সব সময় নিজের reporter_id
         if ($user && $user->role === 'reporter' && $user->reporter_id) {
             return $user->reporter_id;
         }
+
+        // Sub Editor role: শুধু তার sub_editor_id মেলা reporter id (থাকলে)
+        if ($user->role === 'sub editor') {
+            $ownReporter = Reporter::where('status', 'active')
+                ->where('sub_editor_id', $user->id)
+                ->first();
+
+            if ($ownReporter) {
+                return $ownReporter->id;
+            }
+        }
+
+        // অন্য সব ক্ষেত্রে form থেকে যা আসছে সেটা রাখি (admin / senior editor ইত্যাদি)
         return $requestReporterId;
     }
 }
