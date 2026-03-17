@@ -118,10 +118,35 @@
                         <h1 class="text-2xl md:text-4xl font-bold serif text-title leading-tight">
                             {{ $post->title }}
                         </h1>
-                        @if($post->sub_title)
-                        <p class="text-lg md:text-xl text-desc font-bold leading-relaxed mt-2 whitespace-pre-line">
-                            {{ $post->sub_title }}
-                        </p>
+                        @php
+                            $subTitlePoints = [];
+                            if (!empty($post->sub_title)) {
+                                $decoded = json_decode($post->sub_title, true);
+                                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                    $subTitlePoints = collect($decoded)
+                                        ->filter(function ($value) {
+                                            return is_string($value) && trim($value) !== '';
+                                        })
+                                        ->values()
+                                        ->all();
+                                } else {
+                                    $subTitlePoints = [ $post->sub_title ];
+                                }
+                            }
+                        @endphp
+                        @if(!empty($subTitlePoints))
+                            <div class="mt-3 space-y-2">
+                                @foreach($subTitlePoints as $point)
+                                    <div class="flex items-center gap-3">
+                                        <span class="flex-shrink-0 inline-flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-black" viewBox="0 0 24 24" fill="currentColor">
+                                                <circle cx="12" cy="12" r="6" />
+                                            </svg>
+                                        </span>
+                                        <p class="text-lg md:text-xl font-bold leading-relaxed text-black whitespace-pre-line">{{ $point }}</p>
+                                    </div>
+                                @endforeach
+                            </div>
                         @endif
 
                         <div class="flex flex-col gap-1 pb-2 mb-2">

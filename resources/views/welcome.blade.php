@@ -455,10 +455,24 @@
                                 <h3 class="text-2xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mb-1.5">
                                     {{ $mainNational->title }}
                                 </h3>
-                                @if($mainNational->sub_title)
-                                <p class="text-desc text-sm font-semibold leading-relaxed text-left">
-                                    {{ $mainNational->sub_title }}
-                                </p>
+                                @php
+                                    $mainNationalSub = null;
+                                    if (!empty($mainNational->sub_title)) {
+                                        $decoded = json_decode($mainNational->sub_title, true);
+                                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                            $mainNationalSub = collect($decoded)
+                                                ->first(function ($value) {
+                                                    return is_string($value) && trim($value) !== '';
+                                                });
+                                        } else {
+                                            $mainNationalSub = $mainNational->sub_title;
+                                        }
+                                    }
+                                @endphp
+                                @if($mainNationalSub)
+                                    <p class="text-desc text-sm font-semibold leading-relaxed text-left">
+                                        {{ $mainNationalSub }}
+                                    </p>
                                 @endif
                             </a>
                             @else

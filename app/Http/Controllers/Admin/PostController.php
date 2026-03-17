@@ -81,7 +81,8 @@ class PostController extends Controller
     {
         $request->validate([
             'title'              => 'required|string|max:255',
-            'sub_title'          => 'nullable|string|max:1000',
+            'sub_title_points'   => 'nullable|array',
+            'sub_title_points.*' => 'nullable|string|max:255',
             'category_id'        => 'required|exists:categories,id',
             'image'              => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'image_caption'      => 'nullable|string',
@@ -99,9 +100,24 @@ class PostController extends Controller
         ]);
 
         $data = $request->only([
-            'title', 'sub_title', 'description', 'image_caption',
+            'title', 'description', 'image_caption',
             'seo_keywords', 'status', 'hero_layer'
         ]);
+
+        // Sub title points -> JSON string in sub_title column
+        $points = collect($request->input('sub_title_points', []))
+            ->map(function ($value) {
+                return is_string($value) ? trim($value) : '';
+            })
+            ->filter(function ($value) {
+                return $value !== '';
+            })
+            ->values()
+            ->all();
+
+        $data['sub_title'] = !empty($points)
+            ? json_encode($points, JSON_UNESCAPED_UNICODE)
+            : null;
         $data['reporter_id'] = $this->resolveReporterId($request->reporter_id);
         $data['is_special_news'] = $request->boolean('is_special_news');
 
@@ -143,7 +159,8 @@ class PostController extends Controller
 
         $request->validate([
             'title'              => 'required|string|max:255',
-            'sub_title'          => 'nullable|string|max:1000',
+            'sub_title_points'   => 'nullable|array',
+            'sub_title_points.*' => 'nullable|string|max:255',
             'category_id'        => 'required|exists:categories,id',
             'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'image_caption'      => 'nullable|string',
@@ -160,9 +177,24 @@ class PostController extends Controller
         ]);
 
         $data = $request->only([
-            'title', 'sub_title', 'description', 'image_caption',
+            'title', 'description', 'image_caption',
             'seo_keywords', 'status', 'hero_layer'
         ]);
+
+        // Sub title points -> JSON string in sub_title column
+        $points = collect($request->input('sub_title_points', []))
+            ->map(function ($value) {
+                return is_string($value) ? trim($value) : '';
+            })
+            ->filter(function ($value) {
+                return $value !== '';
+            })
+            ->values()
+            ->all();
+
+        $data['sub_title'] = !empty($points)
+            ? json_encode($points, JSON_UNESCAPED_UNICODE)
+            : null;
         $data['reporter_id'] = $this->resolveReporterId($request->reporter_id);
         $data['is_special_news'] = $request->boolean('is_special_news');
 

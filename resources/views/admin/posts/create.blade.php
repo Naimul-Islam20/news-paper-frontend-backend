@@ -21,11 +21,42 @@
                             @error('title') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
-                        {{-- Sub Title (২–৩ লাইন) --}}
+                        {{-- Sub Title Points --}}
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Sub Title</label>
-                            <textarea name="sub_title" rows="3" placeholder="সাবটাইটেল ২–৩ লাইন লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm resize-y min-h-[4.5rem]">{{ old('sub_title') }}</textarea>
-                            @error('sub_title') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Sub Title Points</label>
+                            @php
+                                $oldPoints = old('sub_title_points');
+                                if (!is_array($oldPoints) || empty($oldPoints)) {
+                                    $oldPoints = [''];
+                                }
+                            @endphp
+                            <div id="sub-title-points-wrapper" class="space-y-2">
+                                @foreach($oldPoints as $idx => $value)
+                                    <div class="flex items-center gap-2 sub-title-point-row">
+                                        <input
+                                            type="text"
+                                            name="sub_title_points[]"
+                                            value="{{ $value }}"
+                                            placeholder="Sub title point {{ $idx + 1 }}"
+                                            class="flex-1 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm"
+                                        >
+                                        <button
+                                            type="button"
+                                            class="remove-sub-title-point inline-flex items-center justify-center w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 text-sm"
+                                            title="Remove point"
+                                        >&times;</button>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <button
+                                type="button"
+                                id="add-sub-title-point"
+                                class="mt-2 inline-flex items-center px-3 py-1.5 rounded-lg border border-dashed border-slate-300 text-xs font-normal text-slate-700 hover:border-indigo-400 hover:text-indigo-600 transition-all"
+                            >
+                                + Add point
+                            </button>
+                            @error('sub_title_points') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                            @error('sub_title_points.*') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Category (single) --}}
@@ -195,6 +226,7 @@
             }
         });
 
+        initSubTitlePoints();
     });
 
     // Hero Layer: একটাই সিলেক্ট থাকবে, বাকি ৩টা অটো আনচেক
@@ -248,6 +280,46 @@
         initCKEditor();
     } else {
         window.addEventListener('load', initCKEditor);
+    }
+
+    function initSubTitlePoints() {
+        const wrapper = document.getElementById('sub-title-points-wrapper');
+        const addBtn = document.getElementById('add-sub-title-point');
+        if (!wrapper || !addBtn) return;
+
+        addBtn.addEventListener('click', function () {
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-2 sub-title-point-row';
+            row.innerHTML = `
+                <input
+                    type="text"
+                    name="sub_title_points[]"
+                    placeholder="Sub title point"
+                    class="flex-1 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm"
+                >
+                <button
+                    type="button"
+                    class="remove-sub-title-point inline-flex items-center justify-center w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 text-sm"
+                    title="Remove point"
+                >&times;</button>
+            `;
+            wrapper.appendChild(row);
+        });
+
+        wrapper.addEventListener('click', function (event) {
+            const target = event.target;
+            if (target.classList.contains('remove-sub-title-point')) {
+                const row = target.closest('.sub-title-point-row');
+                if (!row) return;
+                const rows = wrapper.querySelectorAll('.sub-title-point-row');
+                if (rows.length > 1) {
+                    row.remove();
+                } else {
+                    const input = row.querySelector('input[name="sub_title_points[]"]');
+                    if (input) input.value = '';
+                }
+            }
+        });
     }
 </script>
 @endpush
