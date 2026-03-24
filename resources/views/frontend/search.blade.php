@@ -18,7 +18,7 @@
                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
                     </a>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                         <path d="m9 18 6-6-6-6" />
                     </svg>
                     <span class="text-black font-bold">অনুসন্ধান</span>
@@ -57,16 +57,6 @@
                             </div>
                         </a>
                         <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium
-                                @if($item->type === 'post') bg-rose-50 text-rose-700 border border-rose-100
-                                @elseif($item->type === 'gallery') bg-indigo-50 text-indigo-700 border border-indigo-100
-                                @else bg-violet-50 text-violet-700 border border-violet-100
-                                @endif">
-                                @if($item->type === 'post') সংবাদ
-                                @elseif($item->type === 'gallery') গ্যালারি
-                                @else ভিডিও
-                                @endif
-                            </span>
                             <a href="{{ $item->url }}">
                                 <h3 class="text-xl md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
                                     {{ $item->title }}

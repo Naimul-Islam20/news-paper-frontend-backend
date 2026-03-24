@@ -16,7 +16,7 @@
 
                 <!-- Header + Breadcrumb -->
                 <div class="mb-4 md:mb-10 text-left">
-                    <h1 class="text-4xl md:text-3xl font-semibold serif text-title mb-3">
+                    <h1 class="text-2xl md:text-3xl font-semibold serif text-title mb-3">
                         {{ $categoryName }}
                     </h1>
 
@@ -27,7 +27,7 @@
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
                         </a>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
                         <span class="text-black font-bold line-clamp-1">{{ $categoryName }}</span>

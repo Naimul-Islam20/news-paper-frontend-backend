@@ -24,7 +24,7 @@
                 <!-- Header + Breadcrumbs -->
                 <div class="mb-4 md:mb-10 text-left">
                     <!-- বড় header: category / parent name -->
-                    <h1 class="text-4xl md:text-3xl font-semibold serif text-title mb-3">
+                    <h1 class="text-2xl md:text-3xl font-semibold serif text-title mb-3">
                         {{ $categoryName }}
                     </h1>
 
@@ -59,13 +59,13 @@
                         </a>
                         @if($parentCategory)
                         {{-- Home > Parent Category > Subcategory --}}
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
                         <a href="{{ route('category.show', $parentCategory->slug) }}" class="text-black hover:text-rose-600 transition-colors">
                             {{ $parentCategory->name }}
                         </a>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
                         <a href="{{ route('category.show.child', [$parentCategory->slug, $primaryCategory->slug]) }}" class="text-black font-bold hover:text-rose-600 transition-colors">
@@ -73,7 +73,7 @@
                         </a>
                         @elseif($primaryCategory)
                         {{-- Home > Single Category --}}
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
                         <a href="{{ route('category.show', $primaryCategory->slug) }}" class="text-black font-bold hover:text-rose-600 transition-colors">
@@ -81,7 +81,7 @@
                         </a>
                         @else
                         {{-- Home > Generic label --}}
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
                         <span class="text-black font-bold">

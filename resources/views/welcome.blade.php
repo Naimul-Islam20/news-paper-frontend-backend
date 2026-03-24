@@ -44,7 +44,7 @@
                         $excerpt = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($post->description)), 100);
                         @endphp
                         @if($excerpt)
-                        <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-1 mt-1 text-left">
+                        <p class="text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-2 mt-1 text-left">
                             {!! $excerpt !!}
                         </p>
                         @endif
@@ -79,7 +79,7 @@
                             $leadExcerpt = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($lead->description)), 100);
                             @endphp
                             @if($leadExcerpt)
-                            <p class="hidden md:block text-sm md:text-base text-desc leading-relaxed mt-1 mb-4 text-center line-clamp-1 font-normal px-6 md:px-0 max-w-[340px] md:max-w-none mx-auto">
+                            <p class="text-sm md:text-base text-desc leading-relaxed mt-1 mb-4 text-center line-clamp-2 font-normal px-6 md:px-0 max-w-[340px] md:max-w-none mx-auto">
                                 {!! $leadExcerpt !!}
                             </p>
                             @endif
@@ -128,7 +128,7 @@
                         $thirdExcerpt = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($post->description)), 130);
                         @endphp
                         @if($thirdExcerpt)
-                        <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                        <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-2">
                             {!! $thirdExcerpt !!}
                         </p>
                         @endif
@@ -311,7 +311,7 @@
                             $politicsExcerpt = \Illuminate\Support\Str::limit(strip_tags($post->description ?? ''), 100);
                             @endphp
                             @if($politicsExcerpt)
-                            <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                            <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
                                 {!! $politicsExcerpt !!}
                             </p>
                             @endif
@@ -462,7 +462,7 @@
                                     );
                                 @endphp
                                 @if($mainNationalExcerpt)
-                                    <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left">
+                                    <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left">
                                         {!! $mainNationalExcerpt !!}
                                 </p>
                                 @endif
@@ -474,7 +474,7 @@
                                 <h3 class="text-2xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mb-1.5">
                                     মেট্রোরেলের নতুন রুট উদ্বোধন: বদলে যাচ্ছে রাজধানীর যাতায়াত দৃশ্যপট
                                 </h3>
-                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left">
+                                <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left">
                                     প্রধানমন্ত্রী আজ সকালে মেট্রোরেলের নতুন বর্ধিত অংশের উদ্বোধন করেছেন। এর ফলে মতিঝিল থেকে উত্তরা পর্যন্ত যেতে সময় লাগবে মাত্র ৩০ মিনিট। আধুনিক এই যাতায়াত ব্যবস্থা রাজধানীর যানজট নিরসনে বিশাল ভূমিকা রাখবে বলে আশা করা হচ্ছে...
                                 </p>
                             </div>
@@ -601,7 +601,7 @@
                                     {{ $post->title }}
                                 </h3>
                                 @if($excerpt)
-                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                                <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
                                     {!! $excerpt !!}
                                 </p>
                                 @endif
@@ -669,7 +669,7 @@
                                         {{ $sportsMain->title }}
                                     </h3>
                                     @if($mainExcerpt)
-                                    <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                                    <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
                                         {{ $mainExcerpt }}
                                     </p>
                                     @endif
@@ -695,7 +695,7 @@
                                         </h4>
                                     </div>
                                     @if($secondaryExcerpt)
-                                    <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
+                                    <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
                                         {!! $secondaryExcerpt !!}
                                     </p>
                                     @endif
@@ -725,7 +725,7 @@
                                         </h4>
                                     </div>
                                     @if($excerpt)
-                                    <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
+                                    <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
                                         {!! $excerpt !!}
                                     </p>
                                     @endif
@@ -816,7 +816,7 @@
                                             {{ $countryMain->title }}
                                         </h3>
                                         @if($mainExcerpt)
-                                        <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                                        <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
                                             {{ $mainExcerpt }}
                                         </p>
                                         @endif
@@ -1021,7 +1021,7 @@
                                     {{ $worldMain->title }}
                                 </h3>
                                 @if($mainExcerpt)
-                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                                <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
                                     {{ $mainExcerpt }}
                                 </p>
                                 @endif
@@ -1048,7 +1048,7 @@
                                     </h4>
                                 </div>
                                 @if($excerpt)
-                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
+                                <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
                                     {!! $excerpt !!}
                                 </p>
                                 @endif
@@ -1071,7 +1071,7 @@
                                     </h4>
                                 </div>
                                 @if($excerpt)
-                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
+                                <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
                                     {!! $excerpt !!}
                                 </p>
                                 @endif
@@ -1178,7 +1178,7 @@
                                     {{ $entMid->title }}
                                 </h3>
                                 @if($excerpt)
-                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                                <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
                                     {!! $excerpt !!}
                                 </p>
                                 @endif
