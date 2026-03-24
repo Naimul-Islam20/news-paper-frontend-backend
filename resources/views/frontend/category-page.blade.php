@@ -37,7 +37,7 @@
                     <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
 
                     <div class="prose prose-slate max-w-none text-gray-700 leading-relaxed text-base font-semibold text-justify line-clamp-5">
-                        {!! Str::limit(strip_tags($page->content ?? ''), 400) !!}
+                        {!! Str::limit(html_entity_decode(strip_tags($page->content ?? '')), 400) !!}
                     </div>
 
                     <div class="flex items-center justify-between mt-4">

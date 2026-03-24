@@ -36,25 +36,25 @@
 
                         {{-- Breadcrumb: Category > Subcategory --}}
                         @if($category->parent)
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-100">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
                         <a href="{{ route('category.show', $category->parent->slug) }}" class="text-black hover:text-rose-600 transition-colors">
                             {{ $category->parent->name }}
                         </a>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-100">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
                         <span class="text-black font-bold">{{ $category->name }}</span>
                         @else
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-100">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
                         <span class="text-black font-bold">{{ $category->name }}</span>
                         @endif
                     </div>
 
-                    <div class="w-full border-b border-slate-300 relative mb-4 md:mb-8">
+                    <div class="w-full border-b border-slate-100 relative mb-4 md:mb-8">
                         <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
                     </div>
                 </div>
@@ -109,31 +109,13 @@
                                         href="{{ $subCategorySlug
                                             ? route('news.show.sub', [$categorySlug, $subCategorySlug, $post->slug])
                                             : route('news.show', [$categorySlug, $post->slug]) }}">
-                                        <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                        <h3 class="text-xl md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
                                             {{ $post->title }}
                                         </h3>
                                     </a>
-                                    @php
-                                        $subTitleText = null;
-                                        if (!empty($post->sub_title)) {
-                                            $decoded = json_decode($post->sub_title, true);
-                                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                                $subTitleText = collect($decoded)
-                                                    ->first(function ($value) {
-                                                        return is_string($value) && trim($value) !== '';
-                                                    });
-                                            } else {
-                                                $subTitleText = $post->sub_title;
-                                            }
-                                        }
-                                    @endphp
-                                    @if($subTitleText)
-                                        <p class="hidden md:block text-sm font-semibold text-desc leading-relaxed line-clamp-2">
-                                            {{ $subTitleText }}
-                                        </p>
-                                    @elseif($post->description)
-                                        <p class="hidden md:block text-sm font-semibold text-desc leading-relaxed line-clamp-2">
-                                            {{ Str::limit(strip_tags($post->description), 160) }}
+                                    @if($post->description)
+                                        <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-1">
+                                            {!! html_entity_decode(Str::limit(strip_tags($post->description), 100)) !!}
                                         </p>
                                     @endif
                                     <div class="flex items-center gap-1.5 mt-auto text-gray-500">

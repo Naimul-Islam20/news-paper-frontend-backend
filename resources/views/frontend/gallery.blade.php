@@ -70,7 +70,7 @@
                                 </a>
                                 @if($gallery->description)
                                 <p class="hidden md:block text-sm font-semibold text-desc leading-relaxed line-clamp-2">
-                                    {{ Str::limit(strip_tags($gallery->description), 160) }}
+                                    {{ Str::limit(html_entity_decode(strip_tags($gallery->description)), 160) }}
                                 </p>
                                 @endif
                                 <div class="flex items-center gap-1.5 mt-auto text-gray-500">

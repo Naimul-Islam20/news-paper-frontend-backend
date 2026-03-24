@@ -18,13 +18,13 @@
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
                         </a>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-100">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
                         <span class="text-black font-bold">{{ $categoryName }}</span>
                     </div>
 
-                    <div class="w-full border-b border-slate-300 relative mb-8">
+                    <div class="w-full border-b border-slate-100 relative mb-8">
                         <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
                     </div>
                 </div>
@@ -73,8 +73,11 @@
                                         <span style="color: red !important;">{{ $categoryName }} /</span> {{ $featured->title }}
                                     </h3>
                                 </a>
-                                <p class="text-base font-semibold text-desc leading-relaxed line-clamp-4">
-                                    {!! \Illuminate\Support\Str::limit(strip_tags($featured->description), 280) !!}
+                                <p class="text-base font-normal text-desc leading-relaxed md:hidden">
+                                    {{ \Illuminate\Support\Str::words(html_entity_decode(strip_tags($featured->description)), 18, '...') }}
+                                </p>
+                                <p class="text-base font-normal text-desc leading-relaxed hidden md:block">
+                                    {{ \Illuminate\Support\Str::words(html_entity_decode(strip_tags($featured->description)), 32, '...') }}
                                 </p>
                                 <div class="flex items-center gap-1.5 mt-auto text-slate-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -104,13 +107,13 @@
                             @foreach($gridPosts as $index => $post)
                             <article class="flex flex-row-reverse md:flex-col gap-2 md:gap-3 pb-4 border-b border-gray-100 md:border-b-0 md:pb-0 {{ $index < 2 ? 'md:pr-3 md:border-r md:border-slate-200' : 'md:pl-3' }}">
                                 <a href="{{ url('/news/' . $post->slug) }}" class="group overflow-hidden shrink-0">
-                                    <div class="img-placeholder w-36 h-24 md:w-full md:h-[180px]"><img src="{{ Storage::url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')"></div>
+                                    <div class="img-placeholder w-36 h-24 md:w-full md:h-[100px]"><img src="{{ Storage::url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')"></div>
                                 </a>
                                 <div class="flex flex-col gap-1 flex-1">
                                     <a href="{{ url('/news/' . $post->slug) }}">
-                                        <h4 class="text-base md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors line-clamp-2">{{ $post->title }}</h4>
+                                        <h4 class="text-base md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors line-clamp-1">{{ $post->title }}</h4>
                                     </a>
-                                    <p class="text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-2 md:line-clamp-3">{!! \Illuminate\Support\Str::limit(strip_tags($post->description), 120) !!}</p>
+                                    <p class="hidden md:block text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-1">{{ html_entity_decode(\Illuminate\Support\Str::limit(strip_tags($post->description), 100)) }}</p>
                                     <div class="flex items-center gap-1.5 mt-1 text-slate-400">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <circle cx="12" cy="12" r="10" />
@@ -149,7 +152,7 @@
                             @forelse(isset($latestSidebarPosts) ? $latestSidebarPosts : [] as $index => $post)
                             @php $bn = ['১','২','৩','৪','৫','৬']; $num = $bn[$index] ?? ($index + 1); @endphp
                             <a href="{{ url('/news/' . $post->slug) }}" class="group cursor-pointer flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0 block">
-                                <span class="text-2xl font-bold text-gray-300 serif shrink-0 leading-none">{{ $num }}.</span>
+                                <span class="text-2xl font-bold text-gray-400 serif shrink-0 leading-none">{{ $num }}.</span>
                                 <div class="flex-1">
                                     <h4 class="text-base font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
                                 </div>
@@ -167,7 +170,7 @@
                             @forelse(isset($popularSidebarPosts) ? $popularSidebarPosts : [] as $index => $post)
                             @php $bn = ['১','২','৩','৪','৫','৬']; $num = $bn[$index] ?? ($index + 1); @endphp
                             <a href="{{ url('/news/' . $post->slug) }}" class="group cursor-pointer flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0 block">
-                                <span class="text-2xl font-bold text-gray-300 serif shrink-0 leading-none">{{ $num }}.</span>
+                                <span class="text-2xl font-bold text-gray-400 serif shrink-0 leading-none">{{ $num }}.</span>
                                 <div class="flex-1">
                                     <h4 class="text-base font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
                                 </div>
@@ -224,9 +227,9 @@
                                     </a>
                                     <div class="flex flex-col justify-start gap-1 md:gap-2 pt-0 md:pt-1 md:px-0 flex-1">
                                         <a href="{{ url('/news/' . $post->slug) }}">
-                                            <h3 class="text-lg md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors line-clamp-2">{{ $post->title }}</h3>
+                                            <h3 class="text-lg md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors line-clamp-1">{{ $post->title }}</h3>
                                         </a>
-                                        <p class="hidden md:block text-sm font-semibold text-desc leading-relaxed line-clamp-2">{!! \Illuminate\Support\Str::limit(strip_tags($post->description), 180) !!}</p>
+                                        <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-1">{{ html_entity_decode(\Illuminate\Support\Str::limit(strip_tags($post->description), 100)) }}</p>
                                         <div class="flex items-center gap-1.5 mt-auto text-gray-500">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                             <span class="text-[10px] md:text-xs font-medium text-gray-500">{{ $post->created_at->diffForHumans() }}</span>
@@ -263,7 +266,7 @@
 
                         {{-- বিজ্ঞাপন ১: বড় ব্যানার --}}
                         <a href="#" class="block overflow-hidden border border-slate-200 shadow-sm transition-all group relative">
-                            <div class="relative h-[250px] w-full overflow-hidden">
+                            <div class="relative h-[100px] w-full overflow-hidden">
                                 <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&auto=format&fit=crop&q=80"
                                     alt="বিজ্ঞাপন"
                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -277,7 +280,7 @@
 
                         {{-- বিজ্ঞাপন ২: মাঝারি ব্যানার --}}
                         <a href="#" class="block overflow-hidden border border-slate-200 shadow-sm transition-all group relative mt-4">
-                            <div class="relative h-[180px] w-full overflow-hidden">
+                            <div class="relative h-[100px] w-full overflow-hidden">
                                 <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&auto=format&fit=crop&q=80"
                                     alt="স্পনসরড"
                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">

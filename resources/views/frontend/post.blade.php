@@ -1,6 +1,6 @@
 @php
     $postShareTitle = $post->title . ' - দ্য ডেইলি নিউজ';
-    $postShareDesc = \Illuminate\Support\Str::limit(strip_tags($post->description ?? ''), 160);
+    $postShareDesc = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($post->description ?? '')), 160);
     // শেয়ার প্রিভিউতে ইমেজ দেখাতে পূর্ণ absolute URL দরকার (Facebook/WhatsApp/Twitter)
     $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : null;
 @endphp

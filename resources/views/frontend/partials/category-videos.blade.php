@@ -38,8 +38,8 @@ if ($video->image) {
             </h3>
         </a>
         @if($video->description)
-        <p class="text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-3">
-            {{ Str::limit(strip_tags($video->description), 200) }}
+        <p class="text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-2">
+            {{ Str::limit(html_entity_decode(strip_tags($video->description)), 200) }}
         </p>
         @endif
         <div class="flex items-center gap-1.5 mt-auto text-gray-500">

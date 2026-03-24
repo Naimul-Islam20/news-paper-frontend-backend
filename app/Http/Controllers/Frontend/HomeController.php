@@ -161,17 +161,17 @@ class HomeController extends Controller
                 ->get();
         }
 
-        // ২ নং সেকশনের শেষ কলাম: সর্বশেষ (লেটেস্ট ৬ পোস্ট, পোস্ট-টাইপ ক্যাটাগরি) ও পঠিত (ভিউ অনুযায়ী টপ ৬)
+        // ২ নং সেকশনের শেষ কলাম: সর্বশেষ (লেটেস্ট ৫ পোস্ট, পোস্ট-টাইপ ক্যাটাগরি) ও পঠিত (ভিউ অনুযায়ী টপ ৫)
         $latestSidebarPosts = Post::with('categories.parent')
             ->where('status', 'published')
             ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
             ->latest('created_at')
-            ->limit(6)
+            ->limit(5)
             ->get();
         $popularSidebarPosts = Post::with('categories.parent')
             ->where('status', 'published')
             ->orderByDesc('views')
-            ->limit(6)
+            ->limit(5)
             ->get();
 
         return view('welcome', [

@@ -120,7 +120,7 @@
 }
 
 @utility border-custom {
-    border-color: var(--color-gray-400, #ffff);
+    border-color: #e5e7eb !important;
 }
 
 img {

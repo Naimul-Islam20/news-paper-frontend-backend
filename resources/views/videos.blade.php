@@ -81,7 +81,7 @@
                                         জাতীয় সংসদের বাজেট অধিবেশনের সরাসরি সম্প্রচার
                                     </h3>
                                 </a>
-                                <p class="text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-3">
+                                <p class="text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-2">
                                     আজকের বাজেট অধিবেশনে গুরুত্বপূর্ণ প্রস্তাবনা নিয়ে আলোচনা করছেন সংসদ সদস্যরা। ২০২৬-২৭ অর্থবছরের বাজেট নিয়ে বিস্তারিত দেখুন আমাদের এই প্রতিবেদনে।
                                 </p>
                                 <div class="flex items-center gap-1.5 mt-auto text-gray-500">
@@ -117,7 +117,7 @@
                                         বিপিএল ২০২৬: গ্যালারিতে উন্মাদনা ও রুদ্ধশ্বাস মুহূর্ত
                                     </h3>
                                 </a>
-                                <p class="text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-3">
+                                <p class="text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-2">
                                     স্টেডিয়ামের উত্তেজনা এখন সবার হাতের মুঠোয়। বিপিএলের শেষ ওভারের সেই থ্রিলার মিস করলে এখনই দেখে নিন ভিডিওটি।
                                 </p>
                                 <div class="flex items-center gap-1.5 mt-auto text-gray-500">
@@ -153,7 +153,7 @@
                                         বর্ষায় বাংলার রূপ: ছোট এক নৌকায় নদী ভ্রমণ
                                     </h3>
                                 </a>
-                                <p class="text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-3">
+                                <p class="text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-2">
                                     বাংলার চিরচেনা রূপ আরও সুন্দর হয়ে ধরা দিয়েছে এই প্রতিবেদনে। যমুনা নদীর পাড় থেকে আমাদের প্রতিনিধির ধারণ করা বিশেষ ভিডিও।
                                 </p>
                                 <div class="flex items-center gap-1.5 mt-auto text-gray-500">

@@ -18,13 +18,13 @@
                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
                     </a>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-100">
                         <path d="m9 18 6-6-6-6" />
                     </svg>
                     <span class="text-black font-bold">অনুসন্ধান</span>
                 </div>
 
-                <div class="w-full border-b border-slate-300 relative mb-4 md:mb-8">
+                <div class="w-full border-b border-slate-100 relative mb-4 md:mb-8">
                     <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
                 </div>
             </div>
@@ -68,13 +68,13 @@
                                 @endif
                             </span>
                             <a href="{{ $item->url }}">
-                                <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                <h3 class="text-xl md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
                                     {{ $item->title }}
                                 </h3>
                             </a>
                             @if($item->snippet)
-                            <p class="hidden md:block text-sm font-semibold text-desc leading-relaxed line-clamp-2">
-                                {{ $item->snippet }}
+                            <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-1">
+                                {!! $item->snippet !!}
                             </p>
                             @endif
                             <div class="flex items-center gap-1.5 mt-auto text-gray-500">

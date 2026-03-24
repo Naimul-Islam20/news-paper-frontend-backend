@@ -1,14 +1,14 @@
 <x-layout>
     <x-slot:title>
         {{ optional($siteMeta)->site_title ?? optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ | প্রিমিয়াম নিউজপেপার সাইট' }}
-    </x-slot>
+        </x-slot>
 
         @php $adBelowMenu = ad_slot('below_menu'); @endphp
         @if($adBelowMenu && $adBelowMenu->image)
         <div class="py-4 md:py-8 flex justify-center bg-transparent px-0 md:px-4">
             <div class="container flex justify-center overflow-hidden">
                 <a href="{{ $adBelowMenu->link ?? '#' }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
-                    <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[120px] overflow-hidden shrink-0">
+                    <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[100px] overflow-hidden shrink-0">
                         <img src="{{ storage_image_url($adBelowMenu->image) }}"
                             alt="{{ $adBelowMenu->caption ?? 'Advertisement' }}"
                             class="w-full h-full object-cover object-center shadow-sm"
@@ -41,11 +41,11 @@
                             {{ $post->title }}
                         </h4>
                         @php
-                        $excerpt = $post->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($post->description), 120);
+                        $excerpt = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($post->description)), 100);
                         @endphp
                         @if($excerpt)
-                        <p class="text-sm lg:text-md text-desc font-medium leading-relaxed line-clamp-3 mt-1 text-left">
-                            {{ $excerpt }}
+                        <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-1 mt-1 text-left">
+                            {!! $excerpt !!}
                         </p>
                         @endif
                     </a>
@@ -76,11 +76,11 @@
                                 {{ $lead->title }}
                             </h2>
                             @php
-                            $leadExcerpt = $lead->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($lead->description), 140);
+                            $leadExcerpt = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($lead->description)), 100);
                             @endphp
                             @if($leadExcerpt)
-                            <p class="text-desc.leading-relaxed mt-1 mb-4 text-center line-clamp-2 font-medium px-6 md:px-0 max-w-[340px] md:max-w-none mx-auto">
-                                {{ $leadExcerpt }}
+                            <p class="hidden md:block text-sm md:text-base text-desc leading-relaxed mt-1 mb-4 text-center line-clamp-1 font-normal px-6 md:px-0 max-w-[340px] md:max-w-none mx-auto">
+                                {!! $leadExcerpt !!}
                             </p>
                             @endif
                         </div>
@@ -125,11 +125,11 @@
                             {{ $post->title }}
                         </h3>
                         @php
-                        $thirdExcerpt = $post->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($post->description), 130);
+                        $thirdExcerpt = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($post->description)), 130);
                         @endphp
                         @if($thirdExcerpt)
-                        <p class="text-desc text-sm leading-relaxed text-left line-clamp-2">
-                            {{ $thirdExcerpt }}
+                        <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                            {!! $thirdExcerpt !!}
                         </p>
                         @endif
                     </a>
@@ -175,10 +175,10 @@
                                 </a>
                                 @if(optional($post->reporter)->desk || optional($post->reporter)->name)
                                 <div class="flex items-center gap-1.5 pt-1">
-                                    <svg class="w-3.5 h-3.5 text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3.5 h-3.5 hidden md:block text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
-                                    <span class="text-[12px] text-desc font-bold text-left ml-0 leading-none">
+                                    <span class="text-[12px] hidden md:block text-desc font-bold text-left ml-0 leading-none">
                                         {{ $post->reporter->desk ?? $post->reporter->name }}
                                     </span>
                                 </div>
@@ -196,10 +196,10 @@
                                     </h4>
                                 </div>
                                 <div class="flex items-center gap-1.5 pt-1">
-                                    <svg class="w-3.5 h-3.5 text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3.5 h-3.5 hidden md:block text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
-                                    <span class="text-[12px] text-desc font-bold text-left ml-0 leading-none">ড. মো. রুহুল আমিন সরকার</span>
+                                    <span class="text-[12px] hidden md:block text-desc font-bold text-left ml-0 leading-none">ড. মো. রুহুল আমিন সরকার</span>
                                 </div>
                             </div>
 
@@ -213,10 +213,10 @@
                                     </h4>
                                 </div>
                                 <div class="flex items-center gap-1.5 pt-1">
-                                    <svg class="w-3.5 h-3.5 text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3.5 h-3.5 hidden md:block text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
-                                    <span class="text-[12px] text-desc font-bold text-left ml-0 leading-none">অধ্যাপক ড. এম শাহিনুর রহমান</span>
+                                    <span class="text-[12px] hidden md:block text-desc font-bold text-left ml-0 leading-none">অধ্যাপক ড. এম শাহিনুর রহমান</span>
                                 </div>
                             </div>
 
@@ -230,10 +230,10 @@
                                     </h4>
                                 </div>
                                 <div class="flex items-center gap-1.5 pt-1">
-                                    <svg class="w-3.5 h-3.5 text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-3.5 h-3.5 hidden md:block text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
-                                    <span class="text-[12px] text-desc font-bold text-left ml-0 leading-none">ড. নীলুফার পারভীন</span>
+                                    <span class="text-[12px] hidden md:block text-desc font-bold text-left ml-0 leading-none">ড. নীলুফার পারভীন</span>
                                 </div>
                             </div>
                             @endforelse
@@ -256,7 +256,7 @@
             <div class="py-4 md:py-8 flex justify-center bg-transparent px-0 md:px-4">
                 <div class="container flex justify-center overflow-hidden">
                     <a href="{{ $adHeroBelow->link ?? '#' }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
-                        <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[120px] overflow-hidden shrink-0">
+                        <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[100px] overflow-hidden shrink-0">
                             <img src="{{ storage_image_url($adHeroBelow->image) }}"
                                 alt="{{ $adHeroBelow->caption ?? 'Advertisement' }}"
                                 class="w-full h-full object-cover object-center shadow-sm"
@@ -308,11 +308,11 @@
                                 {{ $post->title }}
                             </h3>
                             @php
-                            $politicsExcerpt = $post->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($post->description ?? ''), 120);
+                            $politicsExcerpt = \Illuminate\Support\Str::limit(strip_tags($post->description ?? ''), 100);
                             @endphp
                             @if($politicsExcerpt)
-                            <p class="text-desc text-sm font-semibold leading-relaxed text-left line-clamp-2">
-                                {{ $politicsExcerpt }}
+                            <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                                {!! $politicsExcerpt !!}
                             </p>
                             @endif
                         </a>
@@ -456,23 +456,15 @@
                                     {{ $mainNational->title }}
                                 </h3>
                                 @php
-                                    $mainNationalSub = null;
-                                    if (!empty($mainNational->sub_title)) {
-                                        $decoded = json_decode($mainNational->sub_title, true);
-                                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                            $mainNationalSub = collect($decoded)
-                                                ->first(function ($value) {
-                                                    return is_string($value) && trim($value) !== '';
-                                                });
-                                        } else {
-                                            $mainNationalSub = $mainNational->sub_title;
-                                        }
-                                    }
+                                    $mainNationalExcerpt = \Illuminate\Support\Str::limit(
+                                        html_entity_decode(strip_tags($mainNational->description ?? '')),
+                                        120
+                                    );
                                 @endphp
-                                @if($mainNationalSub)
-                                    <p class="text-desc text-sm font-semibold leading-relaxed text-left">
-                                        {{ $mainNationalSub }}
-                                    </p>
+                                @if($mainNationalExcerpt)
+                                    <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left">
+                                        {!! $mainNationalExcerpt !!}
+                                </p>
                                 @endif
                             </a>
                             @else
@@ -482,7 +474,7 @@
                                 <h3 class="text-2xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mb-1.5">
                                     মেট্রোরেলের নতুন রুট উদ্বোধন: বদলে যাচ্ছে রাজধানীর যাতায়াত দৃশ্যপট
                                 </h3>
-                                <p class="text-desc text-sm font-semibold leading-relaxed text-left">
+                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left">
                                     প্রধানমন্ত্রী আজ সকালে মেট্রোরেলের নতুন বর্ধিত অংশের উদ্বোধন করেছেন। এর ফলে মতিঝিল থেকে উত্তরা পর্যন্ত যেতে সময় লাগবে মাত্র ৩০ মিনিট। আধুনিক এই যাতায়াত ব্যবস্থা রাজধানীর যানজট নিরসনে বিশাল ভূমিকা রাখবে বলে আশা করা হচ্ছে...
                                 </p>
                             </div>
@@ -527,7 +519,7 @@
                             <div id="panel-latest" class="space-y-4">
                                 @foreach($latestSidebarPosts ?? [] as $index => $post)
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex items-start gap-4 pb-4 border-b border-custom last:border-0 last:pb-0 block">
-                                    <span class="text-3xl font-bold text-gray-300 serif shrink-0 leading-none">{{ $bnNum[$index] ?? ($index + 1) }}.</span>
+                                    <span class="text-3xl font-bold text-gray-400 serif shrink-0 leading-none">{{ $bnNum[$index] ?? ($index + 1) }}.</span>
                                     <div class="flex-1 min-w-0">
                                         <h4 class="text-base font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">
                                             {{ $post->title }}
@@ -546,7 +538,7 @@
                             <div id="panel-popular" class="space-y-4 hidden">
                                 @foreach($popularSidebarPosts ?? [] as $index => $post)
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex items-start gap-3 pb-3 border-b border-custom last:border-0 last:pb-0 block">
-                                    <span class="text-3xl font-bold text-gray-300 serif shrink-0 leading-none">{{ $bnNum[$index] ?? ($index + 1) }}.</span>
+                                    <span class="text-3xl font-bold text-gray-400 serif shrink-0 leading-none">{{ $bnNum[$index] ?? ($index + 1) }}.</span>
                                     <div class="flex-1 min-w-0">
                                         <h4 class="text-base font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
                                             {{ $post->title }}
@@ -591,7 +583,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-6 lg:gap-0 lg:-mx-3">
                         @forelse($capitalPosts->take(4) as $index => $post)
                         @php
-                        $excerpt = $post->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($post->description), 120);
+                        $excerpt = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($post->description)), 100);
                         @endphp
                         <div class="group cursor-pointer lg:px-3{{ $index < 3 ? ' lg:border-r border-custom' : '' }}">
                             <a
@@ -609,8 +601,8 @@
                                     {{ $post->title }}
                                 </h3>
                                 @if($excerpt)
-                                <p class="text-desc text-sm font-semibold leading-relaxed text-left line-clamp-2">
-                                    {{ $excerpt }}
+                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                                    {!! $excerpt !!}
                                 </p>
                                 @endif
                             </a>
@@ -665,7 +657,7 @@
                             <div class="group cursor-pointer">
                                 @if($sportsMain)
                                 @php
-                                $mainExcerpt = $sportsMain->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($sportsMain->description), 140);
+                                $mainExcerpt = \Illuminate\Support\Str::limit(strip_tags($sportsMain->description), 100);
                                 @endphp
                                 <a href="{{ news_url($sportsMain) }}" class="block">
                                     <div class="img-placeholder overflow-hidden aspect-video mb-2 relative shadow-sm">
@@ -677,7 +669,7 @@
                                         {{ $sportsMain->title }}
                                     </h3>
                                     @if($mainExcerpt)
-                                    <p class="text-desc text-base font-semibold leading-relaxed text-left line-clamp-2">
+                                    <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
                                         {{ $mainExcerpt }}
                                     </p>
                                     @endif
@@ -689,7 +681,7 @@
                             <div class="group cursor-pointer pb-4 border-b border-custom lg:border-0 lg:pb-0">
                                 @if($sportsSecondary)
                                 @php
-                                $secondaryExcerpt = $sportsSecondary->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($sportsSecondary->description), 120);
+                                $secondaryExcerpt = \Illuminate\Support\Str::limit(strip_tags($sportsSecondary->description), 100);
                                 @endphp
                                 <a href="{{ news_url($sportsSecondary) }}" class="block">
                                     <div class="flex gap-2 lg:gap-4">
@@ -698,13 +690,13 @@
                                             <img src="{{ Storage::url($sportsSecondary->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
-                                        <h4 class="text-lg font-semibold serif leading-tight group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">
+                                        <h4 class="text-lg font-normal serif leading-tight group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">
                                             {{ $sportsSecondary->title }}
                                         </h4>
                                     </div>
                                     @if($secondaryExcerpt)
-                                    <p class="text-desc text-sm font-semibold leading-relaxed text-left line-clamp-2 hidden md:block mt-1">
-                                        {{ $secondaryExcerpt }}
+                                    <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
+                                        {!! $secondaryExcerpt !!}
                                     </p>
                                     @endif
                                 </a>
@@ -718,7 +710,7 @@
                             @php $post = $item['post']; @endphp
                             @if($post)
                             @php
-                            $excerpt = $post->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($post->description), 120);
+                            $excerpt = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($post->description)), 100);
                             @endphp
                             <div class="group cursor-pointer pb-4 border-b border-custom lg:border-0 lg:pb-0">
                                 <a href="{{ news_url($post) }}" class="block">
@@ -733,8 +725,8 @@
                                         </h4>
                                     </div>
                                     @if($excerpt)
-                                    <p class="text-desc text-sm font-semibold leading-relaxed text-left line-clamp-2 hidden md:block mt-1">
-                                        {{ $excerpt }}
+                                    <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
+                                        {!! $excerpt !!}
                                     </p>
                                     @endif
                                 </a>
@@ -812,7 +804,7 @@
                                 <div class="lg:col-span-6 lg:px-3 lg:border-r border-custom mb-6 lg:mb-0">
                                     @if($countryMain)
                                     @php
-                                    $mainExcerpt = $countryMain->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($countryMain->description), 180);
+                                    $mainExcerpt = \Illuminate\Support\Str::limit(strip_tags($countryMain->description), 180);
                                     @endphp
                                     <a href="{{ news_url($countryMain) }}" class="group cursor-pointer">
                                         <div class="img-placeholder overflow-hidden aspect-video mb-4 relative shadow-sm">
@@ -824,7 +816,7 @@
                                             {{ $countryMain->title }}
                                         </h3>
                                         @if($mainExcerpt)
-                                        <p class="text-desc text-lg font-semibold leading-relaxed text-left line-clamp-3 hidden md:block">
+                                        <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
                                             {{ $mainExcerpt }}
                                         </p>
                                         @endif
@@ -1017,7 +1009,7 @@
                         <div class="lg:px-3 lg:border-r border-custom">
                             @if($worldMain)
                             @php
-                            $mainExcerpt = $worldMain->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($worldMain->description), 200);
+                            $mainExcerpt = \Illuminate\Support\Str::limit(strip_tags($worldMain->description), 200);
                             @endphp
                             <a href="{{ news_url($worldMain) }}" class="group cursor-pointer">
                                 <div class="img-placeholder overflow-hidden aspect-video mb-2 relative shadow-sm">
@@ -1029,7 +1021,7 @@
                                     {{ $worldMain->title }}
                                 </h3>
                                 @if($mainExcerpt)
-                                <p class="text-desc text-sm font-semibold leading-relaxed text-left line-clamp-3">
+                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
                                     {{ $mainExcerpt }}
                                 </p>
                                 @endif
@@ -1042,7 +1034,7 @@
                             <!-- Middle Item 1 -->
                             @if($worldMid1)
                             @php
-                            $excerpt = $worldMid1->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($worldMid1->description), 140);
+                            $excerpt = \Illuminate\Support\Str::limit(strip_tags($worldMid1->description), 100);
                             @endphp
                             <a href="{{ news_url($worldMid1) }}" class="group cursor-pointer pb-4 border-b border-custom last:border-0 last:pb-0">
                                 <div class="flex flex-row lg:block gap-2 lg:gap-0">
@@ -1056,8 +1048,8 @@
                                     </h4>
                                 </div>
                                 @if($excerpt)
-                                <p class="text-desc text-sm font-semibold leading-relaxed text-left line-clamp-2 hidden md:block mt-1">
-                                    {{ $excerpt }}
+                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
+                                    {!! $excerpt !!}
                                 </p>
                                 @endif
                             </a>
@@ -1065,7 +1057,7 @@
                             <!-- Middle Item 2 -->
                             @if($worldMid2)
                             @php
-                            $excerpt = $worldMid2->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($worldMid2->description), 140);
+                            $excerpt = \Illuminate\Support\Str::limit(strip_tags($worldMid2->description), 100);
                             @endphp
                             <a href="{{ news_url($worldMid2) }}" class="group cursor-pointer pb-4 border-b border-custom last:border-0 last:pb-0">
                                 <div class="flex flex-row lg:block gap-2 lg:gap-0">
@@ -1079,8 +1071,8 @@
                                     </h4>
                                 </div>
                                 @if($excerpt)
-                                <p class="text-desc text-sm font-semibold leading-relaxed text-left line-clamp-2 hidden md:block mt-1">
-                                    {{ $excerpt }}
+                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1 mt-1">
+                                    {!! $excerpt !!}
                                 </p>
                                 @endif
                             </a>
@@ -1174,7 +1166,7 @@
                         <div class="lg:px-3 lg:border-r  border-custom">
                             @if($entMid)
                             @php
-                            $excerpt = $entMid->sub_title ?: \Illuminate\Support\Str::limit(strip_tags($entMid->description), 180);
+                            $excerpt = \Illuminate\Support\Str::limit(strip_tags($entMid->description), 180);
                             @endphp
                             <a href="{{ news_url($entMid) }}" class="group cursor-pointer">
                                 <div class="img-placeholder overflow-hidden h-84 mb-3 relative shadow-sm">
@@ -1186,8 +1178,8 @@
                                     {{ $entMid->title }}
                                 </h3>
                                 @if($excerpt)
-                                <p class="text-desc text-sm font-semibold leading-relaxed text-left line-clamp-3">
-                                    {{ $excerpt }}
+                                <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed text-left line-clamp-1">
+                                    {!! $excerpt !!}
                                 </p>
                                 @endif
                             </a>
@@ -1284,7 +1276,7 @@
                                         <img src="{{ Storage::url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-lg font-semibold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
                                         {{ $post->title }}
                                     </h5>
                                 </a>
@@ -1325,7 +1317,7 @@
                                         <img src="{{ Storage::url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-lg font-semibold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
                                         {{ $post->title }}
                                     </h5>
                                 </a>
@@ -1366,7 +1358,7 @@
                                         <img src="{{ Storage::url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-lg font-semibold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
                                         {{ $post->title }}
                                     </h5>
                                 </a>
@@ -1429,9 +1421,9 @@
                 <section class="mt-12 border-t border-custom pt-8">
                     <!-- Tabs Header (শুধু ট্যাব, ক্যাটাগরি পেজে নেয় না) -->
                     <div class="flex items-center gap-8 border-b border-custom mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                        <button type="button" onclick="switchTopicTab('projonmo')" id="tab-projonmo" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-rose-600 text-rose-600 transition-all duration-300">{{ $genTitle ?: 'প্রজন্ম' }}</button>
-                        <button type="button" onclick="switchTopicTab('campus')" id="tab-campus" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-300">{{ $campusTitle ?: 'ক্যাম্পাস' }}</button>
-                        <button type="button" onclick="switchTopicTab('chakri')" id="tab-chakri" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-300">{{ $jobTitle ?: 'চাকরি' }}</button>
+                        <button type="button" onclick="switchTopicTab('projonmo')" id="tab-projonmo" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-rose-600 text-rose-600 transition-all duration-180">{{ $genTitle ?: 'প্রজন্ম' }}</button>
+                        <button type="button" onclick="switchTopicTab('campus')" id="tab-campus" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-180">{{ $campusTitle ?: 'ক্যাম্পাস' }}</button>
+                        <button type="button" onclick="switchTopicTab('chakri')" id="tab-chakri" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-180">{{ $jobTitle ?: 'চাকরি' }}</button>
                     </div>
 
                     <!-- Tab Panels Container -->
@@ -1462,7 +1454,7 @@
                                         <img src="{{ Storage::url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-semibold serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1478,7 +1470,7 @@
                                         <img src="{{ Storage::url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-semibold serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1514,7 +1506,7 @@
                                         <img src="{{ Storage::url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-semibold serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1530,7 +1522,7 @@
                                         <img src="{{ Storage::url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-semibold serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1566,7 +1558,7 @@
                                         <img src="{{ Storage::url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-semibold serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1582,7 +1574,7 @@
                                         <img src="{{ Storage::url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-semibold serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1672,7 +1664,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <h3 class="text-xl lg:text-2xl font-bold serif leading-tight group-hover:text-rose-600 transition-colors line-clamp-2 lg:line-clamp-1 lg:mt-3">{{ $mainVideo->title }}</h3>
+                                        <h3 class="text-xl lg:text-2xl font-bold serif leading-tight group-hover:text-rose-600 transition-colors line-clamp-1 lg:line-clamp-1 lg:mt-3">{{ $mainVideo->title }}</h3>
                                     </div>
                                 </a>
                                 @endif
@@ -1696,7 +1688,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <h4 class="text-base lg:text-lg font-semibold serif leading-snug group-hover:text-rose-600 transition-colors line-clamp-2">{{ $video->title }}</h4>
+                                        <h4 class="text-base lg:text-lg font-normal serif leading-snug group-hover:text-rose-600 transition-colors line-clamp-1">{{ $video->title }}</h4>
                                     </a>
                                     @endif
                                     @endforeach
@@ -1730,12 +1722,12 @@
                             <div class="flex flex-col gap-4">
                                 @if($galleryMain)
                                 @php $galleryMainCover = $galleryMain->images->first(); @endphp
-                                <a href="{{ route('gallery.show', $galleryMain->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[250px] md:h-[330px]">
+                                <a href="{{ route('gallery.show', $galleryMain->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[180px] md:h-[330px]">
                                     @if($galleryMainCover)
                                     <img src="{{ Storage::url($galleryMainCover->image) }}" alt="{{ $galleryMain->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
-                                        <p class="text-white font-serif text-base font-semibold leading-tight line-clamp-2">{{ $galleryMain->title }}</p>
+                                        <p class="text-white font-serif text-base font-normal leading-tight line-clamp-1">{{ $galleryMain->title }}</p>
                                     </div>
                                 </a>
                                 @endif
@@ -1744,12 +1736,12 @@
                                     @foreach([$gallerySmall1, $gallerySmall2] as $gallery)
                                     @if($gallery)
                                     @php $cover = $gallery->images->first(); @endphp
-                                    <a href="{{ route('gallery.show', $gallery->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[200px] md:h-[160px]">
+                                    <a href="{{ route('gallery.show', $gallery->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[200px] md:h-[100px]">
                                         @if($cover)
                                         <img src="{{ Storage::url($cover->image) }}" alt="{{ $gallery->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
-                                            <p class="text-white font-serif text-base font-semibold leading-tight line-clamp-2">{{ $gallery->title }}</p>
+                                            <p class="text-white font-serif text-base font-normal leading-tight line-clamp-1">{{ $gallery->title }}</p>
                                         </div>
                                     </a>
                                     @endif
@@ -1759,13 +1751,13 @@
 
                             @if($galleryRight)
                             @php $galleryRightCover = $galleryRight->images->first(); @endphp
-                            <a href="{{ route('gallery.show', $galleryRight->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[300px] md:h-[505px]">
+                            <a href="{{ route('gallery.show', $galleryRight->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[180px] md:h-[505px]">
                                 @if($galleryRightCover)
                                 <img src="{{ Storage::url($galleryRightCover->image) }}" alt="{{ $galleryRight->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.parentElement.classList.remove('img-placeholder')">
                                 @endif
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6">
                                     <span class="bg-rose-600 text-white text-xs font-bold px-2 py-1 w-max mb-3">ফিচারড ফটো</span>
-                                    <h3 class="text-white text-xl md:text-3xl font-bold serif leading-tight line-clamp-2">{{ $galleryRight->title }}</h3>
+                                    <h3 class="text-white text-xl md:text-3xl font-bold serif leading-tight line-clamp-1">{{ $galleryRight->title }}</h3>
                                 </div>
                             </a>
                             @endif

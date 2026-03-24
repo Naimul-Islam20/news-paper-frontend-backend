@@ -38,12 +38,25 @@ class SearchController extends Controller
                 ->get();
 
             foreach ($posts as $post) {
+                // Handling sub_title if it's JSON or has HTML tags
+                $subTitle = $post->sub_title;
+                if ($subTitle && is_string($subTitle)) {
+                    $decoded = json_decode($subTitle, true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                        $subTitle = collect($decoded)
+                            ->map(fn($v) => is_string($v) ? html_entity_decode(strip_tags($v)) : $v)
+                            ->first(fn($v) => is_string($v) && trim($v) !== '');
+                    } else {
+                        $subTitle = html_entity_decode(strip_tags($subTitle));
+                    }
+                }
+
                 $items->push((object) [
                     'type'       => 'post',
                     'url'        => news_url($post),
                     'title'      => $post->title,
                     'image'      => $post->image ? asset('storage/' . ltrim($post->image, '/')) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600',
-                    'snippet'    => $post->sub_title ?: Str::limit(strip_tags((string) $post->description ?? ''), 160),
+                    'snippet'    => $subTitle ?: html_entity_decode(Str::limit(strip_tags((string) $post->description ?? ''), 160)),
                     'created_at' => $post->created_at,
                 ]);
             }
@@ -69,7 +82,7 @@ class SearchController extends Controller
                     'url'        => route('gallery.show', $gallery->slug),
                     'title'      => $gallery->title,
                     'image'      => $imageUrl,
-                    'snippet'    => Str::limit(strip_tags((string) $gallery->description), 160),
+                    'snippet'    => html_entity_decode(Str::limit(strip_tags((string) $gallery->description), 160)),
                     'created_at' => $gallery->created_at,
                 ]);
             }
@@ -93,7 +106,7 @@ class SearchController extends Controller
                     'url'        => route('videos.show', $video->slug),
                     'title'      => $video->title,
                     'image'      => $imageUrl,
-                    'snippet'    => Str::limit(strip_tags((string) $video->description), 160),
+                    'snippet'    => html_entity_decode(Str::limit(strip_tags((string) $video->description), 160)),
                     'created_at' => $video->created_at,
                 ]);
             }
