@@ -25,7 +25,7 @@ class HomeController extends Controller
         // হোম পেজের মতোই সর্বশেষ ও পঠিত – সব পোস্ট থেকে, একই ডাটা
         $latestSidebarPosts = Post::with('categories.parent')
             ->where('status', 'published')
-            ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
+            ->whereHas('categories', fn($q) => $q->where('type', 'post'))
             ->latest('created_at')
             ->limit(6)
             ->get();
@@ -164,7 +164,7 @@ class HomeController extends Controller
         // ২ নং সেকশনের শেষ কলাম: সর্বশেষ (লেটেস্ট ৫ পোস্ট, পোস্ট-টাইপ ক্যাটাগরি) ও পঠিত (ভিউ অনুযায়ী টপ ৫)
         $latestSidebarPosts = Post::with('categories.parent')
             ->where('status', 'published')
-            ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
+            ->whereHas('categories', fn($q) => $q->where('type', 'post'))
             ->latest('created_at')
             ->limit(5)
             ->get();
@@ -189,4 +189,3 @@ class HomeController extends Controller
         ]);
     }
 }
-

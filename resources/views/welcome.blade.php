@@ -1649,11 +1649,21 @@
                             <!-- Main Video: 7 Cols -->
                             <div class="lg:col-span-7 group cursor-pointer pb-4 border-b border-custom lg:border-0 lg:pb-0">
                                 @if($mainVideo)
+                                @php
+                                    $mainThumb = null;
+                                    if (!empty($mainVideo->image)) {
+                                        $mainThumb = Storage::url($mainVideo->image);
+                                    } elseif (!empty($mainVideo->youtube_link) && preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i', $mainVideo->youtube_link, $m)) {
+                                        $mainThumb = 'https://img.youtube.com/vi/' . $m[1] . '/hqdefault.jpg';
+                                    }
+                                @endphp
                                 <a href="{{ route('videos.show', $mainVideo->slug) }}">
                                     <div class="flex flex-row lg:block gap-2 lg:gap-0">
-                                        <div class="img-placeholder w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 relative overflow-hidden bg-black shadow-sm mb-0">
-                                            @if($mainVideo->image)
-                                            <img src="{{ Storage::url($mainVideo->image) }}" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <div class="{{ $mainThumb ? 'img-placeholder' : '' }} w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 relative overflow-hidden bg-black shadow-sm mb-0">
+                                            @if($mainThumb)
+                                                <img src="{{ $mainThumb }}" alt="{{ $mainVideo->title }}"
+                                                    class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700"
+                                                    onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                             <!-- Play Button Overlay -->
                                             <div class="absolute inset-0 flex items-center justify-center">
@@ -1675,10 +1685,20 @@
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-y-3 lg:gap-4">
                                     @foreach([$side1, $side2, $side3] as $video)
                                     @if($video)
+                                    @php
+                                        $sideThumb = null;
+                                        if (!empty($video->image)) {
+                                            $sideThumb = Storage::url($video->image);
+                                        } elseif (!empty($video->youtube_link) && preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i', $video->youtube_link, $m)) {
+                                            $sideThumb = 'https://img.youtube.com/vi/' . $m[1] . '/hqdefault.jpg';
+                                        }
+                                    @endphp
                                     <a href="{{ route('videos.show', $video->slug) }}" class="group cursor-pointer flex gap-2 lg:block pb-3 border-b border-custom last:border-0 lg:border-0 lg:pb-0">
-                                        <div class="img-placeholder w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 relative overflow-hidden bg-black shadow-sm mb-0 lg:mb-2">
-                                            @if($video->image)
-                                            <img src="{{ Storage::url($video->image) }}" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <div class="{{ $sideThumb ? 'img-placeholder' : '' }} w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 relative overflow-hidden bg-black shadow-sm mb-0 lg:mb-2">
+                                            @if($sideThumb)
+                                                <img src="{{ $sideThumb }}" alt="{{ $video->title }}"
+                                                    class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"
+                                                    onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                             <div class="absolute inset-0 flex items-center justify-center">
                                                 <div class="w-10 h-10 bg-black/60 backdrop-blur-sm flex items-center justify-center text-white border border-custom/20 group-hover:bg-rose-600 transition-colors">
@@ -1736,7 +1756,7 @@
                                     @foreach([$gallerySmall1, $gallerySmall2] as $gallery)
                                     @if($gallery)
                                     @php $cover = $gallery->images->first(); @endphp
-                                    <a href="{{ route('gallery.show', $gallery->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[200px] md:h-[100px]">
+                                    <a href="{{ route('gallery.show', $gallery->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[240px] md:h-[180px]">
                                         @if($cover)
                                         <img src="{{ Storage::url($cover->image) }}" alt="{{ $gallery->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif

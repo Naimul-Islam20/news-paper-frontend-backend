@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Reporter;
 use App\Models\Video;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -67,11 +68,14 @@ class VideoController extends Controller
             'is_main_video'=> 'required|in:yes,no',
         ]);
 
+        $baseSlug = Str::slug($request->title);
+        $slug = $this->makeUniqueSlug($baseSlug);
+
         $data = [
             'category_id'   => $request->category_id,
             'reporter_id'   => $this->resolveReporterId($request->reporter_id),
             'title'         => $request->title,
-            'slug'          => Str::slug($request->title),
+            'slug'          => $slug,
             'youtube_link'  => $request->youtube_link,
             'description'   => $request->description,
             'status'        => $request->status,
@@ -110,10 +114,13 @@ class VideoController extends Controller
             'is_main_video'=> 'required|in:yes,no',
         ]);
 
+        $baseSlug = Str::slug($request->title);
+        $slug = $this->makeUniqueSlug($baseSlug, $video->id);
+
         $video->category_id   = $request->category_id;
         $video->reporter_id   = $this->resolveReporterId($request->reporter_id);
         $video->title         = $request->title;
-        $video->slug          = Str::slug($request->title);
+        $video->slug          = $slug;
         $video->youtube_link  = $request->youtube_link;
         $video->description   = $request->description;
         $video->status        = $request->status;
@@ -146,7 +153,7 @@ class VideoController extends Controller
 
     protected function reportersForCurrentUser()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         if ($user && $user->role === 'reporter' && $user->reporter_id) {
             return Reporter::where('id', $user->reporter_id)->get();
         }
@@ -155,10 +162,36 @@ class VideoController extends Controller
 
     protected function resolveReporterId($requestReporterId)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         if ($user && $user->role === 'reporter' && $user->reporter_id) {
             return $user->reporter_id;
         }
         return $requestReporterId;
+    }
+
+    /**
+     * Make slug unique for `videos.slug` (DB column has UNIQUE constraint).
+     * Example: if `my-video` exists, generate `my-video-1`, `my-video-2`, ...
+     */
+    protected function makeUniqueSlug(string $baseSlug, ?int $excludeId = null): string
+    {
+        $baseSlug = trim($baseSlug);
+        if ($baseSlug === '') {
+            $baseSlug = 'video';
+        }
+
+        $candidate = $baseSlug;
+        $i = 1;
+
+        while (Video::query()
+            ->where('slug', $candidate)
+            ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
+            ->exists()
+        ) {
+            $candidate = $baseSlug . '-' . $i;
+            $i++;
+        }
+
+        return $candidate;
     }
 }

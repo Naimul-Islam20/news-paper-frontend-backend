@@ -8,6 +8,7 @@ use App\Models\Gallery;
 use App\Models\GalleryImage;
 use App\Models\Reporter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -69,12 +70,15 @@ class GalleryController extends Controller
             'status'      => 'required|in:active,inactive',
         ]);
 
+        $baseSlug = Str::slug($request->title);
+        $slug = $this->makeUniqueSlug($baseSlug);
+
         // Create the Gallery
         $gallery = Gallery::create([
             'category_id' => $request->category_id,
             'reporter_id' => $this->resolveReporterId($request->reporter_id),
             'title'       => $request->title,
-            'slug'        => Str::slug($request->title),
+            'slug'        => $slug,
             'description' => $request->description,
             'status'      => $request->status,
         ]);
@@ -125,7 +129,8 @@ class GalleryController extends Controller
         $gallery->category_id = $request->category_id;
         $gallery->reporter_id = $this->resolveReporterId($request->reporter_id);
         $gallery->title       = $request->title;
-        $gallery->slug        = Str::slug($request->title);
+        $baseSlug = Str::slug($request->title);
+        $gallery->slug        = $this->makeUniqueSlug($baseSlug, $gallery->id);
         $gallery->description = $request->description;
         $gallery->status      = $request->status;
         $gallery->save();
@@ -188,7 +193,7 @@ class GalleryController extends Controller
 
     protected function reportersForCurrentUser()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         if ($user && $user->role === 'reporter' && $user->reporter_id) {
             return Reporter::where('id', $user->reporter_id)->get();
         }
@@ -197,10 +202,37 @@ class GalleryController extends Controller
 
     protected function resolveReporterId($requestReporterId)
     {
-        $user = auth()->user();
+        $user = Auth::user();
         if ($user && $user->role === 'reporter' && $user->reporter_id) {
             return $user->reporter_id;
         }
         return $requestReporterId;
+    }
+
+    /**
+     * Make slug unique for `galleries.slug` (DB column has UNIQUE constraint).
+     * Example: `my-slug` exists -> `my-slug-1`, `my-slug-2`, ...
+     */
+    protected function makeUniqueSlug(string $baseSlug, ?int $excludeId = null): string
+    {
+        $baseSlug = trim($baseSlug);
+        if ($baseSlug === '') {
+            $baseSlug = 'gallery';
+        }
+
+        $candidate = $baseSlug;
+        $i = 1;
+
+        while (
+            Gallery::query()
+                ->where('slug', $candidate)
+                ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
+                ->exists()
+        ) {
+            $candidate = $baseSlug . '-' . $i;
+            $i++;
+        }
+
+        return $candidate;
     }
 }
