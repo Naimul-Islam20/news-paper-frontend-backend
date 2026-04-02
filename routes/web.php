@@ -194,16 +194,7 @@ Route::prefix('admin')
         });
     });
 
-// News detail routes with SEO-friendly category/subcategory slugs
-// Placed AFTER admin routes so that /admin/... is never captured here.
-Route::get('/{categorySlug}/{postSlug}', [FrontendPostController::class, 'showWithPath'])
-    ->where('categorySlug', '^(?!admin$|category$|page$|gallery$|video$|login$).+')
+// News detail route (fully simplified)
+Route::get('/{slug}', [FrontendPostController::class, 'show'])
+    ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|subscribe$|special-news$|videos$|terms$|privacy-policy$|news-details$|gallery-details$|video-details$|heartbeat$|national$|api$).+')
     ->name('news.show');
-
-Route::get('/{categorySlug}/{subCategorySlug}/{postSlug}', [FrontendPostController::class, 'showWithPath'])
-    ->where('categorySlug', '^(?!admin$|category$|page$|gallery$|video$|login$).+')
-    ->name('news.show.sub');
-
-// Legacy detail URL (for old links): /news/{slug}
-Route::get('/news/{slug}', [FrontendPostController::class, 'showLegacy'])
-    ->name('news.legacy');

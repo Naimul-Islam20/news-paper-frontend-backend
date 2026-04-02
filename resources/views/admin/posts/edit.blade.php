@@ -70,20 +70,20 @@
                             @error('sub_title_points.*') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
-                        {{-- Category (single) --}}
+                        {{-- Category (multiple allowed) --}}
                         <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Category <span class="text-rose-500">*</span></label>
                             <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 max-h-[300px] overflow-y-auto shadow-inner">
                                 <div class="columns-1 md:columns-2 gap-x-12">
-                                    @php $selectedCategoryId = $post->categories->pluck('id')->first(); @endphp
+                                    @php $selectedCategoryIds = $post->categories->pluck('id')->toArray(); @endphp
                                     @forelse($categories as $category)
                                         <div class="break-inside-avoid mb-2">
                                             <label class="flex items-center gap-2 cursor-pointer group py-1 px-2 rounded hover:bg-indigo-50 transition-all">
                                                 <input
-                                                    type="radio"
-                                                    name="category_id"
+                                                    type="checkbox"
+                                                    name="category_ids[]"
                                                     value="{{ $category->id }}"
-                                                    {{ old('category_id', $selectedCategoryId) == $category->id ? 'checked' : '' }}
+                                                    {{ in_array($category->id, old('category_ids', $selectedCategoryIds)) ? 'checked' : '' }}
                                                     class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                                                 >
                                                 <span class="text-sm font-medium text-slate-900 dark:text-white group-hover:text-indigo-600 transition-all">{{ $category->name }}</span>
@@ -94,7 +94,7 @@
                                     @endforelse
                                 </div>
                             </div>
-                            @error('category_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                            @error('category_ids') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Image & Caption --}}

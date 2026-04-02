@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subscriber;
+use App\Mail\NewsletterMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -54,7 +56,22 @@ class SubscribeController extends Controller
      */
     public function store(Request $request)
     {
-        // This is a placeholder for actual email sending logic
-        return back()->with('success', 'Email sent to subscribers successfully!');
+        $request->validate([
+            'subject' => 'required',
+            'message' => 'required',
+            'link'    => 'nullable|url'
+        ]);
+
+        $subscribers = Subscriber::all();
+        
+        foreach($subscribers as $subscriber) {
+            Mail::to($subscriber->email)->send(new NewsletterMail(
+                $request->subject, 
+                $request->message, 
+                $request->link
+            ));
+        }
+
+        return back()->with('success', 'Email sent to all ' . $subscribers->count() . ' subscribers successfully!');
     }
 }

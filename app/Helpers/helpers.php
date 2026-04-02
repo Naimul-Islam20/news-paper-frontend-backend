@@ -60,25 +60,13 @@ if (!function_exists('ad_slot')) {
 
 if (!function_exists('news_url')) {
     /**
-     * Build news post URL from category slugs, or fallback to home when missing.
+     * Build simple news post URL (/{slug}).
      */
     function news_url($post): string
     {
         if (!$post || !$post->slug) {
             return url('/');
         }
-        $primaryCategory = $post->categories->first();
-        if (!$primaryCategory) {
-            return url('/');
-        }
-        $parentCategory = $primaryCategory->parent;
-        $categorySlug = $parentCategory ? $parentCategory->slug : $primaryCategory->slug;
-        $subCategorySlug = $parentCategory ? $primaryCategory->slug : null;
-        if (!$categorySlug) {
-            return url('/');
-        }
-        return $subCategorySlug
-            ? route('news.show.sub', [$categorySlug, $subCategorySlug, $post->slug])
-            : route('news.show', [$categorySlug, $post->slug]);
+        return route('news.show', [$post->slug]);
     }
 }

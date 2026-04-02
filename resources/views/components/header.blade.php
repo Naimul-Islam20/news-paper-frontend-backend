@@ -47,8 +47,8 @@
                             {{-- সর্বশেষ সর্বদা বাম পাশের প্রথম মেনু (স্থান পরিবর্তন হবে না) --}}
                             <li class="border-b border-gray-400 pb-1"><a href="{{ route('latest') }}" class="block text-xl font-semibold hover:text-rose-600 transition-colors">সর্বশেষ</a></li>
                             <li class="border-b border-gray-400 pb-1"><a href="/special-news" class="block text-xl font-semibold hover:text-rose-600 transition-colors">বিশেষ সংবাদ</a></li>
-                            @if(isset($headerCategories) && $headerCategories->isNotEmpty())
-                            @foreach($headerCategories as $cat)
+                            @if(isset($sideMenuCategories) && $sideMenuCategories->isNotEmpty())
+                            @foreach($sideMenuCategories as $cat)
                             <li class="border-b border-gray-400 pb-1">
                                 <a href="{{ route('category.show', $cat->slug) }}" class="block text-xl font-semibold hover:text-rose-600 transition-colors">
                                     {{ $cat->name }}

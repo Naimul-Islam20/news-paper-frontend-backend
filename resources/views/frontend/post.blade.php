@@ -257,16 +257,8 @@
                             </div>
 
                             @foreach($related->take(2) as $rel)
-                            @php
-                            $primaryCategory = $rel->categories->first();
-                            $parentCategory = optional($primaryCategory)->parent;
-                            $categorySlug = $parentCategory ? $parentCategory->slug : optional($primaryCategory)->slug;
-                            $subCategorySlug = $parentCategory ? $primaryCategory->slug : null;
-                            @endphp
-                            <a
-                                href="{{ $subCategorySlug
-                                ? route('news.show.sub', [$categorySlug, $subCategorySlug, $rel->slug])
-                                : route('news.show', [$categorySlug, $rel->slug]) }}"
+                             <a
+                                href="{{ route('news.show', [$rel->slug]) }}"
                                 class="group cursor-pointer flex flex-col gap-2">
                                 <div class="img-placeholder aspect-[16/9] overflow-hidden">
                                     <img src="{{ storage_image_url($rel->image) ?: 'https://loremflickr.com/600/400/law?lock='.$rel->id }}"
@@ -296,16 +288,8 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         @foreach($related->skip(2)->take(4) as $rel)
-                        @php
-                        $primaryCategory = $rel->categories->first();
-                        $parentCategory = optional($primaryCategory)->parent;
-                        $categorySlug = $parentCategory ? $parentCategory->slug : optional($primaryCategory)->slug;
-                        $subCategorySlug = $parentCategory ? $primaryCategory->slug : null;
-                        @endphp
                         <a
-                            href="{{ $subCategorySlug
-                            ? route('news.show.sub', [$categorySlug, $subCategorySlug, $rel->slug])
-                            : route('news.show', [$categorySlug, $rel->slug]) }}"
+                            href="{{ route('news.show', [$rel->slug]) }}"
                             class="group cursor-pointer flex flex-row md:flex-col gap-2 md:gap-3 pb-3 border-b border-gray-100 md:border-0 md:pb-0 last:border-0 last:pb-0">
                             <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
                                 <img src="{{ storage_image_url($rel->image) ?: 'https://loremflickr.com/600/400/news?lock='.$rel->id }}"

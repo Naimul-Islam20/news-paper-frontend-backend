@@ -8,7 +8,6 @@ use App\Models\Post;
 use App\Models\Reporter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PostController extends Controller
@@ -88,7 +87,8 @@ class PostController extends Controller
             'title'              => 'required|string|max:255',
             'sub_title_points'   => 'nullable|array',
             'sub_title_points.*' => 'nullable|string|max:255',
-            'category_id'        => 'required|exists:categories,id',
+            'category_ids'      => 'required|array',
+            'category_ids.*'    => 'exists:categories,id',
             'image'              => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'image_caption'      => 'nullable|string',
             'description'        => 'required|string',
@@ -98,7 +98,7 @@ class PostController extends Controller
             'hero_layer'         => 'nullable|in:1,2,3,4',
         ], [
             'title.required'       => 'শিরোনাম অবশ্যই দিতে হবে।',
-            'category_id.required' => 'ক্যাটাগরি নির্বাচন করুন।',
+            'category_ids.required' => 'ক্যাটাগরি নির্বাচন করুন।',
             'image.required'       => 'ছবি আপলোড করুন।',
             'description.required' => 'বিবরণ লিখুন।',
             'reporter_id.required' => 'রিপোর্টার নির্বাচন করুন।',
@@ -136,9 +136,9 @@ class PostController extends Controller
 
         $post = Post::create($data);
 
-        // Ensure a post belongs to at most one category
-        if ($request->filled('category_id')) {
-            $post->categories()->sync([$request->category_id]);
+        // Sync categories
+        if ($request->has('category_ids')) {
+            $post->categories()->sync($request->category_ids);
         }
 
         return redirect()->route('admin.posts.index')->with('success', 'Post published successfully!');
@@ -166,7 +166,8 @@ class PostController extends Controller
             'title'              => 'required|string|max:255',
             'sub_title_points'   => 'nullable|array',
             'sub_title_points.*' => 'nullable|string|max:255',
-            'category_id'        => 'required|exists:categories,id',
+            'category_ids'      => 'required|array',
+            'category_ids.*'    => 'exists:categories,id',
             'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'image_caption'      => 'nullable|string',
             'description'        => 'required|string',
@@ -176,7 +177,7 @@ class PostController extends Controller
             'hero_layer'         => 'nullable|in:1,2,3,4',
         ], [
             'title.required'       => 'শিরোনাম অবশ্যই দিতে হবে।',
-            'category_id.required' => 'ক্যাটাগরি নির্বাচন করুন।',
+            'category_ids.required' => 'ক্যাটাগরি নির্বাচন করুন।',
             'description.required' => 'বিবরণ লিখুন।',
             'reporter_id.required' => 'রিপোর্টার নির্বাচন করুন।',
         ]);
@@ -216,9 +217,9 @@ class PostController extends Controller
 
         $post->update($data);
 
-        // Ensure a post belongs to at most one category
-        if ($request->filled('category_id')) {
-            $post->categories()->sync([$request->category_id]);
+        // Sync categories
+        if ($request->has('category_ids')) {
+            $post->categories()->sync($request->category_ids);
         } else {
             $post->categories()->sync([]);
         }

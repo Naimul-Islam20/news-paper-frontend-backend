@@ -14,31 +14,19 @@
                     <h3 class="text-lg font-medium text-slate-900 dark:text-white">Send Email to Subscribers</h3>
                 </div>
 
-                <form action="#" method="POST">
+                <form action="{{ route('admin.subscribes.store') }}" method="POST">
                     @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        {{-- Name --}}
-                        <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Name</label>
-                            <input type="text" name="name" placeholder="Enter name..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
-                        </div>
-
-                        {{-- Email --}}
-                        <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Email</label>
-                            <input type="email" name="email" placeholder="Enter email..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
-                        </div>
-
+                    <div class="space-y-6 mb-6">
                         {{-- Subject --}}
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Subject</label>
-                            <input type="text" name="subject" placeholder="Enter subject..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Subject <span class="text-rose-500">*</span></label>
+                            <input type="text" name="subject" required placeholder="Enter email subject..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
 
                         {{-- Link --}}
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Link</label>
-                            <input type="url" name="link" placeholder="https://example.com" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Link (Optional)</label>
+                            <input type="url" name="link" placeholder="https://example.com/news-link" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                     </div>
 

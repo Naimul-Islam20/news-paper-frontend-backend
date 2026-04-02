@@ -55,9 +55,9 @@
 
             <!-- Column 2: Category Links (Span 4) -->
             <div class="col-span-2 md:col-span-4 md:border-r border-slate-200 md:pr-4">
-                @if(isset($footerCategories) && $footerCategories->isNotEmpty())
+                @if(isset($footerCol2) && $footerCol2->isNotEmpty())
                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-2 text-base font-semibold">
-                    @foreach($footerCategories as $cat)
+                    @foreach($footerCol2 as $cat)
                     <a href="{{ route('category.show', $cat->slug) }}" class="hover:text-rose-600 transition-colors">{{ $cat->name }}</a>
                     @endforeach
                 </div>
@@ -65,20 +65,26 @@
                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-2 text-base font-semibold">
                     <a href="/gallery" class="hover:text-rose-600 transition-colors">ছবি</a>
                     <a href="/videos" class="hover:text-rose-600 transition-colors">ভিডিও</a>
-                    <a href="/terms" class="hover:text-rose-600 transition-colors">শর্তাবলী</a>
-                    <a href="/privacy-policy" class="hover:text-rose-600 transition-colors">গোপনীয়তা নীতি</a>
                 </div>
                 @endif
             </div>
 
-            <!-- Column 3: Legal Links (Span 3) -->
+            <!-- Column 3: Custom Links / Footer Column 3 (Span 3) -->
             <div class="md:col-span-3 md:border-r border-slate-200 md:pr-4">
+                @if(isset($footerCol3) && $footerCol3->isNotEmpty())
+                <ul class="space-y-4 text-base font-semibold">
+                    @foreach($footerCol3 as $cat)
+                    <li><a href="{{ route('category.show', $cat->slug) }}" class="hover:text-rose-600 transition-colors">{{ $cat->name }}</a></li>
+                    @endforeach
+                </ul>
+                @else
                 <ul class="space-y-4 text-base font-semibold">
                     <li><a href="#" class="hover:text-rose-600 transition-colors">বিজ্ঞাপন</a></li>
                     <li><a href="#" class="hover:text-rose-600 transition-colors">যোগাযোগ</a></li>
                     <li><a href="/privacy-policy" class="hover:text-rose-600 transition-colors">গোপনীয়তা নীতি</a></li>
                     <li><a href="/terms" class="hover:text-rose-600 transition-colors">শর্তাবলী</a></li>
                 </ul>
+                @endif
             </div>
 
             <!-- Column 4: Social Links – backend (site meta) থেকে ডাইনামিক -->

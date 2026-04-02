@@ -27,19 +27,30 @@ class AppServiceProvider extends ServiceProvider
             function ($view) {
                 try {
                     $headerIds = Setting::getJson('header_categories', []);
-                    $footerIds  = Setting::getJson('footer_categories', []);
+                    $col2Ids   = Setting::getJson('footer_col2_categories', []);
+                    $col3Ids   = Setting::getJson('footer_col3_categories', []);
 
-                    // Preserve admin-selected order by sorting in PHP after fetch
+                    // Preserve admin-order for each section
                     $headerCategories = $headerIds
                         ? Category::whereIn('id', $headerIds)->get()->sortBy(fn($c) => array_search($c->id, $headerIds))->values()
                         : collect();
 
-                    $footerCategories = $footerIds
-                        ? Category::whereIn('id', $footerIds)->get()->sortBy(fn($c) => array_search($c->id, $footerIds))->values()
+                    $footerCol2 = $col2Ids
+                        ? Category::whereIn('id', $col2Ids)->get()->sortBy(fn($c) => array_search($c->id, $col2Ids))->values()
                         : collect();
+
+                    $footerCol3 = $col3Ids
+                        ? Category::whereIn('id', $col3Ids)->get()->sortBy(fn($c) => array_search($c->id, $col3Ids))->values()
+                        : collect();
+
+                    // Combined categories for the side menu drawer (Header -> Footer2 -> Footer3)
+                    $sideMenuCategories = $headerCategories->merge($footerCol2)->merge($footerCol3)->unique('id');
+
                 } catch (\Throwable) {
                     $headerCategories = collect();
-                    $footerCategories = collect();
+                    $footerCol2 = collect();
+                    $footerCol3 = collect();
+                    $sideMenuCategories = collect();
                 }
 
                 try {
@@ -48,7 +59,13 @@ class AppServiceProvider extends ServiceProvider
                     $siteMeta = null;
                 }
 
-                $view->with(compact('headerCategories', 'footerCategories', 'siteMeta'));
+                $view->with(compact(
+                    'headerCategories', 
+                    'footerCol2', 
+                    'footerCol3', 
+                    'sideMenuCategories', 
+                    'siteMeta'
+                ));
             }
         );
     }

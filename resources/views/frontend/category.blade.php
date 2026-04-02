@@ -83,18 +83,10 @@
                     <div class="bg-white p-0 md:p-4 flex flex-col gap-3 md:gap-5">
                         <div id="category-posts-list" class="flex flex-col gap-3 md:gap-5">
                             @forelse($posts as $post)
-                            @php
-                            $primaryCategory = $post->categories->first();
-                            $parentCategory = optional($primaryCategory)->parent;
-                            $categorySlug = $parentCategory ? $parentCategory->slug : optional($primaryCategory)->slug;
-                            $subCategorySlug = $parentCategory ? $primaryCategory->slug : null;
-                            @endphp
                             <article class="flex flex-col md:flex-row gap-2 md:gap-4 last:pb-0 category-post-item">
                                 {{-- ছবি --}}
                                 <a
-                                    href="{{ $subCategorySlug
-                                        ? route('news.show.sub', [$categorySlug, $subCategorySlug, $post->slug])
-                                        : route('news.show', [$categorySlug, $post->slug]) }}"
+                                    href="{{ route('news.show', [$post->slug]) }}"
                                     class="w-full md:w-auto flex-shrink-0">
                                     <div class="img-placeholder w-full md:w-[305px] h-[200px] md:h-[170px] overflow-hidden">
                                         <img src="{{ $post->image ? asset('storage/'.$post->image) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600' }}"
@@ -106,16 +98,14 @@
                                 {{-- টাইটেল + বিবরণ --}}
                                 <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
                                     <a
-                                        href="{{ $subCategorySlug
-                                            ? route('news.show.sub', [$categorySlug, $subCategorySlug, $post->slug])
-                                            : route('news.show', [$categorySlug, $post->slug]) }}">
+                                        href="{{ route('news.show', [$post->slug]) }}">
                                         <h3 class="text-xl md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
                                             {{ $post->title }}
                                         </h3>
                                     </a>
                                     @if($post->description)
                                         <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-1">
-                                            {!! html_entity_decode(Str::limit(strip_tags($post->description), 100)) !!}
+                                            {!! html_entity_decode(\Illuminate\Support\Str::limit(strip_tags($post->description), 100)) !!}
                                         </p>
                                     @endif
                                     <div class="flex items-center gap-1.5 mt-auto text-gray-500">
