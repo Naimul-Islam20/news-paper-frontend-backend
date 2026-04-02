@@ -100,6 +100,7 @@ class CategoryController extends Controller
             'slug'        => 'nullable|string|max:255|unique:categories,slug,' . $id,
             'type'        => 'nullable|string|in:post,page,gallery,video|max:100', // Nullable for subcategory edit
             'description' => 'nullable|string|max:500',
+            'parent_id'   => 'nullable|exists:categories,id',
             'status'      => 'required|in:active,inactive',
         ]);
 
@@ -122,16 +123,33 @@ class CategoryController extends Controller
             $category->slug = $slug;
         }
 
-        $category->name        = $request->name;
-        // Only update type if it's a parent category or provided
+        // Parent Logic
+        if ($request->filled('parent_id')) {
+            $category->parent_id = $request->parent_id;
+            
+            // Subcategory inherits type from parent
+            $parent = Category::find($request->parent_id);
+            if ($parent) {
+                $category->type = $parent->type;
+            }
+        } elseif ($category->parent_id && !$request->filled('parent_id')) {
+            // It was a subcategory but now it's a parent? (If the UI allows this)
+            // For now, let's just keep it as is unless explicitly cleared.
+        }
+
+        $category->name = $request->name;
+
+        // If it's a parent category, update its type
         if (!$category->parent_id && $request->filled('type')) {
             $category->type = $request->type;
         }
+
         $category->description = $request->description;
         $category->status      = $request->status;
         $category->save();
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully!');
+        $route = $category->parent_id ? 'admin.sub-categories.index' : 'admin.categories.index';
+        return redirect()->route($route)->with('success', 'Category updated successfully!');
     }
 
     /**

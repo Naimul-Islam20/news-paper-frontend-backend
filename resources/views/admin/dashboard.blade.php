@@ -241,7 +241,7 @@ Welcome back, <span class="font-semibold text-slate-900 dark:text-slate-100">{{ 
                             </h4>
                             <p class="text-[11px] text-slate-500 mt-0.5 truncate">
                                 @if($post->reporter)
-                                By {{ $post->reporter->name }} ·
+                                {{ $post->reporter->desk ?? $post->reporter->name }} ·
                                 @endif
                                 {{ \Carbon\Carbon::parse($post->created_at)->diffForHumans(null, true) }} ago
                             </p>

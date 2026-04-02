@@ -27,12 +27,11 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 divide-x divide-slate-200 dark:divide-slate-800">
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">ID</th>
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">SL</th>
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Name</th>
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Parent Category</th>
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Type</th>
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Description</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center">Serial</th>
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status</th>
                         <th class="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Actions</th>
                     </tr>
@@ -40,7 +39,7 @@
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                     @foreach($subCategories as $sub)
                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors divide-x divide-slate-100 dark:divide-slate-800">
-                        <td class="px-6 py-4 text-sm font-medium text-black">{{ $sub['id'] }}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-black">{{ $loop->iteration }}</td>
                         <td class="px-6 py-4">
                             <span class="text-sm font-bold text-black">{{ $sub['name'] }}</span>
                         </td>
@@ -58,9 +57,6 @@
                             <span class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
                                 {{ $sub['description'] ?? '—' }}
                             </span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-black">{{ $sub['serial'] }}</span>
                         </td>
                         <td class="px-6 py-4 text-sm">
                             <span class="px-3 py-1.5 text-xs font-bold rounded-xl {{ $sub['status'] == 'Active' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400' }}">
