@@ -194,7 +194,5 @@ Route::prefix('admin')
         });
     });
 
-// News detail route (fully simplified)
-Route::get('/{slug}', [FrontendPostController::class, 'show'])
-    ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|subscribe$|special-news$|videos$|terms$|privacy-policy$|news-details$|gallery-details$|video-details$|heartbeat$|national$|api$).+')
-    ->name('news.show');
+// News detail route
+Route::get('/news/{slug}', [FrontendPostController::class, 'show'])->name('news.show');
