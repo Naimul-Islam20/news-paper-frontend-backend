@@ -10,7 +10,7 @@
     <x-slot:metaImage>{{ $postShareImage }}</x-slot>
     @endif
     <x-slot:metaDescription>{{ $postShareDesc }}</x-slot>
-    <x-slot:ogTitle>{{ $post->title }}</x-slot>
+    <x-slot:ogTitle>{{ $postShareTitle }}</x-slot>
 
         <div class="py-4 md:py-10 min-h-screen bg-white">
             <div class="container">
@@ -183,7 +183,7 @@
 
                         <!-- ফিচারড ইমেজ -->
                         <div class="w-full">
-                            <div class="img-placeholder w-full aspect-[3/2] overflow-hidden shadow-md">
+                            <div class="img-placeholder w-full aspect-video overflow-hidden shadow-md">
                                 <img src="{{ storage_image_url($post->image) ?: 'https://loremflickr.com/1200/800/parliament,building?lock=1' }}"
                                     alt="{{ $post->title }}"
                                     class="w-full h-full object-cover"

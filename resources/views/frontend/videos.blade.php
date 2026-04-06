@@ -63,7 +63,7 @@
                         @endphp
                         <article class="flex flex-col md:flex-row gap-4 md:gap-6 last:pb-0 group">
                             {{-- ভিডিও থাম্বনেইল --}}
-                            <a href="{{ route('videos.show', $video->slug) }}" class="relative w-full md:w-[320px] h-[210px] md:h-[180px] shrink-0 overflow-hidden block">
+                            <a href="{{ route('news.show', $video->slug) }}" class="relative w-full md:w-[320px] h-[210px] md:h-[180px] shrink-0 overflow-hidden block">
                                 @if($thumb)
                                 <div class="img-placeholder w-full h-full">
                                     <img src="{{ $thumb }}"
@@ -91,14 +91,14 @@
                             </a>
                             {{-- টাইটেল + বিবরণ --}}
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
-                                <a href="{{ route('videos.show', $video->slug) }}">
+                                <a href="{{ route('news.show', $video->slug) }}">
                                     <h3 class="text-xl md:text-2xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
                                         {{ $video->title }}
                                     </h3>
                                 </a>
                                 @if($video->description)
                                 <p class="text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-2">
-                                    {{ Str::limit(html_entity_decode(strip_tags($video->description)), 200) }}
+                                    {{ \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($video->description)), 200) }}
                                 </p>
                                 @endif
                                 <div class="flex items-center gap-1.5 mt-auto text-gray-500">

@@ -8,6 +8,12 @@ use Illuminate\View\View;
 
 class VideoController extends Controller
 {
+    public function index(): View
+    {
+        $videos = Video::with(['category'])->where('status', 'active')->latest()->paginate(12);
+        return view('frontend.videos', compact('videos'));
+    }
+
     public function show(string $slug): View
     {
         $video = Video::with(['category', 'reporter'])

@@ -39,7 +39,10 @@ Route::get('/category/{slug}', [FrontendCategoryController::class, 'show'])->nam
 Route::get('/category/{parentSlug}/{childSlug}', [FrontendCategoryController::class, 'showChild'])
     ->name('category.show.child');
 Route::get('/page/{slug}', [FrontendPageController::class, 'show'])->name('page.show');
+Route::get('/gallery', [FrontendGalleryController::class, 'index'])->name('gallery.index');
 Route::get('/gallery/{slug}', [FrontendGalleryController::class, 'show'])->name('gallery.show');
+
+Route::get('/videos', [FrontendVideoController::class, 'index'])->name('videos.index');
 Route::get('/video/{slug}', [FrontendVideoController::class, 'show'])->name('videos.show');
 
 // Simple public newsletter subscribe endpoint (footer form)
@@ -54,11 +57,6 @@ Route::post('/subscribe', function (\Illuminate\Http\Request $request) {
 // Static pages copied from the news-paper frontend project
 Route::view('/national', 'national');
 Route::get('/special-news', [FrontendHomeController::class, 'specialNews'])->name('special-news');
-Route::view('/news-details', 'news-details');
-Route::view('/gallery', 'gallery')->name('gallery.index');
-Route::view('/gallery-details', 'gallery-details');
-Route::view('/videos', 'videos')->name('videos.index');
-Route::view('/video-details', 'video-details');
 Route::view('/terms', 'terms')->name('terms');
 Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 
@@ -194,5 +192,7 @@ Route::prefix('admin')
         });
     });
 
-// News detail route
-Route::get('/news/{slug}', [FrontendPostController::class, 'show'])->name('news.show');
+// News detail route (fully simplified)
+Route::get('/{slug}', [FrontendPostController::class, 'show'])
+    ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|subscribe$|special-news$|videos$|terms$|privacy-policy$|heartbeat$|national$|api$).+')
+    ->name('news.show');

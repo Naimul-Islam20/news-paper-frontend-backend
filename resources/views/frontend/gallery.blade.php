@@ -54,7 +54,7 @@
                         {{-- গ্যালারি আইটেম --}}
                         <article class="flex flex-col md:flex-row gap-2 md:gap-4 pb-4 border-b border-custom last:border-0 last:pb-0">
                             {{-- ছবি --}}
-                            <a href="{{ route('gallery.show', $gallery->slug) }}" class="w-full md:w-auto flex-shrink-0">
+                            <a href="{{ route('news.show', $gallery->slug) }}" class="w-full md:w-auto flex-shrink-0">
                                 <div class="img-placeholder w-full md:w-[305px] h-[200px] md:h-[170px] overflow-hidden">
                                     <img src="{{ $thumb ? storage_image_url($thumb->image) : 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=600' }}"
                                         alt="{{ $gallery->title }}"
@@ -63,14 +63,14 @@
                             </a>
                             {{-- টাইটেল + বিবরণ --}}
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
-                                <a href="{{ route('gallery.show', $gallery->slug) }}">
+                                <a href="{{ route('news.show', $gallery->slug) }}">
                                     <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
                                         {{ $gallery->title }}
                                     </h3>
                                 </a>
                                 @if($gallery->description)
                                 <p class="hidden md:block text-sm font-semibold text-desc leading-relaxed line-clamp-2">
-                                    {{ Str::limit(html_entity_decode(strip_tags($gallery->description)), 160) }}
+                                    {{ \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($gallery->description)), 160) }}
                                 </p>
                                 @endif
                                 <div class="flex items-center gap-1.5 mt-auto text-gray-500">

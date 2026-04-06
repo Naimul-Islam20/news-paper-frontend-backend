@@ -79,7 +79,7 @@
         
         <x-header />
 
-        <main class="pt-[110px] md:pt-6 pb-12">
+        <main class="md:pt-6 pb-12">
             {{ $slot }}
         </main>
 

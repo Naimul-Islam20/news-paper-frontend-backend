@@ -8,6 +8,12 @@ use Illuminate\View\View;
 
 class GalleryController extends Controller
 {
+    public function index(): View
+    {
+        $galleries = Gallery::with(['images', 'category'])->where('status', 'active')->latest()->paginate(12);
+        return view('frontend.gallery', compact('galleries'));
+    }
+
     public function show(string $slug): View
     {
         $gallery = Gallery::with(['images', 'category', 'reporter'])
