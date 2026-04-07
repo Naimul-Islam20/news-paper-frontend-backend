@@ -1,12 +1,12 @@
 <x-layout>
-    <x-slot:title>{{ $gallery->title }} - দ্য ডেইলি নিউজ</x-slot>
+    <x-slot:title>{{ $gallery->title }} - {{ optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান' }}</x-slot>
 
         <div class="py-4 md:py-10 min-h-screen bg-white">
             <div class="container">
                 @php \Carbon\Carbon::setLocale('bn'); @endphp
 
                 <!-- Breadcrumbs -->
-                <div class="mb-4 md:mb-10 text-left">
+                <div class="mb-4 md:mb-10 text-left no-print">
                     <div class="flex flex-wrap items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
                         <a href="/" class="text-slate-500 hover:text-rose-600 transition-all flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -39,6 +39,40 @@
                     @media (min-width: 1024px) {
                         .details-grid {
                             grid-template-columns: 9fr 3fr;
+                        }
+                    }
+
+                    /* প্রিন্ট সেটিংস */
+                    @media print {
+                        header, footer, x-header, x-footer, .md\:fixed, nav, 
+                        #globalScrollToTopBtn, .details-grid > div:nth-child(2), 
+                        .mt-12, .flex.items-center.gap-3, .ad-section, 
+                        .flex.flex-col.gap-1.pb-2, .sub-nav, .search-overlay,
+                        .no-print,
+                        [class*="ad-"], [class*="advertisement"], .img-placeholder::after {
+                            display: none !important;
+                        }
+
+                        body, .bg-white {
+                            background: white !important;
+                            color: black !important;
+                        }
+                        
+                        .container {
+                            width: 100% !important;
+                            max-width: 100% !important;
+                            padding: 0 !important;
+                            margin: 0 !important;
+                        }
+
+                        .details-grid {
+                            display: block !important;
+                        }
+
+                        .prose {
+                            padding-left: 0 !important;
+                            padding-right: 0 !important;
+                            max-width: 100% !important;
                         }
                     }
                 </style>

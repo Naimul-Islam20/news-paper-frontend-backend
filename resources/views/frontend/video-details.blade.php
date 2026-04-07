@@ -8,7 +8,7 @@ if ($video->youtube_link) {
 }
 $categoryName = $video->category->name ?? 'ভিডিও';
 
-$videoShareTitle = $video->title . ' - দ্য ডেইলি নিউজ';
+$videoShareTitle = $video->title . ' - ' . (optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান');
 $videoShareDesc = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($video->description ?? '')), 160);
 
 $videoThumb = $video->image ? storage_image_url($video->image) : null;
@@ -29,7 +29,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
             <div class="container">
 
                 <!-- Header + Breadcrumb -->
-                <div class="mb-4 md:mb-10 text-left">
+                <div class="mb-4 md:mb-10 text-left no-print">
                     <h1 class="text-2xl md:text-3xl font-semibold serif text-title mb-3">
                         {{ $categoryName }}
                     </h1>
@@ -64,7 +64,72 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                             grid-template-columns: 9fr 3fr;
                         }
                     }
+
+                    /* প্রিন্ট সেটিংস */
+                    @media print {
+                        header, footer, x-header, x-footer, .md\:fixed, nav, 
+                        #globalScrollToTopBtn, .details-grid > div:nth-child(2), 
+                        .mt-12, .flex.items-center.gap-3, .ad-section, 
+                        .flex.flex-col.gap-1.pb-2, .sub-nav, .search-overlay,
+                        .no-print,
+                        [class*="ad-"], [class*="advertisement"], .img-placeholder::after {
+                            display: none !important;
+                        }
+
+                        body, .bg-white {
+                            background: white !important;
+                            color: black !important;
+                        }
+                        
+                        .container {
+                            width: 100% !important;
+                            max-width: 100% !important;
+                            padding: 0 !important;
+                            margin: 0 !important;
+                        }
+
+                        .details-grid {
+                            display: block !important;
+                        }
+
+                        .prose {
+                            padding-left: 0 !important;
+                            padding-right: 0 !important;
+                            max-width: 100% !important;
+                        }
+
+                        /* প্রিন্ট হেডার দেখানো */
+                        .print-only-header {
+                            display: flex !important;
+                            justify-content: center;
+                            align-items: center;
+                            padding-bottom: 20px;
+                            margin-bottom: 30px;
+                            border-bottom: 2px solid #eee;
+                        }
+
+                        #video-player-wrap {
+                            display: none !important;
+                        }
+
+                        .print-video-thumb {
+                            display: block !important;
+                        }
+                    }
+
+                    .print-only-header, .print-video-thumb {
+                        display: none;
+                    }
                 </style>
+                
+                <!-- Print Only Header -->
+                <div class="print-only-header">
+                    @if(!empty(optional($siteMeta)->site_logo))
+                        <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="Logo" style="height: 80px; width: auto;">
+                    @else
+                        <h1 style="font-size: 24px; font-weight: bold; color: #e11d48;">{{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}</h1>
+                    @endif
+                </div>
 
                 <section class="details-grid">
 
@@ -107,12 +172,17 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                             {!! $video->description !!}
                         </div>
                         @endif
-
+                        
                         <!-- ভিডিও প্লেয়ার: থাম্বনেইল থাকলে উপরে দেখাবে, ক্লিকে ভিডিও চালু -->
                         @php
                         $videoThumbUrl = $video->image ? storage_image_url($video->image) : null;
                         $hasYoutube = (bool) $youtubeId;
                         @endphp
+                        
+                        <!-- প্রিন্টের জন্য থাম্বনেইল -->
+                        <div class="print-video-thumb w-full mb-6">
+                            <img src="{{ $videoThumbUrl ?: $videoShareImage }}" alt="{{ $video->title }}" class="w-full h-auto shadow-md">
+                        </div>
                         <div class="w-full bg-black aspect-video relative overflow-hidden shadow-2xl" id="video-player-wrap">
                             @if($hasYoutube && $videoThumbUrl)
                             {{-- ইউটিউব + কাস্টম থাম্বনেইল: থাম্বনেইল পোস্টার, ক্লিকে ইফ্রেম চালু --}}

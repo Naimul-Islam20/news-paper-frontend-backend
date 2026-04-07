@@ -1,5 +1,5 @@
 @php
-    $postShareTitle = $post->title . ' - দ্য ডেইলি নিউজ';
+    $postShareTitle = $post->title . ' - ' . (optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান');
     $postShareDesc = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($post->description ?? '')), 160);
     // শেয়ার প্রিভিউতে ইমেজ দেখাতে পূর্ণ absolute URL দরকার (Facebook/WhatsApp/Twitter)
     $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : null;
@@ -22,7 +22,7 @@
                 @endphp
 
                 <!-- Header + Breadcrumbs -->
-                <div class="mb-4 md:mb-10 text-left">
+                <div class="mb-4 md:mb-10 text-left no-print">
                     <!-- বড় header: category / parent name -->
                     <h1 class="text-2xl md:text-3xl font-semibold serif text-title mb-3">
                         {{ $categoryName }}
@@ -107,7 +107,67 @@
                             grid-template-columns: 9fr 3fr;
                         }
                     }
+
+                    /* প্রিন্ট সেটিংস */
+                    @media print {
+                        /* হেডার, ফুটার, সাইডবার, বিজ্ঞাপন হিপ করা */
+                        header, footer, x-header, x-footer, .md\:fixed, nav, 
+                        #globalScrollToTopBtn, .details-grid > div:nth-child(2), 
+                        .mt-12, .flex.items-center.gap-3, .ad-section, 
+                        .flex.flex-col.gap-1.pb-2, .sub-nav, .search-overlay,
+                        .no-print,
+                        [class*="ad-"], [class*="advertisement"], .img-placeholder::after {
+                            display: none !important;
+                        }
+
+                        /* মেইন লেআউট ফিক্স করা */
+                        body, .bg-white {
+                            background: white !important;
+                            color: black !important;
+                        }
+                        
+                        .container {
+                            width: 100% !important;
+                            max-width: 100% !important;
+                            padding: 0 !important;
+                            margin: 0 !important;
+                        }
+
+                        .details-grid {
+                            display: block !important;
+                        }
+
+                        /* কন্টেন্ট টেক্সট ফিক্স করা */
+                        .prose {
+                            padding-left: 0 !important;
+                            padding-right: 0 !important;
+                            max-width: 100% !important;
+                        }
+
+                        /* প্রিন্ট হেডার দেখানো */
+                        .print-only-header {
+                            display: flex !important;
+                            justify-content: center;
+                            align-items: center;
+                            padding-bottom: 20px;
+                            margin-bottom: 30px;
+                            border-bottom: 2px solid #eee;
+                        }
+                    }
+
+                    .print-only-header {
+                        display: none;
+                    }
                 </style>
+
+                <!-- Print Only Header -->
+                <div class="print-only-header">
+                    @if(!empty(optional($siteMeta)->site_logo))
+                        <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="Logo" style="height: 80px; width: auto;">
+                    @else
+                        <h1 style="font-size: 24px; font-weight: bold; color: #e11d48;">{{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}</h1>
+                    @endif
+                </div>
 
                 <!-- Main Layout Grid -->
                 <section class="details-grid">
@@ -198,7 +258,7 @@
 
                         @php $adPostTop = ad_slot('post_top'); @endphp
                         @if($adPostTop && $adPostTop->image)
-                        <div class="my-6 w-full flex justify-center">
+                        <div class="my-6 w-full flex justify-center ad-section">
                             <a href="{{ $adPostTop->link ?? '#' }}" class="w-[80%] max-w-[1000px] flex justify-center shrink-0" target="_blank" rel="noopener">
                                 <div class="img-placeholder w-full h-[90px] overflow-hidden flex items-center justify-center">
                                     <img src="{{ storage_image_url($adPostTop->image) }}"
@@ -224,7 +284,7 @@
                             $adSidebar2 = ad_slot('post_sidebar_2');
                         @endphp
                         @if(($adSidebar1 && $adSidebar1->image) || ($adSidebar2 && $adSidebar2->image))
-                        <div class="w-full max-w-[280px] space-y-4">
+                        <div class="w-full max-w-[280px] space-y-4 ad-section">
                             @if($adSidebar1 && $adSidebar1->image)
                             <div class="bg-slate-50 overflow-hidden border border-slate-100 shadow-sm">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest p-2 block bg-white/50 text-center">বিজ্ঞাপন</span>
@@ -280,7 +340,7 @@
 
                 <!-- এ সম্পর্কিত আরও পড়ুন (নিচে পরের ৪টা) -->
                 @if($related->skip(2)->take(4)->isNotEmpty())
-                <div class="mt-12 md:mt-[100px] pt-8 md:pt-[60px] ">
+                <div class="mt-12 md:mt-[100px] pt-8 md:pt-[60px] related-section-bottom">
                     <div class="flex items-center gap-3 mb-8">
                         <div class="w-2 h-8 bg-rose-600"></div>
                         <h3 class="text-xl md:text-3xl font-bold serif text-title">এ সম্পর্কিত আরও পড়ুন</h3>

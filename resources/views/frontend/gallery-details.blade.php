@@ -2,7 +2,7 @@
 \Carbon\Carbon::setLocale('bn');
 $categoryName = $gallery->category->name ?? 'গ্যালারি';
 
-$galleryShareTitle = $gallery->title . ' - দ্য ডেইলি নিউজ';
+$galleryShareTitle = $gallery->title . ' - ' . (optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান');
 $galleryShareDesc = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($gallery->description ?? '')), 160);
 $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gallery->images->first()->image))) : null;
 @endphp
@@ -18,7 +18,7 @@ $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gal
             <div class="container">
 
                 <!-- Header + Breadcrumb -->
-                <div class="mb-4 md:mb-10 text-left">
+                <div class="mb-4 md:mb-10 text-left no-print">
                     <h1 class="text-2xl md:text-3xl font-semibold serif text-title mb-3">
                         {{ $categoryName }}
                     </h1>
@@ -53,7 +53,64 @@ $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gal
                             grid-template-columns: 9fr 3fr;
                         }
                     }
+
+                    /* প্রিন্ট সেটিংস */
+                    @media print {
+                        header, footer, x-header, x-footer, .md\:fixed, nav, 
+                        #globalScrollToTopBtn, .details-grid > div:nth-child(2), 
+                        .mt-12, .flex.items-center.gap-3, .ad-section, 
+                        .flex.flex-col.gap-1.pb-2, .sub-nav, .search-overlay,
+                        .no-print,
+                        [class*="ad-"], [class*="advertisement"], .img-placeholder::after {
+                            display: none !important;
+                        }
+
+                        body, .bg-white {
+                            background: white !important;
+                            color: black !important;
+                        }
+                        
+                        .container {
+                            width: 100% !important;
+                            max-width: 100% !important;
+                            padding: 0 !important;
+                            margin: 0 !important;
+                        }
+
+                        .details-grid {
+                            display: block !important;
+                        }
+
+                        .prose {
+                            padding-left: 0 !important;
+                            padding-right: 0 !important;
+                            max-width: 100% !important;
+                        }
+
+                        /* প্রিন্ট হেডার দেখানো */
+                        .print-only-header {
+                            display: flex !important;
+                            justify-content: center;
+                            align-items: center;
+                            padding-bottom: 20px;
+                            margin-bottom: 30px;
+                            border-bottom: 2px solid #eee;
+                        }
+                    }
+
+                    .print-only-header {
+                        display: none;
+                    }
                 </style>
+                
+                <!-- Print Only Header -->
+                <div class="print-only-header">
+                    @if(!empty(optional($siteMeta)->site_logo))
+                        <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="Logo" style="height: 80px; width: auto;">
+                    @else
+                        <h1 style="font-size: 24px; font-weight: bold; color: #e11d48;">{{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}</h1>
+                    @endif
+                </div>
 
                 <section class="details-grid">
 

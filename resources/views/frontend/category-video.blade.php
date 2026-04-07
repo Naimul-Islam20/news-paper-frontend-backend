@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot:title>{{ $category->name }} - দ্য ডেইলি নিউজ</x-slot>
+    <x-slot:title>{{ $category->name }} - {{ optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান' }}</x-slot>
 
         <div class="py-4 md:py-10 min-h-screen">
             <div class="container">
