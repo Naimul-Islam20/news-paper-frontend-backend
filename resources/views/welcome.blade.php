@@ -927,16 +927,11 @@
                                     <!-- Division -->
                                     <div>
                                         <label class="block text-sm font-bold text-gray-700 mb-1">বিভাগ</label>
-                                        <select class="w-full border-custom  text-sm focus:ring-rose-500 focus:border-rose-500 py-2.5 bg-white">
-                                            <option>বিভাগ নির্বাচন করুন</option>
-                                            <option>ঢাকা</option>
-                                            <option>চট্টগ্রাম</option>
-                                            <option>রাজশাহী</option>
-                                            <option>খুলনা</option>
-                                            <option>বরিশাল</option>
-                                            <option>সিলেট</option>
-                                            <option>রংপুর</option>
-                                            <option>ময়মনসিংহ</option>
+                                        <select id="division-select" class="w-full border-custom  text-sm focus:ring-rose-500 focus:border-rose-500 py-2.5 bg-white">
+                                            <option value="">বিভাগ নির্বাচন করুন</option>
+                                            @foreach($divisions as $division)
+                                                <option value="{{ $division->slug }}">{{ $division->name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
@@ -957,13 +952,31 @@
                                     </div>
 
                                     <!-- Search Button -->
-                                    <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3  transition-colors mt-4 shadow-md flex items-center justify-center gap-2">
+                                    <button type="button" id="regional-search-btn" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3  transition-colors mt-4 shadow-md flex items-center justify-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                                         </svg>
                                         খুঁজুন
                                     </button>
                                 </form>
+
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        const searchBtn = document.getElementById('regional-search-btn');
+                                        const divisionSelect = document.getElementById('division-select');
+
+                                        if (searchBtn && divisionSelect) {
+                                            searchBtn.addEventListener('click', function() {
+                                                const slug = divisionSelect.value;
+                                                if (slug) {
+                                                    window.location.href = '/topic/' + slug;
+                                                } else {
+                                                    alert('দয়া করে একটি বিভাগ নির্বাচন করুন।');
+                                                }
+                                            });
+                                        }
+                                    });
+                                </script>
                             </div>
                         </div>
                     </div>

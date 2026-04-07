@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Reporter;
+use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -77,8 +78,9 @@ class PostController extends Controller
             ->get();
 
         $reporters = $this->reportersForCurrentUser();
+        $topics = Topic::orderBy('can_delete', 'asc')->orderBy('name', 'asc')->get();
 
-        return view('admin.posts.create', compact('categories', 'reporters'));
+        return view('admin.posts.create', compact('categories', 'reporters', 'topics'));
     }
 
     public function store(Request $request)
@@ -141,6 +143,11 @@ class PostController extends Controller
             $post->categories()->sync($request->category_ids);
         }
 
+        // Sync topics
+        if ($request->has('topic_ids')) {
+            $post->topics()->sync($request->topic_ids);
+        }
+
         return redirect()->route('admin.posts.index')->with('success', 'Post published successfully!');
     }
 
@@ -154,8 +161,9 @@ class PostController extends Controller
             ->get();
 
         $reporters = $this->reportersForCurrentUser();
+        $topics = Topic::orderBy('can_delete', 'asc')->orderBy('name', 'asc')->get();
 
-        return view('admin.posts.edit', compact('post', 'categories', 'reporters'));
+        return view('admin.posts.edit', compact('post', 'categories', 'reporters', 'topics'));
     }
 
     public function update(Request $request, $id)
@@ -222,6 +230,13 @@ class PostController extends Controller
             $post->categories()->sync($request->category_ids);
         } else {
             $post->categories()->sync([]);
+        }
+
+        // Sync topics
+        if ($request->has('topic_ids')) {
+            $post->topics()->sync($request->topic_ids);
+        } else {
+            $post->topics()->sync([]);
         }
 
         return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully!');

@@ -14,7 +14,7 @@ class PostController extends Controller
     public function show(string $slug): View
     {
         // Try finding a Post first
-        $post = Post::with(['reporter', 'categories.parent.subCategories'])
+        $post = Post::with(['reporter', 'categories.parent.subCategories', 'topics'])
             ->where('slug', $slug)
             ->where('status', 'published')
             ->first();

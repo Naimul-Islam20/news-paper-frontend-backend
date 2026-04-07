@@ -37,4 +37,9 @@ class Post extends Model
     {
         return $this->belongsToMany(Category::class);
     }
+
+    public function topics()
+    {
+        return $this->belongsToMany(Topic::class);
+    }
 }

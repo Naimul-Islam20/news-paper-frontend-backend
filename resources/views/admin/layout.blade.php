@@ -231,14 +231,12 @@
                         <div class="overflow-hidden">
                             <div class="ml-4 pl-0 border-l border-slate-200 dark:border-slate-800 space-y-0 py-1">
                                 <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative">
-                                    {{-- L-shaped connector --}}
                                     <svg class="w-6 h-6 text-slate-200 dark:text-slate-800 -ml-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 12h10m0 0l-4-4m4 4l-4 4"></path>
                                     </svg>
                                     <span class="ml-1">Category</span>
                                 </a>
                                 <a href="{{ route('admin.sub-categories.index') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative">
-                                    {{-- L-shaped connector --}}
                                     <svg class="w-6 h-6 text-slate-200 dark:text-slate-800 -ml-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 12h10m0 0l-4-4m4 4l-4 4"></path>
                                     </svg>
@@ -248,6 +246,18 @@
                         </div>
                     </div>
                 </div>
+                @endif
+
+                {{-- Topics --}}
+                @if(auth()->user()->canFeature('categories.manage'))
+                <a
+                    href="{{ route('admin.topics.index') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('admin.topics.*') ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }}">
+                    <svg class="w-5 h-5 {{ request()->routeIs('admin.topics.*') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                    </svg>
+                    <span class="font-medium">Topics</span>
+                </a>
                 @endif
 
 

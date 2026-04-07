@@ -30,6 +30,7 @@ Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
 
 // Search (post, gallery, video – one list, category-style)
 Route::get('/search', [FrontendSearchController::class, 'index'])->name('search');
+Route::get('/topic/{slug}', [FrontendSearchController::class, 'index'])->name('topic.show');
 
 // সর্বশেষ – সব নতুন পোস্ট, ক্যাটাগরি পেজের মতো UI
 Route::get('/latest', [FrontendCategoryController::class, 'latest'])->name('latest');
@@ -95,6 +96,13 @@ Route::prefix('admin')
                 Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
                 Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
                 Route::get('/sub-categories', [SubCategoryController::class, 'index'])->name('sub-categories.index');
+
+                // Topic Routes
+                Route::get('/topics', [App\Http\Controllers\Admin\TopicController::class, 'index'])->name('topics.index');
+                Route::post('/topics', [App\Http\Controllers\Admin\TopicController::class, 'store'])->name('topics.store');
+                Route::post('/topics/quick-store', [App\Http\Controllers\Admin\TopicController::class, 'quickStore'])->name('topics.quick-store');
+                Route::put('/topics/{id}', [App\Http\Controllers\Admin\TopicController::class, 'update'])->name('topics.update');
+                Route::delete('/topics/{id}', [App\Http\Controllers\Admin\TopicController::class, 'destroy'])->name('topics.destroy');
             });
 
             Route::middleware('feature:posts.view')->group(function (): void {

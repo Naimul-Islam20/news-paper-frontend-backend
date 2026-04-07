@@ -78,7 +78,7 @@
                                     @php $selectedCategoryIds = $post->categories->pluck('id')->toArray(); @endphp
                                     @forelse($categories as $category)
                                         <div class="break-inside-avoid mb-2">
-                                            <label class="flex items-center gap-2 cursor-pointer group py-1 px-2 rounded hover:bg-indigo-50 transition-all">
+                                            <label class="flex items-center gap-2 cursor-pointer group py-1 px-2 rounded hover:bg-emerald-50 transition-all">
                                                 <input
                                                     type="checkbox"
                                                     name="category_ids[]"
@@ -86,16 +86,18 @@
                                                     {{ in_array($category->id, old('category_ids', $selectedCategoryIds)) ? 'checked' : '' }}
                                                     class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                                                 >
-                                                <span class="text-sm font-medium text-slate-900 dark:text-white group-hover:text-indigo-600 transition-all">{{ $category->name }}</span>
+                                                <span class="text-sm font-medium text-slate-900 dark:text-white group-hover:text-emerald-700 transition-all">{{ $category->name }}</span>
                                             </label>
                                         </div>
                                     @empty
-                                        <p class="text-xs text-slate-400">No post-type categories found. Please add categories with type "Post" first.</p>
+                                        <p class="text-xs text-slate-400">No post-type categories found.</p>
                                     @endforelse
                                 </div>
                             </div>
                             @error('category_ids') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
+
+
 
                         {{-- Image & Caption --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -200,6 +202,130 @@
                             <textarea name="seo_keywords" id="seo_keywords" placeholder="news, politics, world..." class="w-full h-20 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm resize-none bg-white dark:bg-slate-900">{{ old('seo_keywords', $post->seo_keywords) }}</textarea>
                         </div>
 
+                        {{-- Topics (Tags) moved to Sidebar --}}
+                        <div>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Topics / Tags</label>
+                            <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 shadow-inner">
+                                <div id="topics-interface" class="space-y-4">
+                                    {{-- Selected Topics Container --}}
+                                    <div id="selected-topics-area" class="flex flex-wrap gap-2 min-h-[40px] p-2 bg-white dark:bg-slate-900 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 font-medium">
+                                        <p id="no-topics-selected" class="text-xs text-slate-400 italic py-1 font-normal">No topics selected</p>
+                                    </div>
+
+                                    {{-- Search & Create Container --}}
+                                    <div class="flex flex-col gap-2">
+                                        <div class="flex items-center gap-2">
+                                            <div class="relative flex-grow">
+                                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                                </span>
+                                                <input 
+                                                    type="text" 
+                                                    id="topic-search-input" 
+                                                    placeholder="Search topics..." 
+                                                    class="w-full pl-9 pr-4 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-900 transition-all font-medium"
+                                                >
+                                            </div>
+                                            <button type="button" onclick="openQuickTopicModal('quickTopicModal', 'quickModalContainer')" class="shrink-0 p-1.5 text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-100 transition-all" title="Quick Add Topic">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {{-- QUICK ADD TOPIC MODAL (Identical to Topic Index) --}}
+                                    <div id="quickTopicModal" class="fixed inset-0 z-[9999] hidden text-left">
+                                        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" id="quickTopicModalBackdrop"></div>
+                                        <div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+                                            <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 transition-all scale-95 opacity-0 duration-300 pointer-events-auto" id="quickModalContainer">
+                                                <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+                                                    <div>
+                                                        <h3 class="text-base font-semibold text-slate-900 dark:text-white">Add New Topic</h3>
+                                                        <p class="text-xs text-slate-500 mt-0.5">Create and automatically select a new topic.</p>
+                                                    </div>
+                                                    <button type="button" id="quickTopicModalCloseX" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                    </button>
+                                                </div>
+                                                <div class="p-5 space-y-4">
+                                                    <div>
+                                                        <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Topic Name <span class="text-rose-500">*</span></label>
+                                                        <input type="text" id="quick-topic-name" placeholder="e.g. আইন আদালত" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Slug</label>
+                                                        <input type="text" id="quick-topic-slug" placeholder="auto-generated from name" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-500 dark:text-slate-400">
+                                                    </div>
+                                                    <div class="flex items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                                                        <button type="button" id="quickTopicModalCancel" class="flex-1 px-5 py-2.5 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-normal rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm">Cancel</button>
+                                                        <button type="button" id="confirm-quick-add" class="flex-1 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-normal rounded-lg transition-all shadow-md text-sm">Save Topic</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @php 
+                                        $permanentTopics = $topics->where('can_delete', false);
+                                        $otherTopics = $topics->where('can_delete', true);
+                                    @endphp
+
+                                    <div id="topics-selector-container" class="max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                                        {{-- Permanent Topics (Divisions) --}}
+                                        <div class="mb-4">
+                                            <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-2 font-bold">বিভাগসমূহ</p>
+                                            <div class="flex flex-wrap gap-1.5">
+                                                @foreach($permanentTopics as $topic)
+                                                    <div 
+                                                        class="topic-chip available cursor-pointer px-2.5 py-1 text-xs font-normal bg-rose-50 text-rose-700 border border-rose-100 rounded-full hover:bg-rose-100 transition-all"
+                                                        data-id="{{ $topic->id }}"
+                                                        data-name="{{ $topic->name }}"
+                                                        data-slug="{{ $topic->slug }}"
+                                                        data-permanent="true"
+                                                    >
+                                                        {{ $topic->name }}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        {{-- Other Topics --}}
+                                        <div>
+                                            <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-2 font-bold">অন্যান্য</p>
+                                            <div id="other-topics-list" class="flex flex-wrap gap-1.5 font-medium">
+                                                @foreach($otherTopics as $idx => $topic)
+                                                    <div 
+                                                        class="topic-chip available {{ $idx >= 40 ? 'hidden' : '' }} cursor-pointer px-2.5 py-1 text-xs font-normal bg-slate-100 text-slate-700 border border-slate-200 rounded-full hover:bg-slate-200 transition-all"
+                                                        data-id="{{ $topic->id }}"
+                                                        data-name="{{ $topic->name }}"
+                                                        data-slug="{{ $topic->slug }}"
+                                                        data-permanent="false"
+                                                    >
+                                                        {{ $topic->name }}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            
+                                            {{-- Loading Sentinel for Infinite Scroll --}}
+                                            @if($otherTopics->count() > 40)
+                                                <div id="topics-loader-sentinel" class="h-10 flex items-center justify-center mt-2">
+                                                    <div class="flex items-center gap-2 text-slate-400 text-[10px] font-medium">
+                                                        <svg class="animate-spin h-3.5 w-3.5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        <span>Loading more...</span>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Hidden Inputs Container --}}
+                                    <div id="hidden-topic-inputs"></div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -243,7 +369,305 @@
         });
 
         initSubTitlePoints();
+        initTopicsSelection();
     });
+
+    function initTopicsSelection() {
+        const area = document.getElementById('selected-topics-area');
+        const hiddenContainer = document.getElementById('hidden-topic-inputs');
+        const placeholder = document.getElementById('no-topics-selected');
+        const showMoreBtn = document.getElementById('show-more-topics');
+        const searchInput = document.getElementById('topic-search-input');
+        const allChips = document.querySelectorAll('.topic-chip.available');
+        
+        const selectedIds = new Set();
+
+        // Search logic
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                
+                if (query === '') {
+                    // Reset to initial state
+                    allChips.forEach((chip, idx) => {
+                        // Only show first 40 of 'other' topics + all permanent
+                        const isPermanent = chip.dataset.permanent === 'true';
+                        const otherIdx = Array.from(document.querySelectorAll('#other-topics-list .topic-chip.available')).indexOf(chip);
+                        
+                        if (isPermanent || (otherIdx !== -1 && otherIdx < 40)) {
+                            chip.classList.remove('hidden');
+                        } else {
+                            chip.classList.add('hidden');
+                        }
+                    });
+                    if (showMoreBtn) showMoreBtn.classList.remove('hidden');
+                    return;
+                }
+
+                // Filtering
+                allChips.forEach(chip => {
+                    const name = chip.dataset.name.toLowerCase();
+                    const slug = chip.dataset.slug ? chip.dataset.slug.toLowerCase() : '';
+                    if (name.includes(query) || slug.includes(query)) {
+                        chip.classList.remove('hidden');
+                    } else {
+                        chip.classList.add('hidden');
+                    }
+                });
+
+                if (showMoreBtn) showMoreBtn.classList.add('hidden');
+            });
+        }
+
+        function addTopic(id, name, isPermanent) {
+            id = id.toString();
+            if (selectedIds.has(id)) return;
+            selectedIds.add(id);
+
+            // Hide placeholder
+            if (placeholder) placeholder.classList.add('hidden');
+
+            // Create chip in selected area
+            const chip = document.createElement('div');
+            chip.className = `px-2.5 py-1 text-xs font-normal border rounded-full flex items-center gap-1.5 transition-all ${isPermanent ? 'bg-rose-50 text-rose-700 border-rose-100' : 'bg-indigo-50 text-indigo-700 border-indigo-100'}`;
+            chip.dataset.id = id;
+            chip.innerHTML = `
+                ${name}
+                <button type="button" class="remove-topic font-bold hover:text-red-600">&times;</button>
+            `;
+            area.appendChild(chip);
+
+            // Add hidden input
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'topic_ids[]';
+            input.value = id;
+            input.id = `input-topic-${id}`;
+            hiddenContainer.appendChild(input);
+
+            // Mark in selector
+            const selectorChip = document.querySelector(`.topic-chip.available[data-id="${id}"]`);
+            if (selectorChip) selectorChip.classList.add('opacity-40', 'pointer-events-none');
+        }
+
+        function removeTopic(id) {
+            id = id.toString();
+            selectedIds.delete(id);
+            
+            // Remove chip
+            const chip = area.querySelector(`div[data-id="${id}"]`);
+            if (chip) chip.remove();
+
+            // Remove hidden input
+            const input = document.getElementById(`input-topic-${id}`);
+            if (input) input.remove();
+
+            // Show placeholder if empty
+            if (selectedIds.size === 0 && placeholder) {
+                placeholder.classList.remove('hidden');
+            }
+
+            // Unmark in selector
+            const selectorChip = document.querySelector(`.topic-chip.available[data-id="${id}"]`);
+            if (selectorChip) selectorChip.classList.remove('opacity-40', 'pointer-events-none');
+        }
+
+        // Handle clicks on available chips
+        document.querySelectorAll('.topic-chip.available').forEach(chip => {
+            chip.addEventListener('click', function() {
+                addTopic(this.dataset.id, this.dataset.name, this.dataset.permanent === 'true');
+            });
+        });
+
+        // Modal Helpers
+        const qModal = document.getElementById('quickTopicModal');
+        const qContainer = document.getElementById('quickModalContainer');
+        const qBackdrop = document.getElementById('quickTopicModalBackdrop');
+        const qCloseX = document.getElementById('quickTopicModalCloseX');
+        const qCancel = document.getElementById('quickTopicModalCancel');
+
+        window.openQuickTopicModal = function() {
+            qModal.classList.remove('hidden');
+            setTimeout(() => {
+                qContainer.classList.remove('scale-95', 'opacity-0');
+                qContainer.classList.add('scale-100', 'opacity-100');
+                document.getElementById('quick-topic-name').focus();
+            }, 10);
+        }
+
+        window.closeQuickTopicModal = function() {
+            qContainer.classList.remove('scale-100', 'opacity-100');
+            qContainer.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { qModal.classList.add('hidden'); }, 200);
+        }
+
+        if (qBackdrop) qBackdrop.addEventListener('click', closeQuickTopicModal);
+        if (qCloseX) qCloseX.addEventListener('click', closeQuickTopicModal);
+        if (qCancel) qCancel.addEventListener('click', closeQuickTopicModal);
+
+        // Auto-slugification for Quick Add
+        (function() {
+            const nameInput = document.getElementById('quick-topic-name');
+            const slugInput = document.getElementById('quick-topic-slug');
+            if (!nameInput || !slugInput) return;
+
+            function slugify(str) {
+                return str.toString().toLowerCase().trim()
+                    .replace(/\s+/g, '-')           // Replace spaces with -
+                    .replace(/[^\w-]+/g, '')       // Remove all non-word chars
+                    .replace(/--+/g, '-')         // Replace multiple - with single -
+                    .replace(/^-+/, '')             // Trim - from start of text
+                    .replace(/-+$/, '');            // Trim - from end of text
+            }
+
+            let slugManuallyChanged = false;
+            
+            // When typing in name, update slug if NOT manually edited
+            nameInput.addEventListener('keyup', () => {
+                if (!slugManuallyChanged) {
+                    slugInput.value = slugify(nameInput.value);
+                }
+            });
+
+            // When typing in slug, slugify it in real-time and mark as manual
+            slugInput.addEventListener('input', (e) => {
+                slugManuallyChanged = true;
+                const start = e.target.selectionStart;
+                const end = e.target.selectionEnd;
+                
+                // Keep allow user to type but replace spaces/special on the fly
+                // or just wait for blur. User wants space to be -
+                let val = slugInput.value;
+                val = val.toLowerCase().replace(/\s+/g, '-');
+                slugInput.value = val;
+                
+                // Try to keep cursor position
+                slugInput.setSelectionRange(start, end);
+            });
+
+            // Final slugify on blur for slug input
+            slugInput.addEventListener('blur', () => {
+                slugInput.value = slugify(slugInput.value);
+            });
+        })();
+
+        // Handle Quick Add AJAX
+        const confirmBtn = document.getElementById('confirm-quick-add');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', async function() {
+                const nameInput = document.getElementById('quick-topic-name');
+                const slugInput = document.getElementById('quick-topic-slug');
+                const name = nameInput.value.trim();
+                const slug = slugInput.value.trim();
+                
+                if (!name) return;
+
+                this.disabled = true;
+                const originalText = this.textContent;
+                this.innerHTML = '<svg class="animate-spin h-3.5 w-3.5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+
+                try {
+                    const response = await fetch("{{ route('admin.topics.quick-store') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ name: name, slug: slug })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Add to selected
+                        addTopic(data.topic.id, data.topic.name, false);
+                        
+                        // Clear and close
+                        nameInput.value = '';
+                        slugInput.value = '';
+                        closeQuickTopicModal();
+                        
+                        // Add to "Other" list dynamically
+                        const otherList = document.getElementById('other-topics-list');
+                        if (otherList) {
+                            const newChip = document.createElement('div');
+                            newChip.className = 'topic-chip available cursor-pointer px-2.5 py-1 text-xs font-normal bg-slate-100 text-slate-700 border border-slate-200 rounded-full hover:bg-slate-200 transition-all opacity-40 pointer-events-none';
+                            newChip.dataset.id = data.topic.id;
+                            newChip.dataset.name = data.topic.name;
+                            newChip.dataset.slug = data.topic.slug;
+                            newChip.dataset.permanent = 'false';
+                            newChip.textContent = data.topic.name;
+                            otherList.prepend(newChip);
+                        }
+                    } else {
+                        alert(data.message || 'Error adding topic');
+                    }
+                } catch (error) {
+                    console.error('Quick add error:', error);
+                    alert('Failed to add topic. Please try again.');
+                } finally {
+                    this.disabled = false;
+                    this.textContent = originalText;
+                }
+            });
+        }
+
+        // Handle removal
+        area.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-topic')) {
+                const chip = e.target.closest('div');
+                removeTopic(chip.dataset.id);
+            }
+        });
+
+        // Auto-load on Scroll (Infinite Scroll)
+        const sentinel = document.getElementById('topics-loader-sentinel');
+        if (sentinel) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    // Only trigger if visible AND not searching
+                    if (entry.isIntersecting && (!searchInput || searchInput.value.trim() === '')) {
+                        // Small delay for visual feedback
+                        setTimeout(() => {
+                            const hiddenItems = document.querySelectorAll('.topic-chip.available.hidden');
+                            let count = 0;
+                            hiddenItems.forEach(item => {
+                                if (count < 20) {
+                                    item.classList.remove('hidden');
+                                    count++;
+                                }
+                            });
+
+                            const remaining = document.querySelectorAll('.topic-chip.available.hidden').length;
+                            if (remaining === 0) {
+                                sentinel.classList.add('hidden');
+                                observer.unobserve(sentinel);
+                            }
+                        }, 300);
+                    }
+                });
+            }, {
+                root: document.getElementById('topics-selector-container'),
+                threshold: 0.1
+            });
+            observer.observe(sentinel);
+        }
+
+        // Pre-fill selections
+        @php 
+            $selectedTopicIds = old('topic_ids', $post->topics->pluck('id')->toArray());
+        @endphp
+        
+        @if(!empty($selectedTopicIds))
+            @foreach($selectedTopicIds as $id)
+                @php $t = $topics->firstWhere('id', $id); @endphp
+                @if($t)
+                    addTopic("{{ $t->id }}", "{{ $t->name }}", {{ $t->can_delete ? 'false' : 'true' }});
+                @endif
+            @endforeach
+        @endif
+    }
 
     // Hero Layer: একটাই সিলেক্ট থাকবে, বাকি ৩টা অটো আনচেক
     function initHeroLayerCheckboxes() {

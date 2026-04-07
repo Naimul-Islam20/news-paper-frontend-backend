@@ -8,7 +8,7 @@
             <!-- Header (category-style) -->
             <div class="mb-4 md:mb-10 text-left">
                 <h1 class="text-4xl md:text-3xl font-semibold serif text-title mb-3">
-                    {{ $query ? 'অনুসন্ধান: ' . $query : 'অনুসন্ধান' }}
+                    {{ $query ?: 'অনুসন্ধান' }}
                 </h1>
 
                 <div class="flex items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
@@ -21,7 +21,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                         <path d="m9 18 6-6-6-6" />
                     </svg>
-                    <span class="text-black font-bold">অনুসন্ধান</span>
+                    <span class="text-black font-bold uppercase tracking-widest">{{ $query ?: 'অনুসন্ধান' }}</span>
                 </div>
 
                 <div class="w-full border-b border-slate-100 relative mb-4 md:mb-8">

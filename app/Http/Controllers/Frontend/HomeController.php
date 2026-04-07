@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use App\Models\HomeLayoutSection;
 use App\Models\Post;
+use App\Models\Topic;
 use App\Models\Video;
 use Illuminate\View\View;
 
@@ -174,6 +175,11 @@ class HomeController extends Controller
             ->limit(5)
             ->get();
 
+        // Fetch permanent divisions (Topics where can_delete is false/0)
+        $divisions = Topic::where('can_delete', false)
+            ->orderBy('name', 'asc')
+            ->get();
+
         return view('welcome', [
             'hero_layer_1_posts' => $heroLayers['hero_layer_1'] ?? collect(),
             'hero_layer_2_posts' => $heroLayers['hero_layer_2'] ?? collect(),
@@ -186,6 +192,7 @@ class HomeController extends Controller
             'layoutSections'      => $sections,
             'latestSidebarPosts'  => $latestSidebarPosts,
             'popularSidebarPosts' => $popularSidebarPosts,
+            'divisions'           => $divisions,
         ]);
     }
 }

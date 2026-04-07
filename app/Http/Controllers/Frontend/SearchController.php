@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use App\Models\Post;
 use App\Models\Video;
+use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -16,9 +17,15 @@ class SearchController extends Controller
      * Unified search: Post, Gallery, Video by title/description.
      * Results merged into one list (category-page style), sorted by date.
      */
-    public function index(Request $request): View
+    public function index(Request $request, $slug = null): View
     {
-        $query = trim((string) $request->get('q', ''));
+        // যদি স্লাগ (slug) থাকে তবে সেটাকে কুয়েরি হিসেবে নেওয়া, নতুবা সার্চ বক্সের ইনপুট নেওয়া
+        if ($slug) {
+            $topic = Topic::where('slug', $slug)->first();
+            $query = $topic ? $topic->name : str_replace('-', ' ', $slug);
+        } else {
+            $query = trim((string) $request->get('q', ''));
+        }
         $limit = 20;
 
         $items = collect();
@@ -27,13 +34,24 @@ class SearchController extends Controller
             $term = '%' . $query . '%';
 
             // Posts (published)
-            $posts = Post::with(['categories.parent'])
-                ->where('status', 'published')
-                ->where(function ($q) use ($term) {
+            $postsQuery = Post::with(['categories.parent', 'topics'])
+                ->where('status', 'published');
+
+            if ($slug) {
+                // If slug exists, strictly find posts with that specific topic slug
+                $postsQuery->whereHas('topics', function($sq) use ($slug) {
+                    $sq->where('slug', $slug);
+                });
+            } else {
+                // Normal search box query
+                $postsQuery->where(function ($q) use ($term) {
                     $q->where('title', 'like', $term)
-                        ->orWhere('description', 'like', $term);
-                })
-                ->latest()
+                        ->orWhere('description', 'like', $term)
+                        ->orWhere('seo_keywords', 'like', $term);
+                });
+            }
+
+            $posts = $postsQuery->latest()
                 ->limit($limit)
                 ->get();
 
@@ -61,54 +79,56 @@ class SearchController extends Controller
                 ]);
             }
 
-            // Galleries (active)
-            $galleries = Gallery::with('images')
-                ->where('status', 'active')
-                ->where(function ($q) use ($term) {
-                    $q->where('title', 'like', $term)
-                        ->orWhere('description', 'like', $term);
-                })
-                ->latest()
-                ->limit($limit)
-                ->get();
+            if (!$slug) {
+                // Galleries (active)
+                $galleries = Gallery::with('images')
+                    ->where('status', 'active')
+                    ->where(function ($q) use ($term) {
+                        $q->where('title', 'like', $term)
+                            ->orWhere('description', 'like', $term);
+                    })
+                    ->latest()
+                    ->limit($limit)
+                    ->get();
 
-            foreach ($galleries as $gallery) {
-                $firstImage = $gallery->images->first();
-                $imageUrl = $firstImage && $firstImage->image
-                    ? asset('storage/' . ltrim($firstImage->image, '/'))
-                    : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';
-                $items->push((object) [
-                    'type'       => 'gallery',
-                    'url'        => route('gallery.show', $gallery->slug),
-                    'title'      => $gallery->title,
-                    'image'      => $imageUrl,
-                    'snippet'    => html_entity_decode(Str::limit(strip_tags((string) $gallery->description), 160)),
-                    'created_at' => $gallery->created_at,
-                ]);
-            }
+                foreach ($galleries as $gallery) {
+                    $firstImage = $gallery->images->first();
+                    $imageUrl = $firstImage && $firstImage->image
+                        ? asset('storage/' . ltrim($firstImage->image, '/'))
+                        : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';
+                    $items->push((object) [
+                        'type'       => 'gallery',
+                        'url'        => route('gallery.show', $gallery->slug),
+                        'title'      => $gallery->title,
+                        'image'      => $imageUrl,
+                        'snippet'    => html_entity_decode(Str::limit(strip_tags((string) $gallery->description), 160)),
+                        'created_at' => $gallery->created_at,
+                    ]);
+                }
 
-            // Videos (active)
-            $videos = Video::where('status', 'active')
-                ->where(function ($q) use ($term) {
-                    $q->where('title', 'like', $term)
-                        ->orWhere('description', 'like', $term);
-                })
-                ->latest()
-                ->limit($limit)
-                ->get();
+                // Videos (active)
+                $videos = Video::where('status', 'active')
+                    ->where(function ($q) use ($term) {
+                        $q->where('title', 'like', $term)
+                            ->orWhere('description', 'like', $term);
+                    })
+                    ->latest()
+                    ->limit($limit)
+                    ->get();
 
-            foreach ($videos as $video) {
-                $imageUrl = $video->image
-                    ? asset('storage/' . ltrim($video->image, '/'))
-                    : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';
-                $items->push((object) [
-                    'type'       => 'video',
-                    'url'        => route('videos.show', $video->slug),
-                    'title'      => $video->title,
-                    'image'      => $imageUrl,
-                    'snippet'    => html_entity_decode(Str::limit(strip_tags((string) $video->description), 160)),
-                    'created_at' => $video->created_at,
-                ]);
+                foreach ($videos as $video) {
+                    $imageUrl = $video->image
+                        ? asset('storage/' . ltrim($video->image, '/'))
+                        : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';
+                    $items->push((object) [
+                        'type'       => 'video',
+                        'url'        => route('videos.show', $video->slug),
+                        'title'      => $video->title,
+                        'image'      => $imageUrl,
+                        'snippet'    => html_entity_decode(Str::limit(strip_tags((string) $video->description), 160)),
+                        'created_at' => $video->created_at,
+                    ]);
+                }
             }
 
             $items = $items->sortByDesc(fn ($i) => $i->created_at->timestamp)->values();
