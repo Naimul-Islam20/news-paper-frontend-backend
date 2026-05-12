@@ -24,7 +24,7 @@ $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gal
                     </h1>
 
                     <div class="flex flex-wrap items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
-                        <a href="/" class="text-slate-500 hover:text-rose-600 transition-all flex items-center">
+                        <a href="/" class="text-slate-500 hover:text-primary transition-all flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -37,7 +37,7 @@ $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gal
                     </div>
 
                     <div class="w-full border-b border-slate-300 relative mb-8">
-                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                     </div>
                 </div>
 
@@ -181,7 +181,7 @@ $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gal
                         @if($related->isNotEmpty())
                         <div class="hidden lg:flex flex-col gap-6 pt-5">
                             <div class="flex items-center gap-3 border-b border-slate-100 pb-2">
-                                <div class="w-1.5 h-6 bg-rose-600"></div>
+                                <div class="w-1.5 h-6 bg-primary"></div>
                                 <h3 class="text-xl font-bold serif text-title">আরও গ্যালারি</h3>
                             </div>
                             @foreach($related as $rel)
@@ -193,7 +193,7 @@ $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gal
                                         class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                 </div>
-                                <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors">
+                                <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-primary transition-colors">
                                     {{ \Illuminate\Support\Str::limit($rel->title, 80) }}
                                 </h4>
                             </a>

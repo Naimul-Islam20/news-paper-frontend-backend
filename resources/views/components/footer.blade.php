@@ -6,11 +6,11 @@
             <a href="{{ front_home_url() }}" class="shrink-0 text-left">
                 @if(!empty(optional($siteMeta)->site_logo))
                 <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="{{ optional($siteMeta)->site_name ?? 'Logo' }}" class="h-14 md:h-20 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling && this.nextElementSibling.classList.remove('hidden');">
-                <h2 class="text-4xl md:text-5xl font-black serif tracking-tighter uppercase underline decoration-rose-500 underline-offset-8 decoration-4 hidden">
+                <h2 class="text-4xl md:text-5xl font-black serif tracking-tighter uppercase underline decoration-primary underline-offset-8 decoration-4 hidden">
                     {{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}
                 </h2>
                 @else
-                <h2 class="text-4xl md:text-5xl font-black serif tracking-tighter uppercase underline decoration-rose-500 underline-offset-8 decoration-4">
+                <h2 class="text-4xl md:text-5xl font-black serif tracking-tighter uppercase underline decoration-primary underline-offset-8 decoration-4">
                     {{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}
                 </h2>
                 @endif
@@ -23,7 +23,7 @@
                 @endif
                 <form action="{{ route('frontend.subscribe') }}" method="POST" class="flex gap-2">
                     @csrf
-                    <input type="email" name="email" required placeholder="ইমেইল লিখুন" class="flex-1 min-w-[220px] px-4 py-2.5 border border-gray-300 bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 text-sm">
+                    <input type="email" name="email" required placeholder="ইমেইল লিখুন" class="flex-1 min-w-[220px] px-4 py-2.5 border border-gray-300 bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm">
                     <button type="submit" class="shrink-0 px-5 py-2.5 bg-black text-white font-semibold text-sm hover:bg-slate-800 transition-colors">
                         সাবস্ক্রাইব
                     </button>
@@ -58,13 +58,13 @@
                 @if(isset($footerCol2) && $footerCol2->isNotEmpty())
                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-2 text-base font-semibold">
                     @foreach($footerCol2 as $cat)
-                    <a href="{{ route('category.show', $cat->slug) }}" class="hover:text-rose-600 transition-colors">{{ $cat->name }}</a>
+                    <a href="{{ route('category.show', $cat->slug) }}" class="hover:text-primary transition-colors">{{ $cat->name }}</a>
                     @endforeach
                 </div>
                 @else
                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-2 text-base font-semibold">
-                    <a href="{{ route('gallery.index') }}" class="hover:text-rose-600 transition-colors">ছবি</a>
-                    <a href="{{ route('videos.index') }}" class="hover:text-rose-600 transition-colors">ভিডিও</a>
+                    <a href="{{ route('gallery.index') }}" class="hover:text-primary transition-colors">ছবি</a>
+                    <a href="{{ route('videos.index') }}" class="hover:text-primary transition-colors">ভিডিও</a>
                 </div>
                 @endif
             </div>
@@ -74,15 +74,15 @@
                 @if(isset($footerCol3) && $footerCol3->isNotEmpty())
                 <ul class="space-y-4 text-base font-semibold">
                     @foreach($footerCol3 as $cat)
-                    <li><a href="{{ route('category.show', $cat->slug) }}" class="hover:text-rose-600 transition-colors">{{ $cat->name }}</a></li>
+                    <li><a href="{{ route('category.show', $cat->slug) }}" class="hover:text-primary transition-colors">{{ $cat->name }}</a></li>
                     @endforeach
                 </ul>
                 @else
                 <ul class="space-y-4 text-base font-semibold">
-                    <li><a href="#" class="hover:text-rose-600 transition-colors">বিজ্ঞাপন</a></li>
-                    <li><a href="#" class="hover:text-rose-600 transition-colors">যোগাযোগ</a></li>
-                    <li><a href="{{ route('privacy-policy') }}" class="hover:text-rose-600 transition-colors">গোপনীয়তা নীতি</a></li>
-                    <li><a href="{{ route('terms') }}" class="hover:text-rose-600 transition-colors">শর্তাবলী</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">বিজ্ঞাপন</a></li>
+                    <li><a href="#" class="hover:text-primary transition-colors">যোগাযোগ</a></li>
+                    <li><a href="{{ route('privacy-policy') }}" class="hover:text-primary transition-colors">গোপনীয়তা নীতি</a></li>
+                    <li><a href="{{ route('terms') }}" class="hover:text-primary transition-colors">শর্তাবলী</a></li>
                 </ul>
                 @endif
             </div>
@@ -91,21 +91,21 @@
             <div class="md:col-span-2">
                 <ul class="space-y-4 text-base font-semibold">
                     @if(!empty(optional($siteMeta)->facebook_link))
-                    <li><a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener" class="hover:text-rose-600 transition-colors">Facebook</a></li>
+                    <li><a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Facebook</a></li>
                     @endif
                     @if(!empty(optional($siteMeta)->twitter_link))
-                    <li><a href="{{ $siteMeta->twitter_link }}" target="_blank" rel="noopener" class="hover:text-rose-600 transition-colors">Twitter</a></li>
+                    <li><a href="{{ $siteMeta->twitter_link }}" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Twitter</a></li>
                     @endif
                     @if(!empty(optional($siteMeta)->instagram_link))
-                    <li><a href="{{ $siteMeta->instagram_link }}" target="_blank" rel="noopener" class="hover:text-rose-600 transition-colors">Instagram</a></li>
+                    <li><a href="{{ $siteMeta->instagram_link }}" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Instagram</a></li>
                     @endif
                     @if(!empty(optional($siteMeta)->youtube_link))
-                    <li><a href="{{ $siteMeta->youtube_link }}" target="_blank" rel="noopener" class="hover:text-rose-600 transition-colors">YouTube</a></li>
+                    <li><a href="{{ $siteMeta->youtube_link }}" target="_blank" rel="noopener" class="hover:text-primary transition-colors">YouTube</a></li>
                     @endif
                     @if(!empty(optional($siteMeta)->extra_social_links) && is_array($siteMeta->extra_social_links))
                     @foreach($siteMeta->extra_social_links as $extraLink)
                     @if(!empty($extraLink))
-                    <li><a href="{{ $extraLink }}" target="_blank" rel="noopener" class="hover:text-rose-600 transition-colors">লিংক</a></li>
+                    <li><a href="{{ $extraLink }}" target="_blank" rel="noopener" class="hover:text-primary transition-colors">লিংক</a></li>
                     @endif
                     @endforeach
                     @endif

@@ -20,20 +20,20 @@ if ($video->image) {
         </div>
         @else
         <div class="w-full h-full bg-black flex items-center justify-center">
-            <div class="w-12 h-12 bg-rose-600 text-white flex items-center justify-center rounded-full shadow-lg">
+            <div class="w-12 h-12 bg-primary text-white flex items-center justify-center rounded-full shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             </div>
         </div>
         @endif
         <div class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-all">
-            <div class="w-12 h-12 bg-rose-600 text-white flex items-center justify-center rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
+            <div class="w-12 h-12 bg-primary text-white flex items-center justify-center rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             </div>
         </div>
     </a>
     <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
         <a href="{{ route('videos.show', $video->slug) }}">
-            <h3 class="text-xl md:text-2xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+            <h3 class="text-xl md:text-2xl font-bold serif text-title leading-snug hover:text-primary transition-colors">
                 {{ $video->title }}
             </h3>
         </a>

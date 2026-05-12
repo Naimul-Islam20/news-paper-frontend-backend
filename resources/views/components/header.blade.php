@@ -37,7 +37,7 @@
                         </div>
 
                         <ul class="space-y-2">
-                            <li class="border-b border-gray-400 pb-2"><a href="{{ front_home_url() }}" class="block text-lg font-semibold hover:text-rose-600 transition-colors flex items-center gap-2">
+                            <li class="border-b border-gray-400 pb-2"><a href="{{ front_home_url() }}" class="block text-lg font-semibold hover:text-primary transition-colors flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                         <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -45,12 +45,12 @@
                                     হোম
                                 </a></li>
                             {{-- সর্বশেষ সর্বদা বাম পাশের প্রথম মেনু (স্থান পরিবর্তন হবে না) --}}
-                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('latest') }}" class="block text-xl font-semibold hover:text-rose-600 transition-colors">সর্বশেষ</a></li>
-                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('special-news') }}" class="block text-xl font-semibold hover:text-rose-600 transition-colors">বিশেষ সংবাদ</a></li>
+                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('latest') }}" class="block text-xl font-semibold hover:text-primary transition-colors">সর্বশেষ</a></li>
+                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('special-news') }}" class="block text-xl font-semibold hover:text-primary transition-colors">বিশেষ সংবাদ</a></li>
                             @if(isset($sideMenuCategories) && $sideMenuCategories->isNotEmpty())
                             @foreach($sideMenuCategories as $cat)
                             <li class="border-b border-gray-400 pb-1">
-                                <a href="{{ route('category.show', $cat->slug) }}" class="block text-xl font-semibold hover:text-rose-600 transition-colors">
+                                <a href="{{ route('category.show', $cat->slug) }}" class="block text-xl font-semibold hover:text-primary transition-colors">
                                     {{ $cat->name }}
                                 </a>
                             </li>
@@ -75,7 +75,7 @@
                             </a>
                             @endif
                             @if(!empty(optional($siteMeta)->youtube_link))
-                            <a href="{{ $siteMeta->youtube_link }}" target="_blank" rel="noopener" class="text-slate-400 hover:text-rose-600 transition-colors">
+                            <a href="{{ $siteMeta->youtube_link }}" target="_blank" rel="noopener" class="text-slate-400 hover:text-primary transition-colors">
                                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
                                 </svg>
@@ -134,7 +134,7 @@
                                     x-transition:leave-start="opacity-100 translate-x-0 scale-100"
                                     x-transition:leave-end="opacity-0 -translate-x-4 scale-95"
                                     x-cloak>
-                                    <input type="text" name="q" value="{{ request('q') }}" placeholder="অনুসন্ধান করুন..." class="bg-slate-100 border-0  px-4 py-2 text-sm focus:ring-2 focus:ring-rose-500 w-48 md:w-64 outline-none transition-all">
+                                    <input type="text" name="q" value="{{ request('q') }}" placeholder="অনুসন্ধান করুন..." class="bg-slate-100 border-0  px-4 py-2 text-sm focus:ring-2 focus:ring-primary w-48 md:w-64 outline-none transition-all">
                                 </form>
                             </div>
                         </div>
@@ -168,10 +168,10 @@
                     x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="opacity-100 translate-y-0"
                     x-transition:leave-end="opacity-0 translate-y-[-100%]"
-                    class="md:hidden fixed inset-x-0 top-0 h-[68px] md:h-[120px] bg-white z-[150] flex items-center px-4 shadow-xl border-b-2 border-rose-500"
+                    class="md:hidden fixed inset-x-0 top-0 h-[68px] md:h-[120px] bg-white z-[150] flex items-center px-4 shadow-xl border-b-2 border-primary"
                     x-cloak>
                     <div class="flex-1 flex items-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-rose-600 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-primary shrink-0">
                             <circle cx="11" cy="11" r="8"></circle>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
@@ -183,7 +183,7 @@
                             class="flex-1 bg-transparent border-0 py-2 text-lg font-bold focus:ring-0 outline-none placeholder:text-slate-400 min-w-0"
                             @keydown.escape="showSearch = false"
                             x-init="$watch('showSearch', value => value && $nextTick(() => $el.focus()))">
-                        <button type="button" @click="showSearch = false" class="p-2 text-slate-400 hover:text-rose-600 transition-colors shrink-0">
+                        <button type="button" @click="showSearch = false" class="p-2 text-slate-400 hover:text-primary transition-colors shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -195,7 +195,7 @@
                 <!-- Top Utility Bar -->
                 <div class="flex justify-between items-center text-slate-700 text-sm uppercase font-bold tracking-widest mb-2 hidden md:flex">
                     <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-rose-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="16" y1="2" x2="16" y2="6"></line>
                             <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -262,28 +262,28 @@
                     </div>
                     <div class="flex items-center gap-3">
                         @if(!empty(optional($siteMeta)->facebook_link))
-                        <a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-rose-600 transition-colors" title="Facebook" aria-label="Facebook">
+                        <a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-primary transition-colors" title="Facebook" aria-label="Facebook">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                             </svg>
                         </a>
                         @endif
                         @if(!empty(optional($siteMeta)->twitter_link))
-                        <a href="{{ $siteMeta->twitter_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-rose-600 transition-colors" title="Twitter" aria-label="Twitter">
+                        <a href="{{ $siteMeta->twitter_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-primary transition-colors" title="Twitter" aria-label="Twitter">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                             </svg>
                         </a>
                         @endif
                         @if(!empty(optional($siteMeta)->instagram_link))
-                        <a href="{{ $siteMeta->instagram_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-rose-600 transition-colors" title="Instagram" aria-label="Instagram">
+                        <a href="{{ $siteMeta->instagram_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-primary transition-colors" title="Instagram" aria-label="Instagram">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
                             </svg>
                         </a>
                         @endif
                         @if(!empty(optional($siteMeta)->youtube_link))
-                        <a href="{{ $siteMeta->youtube_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-rose-600 transition-colors" title="YouTube" aria-label="YouTube">
+                        <a href="{{ $siteMeta->youtube_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-primary transition-colors" title="YouTube" aria-label="YouTube">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
                             </svg>
@@ -308,7 +308,7 @@
                     <div
                         class="hidden md:flex items-center gap-2 overflow-hidden transition-all duration-500 ease-in-out"
                         :class="isSticky ? 'md:w-20 md:opacity-100 md:mr-2' : 'md:w-0 md:opacity-0 md:mr-0'">
-                        <button @click="showSidebar = true" class="  transition-all text-black hover:text-rose-600 shrink-0">
+                        <button @click="showSidebar = true" class="  transition-all text-black hover:text-primary shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="4" x2="20" y1="12" y2="12"></line>
                                 <line x1="4" x2="20" y1="6" y2="6"></line>
@@ -316,7 +316,7 @@
                             </svg>
                         </button>
 
-                        <a href="{{ front_home_url() }}" class="w-8 h-8 flex items-center justify-center bg-white text-rose-600 font-black serif text-xl shadow border border-black/5 hover:bg-rose-50 transition-colors shrink-0 overflow-hidden" title="{{ optional($siteMeta)->site_name ?? 'হোম' }}">
+                        <a href="{{ front_home_url() }}" class="w-8 h-8 flex items-center justify-center bg-white text-primary font-black serif text-xl shadow border border-black/5 hover:bg-primary/5 transition-colors shrink-0 overflow-hidden" title="{{ optional($siteMeta)->site_name ?? 'হোম' }}">
                             @if(!empty(optional($siteMeta)->site_icon))
                             <img src="{{ storage_image_url($siteMeta->site_icon) }}" alt="" width="32" height="32" class="w-full h-full object-contain p-0.5" loading="lazy">
                             @else
@@ -328,13 +328,13 @@
                     <div class="flex-1 overflow-x-auto overflow-y-hidden no-scrollbar py-0 flex items-center justify-between">
                         <ul class="flex justify-start items-center gap-3 md:gap-5 text-base md:text-lg font-semibold uppercase whitespace-nowrap pt-1 pb-1">
                             {{-- সর্বশেষ সর্বদা হেডার মেনুর বাম পাশের প্রথম আইটেম (স্থান অপরিবর্তিত) --}}
-                            <li><a href="{{ route('latest') }}" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all {{ request()->routeIs('latest') ? 'text-rose-600 border-rose-600' : '' }}">সর্বশেষ</a></li>
-                            <li><a href="{{ route('special-news') }}" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all {{ request()->routeIs('special-news') ? 'text-rose-600 border-rose-600' : '' }}">বিশেষ সংবাদ</a></li>
+                            <li><a href="{{ route('latest') }}" class="hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('latest') ? 'text-primary border-primary' : '' }}">সর্বশেষ</a></li>
+                            <li><a href="{{ route('special-news') }}" class="hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('special-news') ? 'text-primary border-primary' : '' }}">বিশেষ সংবাদ</a></li>
                             @if(isset($headerCategories) && $headerCategories->isNotEmpty())
                             @foreach($headerCategories as $cat)
                             <li>
                                 <a href="{{ route('category.show', $cat->slug) }}"
-                                    class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all {{ request()->is('category/'.$cat->slug) ? 'text-rose-600 border-rose-600' : '' }}">
+                                    class="hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->is('category/'.$cat->slug) ? 'text-primary border-primary' : '' }}">
                                     {{ $cat->name }}
                                 </a>
                             </li>

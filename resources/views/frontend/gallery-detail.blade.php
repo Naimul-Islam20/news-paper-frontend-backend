@@ -8,7 +8,7 @@
                 <!-- Breadcrumbs -->
                 <div class="mb-4 md:mb-10 text-left no-print">
                     <div class="flex flex-wrap items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
-                        <a href="/" class="text-slate-500 hover:text-rose-600 transition-all flex items-center">
+                        <a href="/" class="text-slate-500 hover:text-primary transition-all flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -17,7 +17,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
-                        <a href="{{ route('gallery.index') }}" class="text-slate-500 hover:text-rose-600 transition-all">গ্যালারি</a>
+                        <a href="{{ route('gallery.index') }}" class="text-slate-500 hover:text-primary transition-all">গ্যালারি</a>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
@@ -25,7 +25,7 @@
                     </div>
 
                     <div class="w-full border-b border-slate-300 relative mb-8">
-                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                     </div>
                 </div>
 
@@ -137,7 +137,7 @@
                             <!-- শেয়ার বাটন -->
                             <div x-data="{ showIcons: false }" class="flex items-center gap-4 mt-4">
                                 <button @click="showIcons = !showIcons"
-                                    class="flex items-center gap-2 px-6 py-2 bg-rose-600 text-white font-bold hover:bg-rose-700 transition-all active:scale-95 shadow-lg shadow-rose-600/20">
+                                    class="flex items-center gap-2 px-6 py-2 bg-primary text-white font-bold hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                         <circle cx="18" cy="5" r="3"></circle>
                                         <circle cx="6" cy="12" r="3"></circle>
@@ -200,7 +200,7 @@
                         @if($otherGalleries->count())
                         <div class="hidden lg:flex flex-col gap-6 pt-5">
                             <div class="flex items-center gap-3 border-b border-slate-100 pb-2">
-                                <div class="w-1.5 h-6 bg-rose-600"></div>
+                                <div class="w-1.5 h-6 bg-primary"></div>
                                 <h3 class="text-xl font-bold serif text-title">আরও ছবি</h3>
                             </div>
 
@@ -213,7 +213,7 @@
                                         class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                 </div>
-                                <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors">
+                                <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-primary transition-colors">
                                     {{ $other->title }}
                                 </h4>
                             </a>
@@ -228,7 +228,7 @@
                 @if($otherGalleries->count())
                 <div class="mt-12 md:mt-[100px] pt-8 md:pt-[60px]">
                     <div class="flex items-center gap-3 mb-8">
-                        <div class="w-2 h-8 bg-rose-600"></div>
+                        <div class="w-2 h-8 bg-primary"></div>
                         <h3 class="text-xl md:text-3xl font-bold serif text-title">গ্যালারির আরও খবর</h3>
                     </div>
 
@@ -242,7 +242,7 @@
                                     class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
-                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors flex-1">
+                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
                                 {{ $other->title }}
                             </h4>
                         </a>

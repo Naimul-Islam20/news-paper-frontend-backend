@@ -12,7 +12,7 @@
 
                     <div class="flex items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
                         <!-- Home Icon -->
-                        <a href="/" class="text-slate-500 hover:text-rose-600 transition-all">
+                        <a href="/" class="text-slate-500 hover:text-primary transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="w-full border-b border-slate-300 relative mb-4 md:mb-8">
-                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                     </div>
                 </div>
 
@@ -63,7 +63,7 @@
                             {{-- টাইটেল + বিবরণ --}}
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
                                 <a href="/gallery-details">
-                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-primary transition-colors">
                                         হিমালয়ের পাদদেশে সূর্যাস্তের মনোরম দৃশ্য
                                     </h3>
                                 </a>
@@ -88,7 +88,7 @@
                             </a>
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
                                 <a href="/gallery-details">
-                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-primary transition-colors">
                                         মাঠে ফিরছে ফুটবল, সমর্থকদের উপচে পড়া ভিড়
                                     </h3>
                                 </a>
@@ -113,7 +113,7 @@
                             </a>
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
                                 <a href="/gallery-details">
-                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-primary transition-colors">
                                         পহেলা বৈশাখের মিলনমেলা, রঙিন হয়ে উঠেছে রাজপথ
                                     </h3>
                                 </a>
@@ -138,7 +138,7 @@
                             </a>
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
                                 <a href="/gallery-details">
-                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-primary transition-colors">
                                         নতুন স্মার্টওয়াচ বাজারে আনলো এক জনপ্রিয় ব্র্যান্ড
                                     </h3>
                                 </a>
@@ -178,7 +178,7 @@
                                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                                 </div>
                                 <h4 class="text-white font-bold text-xl leading-tight mb-4 relative z-10">আপনার ব্যবসার প্রসারে<br>আমাদের সাথে নামুন</h4>
-                                <a href="#" class="px-6 py-2.5 bg-rose-600 text-white text-sm font-bold  hover:bg-rose-700 transition-all hover:scale-105 shadow-xl relative z-10">বিজ্ঞাপন দিন →</a>
+                                <a href="#" class="px-6 py-2.5 bg-primary text-white text-sm font-bold  hover:bg-primary/90 transition-all hover:scale-105 shadow-xl relative z-10">বিজ্ঞাপন দিন →</a>
                             </div>
                         </div>
 

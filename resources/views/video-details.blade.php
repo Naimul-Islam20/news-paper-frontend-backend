@@ -11,20 +11,20 @@
             <!-- Breadcrumbs -->
             <div class="mb-4 md:mb-10 text-left">
                 <div class="flex flex-wrap items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
-                    <a href="/" class="text-slate-500 hover:text-rose-600 transition-all flex items-center">
+                    <a href="/" class="text-slate-500 hover:text-primary transition-all flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
                     </a>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="m9 18 6-6-6-6"/></svg>
-                    <a href="/videos" class="text-slate-500 hover:text-rose-600 transition-all">{{ $categoryName }}</a>
+                    <a href="/videos" class="text-slate-500 hover:text-primary transition-all">{{ $categoryName }}</a>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="m9 18 6-6-6-6"/></svg>
                     <span class="text-black font-bold">ভিডিও বিস্তারিত</span>
                 </div>
                 
                 <div class="w-full border-b border-slate-300 relative mb-8">
-                    <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                    <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                 </div>
             </div>
 
@@ -86,14 +86,14 @@
                         
                         {{-- Play Toggle --}}
                         <div class="absolute inset-0 flex items-center justify-center cursor-pointer group-hover:bg-black/10 transition-all">
-                            <div class="w-20 h-20 bg-rose-600/90 text-white rounded-full flex items-center justify-center shadow-2xl transform transition-transform group-hover:scale-110">
+                            <div class="w-20 h-20 bg-primary/90 text-white rounded-full flex items-center justify-center shadow-2xl transform transition-transform group-hover:scale-110">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                             </div>
                         </div>
 
                         {{-- Duration/Live Badge --}}
                         <div class="absolute top-4 left-4">
-                            <span class="bg-rose-600 text-white text-[10px] font-black px-2 py-0.5 uppercase tracking-widest animate-pulse">Live</span>
+                            <span class="bg-primary text-white text-[10px] font-black px-2 py-0.5 uppercase tracking-widest animate-pulse">Live</span>
                         </div>
                     </div>
 
@@ -109,7 +109,7 @@
                         <!-- শেয়ার বাটন নিচের দিকেও থাকবে -->
                          <div x-data="{ showIcons: false }" class="flex items-center gap-4 mt-8 no-print">
                             <button @click="showIcons = !showIcons" 
-                                    class="flex items-center gap-2 px-6 py-2 bg-rose-600 text-white font-bold hover:bg-rose-700 transition-all active:scale-95 shadow-lg shadow-rose-600/20">
+                                    class="flex items-center gap-2 px-6 py-2 bg-primary text-white font-bold hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="18" cy="5" r="3"></circle>
                                     <circle cx="6" cy="12" r="3"></circle>
@@ -146,7 +146,7 @@
                     <!-- আরও ভিডিও (সাইডবার) -->
                     <div class="flex flex-col gap-6">
                         <div class="flex items-center gap-3 border-b border-slate-100 pb-2">
-                            <div class="w-1.5 h-6 bg-rose-600"></div>
+                            <div class="w-1.5 h-6 bg-primary"></div>
                             <h3 class="text-xl font-bold serif text-title">আরও ভিডিও</h3>
                         </div>
 
@@ -160,7 +160,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <h4 class="text-sm md:text-base font-bold text-title group-hover:text-rose-600">বিপিএল ফাইনাল হাইলাইটস: কে জিতলো শিরোপা?</h4>
+                            <h4 class="text-sm md:text-base font-bold text-title group-hover:text-primary">বিপিএল ফাইনাল হাইলাইটস: কে জিতলো শিরোপা?</h4>
                         </a>
 
                         <!-- ভিডিও ২ -->
@@ -173,7 +173,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <h4 class="text-sm md:text-base font-bold text-title group-hover:text-rose-600">রাজধানীর ট্রাফিক জ্যাম নিরসনে নতুন প্রকল্পের শুভ উদ্বোধন</h4>
+                            <h4 class="text-sm md:text-base font-bold text-title group-hover:text-primary">রাজধানীর ট্রাফিক জ্যাম নিরসনে নতুন প্রকল্পের শুভ উদ্বোধন</h4>
                         </a>
                     </div>
 

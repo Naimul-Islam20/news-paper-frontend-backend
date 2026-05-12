@@ -11,7 +11,7 @@
                 <!-- Breadcrumbs -->
                 <div class="mb-4 md:mb-10 text-left">
                     <div class="flex flex-wrap items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
-                        <a href="/" class="text-slate-500 hover:text-rose-600 transition-all flex items-center">
+                        <a href="/" class="text-slate-500 hover:text-primary transition-all flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -20,7 +20,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
-                        <a href="/national" class="text-slate-500 hover:text-rose-600 transition-all">{{ $categoryName }}</a>
+                        <a href="/national" class="text-slate-500 hover:text-primary transition-all">{{ $categoryName }}</a>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300">
                             <path d="m9 18 6-6-6-6" />
                         </svg>
@@ -28,7 +28,7 @@
                     </div>
 
                     <div class="w-full border-b border-slate-300 relative mb-8">
-                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                     </div>
                 </div>
 
@@ -112,7 +112,7 @@
                                     class="w-full h-full object-cover"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
-                            <p class="text-sm text-slate-500 mt-3 italic border-l-4 border-rose-600 py-1 bg-slate-50">
+                            <p class="text-sm text-slate-500 mt-3 italic border-l-4 border-primary py-1 bg-slate-50">
                                 জাতীয় সংসদ ভবন। ছবি: সংগৃহীত
                             </p>
                         </div>
@@ -140,7 +140,7 @@
                         <!-- এ সম্পর্কিত আরও পড়ুন (সাইডবার) -->
                         <div class="hidden lg:flex flex-col gap-6 pt-5">
                             <div class="flex items-center gap-3 border-b border-slate-100 pb-2">
-                                <div class="w-1.5 h-6 bg-rose-600"></div>
+                                <div class="w-1.5 h-6 bg-primary"></div>
                                 <h3 class="text-xl font-bold serif text-title">এ সম্পর্কিত আরও পড়ুন</h3>
                             </div>
 
@@ -152,7 +152,7 @@
                                         class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                 </div>
-                                <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors">
+                                <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-primary transition-colors">
                                     নতুন আইন বাস্তবায়নে জেলা প্রশাসকদের বিশেষ নির্দেশনা
                                 </h4>
                             </div>
@@ -165,7 +165,7 @@
                                         class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                 </div>
-                                <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors">
+                                <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-primary transition-colors">
                                     স্মার্ট বাংলাদেশ গড়তে ডিজিটাল সেবায় আসছে আমূল পরিবর্তন
                                 </h4>
                             </div>
@@ -178,7 +178,7 @@
                 <!-- এ সম্পর্কিত আরও পড়ুন (একদম নিচে, ৪ কলামে) -->
                 <div class="mt-12 md:mt-[100px] pt-8 md:pt-[60px] ">
                     <div class="flex items-center gap-3 mb-8">
-                        <div class="w-2 h-8 bg-rose-600"></div>
+                        <div class="w-2 h-8 bg-primary"></div>
                         <h3 class="text-xl md:text-3xl font-bold serif text-title">এ সম্পর্কিত আরও পড়ুন</h3>
                     </div>
 
@@ -190,7 +190,7 @@
                                     class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
-                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors flex-1">
+                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
                                 নতুন আইন বাস্তবায়নে জেলা প্রশাসকদের বিশেষ নির্দেশনা
                             </h4>
                         </div>
@@ -202,7 +202,7 @@
                                     class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
-                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors flex-1">
+                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
                                 স্মার্ট বাংলাদেশ গড়তে ডিজিটাল সেবায় আসছে আমূল পরিবর্তন
                             </h4>
                         </div>
@@ -215,7 +215,7 @@
                                     class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
-                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors flex-1">
+                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
                                 নতুন আইন বাস্তবায়নে জেলা প্রশাসকদের বিশেষ নির্দেশনা ও সঠিক নিয়মাবলী
                             </h4>
                         </div>
@@ -228,7 +228,7 @@
                                     class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
-                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors flex-1">
+                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
                                 স্মার্ট বাংলাদেশ গড়তে ডিজিটাল সেবায় আসছে আমূল পরিবর্তন ও নতুন পরিকল্পনা
                             </h4>
                         </div>
@@ -241,7 +241,7 @@
                                     class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
-                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors flex-1">
+                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
                                 রাজধানীর যাতায়াত ব্যবস্থায় নতুন দিগন্ত: চালু হচ্ছে আরও একটি ফ্লাইওভার
                             </h4>
                         </div>
@@ -254,7 +254,7 @@
                                     class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
-                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors flex-1">
+                            <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
                                 বৈদেশিক মুদ্রার রিজার্ভে বড় স্বস্তি, বাড়তে শুরু করেছে রেমিট্যান্স প্রবাহ
                             </h4>
                         </div>

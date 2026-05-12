@@ -35,7 +35,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                     </h1>
 
                     <div class="flex flex-wrap items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
-                        <a href="/" class="text-slate-500 hover:text-rose-600 transition-all flex items-center">
+                        <a href="/" class="text-slate-500 hover:text-primary transition-all flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -48,7 +48,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                     </div>
 
                     <div class="w-full border-b border-slate-300 relative mb-8">
-                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                     </div>
                 </div>
 
@@ -189,7 +189,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                             <div id="video-poster" class="absolute inset-0 cursor-pointer flex items-center justify-center bg-black">
                                 <img src="{{ $videoThumbUrl }}" alt="{{ $video->title }}" class="w-full h-full object-cover">
                                 <div class="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
-                                    <div class="w-20 h-20 bg-rose-600/90 text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+                                    <div class="w-20 h-20 bg-primary/90 text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
                                             <path d="M8 5v14l11-7z" />
                                         </svg>
@@ -211,7 +211,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                             <div class="absolute inset-0 flex items-center justify-center">
                                 <img src="{{ $videoThumbUrl }}" alt="{{ $video->title }}" class="w-full h-full object-cover opacity-60">
                                 <div class="absolute inset-0 flex items-center justify-center">
-                                    <div class="w-20 h-20 bg-rose-600/90 text-white rounded-full flex items-center justify-center shadow-2xl">
+                                    <div class="w-20 h-20 bg-primary/90 text-white rounded-full flex items-center justify-center shadow-2xl">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
                                             <path d="M8 5v14l11-7z" />
                                         </svg>
@@ -221,7 +221,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                             @else
                             <div class="absolute inset-0 flex items-center justify-center bg-gray-900">
                                 <div class="text-white text-center">
-                                    <div class="w-20 h-20 bg-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
                                             <path d="M8 5v14l11-7z" />
                                         </svg>
@@ -240,7 +240,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                         @if($related->isNotEmpty())
                         <div class="flex flex-col gap-6">
                             <div class="flex items-center gap-3 border-b border-slate-100 pb-2">
-                                <div class="w-1.5 h-6 bg-rose-600"></div>
+                                <div class="w-1.5 h-6 bg-primary"></div>
                                 <h3 class="text-xl font-bold serif text-title">আরও ভিডিও</h3>
                             </div>
                             @foreach($related->take(2) as $rel)
@@ -267,7 +267,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                                         </div>
                                     </div>
                                 </div>
-                                <h4 class="text-sm md:text-base font-bold text-title group-hover:text-rose-600">
+                                <h4 class="text-sm md:text-base font-bold text-title group-hover:text-primary">
                                     {{ \Illuminate\Support\Str::limit($rel->title, 80) }}
                                 </h4>
                             </a>

@@ -55,7 +55,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                     : $subCategorySource->slug;
                                     @endphp
                                     <a href="{{ route('category.show.child', [$parentSlugForChild, $child->slug]) }}"
-                                        class="px-3 py-1 text-xs md:text-sm font-semibold border {{ $isActive ? 'border-rose-500 text-rose-600' : 'border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-500' }} bg-white">
+                                        class="px-3 py-1 text-xs md:text-sm font-semibold border {{ $isActive ? 'border-primary text-primary' : 'border-slate-200 text-slate-700 hover:text-primary hover:border-primary' }} bg-white">
                                         {{ $child->name }}
                                     </a>
                                     @endforeach
@@ -64,7 +64,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
 
                                 <!-- Breadcrumb line -->
                                 <div class="flex flex-wrap items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
-                                    <a href="/" class="text-slate-500 hover:text-rose-600 transition-all flex items-center">
+                                    <a href="/" class="text-slate-500 hover:text-primary transition-all flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -75,13 +75,13 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                                         <path d="m9 18 6-6-6-6" />
                                     </svg>
-                                    <a href="{{ route('category.show', $parentCategory->slug) }}" class="text-black hover:text-rose-600 transition-colors">
+                                    <a href="{{ route('category.show', $parentCategory->slug) }}" class="text-black hover:text-primary transition-colors">
                                         {{ $parentCategory->name }}
                                     </a>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                                         <path d="m9 18 6-6-6-6" />
                                     </svg>
-                                    <a href="{{ route('category.show.child', [$parentCategory->slug, $primaryCategory->slug]) }}" class="text-black font-bold hover:text-rose-600 transition-colors">
+                                    <a href="{{ route('category.show.child', [$parentCategory->slug, $primaryCategory->slug]) }}" class="text-black font-bold hover:text-primary transition-colors">
                                         {{ $primaryCategory->name }}
                                     </a>
                                     @elseif($primaryCategory)
@@ -89,7 +89,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
                                         <path d="m9 18 6-6-6-6" />
                                     </svg>
-                                    <a href="{{ route('category.show', $primaryCategory->slug) }}" class="text-black font-bold hover:text-rose-600 transition-colors">
+                                    <a href="{{ route('category.show', $primaryCategory->slug) }}" class="text-black font-bold hover:text-primary transition-colors">
                                         {{ $primaryCategory->name }}
                                     </a>
                                     @else
@@ -104,7 +104,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                 </div>
 
                                 <div class="w-full border-b border-slate-300 relative mb-8">
-                                    <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                                    <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                                 </div>
                             </div>
 
@@ -277,7 +277,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                                 onload="this.parentElement.classList.remove('img-placeholder')">
                                         </div>
                                         @if($post->image_caption)
-                                        <p class="text-sm text-slate-500 mt-3 italic border-l-4 border-rose-600 py-1 bg-slate-50">
+                                        <p class="text-sm text-slate-500 mt-3 italic border-l-4 border-primary py-1 bg-slate-50">
                                             {{ $post->image_caption }}
                                         </p>
                                         @endif
@@ -310,7 +310,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                         <div class="flex flex-wrap items-center gap-2">
                                             <span class="text-lg font-bold text-slate-700 mr-2">অনুসন্ধান বিষয় :</span>
                                             @foreach($post->topics as $topic)
-                                            <a href="{{ route('topic.show', ['slug' => $topic->slug]) }}" class="px-3 py-1 bg-slate-100 hover:bg-rose-600 hover:text-white text-slate-700 text-base font-semibold transition-all rounded-sm">
+                                            <a href="{{ route('topic.show', ['slug' => $topic->slug]) }}" class="px-3 py-1 bg-slate-100 hover:bg-primary hover:text-white text-slate-700 text-base font-semibold transition-all rounded-sm">
                                                 {{ $topic->name }}
                                             </a>
                                             @endforeach
@@ -345,7 +345,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                     @if($related->isNotEmpty())
                                     <div class="flex flex-col gap-6 pt-5">
                                         <div class="flex items-center gap-3 border-b border-slate-100 pb-2">
-                                            <div class="w-1.5 h-6 bg-rose-600"></div>
+                                            <div class="w-1.5 h-6 bg-primary"></div>
                                             <h3 class="text-xl font-bold serif text-title">এ সম্পর্কিত আরও পড়ুন</h3>
                                         </div>
 
@@ -359,7 +359,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                                     class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                                     onload="this.parentElement.classList.remove('img-placeholder')">
                                             </div>
-                                            <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors">
+                                            <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-primary transition-colors">
                                                 {{ \Illuminate\Support\Str::limit($rel->title, 80) }}
                                             </h4>
                                         </a>
@@ -375,7 +375,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                             @if($related->skip(2)->take(4)->isNotEmpty())
                             <div class="mt-12 md:mt-[100px] pt-8 md:pt-[60px] related-section-bottom">
                                 <div class="flex items-center gap-3 mb-8">
-                                    <div class="w-2 h-8 bg-rose-600"></div>
+                                    <div class="w-2 h-8 bg-primary"></div>
                                     <h3 class="text-xl md:text-3xl font-bold serif text-title">এ সম্পর্কিত আরও পড়ুন</h3>
                                 </div>
 
@@ -390,7 +390,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                                 class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                                                 onload="this.parentElement.classList.remove('img-placeholder')">
                                         </div>
-                                        <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors flex-1">
+                                        <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
                                             {{ \Illuminate\Support\Str::limit($rel->title, 90) }}
                                         </h4>
                                     </a>

@@ -151,14 +151,45 @@ class Advertisement extends Model
     /**
      * একই স্লটে কিউ: দিন+ঘণ্টা মেয়াদ শেষ হলে পরের অ্যাড replace; প্রথম দেখানোর সময় থেকে মেয়াদ গণনা।
      * পুরনো ক্যালেন্ডার-মাত্র আইটেম (দিন/ঘণ্টা ০) আগের isLiveInQueuedRotation লজিক।
+     *
+     * @param  bool  $forAdminPreview  true হলে শুধু মেমোরিতে মার্জ (অ্যাডমিন ফর্মে ফ্রন্টের মতো দেখানো); reconcile / display_started_at DB / ভিউ-ম্যাপ স্পর্শ করে না।
      */
-    public function applyQueueItemDisplayOverride(): void
+    public function applyQueueItemDisplayOverride(bool $forAdminPreview = false): void
     {
-        AdvertisementQueueItem::reconcileExpiredForAdvertisementId((int) $this->id);
+        if (! $forAdminPreview) {
+            AdvertisementQueueItem::reconcileExpiredForAdvertisementId((int) $this->id);
+        }
 
         // স্লটের উপরের সময়সূচি উইন্ডো চলাকালীন ফ্রন্টে শুধু মূল স্লট (ফর্ম) এর ডেটা; কিউ এখানে মিলবে না।
         if ($this->isWithinSlotScheduleWindow()) {
             return;
+        }
+
+        $item = $this->findQueueItemForFrontDisplayMerge();
+        if (! $item) {
+            return;
+        }
+
+        if ($item->usesDurationRotation() && ! $item->display_started_at) {
+            if (! $forAdminPreview) {
+                AdvertisementQueueItem::query()->whereKey($item->id)->update(['display_started_at' => now()]);
+                $item->display_started_at = now();
+            }
+        }
+
+        $this->mergeQueueItemDisplayFrom($item);
+        if (! $forAdminPreview) {
+            ad_queue_display_set($this, (int) $item->id);
+        }
+    }
+
+    /**
+     * ফ্রন্টে `applyQueueItemDisplayOverride` যে সারিটির সঙ্গে মিলাবে তার মডেল (কোনো DB রাইট ছাড়া)।
+     */
+    public function findQueueItemForFrontDisplayMerge(): ?AdvertisementQueueItem
+    {
+        if ($this->isWithinSlotScheduleWindow()) {
+            return null;
         }
 
         $items = AdvertisementQueueItem::query()
@@ -181,7 +212,6 @@ class Advertisement extends Model
                 continue;
             }
 
-            // ক্যালেন্ডার শুরু এখনো হয়নি — এই সারি ফ্রন্টে মিলাব না (পিছনের স্লট ফর্ম বা পরের কিউ আইটেম)।
             if ($item->starts_at && $item->starts_at->gt(now())) {
                 continue;
             }
@@ -197,16 +227,10 @@ class Advertisement extends Model
                 continue;
             }
 
-            if ($item->usesDurationRotation() && ! $item->display_started_at) {
-                AdvertisementQueueItem::query()->whereKey($item->id)->update(['display_started_at' => now()]);
-                $item->display_started_at = now();
-            }
-
-            $this->mergeQueueItemDisplayFrom($item);
-            ad_queue_display_set($this, (int) $item->id);
-
-            return;
+            return $item;
         }
+
+        return null;
     }
 
     protected function mergeQueueItemDisplayFrom(AdvertisementQueueItem $item): void

@@ -11,7 +11,7 @@
     </a>
     <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
         <a href="{{ route('gallery.show', $gallery->slug) }}">
-            <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+            <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-primary transition-colors">
                 {{ $gallery->title }}
             </h3>
         </a>

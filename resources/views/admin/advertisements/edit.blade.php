@@ -20,6 +20,13 @@
                     @csrf
                     @method('PUT')
 
+                    @if($mergedQueueItem ?? null)
+                    <div class="rounded-lg border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/80 dark:bg-emerald-950/30 px-4 py-3 text-sm text-emerald-900 dark:text-emerald-100 flex flex-wrap items-center justify-between gap-3">
+                        <p class="leading-relaxed"><span class="font-semibold">ফ্রন্টে চলমান কিউ</span> উপরের ফর্মে দেখানো হচ্ছে (লিংক, ছবি, ক্যাপশন/ভিডিও)। নিচের তালিকায় শুধু <span class="font-medium">অপেক্ষমান</span> কিউ — চলমানটা সম্পাদনা করতে এখানে বা মডাল থেকে খুলুন।</p>
+                        <button type="button" class="queue-open-edit shrink-0 px-3 py-1.5 text-xs font-medium rounded-md bg-emerald-600 text-white hover:bg-emerald-700" data-item-id="{{ $mergedQueueItem->id }}">চলমান কিউ সম্পাদনা</button>
+                    </div>
+                    @endif
+
                     {{-- Name / Location: read-only --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -48,7 +55,7 @@
                     <div class="p-4 rounded-lg border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/50 dark:bg-indigo-950/20 space-y-4">
                         <h3 class="text-sm font-semibold text-slate-800 dark:text-white">ফ্রন্টে দেখানোর সময়সূচি</h3>
                         <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">কমপক্ষে <span class="font-semibold">১ ঘণ্টা</span> অথবা <span class="font-semibold">১ দিন</span> দিতে হবে; <span class="font-semibold">সংরক্ষণের সময়</span> থেকে মেয়াদ গণনা। দিন ও ঘণ্টা দুটোই শূন্য হলে সংরক্ষণ হবে না এবং ফ্রন্টে স্লট দেখাবে না। টাইমজোন: <span class="font-mono">{{ config('app.timezone') }}</span></p>
-                        <p class="text-xs text-indigo-800 dark:text-indigo-200 rounded-md border border-indigo-200/80 dark:border-indigo-800/50 bg-indigo-50/70 dark:bg-indigo-950/30 px-3 py-2 leading-relaxed mt-2"><span class="font-semibold">নিয়ম:</span> উপরের ফর্মের বর্তমান উইন্ডো <strong>চলাকালীন</strong> ফ্রন্টে শুধু ওই ফর্মের ডেটাই দেখাবে। এই সময়ে কিউ ফ্রন্টে আসবে না এবং কিউর মেয়াদ/ক্যালেন্ডার <strong>গণনা বন্ধ</strong> থাকবে। উইন্ডো <strong>শেষ</strong> হলেই কিউ শুরু হবে ও মেয়াদ ঘড়ি চলবে; কিউ আইটেম মেয়াদ শেষ হলে <strong>পুরনো অ্যাড</strong> তালিকায় যাবে, পরের কিউ স্বয়ংক্রিয়ভাবে ফ্রন্টে আসবে।</p>
+                        <p class="text-xs text-indigo-800 dark:text-indigo-200 rounded-md border border-indigo-200/80 dark:border-indigo-800/50 bg-indigo-50/70 dark:bg-indigo-950/30 px-3 py-2 leading-relaxed mt-2"><span class="font-semibold">নিয়ম:</span> উপরের ফর্মের বর্তমান উইন্ডো <strong>চলাকালীন</strong> ফ্রন্টে শুধু ওই ফর্মের ডেটাই দেখাবে। এই সময়ে কিউ ফ্রন্টে আসবে না এবং কিউর মেয়াদ/ক্যালেন্ডার <strong>গণনা বন্ধ</strong> থাকবে। উইন্ডো <strong>শেষ</strong> হলেই কিউ শুরু হবে ও মেয়াদ ঘড়ি চলবে; কোনো কিউ আইটেমের মেয়াদ শেষ হলে পরের কিউ স্বয়ংক্রিয়ভাবে ফ্রন্টে আসবে।</p>
                         @if($noSlotSchedule)
                         <p class="text-xs text-amber-900 dark:text-amber-100 rounded-md border border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 leading-relaxed">
                             <span class="font-semibold">সতর্কতা:</span> এখনও মেয়াদ সেভ করা নেই — ফ্রন্টে এই স্লটের অ্যাড <strong>দেখাবে না</strong>। নিচে দিন বা ঘণ্টা সেট করে সংরক্ষণ করুন।
@@ -115,14 +122,14 @@
                         <p class="text-sm text-slate-600 dark:text-slate-400">হোমপেজে ভিডিও ভিউপোর্টে এলে অটো চালু হবে; ভিডিওতে ক্লিক করলে নিচের URL-এ যাবে।</p>
                         <div>
                             <label for="video_youtube_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">YouTube Video ID বা URL</label>
-                            <input type="text" name="video_youtube_id" id="video_youtube_id" value="{{ old('video_youtube_id', $advertisement->video_youtube_id ?? '') }}" placeholder="jNQXAC9IVRw অথবা https://youtube.com/watch?v=..." class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
+                            <input type="text" name="video_youtube_id" id="video_youtube_id" value="{{ old('video_youtube_id', ($adFormDisplay ?? $advertisement)->video_youtube_id ?? '') }}" placeholder="jNQXAC9IVRw অথবা https://youtube.com/watch?v=..." class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
                             @error('video_youtube_id')
                             <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
                             @enderror
                         </div>
                         <div>
                             <label for="link" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Target URL (ক্লিক করলে যাবে) <span class="text-rose-600 dark:text-rose-400">*</span></label>
-                            <input type="url" name="link" id="link" value="{{ old('link', $advertisement->link) }}" placeholder="https://example.com/..." required class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
+                            <input type="url" name="link" id="link" value="{{ old('link', ($adFormDisplay ?? $advertisement)->link) }}" placeholder="https://example.com/..." required class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
                             @error('link')
                             <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
                             @enderror
@@ -132,7 +139,7 @@
                     {{-- ইমেজ অ্যাড স্লট: Target URL, Caption, Image --}}
                     <div>
                         <label for="link" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Target URL (ক্লিক করলে যাবে) <span class="text-rose-600 dark:text-rose-400">*</span></label>
-                        <input type="url" name="link" id="link" value="{{ old('link', $advertisement->link) }}" placeholder="https://example.com/promo" required class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
+                        <input type="url" name="link" id="link" value="{{ old('link', ($adFormDisplay ?? $advertisement)->link) }}" placeholder="https://example.com/promo" required class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
                         @error('link')
                         <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
                         @enderror
@@ -140,7 +147,7 @@
 
                     <div>
                         <label for="caption" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Caption (ঐচ্ছিক)</label>
-                        <input type="text" name="caption" id="caption" value="{{ old('caption', $advertisement->caption) }}" placeholder="সংক্ষিপ্ত টেক্সট" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
+                        <input type="text" name="caption" id="caption" value="{{ old('caption', ($adFormDisplay ?? $advertisement)->caption) }}" placeholder="সংক্ষিপ্ত টেক্সট" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800 dark:text-white text-sm">
                         @error('caption')
                         <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
                         @enderror
@@ -149,9 +156,9 @@
                     <div>
                         <label for="image" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ডেস্কটপ / সাধারণ ইমেজ</label>
                         <div class="flex items-center gap-4 flex-wrap">
-                            @if($advertisement->image)
+                            @if(($adFormDisplay ?? $advertisement)->image)
                             <div class="w-32 h-20 rounded border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                                <img src="{{ storage_image_url($advertisement->image) }}" alt="Current" class="w-full h-full object-contain">
+                                <img src="{{ storage_image_url(($adFormDisplay ?? $advertisement)->image) }}" alt="Current" class="w-full h-full object-contain">
                             </div>
                             <div class="flex flex-col gap-1">
                                 <p class="text-xs text-slate-500">নতুন ইমেজ আপলোড করলে বর্তমানটি প্রতিস্থাপিত হবে।</p>
@@ -171,9 +178,9 @@
                     <div>
                         <label for="image_mobile" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">মোবাইল ইমেজ <span class="text-slate-400 font-normal">(ঐচ্ছিক — না দিলে ডেস্কটপ ইমেজই দেখাবে)</span></label>
                         <div class="flex items-center gap-4 flex-wrap">
-                            @if($advertisement->image_mobile)
+                            @if(($adFormDisplay ?? $advertisement)->image_mobile)
                             <div class="w-24 h-36 rounded border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                                <img src="{{ storage_image_url($advertisement->image_mobile) }}" alt="Mobile current" class="w-full h-full object-contain">
+                                <img src="{{ storage_image_url(($adFormDisplay ?? $advertisement)->image_mobile) }}" alt="Mobile current" class="w-full h-full object-contain">
                             </div>
                             <div class="flex flex-col gap-1">
                                 <p class="text-xs text-slate-500">ছোট স্ক্রিনে (৭৬৭px পর্যন্ত) শুধু এই ছবি ব্যবহার হবে।</p>
@@ -202,63 +209,14 @@
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                         <div>
                             <h3 class="text-lg font-semibold text-slate-800 dark:text-white">অতিরিক্ত অ্যাড কিউ</h3>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">মেয়াদ অনুযায়ী ফ্রন্টে একসময় একটি চলবে। <span class="font-medium">চালু হওয়া</span> অ্যাড উপরের <span class="font-medium">অ্যাড স্লট সম্পাদনা</span> এর মতোই সাইটে দেখাবে; সেই সময় সে নিচের তালিকায় থাকবে না — মেয়াদ শেষ হলে <span class="font-medium">পুরনো অ্যাড</span> তালিকায় চলে যাবে এবং পরের অ্যাড স্বয়ংক্রিয়ভাবে চালু হবে। কিউতে কেউ না থাকলে মূল স্লটের অ্যাড দেখাবে।</p>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">ফ্রন্টে কী দেখাবে তা উপরের <span class="font-medium">অ্যাড স্লট সম্পাদনা</span> ফর্মের সময়সূচি অনুযায়ী: উইন্ডো চলাকালীন শুধু সেই ফর্মের অ্যাড; উইন্ডো শেষ হলে নিচের কিউ থেকে ক্রমে চলবে। <span class="font-medium">চলমান কিউ</span> উপরের ফর্মে মিলিয়ে দেখানো হয় — নিচের তালিকায় শুধু <span class="font-medium">অপেক্ষমান</span> কিউ।</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
                             <button type="button" id="queue-open-create" class="px-4 py-2 bg-emerald-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition">
                                 আরেকটি অ্যাড যোগ করুন
                             </button>
-                            <button type="button" id="toggle-old-queue-ads" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                                পুরনো অ্যাড
-                            </button>
                         </div>
                     </div>
-
-                    <div id="old-queue-ads-panel" class="hidden mb-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 overflow-hidden">
-                        <div class="px-3 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300">মেয়াদ শেষ — আগে চালানো অ্যাড</div>
-                        <div class="overflow-x-auto max-h-64 overflow-y-auto">
-                            <table class="min-w-full text-sm">
-                                <thead class="bg-slate-100/80 dark:bg-slate-800/80 text-left text-xs text-slate-600 dark:text-slate-400">
-                                    <tr>
-                                        <th class="px-3 py-2">শিরোনাম</th>
-                                        <th class="px-3 py-2">মেয়াদ</th>
-                                        <th class="px-3 py-2">শেষ</th>
-                                        <th class="px-3 py-2 text-right">ভিউ / ক্লিক</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
-                                    @forelse($expiredQueueItems ?? [] as $ex)
-                                    <tr>
-                                        <td class="px-3 py-2 text-slate-800 dark:text-slate-200 max-w-[10rem] truncate">{{ $ex->title ?: '—' }}</td>
-                                        <td class="px-3 py-2 text-slate-600 dark:text-slate-400 tabular-nums">{{ (int) ($ex->duration_days ?? 0) }} দিন {{ (int) ($ex->duration_hours ?? 0) }} ঘণ্টা</td>
-                                        <td class="px-3 py-2 text-slate-500 text-xs whitespace-nowrap">{{ optional($ex->expired_at)->format('d M Y, H:i') }}</td>
-                                        <td class="px-3 py-2 text-right tabular-nums text-slate-600">{{ number_format((int) $ex->views_count) }} / {{ number_format((int) $ex->clicks_count) }}</td>
-                                    </tr>
-                                    @empty
-                                    <tr><td colspan="4" class="px-3 py-6 text-center text-slate-500">কোনো পুরনো অ্যাড নেই।</td></tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    @if($liveQueueItem ?? null)
-                    <div class="mb-4 rounded-lg border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/80 dark:bg-emerald-950/30 px-4 py-3">
-                        <p class="text-xs font-semibold text-emerald-900 dark:text-emerald-100 uppercase tracking-wide mb-2">ফ্রন্টে এখন চলছে (কিউ)</p>
-                        <div class="flex flex-wrap items-start gap-3">
-                            @if($isVideoSlot)
-                                <span class="inline-flex items-center justify-center min-w-[4rem] h-12 rounded border border-emerald-200 dark:border-emerald-700 bg-white dark:bg-slate-900 px-2 text-xs font-mono text-emerald-800 dark:text-emerald-200">{{ \Illuminate\Support\Str::limit($liveQueueItem->video_youtube_id, 12, '…') }}</span>
-                            @elseif($liveQueueItem->image)
-                                <img src="{{ storage_image_url($liveQueueItem->image) }}" alt="" class="h-12 w-20 object-contain rounded border border-emerald-200 dark:border-emerald-700 bg-white dark:bg-slate-900">
-                            @endif
-                            <div class="min-w-0 flex-1 text-sm text-emerald-900 dark:text-emerald-100">
-                                <p class="font-medium truncate">{{ $liveQueueItem->title ?: 'শিরোনামহীন' }}</p>
-                                <p class="text-xs text-emerald-800/90 dark:text-emerald-200/90 mt-1 tabular-nums">মেয়াদ: {{ (int) $liveQueueItem->duration_days }} দিন {{ (int) $liveQueueItem->duration_hours }} ঘণ্টা · চালু {{ $liveQueueItem->display_started_at?->format('d M, H:i') }} → শেষ {{ $liveQueueItem->displayRunEndsAt()?->format('d M, H:i') }}</p>
-                                <button type="button" class="queue-open-edit mt-2 text-xs font-medium text-emerald-800 dark:text-emerald-200 underline hover:no-underline" data-item-id="{{ $liveQueueItem->id }}">সম্পাদনা</button>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
 
                     <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
                         <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-sm">
@@ -274,7 +232,7 @@
                                 </tr>
                             </thead>
                             <tbody id="queue-items-tbody" class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-900">
-                                @forelse(($queueItemsWaiting ?? $queueItems) as $index => $item)
+                                @forelse(($queueItemsWaiting ?? $queueItems ?? collect()) as $index => $item)
                                 <tr data-queue-id="{{ $item->id }}" class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
                                     <td class="px-3 py-2 text-slate-600 dark:text-slate-400 tabular-nums">{{ $index + 1 }}</td>
                                     <td class="px-3 py-2">
@@ -324,10 +282,10 @@
                                 @empty
                                 <tr>
                                     <td colspan="7" class="px-3 py-8 text-center text-slate-500 dark:text-slate-400 text-sm">
-                                        @if($liveQueueItem ?? null)
-                                            লাইনে অপেক্ষমান কিউ আইটেম নেই। উপরে চলমান অ্যাডের মেয়াদ শেষ হলে পরেরটি এখানে দেখা যাবে।
+                                        @if($mergedQueueItem ?? null)
+                                        অপেক্ষমান কিউ নেই। ফ্রন্টে চলমান কিউ উপরের ফর্মে; নতুন যোগ করতে <span class="font-medium">আরেকটি অ্যাড যোগ করুন</span> ব্যবহার করুন।
                                         @else
-                                            কোনো কিউ আইটেম নেই। উপরের বাটনে ক্লিক করে যোগ করুন।
+                                        কোনো কিউ আইটেম নেই। উপরের বাটনে ক্লিক করে যোগ করুন।
                                         @endif
                                     </td>
                                 </tr>
@@ -459,8 +417,9 @@ window.__queueItemUpdateUrls = @json($queueItemUpdateUrls);
 window.__queueItemsPayload = @json($queueItemsPayload);
 window.__queueStoreUrl = @json(route('admin.advertisements.queue-items.store', $advertisement->id));
 window.__isVideoSlot = @json($isVideoSlot);
-window.__liveQueueId = @json(optional($liveQueueItem ?? null)->id);
-window.__liveQueueLiveIndex = @json($liveQueueIndex ?? null);
+window.__mergedQueueId = @json(($mergedQueueItem ?? null) ? (int) $mergedQueueItem->id : null);
+window.__mergedQueueLiveIndex = @json((int) ($mergedQueueIndex ?? -1));
+window.__fullQueueCount = @json((int) ($queueItems ?? collect())->count());
 </script>
 <script>
     (function() {
@@ -531,19 +490,27 @@ window.__liveQueueLiveIndex = @json($liveQueueIndex ?? null);
         function submitQueueReorder() {
             if (!reorderForm || !reorderInputs) return;
             var rows = tbody.querySelectorAll('tr[data-queue-id]');
-            if (!rows.length) return;
-            var waitingIds = Array.prototype.map.call(rows, function(tr) {
+            var visibleIds = Array.prototype.map.call(rows, function(tr) {
                 return parseInt(tr.getAttribute('data-queue-id'), 10);
             });
-            var liveId = window.__liveQueueId;
-            var liveIdx = window.__liveQueueLiveIndex;
+            var mergedId = window.__mergedQueueId;
+            var mergedIdx = typeof window.__mergedQueueLiveIndex === 'number' ? window.__mergedQueueLiveIndex : -1;
+            var fullCount = typeof window.__fullQueueCount === 'number' ? window.__fullQueueCount : 0;
             var order;
-            if (liveId != null && liveIdx != null && liveIdx >= 0) {
-                order = waitingIds.slice();
-                order.splice(liveIdx, 0, liveId);
+            if (mergedId != null && mergedId > 0 && mergedIdx >= 0 && fullCount > 0 && visibleIds.length === fullCount - 1) {
+                order = [];
+                var wi = 0;
+                for (var i = 0; i < fullCount; i++) {
+                    if (i === mergedIdx) {
+                        order[i] = mergedId;
+                    } else {
+                        order[i] = visibleIds[wi++];
+                    }
+                }
             } else {
-                order = waitingIds;
+                order = visibleIds;
             }
+            if (!order.length) return;
             reorderInputs.innerHTML = '';
             order.forEach(function(id) {
                 var inp = document.createElement('input');
@@ -556,14 +523,6 @@ window.__liveQueueLiveIndex = @json($liveQueueIndex ?? null);
         }
 
         document.getElementById('queue-open-create').addEventListener('click', openQueueCreate);
-
-        var oldToggle = document.getElementById('toggle-old-queue-ads');
-        var oldPanel = document.getElementById('old-queue-ads-panel');
-        if (oldToggle && oldPanel) {
-            oldToggle.addEventListener('click', function() {
-                oldPanel.classList.toggle('hidden');
-            });
-        }
 
         queueRoot.addEventListener('click', function(e) {
             var editBtn = e.target.closest('.queue-open-edit');

@@ -10,7 +10,7 @@
                     <h1 class="text-4xl md:text-3xl font-semibold serif text-title mb-4">গ্যালারি</h1>
 
                     <div class="flex items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
-                        <a href="/" class="text-slate-500 hover:text-rose-600 transition-all">
+                        <a href="/" class="text-slate-500 hover:text-primary transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="w-full border-b border-slate-300 relative mb-4 md:mb-8">
-                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                     </div>
                 </div>
 
@@ -64,7 +64,7 @@
                             {{-- টাইটেল + বিবরণ --}}
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
                                 <a href="{{ route('news.show', $gallery->slug) }}">
-                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                    <h3 class="text-xl md:text-base font-bold serif text-title leading-snug hover:text-primary transition-colors">
                                         {{ $gallery->title }}
                                     </h3>
                                 </a>

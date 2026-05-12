@@ -14,6 +14,9 @@
     --font-serif: "SolaimanLipi", ui-serif, Georgia, serif;
 
     --container-max: 1300px;
+
+    /* ফ্রন্টএন্ড ব্র্যান্ড রঙ — শুধু এখানে এক হেক্স বদলালেই সাইটের লিংক/ট্যাব/বাটনের রঙ মিলবে (অ্যাডমিন প্যানেলে প্রভাব নেই) */
+    --color-primary: #2563eb;
 }
 
 @utility container {

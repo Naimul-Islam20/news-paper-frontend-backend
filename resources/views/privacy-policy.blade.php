@@ -8,7 +8,7 @@
         <div class="mb-4 md:mb-6 text-left">
             <div class="flex items-center gap-1 text-sm font-bold text-slate-500 mb-3 md:mb-4">
                 <!-- Home Icon -->
-                <a href="/" class="text-slate-500 hover:text-rose-600 transition-all">
+                <a href="/" class="text-slate-500 hover:text-primary transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                         <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -19,7 +19,7 @@
             </div>
 
             <div class="w-full border-b border-slate-300 relative mb-4 md:mb-8">
-                <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
             </div>
         </div>
 
@@ -68,21 +68,21 @@
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Special Precaution</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 In the name of Daily Ittefaq/ দৈনিক ইত্তেফাক, there may be multiple fake websites and facebook pages and unauthorized/ unwanted facebook groups in online. Daily Ittefaq will hold no responsibility for any content generated, published or shared in those fake websites, unauthorized pages or groups in social media.
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">How Daily Ittefaq collects the information</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 Daily Ittefaq collects the information on a user upon the user's access to the Daily Ittefaq website – (i) by registering to the site or Apps, (ii) subscribing to the newsletter, (iii) responding to a survey or participating in a competition, (iv) logging-in to a site or page, etc.
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Disclosure of Information Collected</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 Daily Ittefaq does not trade or provide personally identifiable information to any other parties except for those that assist Daily Ittefaq in operating its website, conducting the business and serving the users.
@@ -101,7 +101,7 @@
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Advertisement</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 The advertisements included in the Daily Ittefaq website and Apps, are by third-party companies and ad networks through independent ad tags, which may collect information about users for which Daily Ittefaq will bear no responsibility that may arise as a result of collecting and/or sharing the information with any other party.
@@ -112,7 +112,7 @@
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Third Party Advertisements and links</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 At the discretion of Daily Ittefaq, the website or application may display or allow advertisements of third party services or products. These third-party sites may have separate and independent privacy policies. Daily Ittefaq accepts no responsibility or liability for the content of advertising material, including, without limitation, any error, omission or inaccuracy therein.
@@ -123,7 +123,7 @@
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Use of Cookies</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 Daily Ittefaq does not collect any user data based on cookies, nor does it store any sort of user information that may be personal to the user.
@@ -134,42 +134,42 @@
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Demographic and purchase information</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 We may reference other sources of demographic and other information to provide you with more targeted communications and promotions. We use Google Analytics, among others, to track the user behavior on our website. You can opt-out of Google Analytics for Display Advertising and customize Google Display Network ads using the Ads Settings options provided by Google.
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Communication by Daily Ittefaq</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 From time to time, Daily Ittefaq may contact its users via e-mail, phone or SMS for invitation for participation in campaigns/competitions organized by Daily Ittefaq, feedback, survey etc., based on the information it has received from the users.
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Accessing the website from outside Bangladesh</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 All personal information submitted by users outside Bangladesh will be processed in accordance with these 'Terms of use' and 'Privacy Policy'.
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Governing Law</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 The laws that govern "Privacy Policy" of Daily Ittefaq and its relationship with the user are the laws of Bangladesh and any dispute regarding the use, retention, disclosure, leakage or dissemination of the information or data can only be raised before the courts of Bangladesh which shall have exclusive jurisdiction on this matter. The entire "Privacy Policy" shall apply to all who enter the website, receive service or use an application from Daily Ittefaq regardless of their nationality, location, residence or place of business.
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Opt-out</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 If, at any time, the users prefer not to receive email containing marketing information from us, then the user can simply follow the unsubscribe options at the bottom of each email.
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Data Retention</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 We shall hold your personal information as long as your account exists with Daily Ittefaq. We will delete your information as soon as reasonably possible, based on account activity and in accordance with applicable law(s), whenever you request us to do so. However, we may archive and/or retain some information for legal purposes.
@@ -184,7 +184,7 @@
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Data Deletion</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 Daily Ittefaq strategies support the deletion of client data. However we prefer such requests to be in writing and made in cooperation with Daily Ittefaq Data Protection and Records management committee.
@@ -199,7 +199,7 @@
             </p>
 
             <h2 class="text-xl font-bold text-title mt-8 mb-2">Modification of Privacy Policy</h2>
-            <div class="w-10 h-[2px] bg-rose-600 mb-4"></div>
+            <div class="w-10 h-[2px] bg-primary mb-4"></div>
 
             <p>
                 Daily Ittefaq reserves the right to amend, modify, alter, or omit any terms in the "Privacy Policy" at any time but the changed policy will be immediately uploaded or updated in the website. By continuing to use our services after any changes are made, you accept those changes and will be bound by them. We encourage you to periodically check back and review this policy so that visitors/readers will always know what information we collect, how we use it, and with whom we share it.

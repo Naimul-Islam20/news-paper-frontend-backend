@@ -12,7 +12,7 @@
 
                     <div class="flex items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
                         <!-- Home Icon -->
-                        <a href="/" class="text-slate-500 hover:text-rose-600 transition-all">
+                        <a href="/" class="text-slate-500 hover:text-primary transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="w-full border-b border-slate-300 relative mb-4 md:mb-8">
-                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                     </div>
                 </div>
 
@@ -65,7 +65,7 @@
                                 </div>
                                 {{-- Play Overlay --}}
                                 <div class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-all">
-                                    <div class="w-12 h-12 bg-rose-600 text-white flex items-center justify-center rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
+                                    <div class="w-12 h-12 bg-primary text-white flex items-center justify-center rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                                     </div>
                                 </div>
@@ -77,7 +77,7 @@
                             {{-- টাইটেল + বিবরণ --}}
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
                                 <a href="/video-details">
-                                    <h3 class="text-xl md:text-2xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                    <h3 class="text-xl md:text-2xl font-bold serif text-title leading-snug hover:text-primary transition-colors">
                                         জাতীয় সংসদের বাজেট অধিবেশনের সরাসরি সম্প্রচার
                                     </h3>
                                 </a>
@@ -103,7 +103,7 @@
                                          onload="this.parentElement.classList.remove('img-placeholder')" >
                                 </div>
                                 <div class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-all">
-                                    <div class="w-12 h-12 bg-rose-600 text-white flex items-center justify-center rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
+                                    <div class="w-12 h-12 bg-primary text-white flex items-center justify-center rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                                     </div>
                                 </div>
@@ -113,7 +113,7 @@
                             </a>
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
                                 <a href="/video-details">
-                                    <h3 class="text-xl md:text-2xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                    <h3 class="text-xl md:text-2xl font-bold serif text-title leading-snug hover:text-primary transition-colors">
                                         বিপিএল ২০২৬: গ্যালারিতে উন্মাদনা ও রুদ্ধশ্বাস মুহূর্ত
                                     </h3>
                                 </a>
@@ -139,7 +139,7 @@
                                          onload="this.parentElement.classList.remove('img-placeholder')" >
                                 </div>
                                 <div class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-all">
-                                    <div class="w-12 h-12 bg-rose-600 text-white flex items-center justify-center rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
+                                    <div class="w-12 h-12 bg-primary text-white flex items-center justify-center rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                                     </div>
                                 </div>
@@ -149,7 +149,7 @@
                             </a>
                             <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
                                 <a href="/video-details">
-                                    <h3 class="text-xl md:text-2xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                    <h3 class="text-xl md:text-2xl font-bold serif text-title leading-snug hover:text-primary transition-colors">
                                         বর্ষায় বাংলার রূপ: ছোট এক নৌকায় নদী ভ্রমণ
                                     </h3>
                                 </a>
@@ -181,7 +181,7 @@
                         <div class="block overflow-hidden border border-slate-200 shadow-sm transition-all group">
                             <div class="relative h-[250px] w-full bg-gradient-to-br from-[#1e3a5f] to-[#0f172a] flex flex-col items-center justify-center p-8 text-center">
                                 <h4 class="text-white font-bold text-lg mb-4">আপনার পণ্যের প্রচারণা আজই শুরু করুন</h4>
-                                <a href="#" class="px-6 py-2 bg-rose-600 text-white text-xs font-bold  hover:bg-rose-700 transition-all">বিস্তারিত দেখুন →</a>
+                                <a href="#" class="px-6 py-2 bg-primary text-white text-xs font-bold  hover:bg-primary/90 transition-all">বিস্তারিত দেখুন →</a>
                             </div>
                         </div>
 

@@ -12,7 +12,7 @@
     </a>
     <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
         <a href="{{ route('news.show', [$post->slug]) }}">
-            <h3 class="text-xl md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+            <h3 class="text-xl md:text-xl font-bold serif text-title leading-snug hover:text-primary transition-colors">
                 {{ $post->title }}
             </h3>
         </a>

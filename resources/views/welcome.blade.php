@@ -38,7 +38,7 @@
                                 onload="this.parentElement.classList.remove('img-placeholder')">
                             @endif
                         </div>
-                        <h4 class="text-xl lg:text-2xl font-semibold  serif leading-snug group-hover:text-rose-600 transition-colors mt-1 text-left text-title">
+                        <h4 class="text-xl lg:text-2xl font-semibold  serif leading-snug group-hover:text-primary transition-colors mt-1 text-left text-title">
                             {{ $post->title }}
                         </h4>
                         @php
@@ -73,7 +73,7 @@
                             @endif
                         </div>
                         <div class="text-center">
-                            <h2 class="text-xl md:text-2xl font-semibold serif leading-tight text-center text-title group-hover:text-rose-600 transition-colors">
+                            <h2 class="text-xl md:text-2xl font-semibold serif leading-tight text-center text-title group-hover:text-primary transition-colors">
                                 {{ $lead->title }}
                             </h2>
                             @php
@@ -102,7 +102,7 @@
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                                 @endif
                             </div>
-                            <h3 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors text-left">
+                            <h3 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors text-left">
                                 {{ $post->title }}
                             </h3>
                         </a>
@@ -122,7 +122,7 @@
                                 onload="this.parentElement.classList.remove('img-placeholder')">
                             @endif
                         </div>
-                        <h3 class="text-lg md:text-xl font-bold serif leading-snug text-title group-hover:text-rose-600 transition-colors text-left mb-2">
+                        <h3 class="text-lg md:text-xl font-bold serif leading-snug text-title group-hover:text-primary transition-colors text-left mb-2">
                             {{ $post->title }}
                         </h3>
                         @php
@@ -165,7 +165,7 @@
                                             onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-rose-600 transition-colors text-left">
+                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-primary transition-colors text-left">
                                         {{ $post->title }}
                                     </h4>
                                 </a>
@@ -187,7 +187,7 @@
                                 <div class="flex items-center gap-3 mb-2">
                                     <div class="img-placeholder w-15 h-15  overflow-hidden shrink-0"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&h=100&auto=format&fit=crop" alt="Author" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                     </div>
-                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-rose-600 transition-colors text-left">
+                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-primary transition-colors text-left">
                                         পুলিশ ব্যবস্থার বর্তমান বাস্তবতা ও ভবিষ্যৎ পথরেখা
                                     </h4>
                                 </div>
@@ -204,7 +204,7 @@
                                 <div class="flex items-center gap-3 mb-2">
                                     <div class="img-placeholder w-15 h-15  overflow-hidden shrink-0"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100&h=100&auto=format&fit=crop" alt="Author" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                     </div>
-                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-rose-600 transition-colors text-left">
+                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-primary transition-colors text-left">
                                         উচ্চশিক্ষার মানোন্নয়ন ও আগামীর চ্যালেঞ্জ
                                     </h4>
                                 </div>
@@ -221,7 +221,7 @@
                                 <div class="flex items-center gap-3 mb-2">
                                     <div class="img-placeholder w-15 h-15  overflow-hidden shrink-0"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=100&h=100&auto=format&fit=crop" alt="Author" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                     </div>
-                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-rose-600 transition-colors text-left">
+                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-primary transition-colors text-left">
                                         নারীর ক্ষমতায়ন ও সামাজিক বিবর্তন
                                     </h4>
                                 </div>
@@ -278,16 +278,16 @@
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-3xl font-semibold serif text-title relative inline-block">
                         @if($politicsCategory)
-                        <a href="{{ category_url($politicsCategory) }}" class="hover:text-rose-600 transition-colors">{{ $politicsTitle }}</a>
+                        <a href="{{ category_url($politicsCategory) }}" class="hover:text-primary transition-colors">{{ $politicsTitle }}</a>
                         @elseif($politicsTitle)
                         {{ $politicsTitle }}
                         @endif
-                        <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-rose-600"></span>
+                        <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary"></span>
                     </h2>
                     @if($politicsCategory)
-                    <a href="{{ category_url($politicsCategory) }}" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                    <a href="{{ category_url($politicsCategory) }}" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                     @else
-                    <a href="#" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                    <a href="#" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                     @endif
                 </div>
 
@@ -305,7 +305,7 @@
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                                 @endif
                             </div>
-                            <h3 class="text-lg font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mb-2">
+                            <h3 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mb-2">
                                 {{ $post->title }}
                             </h3>
                             @php
@@ -427,16 +427,16 @@
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
                             @if($nationalCategory)
-                            <a href="{{ category_url($nationalCategory) }}" class="hover:text-rose-600 transition-colors">{{ $nationalTitle }}</a>
+                            <a href="{{ category_url($nationalCategory) }}" class="hover:text-primary transition-colors">{{ $nationalTitle }}</a>
                             @else
                             {{ $nationalTitle }}
                             @endif
-                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-rose-600"></span>
+                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary"></span>
                         </h2>
                         @if($nationalCategory)
-                        <a href="{{ category_url($nationalCategory) }}" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="{{ category_url($nationalCategory) }}" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @else
-                        <a href="#" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="#" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @endif
                     </div>
 
@@ -457,7 +457,7 @@
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                 </div>
-                                <h3 class="text-2xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mb-1.5">
+                                <h3 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mb-1.5">
                                     {{ $mainNational->title }}
                                 </h3>
                                 @php
@@ -476,7 +476,7 @@
                             <div class="group cursor-pointer">
                                 <div class="img-placeholder overflow-hidden aspect-[16/10] mb-2 relative shadow-sm"><img src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                 </div>
-                                <h3 class="text-2xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mb-1.5">
+                                <h3 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mb-1.5">
                                     মেট্রোরেলের নতুন রুট উদ্বোধন: বদলে যাচ্ছে রাজধানীর যাতায়াত দৃশ্যপট
                                 </h3>
                                 <p class="text-sm md:text-base font-normal text-desc leading-relaxed text-left">
@@ -501,7 +501,7 @@
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                 </div>
-                                <h3 class="text-lg font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                <h3 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                     {{ $post->title }}
                                 </h3>
                             </a>
@@ -512,7 +512,7 @@
                         <div>
                             <!-- Tab Bar -->
                             <div class="flex w-full border-b border-custom mb-4">
-                                <button id="tab-latest" onclick="switchTab('latest')" class="flex-1 text-sm font-bold py-2 border-b-2 border-rose-600 text-rose-600 -mb-px transition-all duration-200 text-center">
+                                <button id="tab-latest" onclick="switchTab('latest')" class="flex-1 text-sm font-bold py-2 border-b-2 border-primary text-primary -mb-px transition-all duration-200 text-center">
                                     সর্বশেষ
                                 </button>
                                 <button id="tab-popular" onclick="switchTab('popular')" class="flex-1 text-sm font-bold py-2 border-b-2 border-custom text-gray-400 -mb-px hover:text-gray-600 transition-all duration-200 text-center">
@@ -526,7 +526,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex items-start gap-4 pb-4 border-b border-custom last:border-0 last:pb-0 block">
                                     <span class="text-3xl font-bold text-gray-400 serif shrink-0 leading-none">{{ $bnNum[$index] ?? ($index + 1) }}.</span>
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="text-base font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">
+                                        <h4 class="text-base font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5">
                                             {{ $post->title }}
                                         </h4>
                                     </div>
@@ -545,7 +545,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex items-start gap-3 pb-3 border-b border-custom last:border-0 last:pb-0 block">
                                     <span class="text-3xl font-bold text-gray-400 serif shrink-0 leading-none">{{ $bnNum[$index] ?? ($index + 1) }}.</span>
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="text-base font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                        <h4 class="text-base font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                             {{ $post->title }}
                                         </h4>
                                     </div>
@@ -580,16 +580,16 @@
                     <div class="flex items-center justify-between mb-5 md:pt-8 pt-5 border-t border-custom">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
                             @if($capitalCategory)
-                            <a href="{{ category_url($capitalCategory) }}" class="hover:text-rose-600 transition-colors">{{ $capitalTitle }}</a>
+                            <a href="{{ category_url($capitalCategory) }}" class="hover:text-primary transition-colors">{{ $capitalTitle }}</a>
                             @elseif($capitalTitle)
                             {{ $capitalTitle }}
                             @endif
-                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-rose-600"></span>
+                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary"></span>
                         </h2>
                         @if($capitalCategory)
-                        <a href="{{ category_url($capitalCategory) }}" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="{{ category_url($capitalCategory) }}" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @else
-                        <a href="#" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="#" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @endif
                     </div>
 
@@ -610,7 +610,7 @@
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                 </div>
-                                <h3 class="text-lg xl:text-xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-2 mb-1.5">
+                                <h3 class="text-lg xl:text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mt-2 mb-1.5">
                                     {{ $post->title }}
                                 </h3>
                                 @if($excerpt)
@@ -649,16 +649,16 @@
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
                             @if($sportsCategoryBottom)
-                            <a href="{{ category_url($sportsCategoryBottom) }}" class="hover:text-rose-600 transition-colors">{{ $sportsTitleBottom ?: 'খেলা' }}</a>
+                            <a href="{{ category_url($sportsCategoryBottom) }}" class="hover:text-primary transition-colors">{{ $sportsTitleBottom ?: 'খেলা' }}</a>
                             @else
                             {{ $sportsTitleBottom ?: 'খেলা' }}
                             @endif
-                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-rose-600"></span>
+                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary"></span>
                         </h2>
                         @if($sportsCategoryBottom)
-                        <a href="{{ category_url($sportsCategoryBottom) }}" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="{{ category_url($sportsCategoryBottom) }}" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @else
-                        <a href="#" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="#" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @endif
                     </div>
 
@@ -678,7 +678,7 @@
                                         <img src="{{ storage_image_url($sportsMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h3 class="text-2xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mb-1">
+                                    <h3 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mb-1">
                                         {{ $sportsMain->title }}
                                     </h3>
                                     @if($mainExcerpt)
@@ -703,7 +703,7 @@
                                             <img src="{{ storage_image_url($sportsSecondary->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
-                                        <h4 class="text-lg font-normal serif leading-tight group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">
+                                        <h4 class="text-lg font-normal serif leading-tight group-hover:text-primary transition-colors text-left text-title mt-0.5">
                                             {{ $sportsSecondary->title }}
                                         </h4>
                                     </div>
@@ -733,7 +733,7 @@
                                             <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
-                                        <h4 class="text-lg font-bold serif leading-tight group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">
+                                        <h4 class="text-lg font-bold serif leading-tight group-hover:text-primary transition-colors text-left text-title mt-0.5">
                                             {{ $post->title }}
                                         </h4>
                                     </div>
@@ -760,7 +760,7 @@
                                             <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
-                                        <h4 class="text-lg font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                        <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                             {{ $post->title }}
                                         </h4>
                                     </div>
@@ -794,16 +794,16 @@
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
                             @if($countryCategory)
-                            <a href="{{ category_url($countryCategory) }}" class="hover:text-rose-600 transition-colors">{{ $countryTitle ?: 'সারাদেশ' }}</a>
+                            <a href="{{ category_url($countryCategory) }}" class="hover:text-primary transition-colors">{{ $countryTitle ?: 'সারাদেশ' }}</a>
                             @else
                             {{ $countryTitle ?: 'সারাদেশ' }}
                             @endif
-                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-rose-600"></span>
+                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary"></span>
                         </h2>
                         @if($countryCategory)
-                        <a href="{{ category_url($countryCategory) }}" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="{{ category_url($countryCategory) }}" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @else
-                        <a href="#" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="#" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @endif
                     </div>
 
@@ -825,7 +825,7 @@
                                             <img src="{{ storage_image_url($countryMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
-                                        <h3 class="text-3xl font-bold serif leading-tight group-hover:text-rose-600 transition-colors text-left text-title mb-4">
+                                        <h3 class="text-3xl font-bold serif leading-tight group-hover:text-primary transition-colors text-left text-title mb-4">
                                             {{ $countryMain->title }}
                                         </h3>
                                         @if($mainExcerpt)
@@ -848,7 +848,7 @@
                                                 <img src="{{ storage_image_url($countryMid1->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                                 @endif
                                             </div>
-                                            <h4 class="text-xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                            <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                                 {{ $countryMid1->title }}
                                             </h4>
                                         </div>
@@ -864,7 +864,7 @@
                                                 <img src="{{ storage_image_url($countryMid2->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                                 @endif
                                             </div>
-                                            <h4 class="text-xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                            <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                                 {{ $countryMid2->title }}
                                             </h4>
                                         </div>
@@ -885,7 +885,7 @@
                                                 <img src="{{ storage_image_url($countryBot1->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                                 @endif
                                             </div>
-                                            <h4 class="text-lg font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                            <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                                 {{ $countryBot1->title }}
                                             </h4>
                                         </div>
@@ -902,7 +902,7 @@
                                                 <img src="{{ storage_image_url($countryBot2->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                                 @endif
                                             </div>
-                                            <h4 class="text-lg font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                            <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                                 {{ $countryBot2->title }}
                                             </h4>
                                         </div>
@@ -919,7 +919,7 @@
                                                 <img src="{{ storage_image_url($countryBot3->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                                 @endif
                                             </div>
-                                            <h4 class="text-lg font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                            <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                                 {{ $countryBot3->title }}
                                             </h4>
                                         </div>
@@ -932,7 +932,7 @@
                         <!-- Right Column: Regional News Search (3 Columns) -->
                         <div class="lg:col-span-3 lg:px-3 lg:border-l border-custom">
                             <div class="bg-gray-50 p-6  border border-custom shadow-sm">
-                                <h3 class="text-xl font-bold serif text-title mb-6 border-b pb-2 border-rose-600 inline-block">
+                                <h3 class="text-xl font-bold serif text-title mb-6 border-b pb-2 border-primary inline-block">
                                     এলাকার খবর
                                 </h3>
 
@@ -940,7 +940,7 @@
                                     <!-- Division -->
                                     <div>
                                         <label class="block text-sm font-bold text-gray-700 mb-1">বিভাগ</label>
-                                        <select id="division-select" class="w-full border-custom  text-sm focus:ring-rose-500 focus:border-rose-500 py-2.5 bg-white">
+                                        <select id="division-select" class="w-full border-custom  text-sm focus:ring-primary focus:border-primary py-2.5 bg-white">
                                             <option value="">বিভাগ নির্বাচন করুন</option>
                                             @foreach($divisions as $division)
                                             <option value="{{ $division->slug }}">{{ $division->name }}</option>
@@ -951,7 +951,7 @@
                                     <!-- District -->
                                     <div>
                                         <label class="block text-sm font-bold text-gray-700 mb-1">জেলা</label>
-                                        <select class="w-full border-custom  text-sm focus:ring-rose-500 focus:border-rose-500 py-2.5 bg-white">
+                                        <select class="w-full border-custom  text-sm focus:ring-primary focus:border-primary py-2.5 bg-white">
                                             <option>জেলা নির্বাচন করুন</option>
                                         </select>
                                     </div>
@@ -959,13 +959,13 @@
                                     <!-- Upazila -->
                                     <div>
                                         <label class="block text-sm font-bold text-gray-700 mb-1">উপজেলা</label>
-                                        <select class="w-full border-custom  text-sm focus:ring-rose-500 focus:border-rose-500 py-2.5 bg-white">
+                                        <select class="w-full border-custom  text-sm focus:ring-primary focus:border-primary py-2.5 bg-white">
                                             <option>উপজেলা নির্বাচন করুন</option>
                                         </select>
                                     </div>
 
                                     <!-- Search Button -->
-                                    <button type="button" id="regional-search-btn" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3  transition-colors mt-4 shadow-md flex items-center justify-center gap-2">
+                                    <button type="button" id="regional-search-btn" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3  transition-colors mt-4 shadow-md flex items-center justify-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                                         </svg>
@@ -1016,16 +1016,16 @@
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
                             @if($worldCategory)
-                            <a href="{{ category_url($worldCategory) }}" class="hover:text-rose-600 transition-colors">{{ $worldTitle ?: 'বিশ্ব সংবাদ' }}</a>
+                            <a href="{{ category_url($worldCategory) }}" class="hover:text-primary transition-colors">{{ $worldTitle ?: 'বিশ্ব সংবাদ' }}</a>
                             @else
                             {{ $worldTitle ?: 'বিশ্ব সংবাদ' }}
                             @endif
-                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-rose-600"></span>
+                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary"></span>
                         </h2>
                         @if($worldCategory)
-                        <a href="{{ category_url($worldCategory) }}" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="{{ category_url($worldCategory) }}" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @else
-                        <a href="#" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="#" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @endif
                     </div>
 
@@ -1043,7 +1043,7 @@
                                     <img src="{{ storage_image_url($worldMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                 </div>
-                                <h3 class="text-2xl font-bold serif leading-tight group-hover:text-rose-600 transition-colors text-left text-title mb-2">
+                                <h3 class="text-2xl font-bold serif leading-tight group-hover:text-primary transition-colors text-left text-title mb-2">
                                     {{ $worldMain->title }}
                                 </h3>
                                 @if($mainExcerpt)
@@ -1069,7 +1069,7 @@
                                         <img src="{{ storage_image_url($worldMid1->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h4 class="text-lg font-bold serif leading-snug lg:leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-0.5 lg:mt-0">
+                                    <h4 class="text-lg font-bold serif leading-snug lg:leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5 lg:mt-0">
                                         {{ $worldMid1->title }}
                                     </h4>
                                 </div>
@@ -1092,7 +1092,7 @@
                                         <img src="{{ storage_image_url($worldMid2->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h4 class="text-lg font-bold serif leading-snug lg:leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-0.5 lg:mt-0">
+                                    <h4 class="text-lg font-bold serif leading-snug lg:leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5 lg:mt-0">
                                         {{ $worldMid2->title }}
                                     </h4>
                                 </div>
@@ -1117,7 +1117,7 @@
                                             <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
-                                        <h4 class="text-lg font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                        <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                             {{ $post->title }}
                                         </h4>
                                     </div>
@@ -1152,16 +1152,16 @@
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
                             @if($entCategory)
-                            <a href="{{ category_url($entCategory) }}" class="hover:text-rose-600 transition-colors">{{ $entTitle ?: 'বিনোদন' }}</a>
+                            <a href="{{ category_url($entCategory) }}" class="hover:text-primary transition-colors">{{ $entTitle ?: 'বিনোদন' }}</a>
                             @else
                             {{ $entTitle ?: 'বিনোদন' }}
                             @endif
-                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-rose-600"></span>
+                            <span class="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary"></span>
                         </h2>
                         @if($entCategory)
-                        <a href="{{ category_url($entCategory) }}" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="{{ category_url($entCategory) }}" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @else
-                        <a href="#" class="text-rose-600 font-bold text-sm hover:underline">আরও খবর →</a>
+                        <a href="#" class="text-primary font-bold text-sm hover:underline">আরও খবর →</a>
                         @endif
                     </div>
 
@@ -1179,7 +1179,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h4 class="text-lg font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                         {{ $post->title }}
                                     </h4>
                                 </a>
@@ -1200,7 +1200,7 @@
                                     <img src="{{ storage_image_url($entMid->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                 </div>
-                                <h3 class="text-2xl font-bold serif leading-tight group-hover:text-rose-600 transition-colors text-left text-title mb-2">
+                                <h3 class="text-2xl font-bold serif leading-tight group-hover:text-primary transition-colors text-left text-title mb-2">
                                     {{ $entMid->title }}
                                 </h3>
                                 @if($excerpt)
@@ -1223,7 +1223,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h4 class="text-lg font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                         {{ $post->title }}
                                     </h4>
                                 </a>
@@ -1273,7 +1273,7 @@
                         <!-- Column 1: Lifestyle (লাইফস্টাইল) -->
                         <div class="lg:px-3 lg:border-r border-custom">
                             <div class="mb-6">
-                                <h3 class="text-xl font-bold serif text-title border-b-2 pb-2 border-rose-600 inline-block">@if($lifeCategory)<a href="{{ category_url($lifeCategory) }}" class="hover:text-rose-600 transition-colors">{{ $lifeTitle ?: 'লাইফস্টাইল' }}</a>@else{{ $lifeTitle ?: 'লাইফস্টাইল' }}@endif</h3>
+                                <h3 class="text-xl font-bold serif text-title border-b-2 pb-2 border-primary inline-block">@if($lifeCategory)<a href="{{ category_url($lifeCategory) }}" class="hover:text-primary transition-colors">{{ $lifeTitle ?: 'লাইফস্টাইল' }}</a>@else{{ $lifeTitle ?: 'লাইফস্টাইল' }}@endif</h3>
                             </div>
 
                             <!-- Lifestyle: Featured -->
@@ -1285,7 +1285,7 @@
                                         <img src="{{ storage_image_url($lifeMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h4 class="text-xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                         {{ $lifeMain->title }}
                                     </h4>
                                 </div>
@@ -1302,7 +1302,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                         {{ $post->title }}
                                     </h5>
                                 </a>
@@ -1314,7 +1314,7 @@
                         <!-- Column 2: Tech (টেক) -->
                         <div class="lg:px-3 lg:border-r border-custom">
                             <div class="mb-6">
-                                <h3 class="text-xl font-bold serif text-title border-b-2 pb-2 border-rose-600 inline-block">@if($techCategory)<a href="{{ category_url($techCategory) }}" class="hover:text-rose-600 transition-colors">{{ $techTitle ?: 'টেক' }}</a>@else{{ $techTitle ?: 'টেক' }}@endif</h3>
+                                <h3 class="text-xl font-bold serif text-title border-b-2 pb-2 border-primary inline-block">@if($techCategory)<a href="{{ category_url($techCategory) }}" class="hover:text-primary transition-colors">{{ $techTitle ?: 'টেক' }}</a>@else{{ $techTitle ?: 'টেক' }}@endif</h3>
                             </div>
 
                             <!-- Tech: Featured -->
@@ -1326,7 +1326,7 @@
                                         <img src="{{ storage_image_url($techMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h4 class="text-xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                         {{ $techMain->title }}
                                     </h4>
                                 </div>
@@ -1343,7 +1343,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                         {{ $post->title }}
                                     </h5>
                                 </a>
@@ -1355,7 +1355,7 @@
                         <!-- Column 3: Different Eyes (ভিন্নচোখে) -->
                         <div class="lg:px-3">
                             <div class="mb-6">
-                                <h3 class="text-xl font-bold serif text-title border-b-2 pb-2 border-rose-600 inline-block">@if($diffCategory)<a href="{{ category_url($diffCategory) }}" class="hover:text-rose-600 transition-colors">{{ $diffTitle ?: 'ভিন্নচোখে' }}</a>@else{{ $diffTitle ?: 'ভিন্নচোখে' }}@endif</h3>
+                                <h3 class="text-xl font-bold serif text-title border-b-2 pb-2 border-primary inline-block">@if($diffCategory)<a href="{{ category_url($diffCategory) }}" class="hover:text-primary transition-colors">{{ $diffTitle ?: 'ভিন্নচোখে' }}</a>@else{{ $diffTitle ?: 'ভিন্নচোখে' }}@endif</h3>
                             </div>
 
                             <!-- Different Eyes: Featured -->
@@ -1367,7 +1367,7 @@
                                         <img src="{{ storage_image_url($diffMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h4 class="text-xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                         {{ $diffMain->title }}
                                     </h4>
                                 </div>
@@ -1384,7 +1384,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title">
+                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                         {{ $post->title }}
                                     </h5>
                                 </a>
@@ -1447,9 +1447,9 @@
                 <section class="mt-12 border-t border-custom pt-8">
                     <!-- Tabs Header (শুধু ট্যাব, ক্যাটাগরি পেজে নেয় না) -->
                     <div class="flex items-center gap-8 border-b border-custom mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                        <button type="button" onclick="switchTopicTab('projonmo')" id="tab-projonmo" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-rose-600 text-rose-600 transition-all duration-180">{{ $genTitle ?: 'প্রজন্ম' }}</button>
-                        <button type="button" onclick="switchTopicTab('campus')" id="tab-campus" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-180">{{ $campusTitle ?: 'ক্যাম্পাস' }}</button>
-                        <button type="button" onclick="switchTopicTab('chakri')" id="tab-chakri" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-rose-600 transition-all duration-180">{{ $jobTitle ?: 'চাকরি' }}</button>
+                        <button type="button" onclick="switchTopicTab('projonmo')" id="tab-projonmo" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-primary text-primary transition-all duration-180">{{ $genTitle ?: 'প্রজন্ম' }}</button>
+                        <button type="button" onclick="switchTopicTab('campus')" id="tab-campus" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-primary transition-all duration-180">{{ $campusTitle ?: 'ক্যাম্পাস' }}</button>
+                        <button type="button" onclick="switchTopicTab('chakri')" id="tab-chakri" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-primary transition-all duration-180">{{ $jobTitle ?: 'চাকরি' }}</button>
                     </div>
 
                     <!-- Tab Panels Container -->
@@ -1465,7 +1465,7 @@
                                             <img src="{{ storage_image_url($genMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
-                                        <h4 class="text-2xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors">{{ $genMain->title }}</h4>
+                                        <h4 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors">{{ $genMain->title }}</h4>
                                     </div>
                                 </a>
                                 @endif
@@ -1480,7 +1480,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1496,7 +1496,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1517,7 +1517,7 @@
                                             <img src="{{ storage_image_url($campusMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
-                                        <h4 class="text-2xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors">{{ $campusMain->title }}</h4>
+                                        <h4 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors">{{ $campusMain->title }}</h4>
                                     </div>
                                 </a>
                                 @endif
@@ -1532,7 +1532,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1548,7 +1548,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1569,7 +1569,7 @@
                                             <img src="{{ storage_image_url($jobMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
-                                        <h4 class="text-2xl font-bold serif leading-snug group-hover:text-rose-600 transition-colors">{{ $jobMain->title }}</h4>
+                                        <h4 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors">{{ $jobMain->title }}</h4>
                                     </div>
                                 </a>
                                 @endif
@@ -1584,7 +1584,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1600,7 +1600,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-rose-600 transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1621,12 +1621,12 @@
                         // Reset all tab buttons
                         ['projonmo', 'campus', 'chakri'].forEach(t => {
                             const btn = document.getElementById(`tab-${t}`);
-                            btn.classList.remove('border-rose-600', 'text-rose-600');
+                            btn.classList.remove('border-primary', 'text-primary');
                             btn.classList.add('border-transparent', 'text-gray-500');
                         });
                         // Set active tab button
                         const activeBtn = document.getElementById(`tab-${topic}`);
-                        activeBtn.classList.add('border-rose-600', 'text-rose-600');
+                        activeBtn.classList.add('border-primary', 'text-primary');
                         activeBtn.classList.remove('border-transparent', 'text-gray-500');
                     }
 
@@ -1638,17 +1638,17 @@
                         if (tab === 'latest') {
                             latestPanel.classList.remove('hidden');
                             popularPanel.classList.add('hidden');
-                            latestBtn.classList.add('border-rose-600', 'text-rose-600');
+                            latestBtn.classList.add('border-primary', 'text-primary');
                             latestBtn.classList.remove('border-custom', 'text-gray-400');
                             popularBtn.classList.add('border-custom', 'text-gray-400');
-                            popularBtn.classList.remove('border-rose-600', 'text-rose-600');
+                            popularBtn.classList.remove('border-primary', 'text-primary');
                         } else {
                             popularPanel.classList.remove('hidden');
                             latestPanel.classList.add('hidden');
-                            popularBtn.classList.add('border-rose-600', 'text-rose-600');
+                            popularBtn.classList.add('border-primary', 'text-primary');
                             popularBtn.classList.remove('border-custom', 'text-gray-400');
                             latestBtn.classList.add('border-custom', 'text-gray-400');
-                            latestBtn.classList.remove('border-rose-600', 'text-rose-600');
+                            latestBtn.classList.remove('border-primary', 'text-primary');
                         }
                     }
                 </script>
@@ -1666,8 +1666,8 @@
                 <section class="py-8 border-t border-custom mt-4">
                     <div class="">
                         <div class="flex items-center gap-3 mb-6">
-                            <h2 class="text-2xl font-bold serif text-gray-900">@if($videoCategory)<a href="{{ category_url($videoCategory) }}" class="hover:text-rose-600 transition-colors">{{ $videoTitle ?: 'ভিডিও' }}</a>@else{{ $videoTitle ?: 'ভিডিও' }}@endif</h2>
-                            <div class="h-1 flex-grow bg-rose-600"></div>
+                            <h2 class="text-2xl font-bold serif text-gray-900">@if($videoCategory)<a href="{{ category_url($videoCategory) }}" class="hover:text-primary transition-colors">{{ $videoTitle ?: 'ভিডিও' }}</a>@else{{ $videoTitle ?: 'ভিডিও' }}@endif</h2>
+                            <div class="h-1 flex-grow bg-primary"></div>
                         </div>
 
                         @if($videoList->isNotEmpty())
@@ -1693,14 +1693,14 @@
                                             @endif
                                             <!-- Play Button Overlay -->
                                             <div class="absolute inset-0 flex items-center justify-center">
-                                                <div class="w-10 h-10 lg:w-16 lg:h-16 bg-rose-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                                                <div class="w-10 h-10 lg:w-16 lg:h-16 bg-primary flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 lg:w-8 lg:h-8 fill-current" viewBox="0 0 24 24">
                                                         <path d="M8 5v14l11-7z" />
                                                     </svg>
                                                 </div>
                                             </div>
                                         </div>
-                                        <h3 class="text-xl lg:text-2xl font-bold serif leading-tight group-hover:text-rose-600 transition-colors line-clamp-1 lg:line-clamp-1 lg:mt-3">{{ $mainVideo->title }}</h3>
+                                        <h3 class="text-xl lg:text-2xl font-bold serif leading-tight group-hover:text-primary transition-colors line-clamp-1 lg:line-clamp-1 lg:mt-3">{{ $mainVideo->title }}</h3>
                                     </div>
                                 </a>
                                 @endif
@@ -1727,14 +1727,14 @@
                                                 onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                             <div class="absolute inset-0 flex items-center justify-center">
-                                                <div class="w-10 h-10 bg-black/60 backdrop-blur-sm flex items-center justify-center text-white border border-custom/20 group-hover:bg-rose-600 transition-colors">
+                                                <div class="w-10 h-10 bg-black/60 backdrop-blur-sm flex items-center justify-center text-white border border-custom/20 group-hover:bg-primary transition-colors">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
                                                         <path d="M8 5v14l11-7z" />
                                                     </svg>
                                                 </div>
                                             </div>
                                         </div>
-                                        <h4 class="text-base lg:text-lg font-normal serif leading-snug group-hover:text-rose-600 transition-colors line-clamp-1">{{ $video->title }}</h4>
+                                        <h4 class="text-base lg:text-lg font-normal serif leading-snug group-hover:text-primary transition-colors line-clamp-1">{{ $video->title }}</h4>
                                     </a>
                                     @endif
                                     @endforeach
@@ -1759,8 +1759,8 @@
                 <section class="py-8 border-t border-custom mt-4">
                     <div class="">
                         <div class="flex items-center gap-3 mb-6">
-                            <h2 class="text-2xl font-bold serif text-gray-900">@if($galleryCategory)<a href="{{ category_url($galleryCategory) }}" class="hover:text-rose-600 transition-colors">{{ $galleryTitle ?: 'ছবি' }}</a>@else{{ $galleryTitle ?: 'ছবি' }}@endif</h2>
-                            <div class="h-1 flex-grow bg-rose-600"></div>
+                            <h2 class="text-2xl font-bold serif text-gray-900">@if($galleryCategory)<a href="{{ category_url($galleryCategory) }}" class="hover:text-primary transition-colors">{{ $galleryTitle ?: 'ছবি' }}</a>@else{{ $galleryTitle ?: 'ছবি' }}@endif</h2>
+                            <div class="h-1 flex-grow bg-primary"></div>
                         </div>
 
                         @if($galleryList->isNotEmpty())
@@ -1802,7 +1802,7 @@
                                 <img src="{{ storage_image_url($galleryRightCover->image) }}" alt="{{ $galleryRight->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.parentElement.classList.remove('img-placeholder')">
                                 @endif
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6">
-                                    <span class="bg-rose-600 text-white text-xs font-bold px-2 py-1 w-max mb-3">ফিচারড ফটো</span>
+                                    <span class="bg-primary text-white text-xs font-bold px-2 py-1 w-max mb-3">ফিচারড ফটো</span>
                                     <h3 class="text-white text-xl md:text-3xl font-bold serif leading-tight line-clamp-1">{{ $galleryRight->title }}</h3>
                                 </div>
                             </a>

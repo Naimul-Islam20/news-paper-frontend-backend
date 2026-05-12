@@ -12,7 +12,7 @@
 
                     <div class="flex items-center gap-1 text-sm font-bold text-slate-500 mb-6">
                         <!-- Home Icon -->
-                        <a href="{{ front_home_url() }}" class="text-slate-500 hover:text-rose-600 transition-all">
+                        <a href="{{ front_home_url() }}" class="text-slate-500 hover:text-primary transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -25,7 +25,7 @@
                     </div>
 
                     <div class="w-full border-b border-slate-100 relative mb-8">
-                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-rose-600"></div>
+                        <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                     </div>
                 </div>
 
@@ -69,7 +69,7 @@
                         <article class="flex flex-col-reverse md:flex-row gap-3 pb-3 last:border-0 text-left border-b border-gray-100">
                             <div class="flex flex-col justify-start gap-3 flex-1">
                                 <a href="{{ url('/news/' . $featured->slug) }}">
-                                    <h3 class="text-2xl md:text-3xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors">
+                                    <h3 class="text-2xl md:text-3xl font-bold serif text-title leading-snug hover:text-primary transition-colors">
                                         <span style="color: red !important;">{{ $categoryName }} /</span> {{ $featured->title }}
                                     </h3>
                                 </a>
@@ -111,7 +111,7 @@
                                 </a>
                                 <div class="flex flex-col gap-1 flex-1">
                                     <a href="{{ url('/news/' . $post->slug) }}">
-                                        <h4 class="text-base md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors line-clamp-1">{{ $post->title }}</h4>
+                                        <h4 class="text-base md:text-xl font-bold serif text-title leading-snug hover:text-primary transition-colors line-clamp-1">{{ $post->title }}</h4>
                                     </a>
                                     <p class="hidden md:block text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-1">{{ html_entity_decode(\Illuminate\Support\Str::limit(strip_tags($post->description), 100)) }}</p>
                                     <div class="flex items-center gap-1.5 mt-1 text-slate-400">
@@ -139,7 +139,7 @@
 
                         <!-- Tab Bar -->
                         <div class="flex w-full border-b border-gray-200 mb-4 px-4 md:px-0">
-                            <button id="sp-tab-latest" onclick="switchSpTab('latest')" class="flex-1 text-lg font-bold py-2 border-b-2 border-rose-600 text-rose-600 -mb-px transition-all duration-200 text-center">
+                            <button id="sp-tab-latest" onclick="switchSpTab('latest')" class="flex-1 text-lg font-bold py-2 border-b-2 border-primary text-primary -mb-px transition-all duration-200 text-center">
                                 সর্বশেষ
                             </button>
                             <button id="sp-tab-popular" onclick="switchSpTab('popular')" class="flex-1 text-lg font-bold py-2 border-b-2 border-transparent text-gray-400 -mb-px hover:text-gray-600 transition-all duration-200 text-center">
@@ -154,7 +154,7 @@
                             <a href="{{ url('/news/' . $post->slug) }}" class="group cursor-pointer flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0 block">
                                 <span class="text-2xl font-bold text-gray-400 serif shrink-0 leading-none">{{ $num }}.</span>
                                 <div class="flex-1">
-                                    <h4 class="text-base font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
+                                    <h4 class="text-base font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
                                 </div>
                                 <div class="overflow-hidden shrink-0 border border-gray-100 shadow-sm" style="width:96px; height:72px; min-width:96px; min-height:72px;">
                                     <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
@@ -172,7 +172,7 @@
                             <a href="{{ url('/news/' . $post->slug) }}" class="group cursor-pointer flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0 block">
                                 <span class="text-2xl font-bold text-gray-400 serif shrink-0 leading-none">{{ $num }}.</span>
                                 <div class="flex-1">
-                                    <h4 class="text-base font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
+                                    <h4 class="text-base font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
                                 </div>
                                 <div class="overflow-hidden shrink-0 border border-gray-100 shadow-sm" style="width:96px; height:72px; min-width:96px; min-height:72px;">
                                     <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
@@ -195,8 +195,8 @@
                             function switchSpTab(tab) {
                                 document.getElementById('sp-panel-latest').classList.toggle('hidden', tab !== 'latest');
                                 document.getElementById('sp-panel-popular').classList.toggle('hidden', tab !== 'popular');
-                                document.getElementById('sp-tab-latest').className = 'flex-1 text-lg font-bold py-2 border-b-2 -mb-px transition-all duration-200 text-center ' + (tab === 'latest' ? 'border-rose-600 text-rose-600' : 'border-transparent text-gray-400 hover:text-gray-600');
-                                document.getElementById('sp-tab-popular').className = 'flex-1 text-lg font-bold py-2 border-b-2 -mb-px transition-all duration-200 text-center ' + (tab === 'popular' ? 'border-rose-600 text-rose-600' : 'border-transparent text-gray-400 hover:text-gray-600');
+                                document.getElementById('sp-tab-latest').className = 'flex-1 text-lg font-bold py-2 border-b-2 -mb-px transition-all duration-200 text-center ' + (tab === 'latest' ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-gray-600');
+                                document.getElementById('sp-tab-popular').className = 'flex-1 text-lg font-bold py-2 border-b-2 -mb-px transition-all duration-200 text-center ' + (tab === 'popular' ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-gray-600');
                             }
                         </script>
 
@@ -227,7 +227,7 @@
                                     </a>
                                     <div class="flex flex-col justify-start gap-1 md:gap-2 pt-0 md:pt-1 md:px-0 flex-1">
                                         <a href="{{ url('/news/' . $post->slug) }}">
-                                            <h3 class="text-lg md:text-xl font-bold serif text-title leading-snug hover:text-rose-600 transition-colors line-clamp-1">{{ $post->title }}</h3>
+                                            <h3 class="text-lg md:text-xl font-bold serif text-title leading-snug hover:text-primary transition-colors line-clamp-1">{{ $post->title }}</h3>
                                         </a>
                                         <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-1">{{ html_entity_decode(\Illuminate\Support\Str::limit(strip_tags($post->description), 100)) }}</p>
                                         <div class="flex items-center gap-1.5 mt-auto text-gray-500">
@@ -273,7 +273,7 @@
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
                                 <div class="absolute bottom-0 left-0 right-0 p-4 text-center">
                                     <p class="text-white font-bold text-base leading-tight mb-2">আপনার ব্যবসার প্রসারে<br>আমাদের সাথে যোগ দিন</p>
-                                    <span class="inline-block px-4 py-1.5 bg-rose-600 text-white text-xs font-bold hover:bg-rose-700 transition-colors">বিজ্ঞাপন দিন →</span>
+                                    <span class="inline-block px-4 py-1.5 bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors">বিজ্ঞাপন দিন →</span>
                                 </div>
                             </div>
                         </a>

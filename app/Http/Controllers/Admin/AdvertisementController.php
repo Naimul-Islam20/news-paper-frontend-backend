@@ -5,10 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Advertisement;
 use App\Models\AdvertisementQueueItem;
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AdvertisementController extends Controller
@@ -35,30 +34,28 @@ class AdvertisementController extends Controller
             ->orderBy('id')
             ->get();
 
-        $liveQueueItem = $advertisement->currentRotatingQueueItem();
-        $liveQueueIndex = null;
-        if ($liveQueueItem) {
-            $idx = $queueItems->search(fn (AdvertisementQueueItem $i) => $i->id === $liveQueueItem->id);
-            $liveQueueIndex = $idx === false ? null : (int) $idx;
-        }
-        $queueItemsWaiting = $liveQueueItem
-            ? $queueItems->reject(fn (AdvertisementQueueItem $i) => $i->id === $liveQueueItem->id)->values()
+        $adFormDisplay = Advertisement::query()->findOrFail($id);
+        $adFormDisplay->setRelation('queueItems', $queueItems);
+        $adFormDisplay->applyQueueItemDisplayOverride(true);
+
+        $mergedQueueItem = $advertisement->findQueueItemForFrontDisplayMerge();
+        $queueItemsWaiting = $mergedQueueItem
+            ? $queueItems->reject(fn (AdvertisementQueueItem $q) => (int) $q->id === (int) $mergedQueueItem->id)->values()
             : $queueItems;
 
-        $expiredQueueItems = AdvertisementQueueItem::query()
-            ->where('advertisement_id', $advertisement->id)
-            ->whereNotNull('expired_at')
-            ->orderByDesc('expired_at')
-            ->orderByDesc('id')
-            ->get();
+        $mergedQueueIndex = -1;
+        if ($mergedQueueItem) {
+            $idx = $queueItems->search(fn (AdvertisementQueueItem $q) => (int) $q->id === (int) $mergedQueueItem->id);
+            $mergedQueueIndex = $idx === false ? -1 : (int) $idx;
+        }
 
         return view('admin.advertisements.edit', compact(
             'advertisement',
+            'adFormDisplay',
             'queueItems',
             'queueItemsWaiting',
-            'liveQueueItem',
-            'liveQueueIndex',
-            'expiredQueueItems',
+            'mergedQueueItem',
+            'mergedQueueIndex',
         ));
     }
 
