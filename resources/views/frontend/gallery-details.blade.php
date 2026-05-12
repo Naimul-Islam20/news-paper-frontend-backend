@@ -177,18 +177,6 @@ $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gal
                     <!-- দ্বিতীয় কলাম (৩ ভাগ) -->
                     <div class="flex flex-col gap-10 w-full">
 
-                        @php $adSidebarList = ad_slot('sidebar_list'); @endphp
-                        @if($adSidebarList && $adSidebarList->image)
-                        <div class="w-full max-w-[280px] bg-slate-50 overflow-hidden border border-slate-100 shadow-sm">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest p-2 block bg-white/50 text-center">বিজ্ঞাপন</span>
-                            <a href="{{ $adSidebarList->link ?? '#' }}" class="block hover:opacity-95 transition-opacity" target="_blank" rel="noopener">
-                                <div class="img-placeholder w-full aspect-[4/3] overflow-hidden">
-                                    <x-ad-picture :ad="$adSidebarList" class="w-full h-full object-cover" />
-                                </div>
-                            </a>
-                        </div>
-                        @endif
-
                         <!-- আরও গ্যালারি (সাইডবার) -->
                         @if($related->isNotEmpty())
                         <div class="hidden lg:flex flex-col gap-6 pt-5">

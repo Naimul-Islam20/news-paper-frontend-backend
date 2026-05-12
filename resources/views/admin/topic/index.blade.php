@@ -83,6 +83,8 @@
     </div>
 </div>
 
+<x-admin.modal-scripts />
+
 {{-- ADD TOPIC MODAL --}}
 <div id="addTopicModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeModal('addTopicModal', 'modalContainer')"></div>
@@ -152,24 +154,6 @@
 
 @push('scripts')
 <script>
-    function openModal(modalId, containerId) {
-        const modal = document.getElementById(modalId);
-        const container = document.getElementById(containerId);
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            container.classList.remove('scale-95', 'opacity-0');
-            container.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    }
-
-    function closeModal(modalId, containerId) {
-        const modal = document.getElementById(modalId);
-        const container = document.getElementById(containerId);
-        container.classList.remove('scale-100', 'opacity-100');
-        container.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => { modal.classList.add('hidden'); }, 300);
-    }
-
     function openEditModal(id, name, slug) {
         document.getElementById('editTopicName').value = name;
         document.getElementById('editTopicSlug').value = slug;

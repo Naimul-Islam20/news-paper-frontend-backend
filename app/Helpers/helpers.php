@@ -157,14 +157,174 @@ if (! function_exists('category_url')) {
     }
 }
 
+if (! function_exists('ad_queue_display_get')) {
+    function ad_queue_display_get(?\App\Models\Advertisement $ad): ?int
+    {
+        if (! $ad) {
+            return null;
+        }
+        if (! isset($GLOBALS['__adQueueDisplayMap']) || ! is_array($GLOBALS['__adQueueDisplayMap'])) {
+            $GLOBALS['__adQueueDisplayMap'] = [];
+        }
+
+        return $GLOBALS['__adQueueDisplayMap'][spl_object_id($ad)] ?? null;
+    }
+}
+
+if (! function_exists('ad_queue_display_set')) {
+    function ad_queue_display_set(\App\Models\Advertisement $ad, int $queueItemId): void
+    {
+        if (! isset($GLOBALS['__adQueueDisplayMap']) || ! is_array($GLOBALS['__adQueueDisplayMap'])) {
+            $GLOBALS['__adQueueDisplayMap'] = [];
+        }
+        $GLOBALS['__adQueueDisplayMap'][spl_object_id($ad)] = $queueItemId;
+    }
+}
+
+if (! function_exists('advertisement_bump_view_once')) {
+    /**
+     * একই HTTP রিকোয়েস্টে একই অ্যাড আইডিতে একবারই views_count বাড়ে।
+     */
+    function advertisement_bump_view_once(?\App\Models\Advertisement $ad): void
+    {
+        if (! $ad || app()->runningInConsole()) {
+            return;
+        }
+        $visible = filled($ad->image) || filled($ad->video_youtube_id);
+        if (! $visible) {
+            return;
+        }
+        try {
+            $req = request();
+        } catch (\Throwable) {
+            return;
+        }
+        if (! $req) {
+            return;
+        }
+        $queueId = ad_queue_display_get($ad);
+        $key = $queueId !== null ? 'q:'.$queueId : 'a:'.$ad->id;
+        $keys = $req->attributes->get('advertisement_view_bumped_keys', []);
+        if (! is_array($keys)) {
+            $keys = [];
+        }
+        if (in_array($key, $keys, true)) {
+            return;
+        }
+        $req->attributes->set('advertisement_view_bumped_keys', array_merge($keys, [$key]));
+        if ($queueId !== null) {
+            \App\Models\AdvertisementQueueItem::query()->whereKey($queueId)->increment('views_count');
+        } else {
+            \App\Models\Advertisement::query()->whereKey($ad->id)->increment('views_count');
+        }
+    }
+}
+
+if (! function_exists('advertisement_record_views_for_models')) {
+    /**
+     * @param  iterable<\App\Models\Advertisement>  $advertisements
+     */
+    function advertisement_record_views_for_models(iterable $advertisements): void
+    {
+        foreach ($advertisements as $ad) {
+            if ($ad instanceof \App\Models\Advertisement) {
+                advertisement_bump_view_once($ad);
+            }
+        }
+    }
+}
+
+if (! function_exists('advertisement_click_url')) {
+    /**
+     * ফ্রন্টে অ্যাড ক্লিক ট্র্যাকিং URL (রিলেটিভ)। টার্গেট লিংক খালি হলেও ক্লিক কাউন্ট হবে; রিডাইরেক্ট হোমে।
+     */
+    function advertisement_click_url(?\App\Models\Advertisement $ad): string
+    {
+        if (! $ad || ! $ad->id) {
+            return '#';
+        }
+        $queueId = ad_queue_display_get($ad);
+        if ($queueId !== null) {
+            $sig = hash_hmac('sha256', 'queue:'.(string) $queueId, (string) config('app.key'));
+
+            return route('advertisement.queue-click', ['queueItem' => $queueId, 's' => $sig], false);
+        }
+        $sig = hash_hmac('sha256', (string) $ad->id, (string) config('app.key'));
+
+        return route('advertisement.click', ['advertisement' => $ad->id, 's' => $sig], false);
+    }
+}
+
 if (! function_exists('ad_slot')) {
     /**
-     * Get ad slot by slug for frontend display.
+     * Get ad slot by frontend slug for display.
      * Returns the Advertisement model or null.
      */
     function ad_slot(string $slug): ?\App\Models\Advertisement
     {
-        return \App\Models\Advertisement::getBySlug($slug);
+        $ad = \App\Models\Advertisement::getBySlug($slug);
+        advertisement_bump_view_once($ad);
+
+        return $ad;
+    }
+}
+
+if (! function_exists('inject_post_detail_ads_between_paragraphs')) {
+    /**
+     * মোবাইল ইনলাইন অ্যাড: প্রথম অ্যাড প্রথম ও দ্বিতীয় প্যারার মাঝের ফাঁকে, দ্বিতীয়টা শেষের আগের ফাঁকে
+     * (কমপক্ষে দুটি `</p>` থাকলে) — একদম শুরু বা একদম শেষে নয়।
+     *
+     * @param  string  $html  WYSIWYG বিবরণ HTML
+     * @param  string  $adBlock1  রেন্ডার করা HTML (খালি হলে বসবে না)
+     * @param  string  $adBlock2  রেন্ডার করা HTML
+     */
+    function inject_post_detail_ads_between_paragraphs(string $html, string $adBlock1, string $adBlock2): string
+    {
+        $adBlock1 = $adBlock1 !== '' ? $adBlock1 : '';
+        $adBlock2 = $adBlock2 !== '' ? $adBlock2 : '';
+        if ($adBlock1 === '' && $adBlock2 === '') {
+            return $html;
+        }
+
+        if (! preg_match_all('/<\/p\s*>/i', $html, $matches, PREG_OFFSET_CAPTURE)) {
+            return $html;
+        }
+
+        $tagMatches = $matches[0];
+        $n = count($tagMatches);
+        if ($n < 2) {
+            return $html;
+        }
+
+        $endAfter = static function (array $m): int {
+            return $m[1] + strlen($m[0]);
+        };
+
+        /** @var array<int, string> */
+        $at = [];
+
+        if ($adBlock1 !== '') {
+            $pos = $endAfter($tagMatches[0]);
+            $at[$pos] = ($at[$pos] ?? '').$adBlock1;
+        }
+
+        if ($adBlock2 !== '') {
+            if ($n === 2) {
+                $pos = $endAfter($tagMatches[0]);
+                $at[$pos] = ($at[$pos] ?? '').$adBlock2;
+            } else {
+                $idx = $n - 2;
+                $pos = $endAfter($tagMatches[$idx]);
+                $at[$pos] = ($at[$pos] ?? '').$adBlock2;
+            }
+        }
+
+        krsort($at, SORT_NUMERIC);
+        foreach ($at as $offset => $fragment) {
+            $html = substr($html, 0, $offset).$fragment.substr($html, $offset);
+        }
+
+        return $html;
     }
 }
 

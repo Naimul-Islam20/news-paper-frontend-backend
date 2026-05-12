@@ -1,6 +1,19 @@
 <x-layout>
     <x-slot:title>{{ $category->name }} - {{ optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান' }}</x-slot>
 
+        @php $adCategoryBelowMenu = ad_slot('category_below_menu'); @endphp
+        @if($adCategoryBelowMenu && $adCategoryBelowMenu->image)
+        <div class="py-2 md:py-3 flex justify-center bg-transparent px-0 md:px-4">
+            <div class="container flex justify-center overflow-hidden">
+                <a href="{{ advertisement_click_url($adCategoryBelowMenu) }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
+                    <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[100px] overflow-hidden shrink-0">
+                        <x-ad-picture :ad="$adCategoryBelowMenu" class="w-full h-full object-cover object-center shadow-sm" />
+                    </div>
+                </a>
+            </div>
+        </div>
+        @endif
+
         <div class="py-4 md:py-10 min-h-screen">
             <div class="container">
                 @php \Carbon\Carbon::setLocale('bn'); @endphp
@@ -34,7 +47,7 @@
                         grid-template-columns: 1fr;
                     }
 
-                    @media (min-width: 768px) {
+                    @@media (min-width: 768px) {
                         .videos-grid {
                             grid-template-columns: 1.7fr 7.4fr 2.9fr;
                         }
@@ -152,21 +165,6 @@
                         @endif
                     </div>
 
-                    @php $adSidebarList = ad_slot('sidebar_list'); @endphp
-                    @if($adSidebarList && $adSidebarList->image)
-                    <div class="flex flex-col gap-4 w-full max-w-[280px]">
-                        <div class="flex items-center gap-2 mb-1">
-                            <div class="h-px flex-1 bg-slate-200"></div>
-                            <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">বিজ্ঞাপন</span>
-                            <div class="h-px flex-1 bg-slate-200"></div>
-                        </div>
-                        <a href="{{ $adSidebarList->link ?? '#' }}" target="_blank" rel="noopener" class="block overflow-hidden border border-slate-200 shadow-sm transition-all group">
-                            <div class="img-placeholder aspect-[4/3] w-full overflow-hidden">
-                                <x-ad-picture :ad="$adSidebarList" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                            </div>
-                        </a>
-                    </div>
-                    @endif
                 </section>
             </div>
         </div>

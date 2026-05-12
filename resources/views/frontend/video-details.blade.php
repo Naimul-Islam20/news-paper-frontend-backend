@@ -236,18 +236,6 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                     <!-- দ্বিতীয় কলাম (৩ ভাগ) -->
                     <div class="flex flex-col gap-10 w-full">
 
-                        @php $adSidebarList = ad_slot('sidebar_list'); @endphp
-                        @if($adSidebarList && $adSidebarList->image)
-                        <div class="w-full max-w-[280px] bg-slate-50 overflow-hidden border border-slate-100 shadow-sm">
-                            <span class="text-[10px] uppercase font-bold text-slate-400 p-2 block text-center border-b border-slate-100">বিজ্ঞাপন</span>
-                            <a href="{{ $adSidebarList->link ?? '#' }}" class="block hover:opacity-95 transition-opacity" target="_blank" rel="noopener">
-                                <div class="img-placeholder w-full aspect-[4/3] overflow-hidden">
-                                    <x-ad-picture :ad="$adSidebarList" class="w-full h-full object-cover" />
-                                </div>
-                            </a>
-                        </div>
-                        @endif
-
                         <!-- আরও ভিডিও (সাইডবার) -->
                         @if($related->isNotEmpty())
                         <div class="flex flex-col gap-6">

@@ -121,21 +121,6 @@
                         @endif
                     </div>
 
-                    @php $adSidebarList = ad_slot('sidebar_list'); @endphp
-                    @if($adSidebarList && $adSidebarList->image)
-                    <div class="flex flex-col gap-4 w-full max-w-[280px]">
-                        <div class="flex items-center gap-2 mb-1">
-                            <div class="h-px flex-1 bg-slate-200"></div>
-                            <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">বিজ্ঞাপন</span>
-                            <div class="h-px flex-1 bg-slate-200"></div>
-                        </div>
-                        <a href="{{ $adSidebarList->link ?? '#' }}" target="_blank" rel="noopener" class="block overflow-hidden border border-slate-200 shadow-sm transition-all group">
-                            <div class="img-placeholder aspect-[4/3] w-full overflow-hidden">
-                                <x-ad-picture :ad="$adSidebarList" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                            </div>
-                        </a>
-                    </div>
-                    @endif
                 </section>
             </div>
         </div>

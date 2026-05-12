@@ -42,7 +42,7 @@ class HomepageController extends Controller
 
         $sections = $sectionCategories->map(function (Category $category) {
             $posts = Post::with(['categories', 'reporter'])
-                ->whereHas('categories', fn($q) => $q->where('categories.id', $category->id))
+                ->whereHas('categories', fn ($q) => $q->where('categories.id', $category->id))
                 ->where('status', 'published')
                 ->latest()
                 ->take(8)
@@ -85,8 +85,14 @@ class HomepageController extends Controller
 
         // Simple advertisements list (schema is minimal for now)
         $ads = Advertisement::query()
+            ->with(['queueItems' => fn ($q) => $q->whereNull('expired_at')->orderBy('sort_order')->orderBy('id')])
+            ->activeForDisplay()
             ->orderBy('id')
             ->get();
+        foreach ($ads as $ad) {
+            $ad->applyQueueItemDisplayOverride();
+        }
+        advertisement_record_views_for_models($ads);
 
         $payload = [
             'meta' => [

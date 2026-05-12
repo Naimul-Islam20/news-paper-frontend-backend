@@ -105,6 +105,8 @@
     </div>
 </div>
 
+<x-admin.modal-scripts />
+
 {{-- ============================================================ --}}
 {{-- ADD CATEGORY MODAL --}}
 {{-- ============================================================ --}}
@@ -233,24 +235,6 @@
 </div>
 
 <script>
-    function openModal(modalId, containerId) {
-        const modal = document.getElementById(modalId);
-        const container = document.getElementById(containerId);
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            container.classList.remove('scale-95', 'opacity-0');
-            container.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    }
-
-    function closeModal(modalId, containerId) {
-        const modal = document.getElementById(modalId);
-        const container = document.getElementById(containerId);
-        container.classList.remove('scale-100', 'opacity-100');
-        container.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => { modal.classList.add('hidden'); }, 300);
-    }
-
     function openEditModal(id, name, type, description, status, isSubCategory = false, slug = '') {
         document.getElementById('editCategoryName').value = name;
         document.getElementById('editCategoryType').value = type;

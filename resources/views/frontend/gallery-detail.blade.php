@@ -171,17 +171,6 @@
                         </div>
                         @endif
 
-                        @php $adPostTop = ad_slot('post_top'); @endphp
-                        @if($adPostTop && $adPostTop->image)
-                        <div class="my-6 w-full flex justify-center">
-                            <a href="{{ $adPostTop->link ?? '#' }}" class="w-[80%] max-w-[1000px] flex justify-center" target="_blank" rel="noopener">
-                                <div class="img-placeholder w-full h-[90px] overflow-hidden flex items-center justify-center">
-                                    <x-ad-picture :ad="$adPostTop" class="max-w-full max-h-full w-auto h-full object-contain shadow-sm" />
-                                </div>
-                            </a>
-                        </div>
-                        @endif
-
                         <!-- বাকি ছবিগুলো: প্রথম ছবির মতোই – ছবি তার নিচে বর্ণনা -->
                         @if($gallery->images->count() > 1)
                         <div class="space-y-6 mt-6">
@@ -206,18 +195,6 @@
 
                     <!-- দ্বিতীয় কলাম (৩ ভাগ) -->
                     <div class="flex flex-col gap-10 w-full">
-
-                        @php $adSidebarList = ad_slot('sidebar_list'); @endphp
-                        @if($adSidebarList && $adSidebarList->image)
-                        <div class="w-full max-w-[280px] bg-slate-50 overflow-hidden border border-slate-100 shadow-sm">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest p-2 block bg-white/50 text-center">বিজ্ঞাপন</span>
-                            <a href="{{ $adSidebarList->link ?? '#' }}" class="block hover:opacity-95 transition-opacity" target="_blank" rel="noopener">
-                                <div class="img-placeholder w-full aspect-[4/3] overflow-hidden">
-                                    <x-ad-picture :ad="$adSidebarList" class="w-full h-full object-cover" />
-                                </div>
-                            </a>
-                        </div>
-                        @endif
 
                         <!-- গ্যালারির আরও ছবি (সাইডবার) -->
                         @if($otherGalleries->count())

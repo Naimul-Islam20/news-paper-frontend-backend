@@ -88,9 +88,9 @@
 
             @php $adHeader = ad_slot('header'); @endphp
             @if($adHeader && $adHeader->image)
-            <div class="hidden w-full py-2 md:flex md:py-3 justify-center bg-white px-2">
+            <div class="hidden w-full py-1 md:flex md:py-2 justify-center bg-white px-2">
                 <div class="container flex justify-center overflow-hidden">
-                    <a href="{{ $adHeader->link ?? '#' }}" class="w-full flex justify-center max-w-[1000px]" target="_blank" rel="noopener">
+                    <a href="{{ advertisement_click_url($adHeader) }}" class="w-full flex justify-center max-w-[1000px]" target="_blank" rel="noopener">
                         <div class="img-placeholder w-full max-w-[1000px] h-[70px] md:h-[90px] overflow-hidden bg-slate-50 flex items-center justify-center shrink-0">
                             <x-ad-picture :ad="$adHeader" class="max-w-full max-h-full w-auto h-full object-contain shadow-sm" />
                         </div>
@@ -299,11 +299,11 @@
 
         <nav
             class="z-50 bg-white md:border-b border-slate-200 transition-all duration-300"
-            :class="isSticky ? 'py-1 md:fixed md:top-0 md:left-0 md:w-full md:shadow md:shadow-black/5 md:py-1' : 'relative py-1 md:py-2'">
+            :class="isSticky ? 'py-1 md:fixed md:top-0 md:left-0 md:w-full md:py-1 shadow-[0_10px_32px_-6px_rgba(15,23,42,0.16),0_-10px_32px_-6px_rgba(15,23,42,0.16)]' : 'relative py-1 md:py-2 shadow-[0_6px_22px_-4px_rgba(15,23,42,0.12),0_-6px_22px_-4px_rgba(15,23,42,0.12)]'">
             <div class="container">
                 <div
-                    class="flex items-center transition-all duration-300"
-                    :class="isSticky ? 'border-t-2 border-black md:border-transparent pt-0.5 md:pt-0' : 'border-t-2 border-black pt-0.5 md:pt-1'">
+                    class="flex items-center transition-all duration-300 border-t-0 md:border-t-2"
+                    :class="isSticky ? 'md:border-transparent pt-0.5 md:pt-0' : 'md:border-black pt-0.5 md:pt-1'">
                     <!-- Smooth Sliding Sidebar Trigger & Logo Short (Desktop Only) -->
                     <div
                         class="hidden md:flex items-center gap-2 overflow-hidden transition-all duration-500 ease-in-out"
@@ -316,13 +316,17 @@
                             </svg>
                         </button>
 
-                        <a href="{{ front_home_url() }}" class="w-8 h-8 flex items-center justify-center bg-white text-rose-600 font-black serif text-xl  shadow border border-black/5 hover:bg-rose-50 transition-colors shrink-0">
-                            D
+                        <a href="{{ front_home_url() }}" class="w-8 h-8 flex items-center justify-center bg-white text-rose-600 font-black serif text-xl shadow border border-black/5 hover:bg-rose-50 transition-colors shrink-0 overflow-hidden" title="{{ optional($siteMeta)->site_name ?? 'হোম' }}">
+                            @if(!empty(optional($siteMeta)->site_icon))
+                            <img src="{{ storage_image_url($siteMeta->site_icon) }}" alt="" width="32" height="32" class="w-full h-full object-contain p-0.5" loading="lazy">
+                            @else
+                            <span class="leading-none">D</span>
+                            @endif
                         </a>
                     </div>
 
                     <div class="flex-1 overflow-x-auto overflow-y-hidden no-scrollbar py-0 flex items-center justify-between">
-                        <ul class="flex justify-start items-center gap-3 md:gap-5 text-sm md:text-lg font-semibold uppercase whitespace-nowrap pt-1 pb-1">
+                        <ul class="flex justify-start items-center gap-3 md:gap-5 text-base md:text-lg font-semibold uppercase whitespace-nowrap pt-1 pb-1">
                             {{-- সর্বশেষ সর্বদা হেডার মেনুর বাম পাশের প্রথম আইটেম (স্থান অপরিবর্তিত) --}}
                             <li><a href="{{ route('latest') }}" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all {{ request()->routeIs('latest') ? 'text-rose-600 border-rose-600' : '' }}">সর্বশেষ</a></li>
                             <li><a href="{{ route('special-news') }}" class="hover:text-rose-600 border-b-2 border-transparent hover:border-rose-600 pb-1 transition-all {{ request()->routeIs('special-news') ? 'text-rose-600 border-rose-600' : '' }}">বিশেষ সংবাদ</a></li>

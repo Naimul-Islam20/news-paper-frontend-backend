@@ -5,9 +5,9 @@
 
         @php $adBelowMenu = ad_slot('below_menu'); @endphp
         @if($adBelowMenu && $adBelowMenu->image)
-        <div class="py-4 md:py-8 flex justify-center bg-transparent px-0 md:px-4">
+        <div class="py-2 md:py-3 flex justify-center bg-transparent px-0 md:px-4">
             <div class="container flex justify-center overflow-hidden">
-                <a href="{{ $adBelowMenu->link ?? '#' }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
+                <a href="{{ advertisement_click_url($adBelowMenu) }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
                     <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[100px] overflow-hidden shrink-0">
                         <x-ad-picture :ad="$adBelowMenu" class="w-full h-full object-cover object-center shadow-sm" />
                     </div>
@@ -18,8 +18,12 @@
 
         <div class="container">
             <!-- Hero Section -->
-            <section class="flex flex-col lg:grid lg:grid-cols-[2.7fr_6.3fr_3fr] gap-6 lg:gap-3 mb-8 border-b border-custom pb-8">
-                <!-- Left Column: Top Stories (Order 2 on mobile, Order 1 on Desktop) -->
+            <section class="flex flex-col lg:grid lg:grid-cols-[2.7fr_6.3fr_3fr] gap-6 lg:gap-3 mb-4 border-b border-custom pb-4">
+                @php
+                $adHeroRight1 = ad_slot('hero_right_1');
+                $adHeroRight2 = ad_slot('hero_right_2');
+                $adHeroRight3 = ad_slot('hero_right_3');
+                @endphp
                 <!-- Left Column: Top Stories (Order 2 on mobile, Order 1 on Desktop) -->
                 <div class="lg:border-r border-custom lg:pr-3 text-left order-2 lg:order-1">
                     @forelse($hero_layer_4_posts as $index => $post)
@@ -132,18 +136,13 @@
                     </a>
                     @endforeach
 
-
                 </div>
 
-                <!-- Right: উপরে ১ অ্যাড, মাঝে মিনি সেকশন, নিচে ১ অ্যাড -->
-                <div class="md:border-l border-custom px-0 md:pl-3 md:px-0 text-left order-3 lg:order-3 flex flex-col h-full min-h-0">
-                    @php
-                    $adHeroRight1 = ad_slot('hero_right_1');
-                    $adHeroRight2 = ad_slot('hero_right_2');
-                    @endphp
+                <!-- Right: উপরে অ্যাড, মাঝে মিনি, ডেস্কটপে নিচে hero_right_3 / hero_right_2 (কলাম প্রস্থ ব্যবহার) -->
+                <div class="md:border-l border-custom px-0 md:pl-3 md:px-0 text-left order-3 lg:order-3 flex flex-col h-full min-h-0 w-full min-w-0">
                     @if($adHeroRight1 && $adHeroRight1->image)
-                    <div class="shrink-0 mb-4 flex justify-center md:justify-start">
-                        <a href="{{ $adHeroRight1->link ?? '#' }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-[280px]">
+                    <div class="shrink-0 mb-4 w-full">
+                        <a href="{{ advertisement_click_url($adHeroRight1) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full">
                             <x-ad-picture :ad="$adHeroRight1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
                         </a>
                     </div>
@@ -237,9 +236,17 @@
                         </div>
                     </div>
 
+                    @if($adHeroRight3 && $adHeroRight3->image)
+                    <div class="hidden md:block shrink-0 mt-4 w-full">
+                        <a href="{{ advertisement_click_url($adHeroRight3) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full">
+                            <x-ad-picture :ad="$adHeroRight3" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
+                        </a>
+                    </div>
+                    @endif
+
                     @if($adHeroRight2 && $adHeroRight2->image)
-                    <div class="shrink-0 mt-4 flex justify-center md:justify-start">
-                        <a href="{{ $adHeroRight2->link ?? '#' }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-[280px]">
+                    <div class="hidden md:block shrink-0 mt-4 w-full">
+                        <a href="{{ advertisement_click_url($adHeroRight2) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full">
                             <x-ad-picture :ad="$adHeroRight2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
                         </a>
                     </div>
@@ -250,9 +257,9 @@
             </section>
             @php $adHeroBelow = ad_slot('hero_below'); @endphp
             @if($adHeroBelow && $adHeroBelow->image)
-            <div class="py-4 md:py-8 flex justify-center bg-transparent px-0 md:px-4">
+            <div class="py-2 md:py-3 flex justify-center bg-transparent px-0 md:px-4">
                 <div class="container flex justify-center overflow-hidden">
-                    <a href="{{ $adHeroBelow->link ?? '#' }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
+                    <a href="{{ advertisement_click_url($adHeroBelow) }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
                         <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[100px] overflow-hidden shrink-0">
                             <x-ad-picture :ad="$adHeroBelow" class="w-full h-full object-cover object-center shadow-sm" />
                         </div>
@@ -267,7 +274,7 @@
             $politicsTitle = optional($politicsCategory)->name;
             $politicsPosts = $sectionPosts['section-politics'] ?? collect();
             @endphp
-            <section class="mt-8 lg:mt-12">
+            <section class="mt-5 lg:mt-8">
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-3xl font-semibold serif text-title relative inline-block">
                         @if($politicsCategory)
@@ -316,6 +323,14 @@
                     @endforelse
                 </div>
 
+                @if($adHeroRight2 && $adHeroRight2->image)
+                <div class="md:hidden mt-8 flex justify-center px-0 w-full">
+                    <a href="{{ advertisement_click_url($adHeroRight2) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-full shadow-sm">
+                        <x-ad-picture :ad="$adHeroRight2" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
+                    </a>
+                </div>
+                @endif
+
                 @php $adHomeVideo = ad_slot('home_video'); @endphp
                 @if($adHomeVideo && $adHomeVideo->video_youtube_id)
                 <!-- ভিডিও: ভিউপোর্টে এলে অটো অন; ক্লিক করলে URL-এ যাবে -->
@@ -323,17 +338,13 @@
                     <div class="rounded-lg overflow-hidden shadow-md w-full max-w-[600px] aspect-video relative">
                         <div id="home-video-player" class="w-full h-full"></div>
                         @if(!empty($adHomeVideo->link))
-                        <a href="{{ $adHomeVideo->link }}" target="_blank" rel="noopener noreferrer" class="absolute inset-0 z-10 block" aria-label="ভিডিওতে ক্লিক করে লিংকে যান"></a>
+                        <a href="{{ advertisement_click_url($adHomeVideo) }}" target="_blank" rel="noopener noreferrer" class="absolute inset-0 z-10 block" aria-label="ভিডিওতে ক্লিক করে লিংকে যান"></a>
                         @endif
                     </div>
                 </div>
                 <script>
                     (function() {
-                        var videoId = {
-                            {
-                                json_encode($adHomeVideo - > video_youtube_id)
-                            }
-                        };
+                        var videoId = @json($adHomeVideo->video_youtube_id);
                         var homeVideoPlayer = null;
 
                         function initHomeVideo() {
@@ -549,6 +560,14 @@
                         </div>
                     </div>
                 </section>
+
+                @if($adHeroRight3 && $adHeroRight3->image)
+                <div class="md:hidden mt-10 flex justify-center px-0 w-full">
+                    <a href="{{ advertisement_click_url($adHeroRight3) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-full shadow-sm">
+                        <x-ad-picture :ad="$adHeroRight3" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
+                    </a>
+                </div>
+                @endif
 
                 <!-- Section: Capital (রাজধানী) -->
                 @php

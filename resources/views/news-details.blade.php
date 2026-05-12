@@ -117,17 +117,6 @@
                             </p>
                         </div>
 
-                        @php $adPostTop = ad_slot('post_top'); @endphp
-                        @if($adPostTop && $adPostTop->image)
-                        <div class="my-6 w-full flex justify-center">
-                            <a href="{{ $adPostTop->link ?? '#' }}" class="w-[80%] max-w-[1000px] flex justify-center" target="_blank" rel="noopener">
-                                <div class="img-placeholder w-full h-[90px] overflow-hidden flex items-center justify-center">
-                                    <x-ad-picture :ad="$adPostTop" class="max-w-full max-h-full w-auto h-full object-contain shadow-sm" />
-                                </div>
-                            </a>
-                        </div>
-                        @endif
-
                         <!-- নিউজ ডেসক্রিপশন -->
                         <div class="prose prose-lg max-w-none text-title text-xl font-medium space-y-6 pt-4 px-0 lg:px-[125px] text-justify leading-[1.8]">
                             <p>
@@ -147,18 +136,6 @@
 
                     <!-- দ্বিতীয় কলাম (৩ ভাগ) -->
                     <div class="flex flex-col gap-10 w-full">
-
-                        @php $adSidebarList = ad_slot('sidebar_list'); @endphp
-                        @if($adSidebarList && $adSidebarList->image)
-                        <div class="w-full max-w-[280px] bg-slate-50 overflow-hidden border border-slate-100 shadow-sm">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest p-2 block bg-white/50 text-center">বিজ্ঞাপন</span>
-                            <a href="{{ $adSidebarList->link ?? '#' }}" class="block hover:opacity-95 transition-opacity" target="_blank" rel="noopener">
-                                <div class="img-placeholder w-full aspect-[4/3] overflow-hidden">
-                                    <x-ad-picture :ad="$adSidebarList" class="w-full h-full object-cover" />
-                                </div>
-                            </a>
-                        </div>
-                        @endif
 
                         <!-- এ সম্পর্কিত আরও পড়ুন (সাইডবার) -->
                         <div class="hidden lg:flex flex-col gap-6 pt-5">

@@ -1,29 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminAuthController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\UserSettingsController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\SubCategoryController;
-use App\Http\Controllers\Admin\PostController;
-use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GalleryController;
-use App\Http\Controllers\Admin\VideoController;
-use App\Http\Controllers\Admin\ReporterController;
-use App\Http\Controllers\Admin\SubscribeController;
-use App\Models\Subscriber;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\MetaController;
 use App\Http\Controllers\Admin\LayoutController;
+use App\Http\Controllers\Admin\MetaController;
+use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\ReporterController;
 use App\Http\Controllers\Admin\RolePermissionController;
-use App\Http\Controllers\Frontend\HomeController as FrontendHomeController;
-use App\Http\Controllers\Frontend\PostController as FrontendPostController;
+use App\Http\Controllers\Admin\SubCategoryController;
+use App\Http\Controllers\Admin\SubscribeController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserSettingsController;
+use App\Http\Controllers\Admin\VideoController;
+use App\Http\Controllers\AdvertisementClickController;
 use App\Http\Controllers\Frontend\CategoryController as FrontendCategoryController;
-use App\Http\Controllers\Frontend\PageController as FrontendPageController;
 use App\Http\Controllers\Frontend\GalleryController as FrontendGalleryController;
-use App\Http\Controllers\Frontend\VideoController as FrontendVideoController;
+use App\Http\Controllers\Frontend\HomeController as FrontendHomeController;
+use App\Http\Controllers\Frontend\PageController as FrontendPageController;
+use App\Http\Controllers\Frontend\PostController as FrontendPostController;
 use App\Http\Controllers\Frontend\SearchController as FrontendSearchController;
+use App\Http\Controllers\Frontend\VideoController as FrontendVideoController;
+use App\Models\Subscriber;
+use Illuminate\Support\Facades\Route;
 
 // Public frontend routes (all non-admin, non-API pages)
 Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
@@ -54,6 +55,16 @@ Route::post('/subscribe', function (\Illuminate\Http\Request $request) {
 
     return back()->with('subscribe_success', 'সাবস্ক্রাইব করার জন্য ধন্যবাদ।');
 })->name('frontend.subscribe');
+
+Route::get('/ad/click/{advertisement}', AdvertisementClickController::class)
+    ->whereNumber('advertisement')
+    ->middleware('throttle:120,1')
+    ->name('advertisement.click');
+
+Route::get('/ad/queue-click/{queueItem}', \App\Http\Controllers\AdvertisementQueueClickController::class)
+    ->whereNumber('queueItem')
+    ->middleware('throttle:120,1')
+    ->name('advertisement.queue-click');
 
 // Static pages copied from the news-paper frontend project
 Route::view('/national', 'national');
@@ -160,6 +171,7 @@ Route::prefix('admin')
                 Route::post('/advertisements/{id}/queue-items', [App\Http\Controllers\Admin\AdvertisementController::class, 'storeQueueItem'])->name('advertisements.queue-items.store');
                 Route::put('/advertisements/{id}/queue-items/{itemId}', [App\Http\Controllers\Admin\AdvertisementController::class, 'updateQueueItem'])->name('advertisements.queue-items.update');
                 Route::delete('/advertisements/{id}/queue-items/{itemId}', [App\Http\Controllers\Admin\AdvertisementController::class, 'destroyQueueItem'])->name('advertisements.queue-items.destroy');
+                Route::post('/advertisements/{id}/queue-items/reorder', [App\Http\Controllers\Admin\AdvertisementController::class, 'reorderQueueItems'])->name('advertisements.queue-items.reorder');
             });
 
             Route::middleware('feature:statistics.view')->group(function (): void {

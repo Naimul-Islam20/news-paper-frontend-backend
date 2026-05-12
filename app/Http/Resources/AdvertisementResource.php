@@ -24,7 +24,10 @@ class AdvertisementResource extends JsonResource
             'image_mobile' => $mobileOnly,
             /** মোবাইলে দেখানো URL: আলাদা মোবাইল ইমেজ না থাকলে ডেস্কটপ */
             'image_url_mobile' => $mobileOnly ?? $desktop,
+            'starts_at' => $this->starts_at?->toIso8601String(),
+            'ends_at' => $this->ends_at?->toIso8601String(),
+            'views_count' => (int) ($this->views_count ?? 0),
+            'clicks_count' => (int) ($this->clicks_count ?? 0),
         ];
     }
 }
-

@@ -82,7 +82,7 @@
 
     <x-header />
 
-    <main id="main-content" class="pb-12 md:pt-6">
+    <main id="main-content" class="pb-12 md:pt-3">
         {{ $slot }}
     </main>
 
