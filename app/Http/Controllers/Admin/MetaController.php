@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\SiteMeta;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class MetaController extends Controller
@@ -51,18 +50,18 @@ class MetaController extends Controller
 
         if ($request->hasFile('site_logo')) {
             if ($meta && $meta->site_logo) {
-                Storage::disk('public')->delete($meta->site_logo);
+                delete_uploaded_media($meta->site_logo);
             }
-            $validated['site_logo'] = $request->file('site_logo')->store('meta', 'public');
+            $validated['site_logo'] = store_public_upload($request->file('site_logo'), 'meta');
         } else {
             unset($validated['site_logo']);
         }
 
         if ($request->hasFile('site_icon')) {
             if ($meta && $meta->site_icon) {
-                Storage::disk('public')->delete($meta->site_icon);
+                delete_uploaded_media($meta->site_icon);
             }
-            $validated['site_icon'] = $request->file('site_icon')->store('meta', 'public');
+            $validated['site_icon'] = store_public_upload($request->file('site_icon'), 'meta');
         } else {
             unset($validated['site_icon']);
         }

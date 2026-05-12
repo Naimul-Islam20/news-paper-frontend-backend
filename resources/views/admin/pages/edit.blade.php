@@ -46,7 +46,7 @@
                             <div class="relative rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
                                 @if($page->image)
                                     <div class="relative">
-                                        <img id="imagePreview" src="{{ Storage::url($page->image) }}" class="w-full h-32 object-cover" alt="Current Image">
+                                        <img id="imagePreview" src="{{ storage_image_url($page->image) }}" class="w-full h-32 object-cover" alt="Current Image">
                                         <div class="absolute inset-0 bg-black/30 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <span class="text-white text-xs">Click to change</span>
                                         </div>

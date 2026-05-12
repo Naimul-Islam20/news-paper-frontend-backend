@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Advertisement;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class AdvertisementController extends Controller
@@ -57,27 +56,19 @@ class AdvertisementController extends Controller
             ];
 
             if ($request->filled('remove_image') && $advertisement->image) {
-                if (Storage::disk('public')->exists($advertisement->image)) {
-                    Storage::disk('public')->delete($advertisement->image);
-                }
+                delete_uploaded_media($advertisement->image);
                 $data['image'] = null;
             } elseif ($request->hasFile('image')) {
-                if ($advertisement->image && Storage::disk('public')->exists($advertisement->image)) {
-                    Storage::disk('public')->delete($advertisement->image);
-                }
-                $data['image'] = $request->file('image')->store('advertisements', 'public');
+                delete_uploaded_media($advertisement->image);
+                $data['image'] = store_public_upload($request->file('image'), 'advertisements');
             }
 
             if ($request->filled('remove_image_mobile') && $advertisement->image_mobile) {
-                if (Storage::disk('public')->exists($advertisement->image_mobile)) {
-                    Storage::disk('public')->delete($advertisement->image_mobile);
-                }
+                delete_uploaded_media($advertisement->image_mobile);
                 $data['image_mobile'] = null;
             } elseif ($request->hasFile('image_mobile')) {
-                if ($advertisement->image_mobile && Storage::disk('public')->exists($advertisement->image_mobile)) {
-                    Storage::disk('public')->delete($advertisement->image_mobile);
-                }
-                $data['image_mobile'] = $request->file('image_mobile')->store('advertisements', 'public');
+                delete_uploaded_media($advertisement->image_mobile);
+                $data['image_mobile'] = store_public_upload($request->file('image_mobile'), 'advertisements');
             }
         }
 

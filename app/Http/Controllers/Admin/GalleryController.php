@@ -9,7 +9,6 @@ use App\Models\GalleryImage;
 use App\Models\Reporter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -90,7 +89,7 @@ class GalleryController extends Controller
         foreach ($images as $index => $image) {
             GalleryImage::create([
                 'gallery_id'  => $gallery->id,
-                'image'       => $image->store('galleries', 'public'),
+                'image'       => store_public_upload($image, 'galleries'),
                 'description' => $descriptions[$index] ?? null,
             ]);
         }
@@ -145,8 +144,8 @@ class GalleryController extends Controller
                 $img->description = $existingDescs[$id] ?: null;
             }
             if (!empty($existingFiles[$id])) {
-                Storage::disk('public')->delete($img->image);
-                $img->image = $existingFiles[$id]->store('galleries', 'public');
+                delete_uploaded_media($img->image);
+                $img->image = store_public_upload($existingFiles[$id], 'galleries');
             }
             $img->save();
         }
@@ -159,7 +158,7 @@ class GalleryController extends Controller
             foreach ($images as $index => $image) {
                 GalleryImage::create([
                     'gallery_id'  => $gallery->id,
-                    'image'       => $image->store('galleries', 'public'),
+                    'image'       => store_public_upload($image, 'galleries'),
                     'description' => $descriptions[$index] ?? null,
                 ]);
             }
@@ -174,7 +173,7 @@ class GalleryController extends Controller
 
         // Delete all associated images from storage
         foreach ($gallery->images as $img) {
-            Storage::disk('public')->delete($img->image);
+            delete_uploaded_media($img->image);
         }
 
         $gallery->delete(); // cascade deletes gallery_images rows
@@ -185,7 +184,7 @@ class GalleryController extends Controller
     public function destroyImage($imageId)
     {
         $image = GalleryImage::findOrFail($imageId);
-        Storage::disk('public')->delete($image->image);
+        delete_uploaded_media($image->image);
         $image->delete();
 
         return back()->with('success', 'Image removed successfully!');

@@ -8,7 +8,6 @@ use App\Models\Post;
 use App\Models\Reporter;
 use App\Models\Topic;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class PostController extends Controller
@@ -133,7 +132,7 @@ class PostController extends Controller
         $data['slug'] = $this->makePostSlug($slugSource);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('posts', 'public');
+            $data['image'] = store_public_upload($request->file('image'), 'posts');
         }
 
         $post = Post::create($data);
@@ -217,10 +216,8 @@ class PostController extends Controller
         $data['slug'] = $this->makePostSlug($slugSource, $post->id);
 
         if ($request->hasFile('image')) {
-            if ($post->image) {
-                Storage::disk('public')->delete($post->image);
-            }
-            $data['image'] = $request->file('image')->store('posts', 'public');
+            delete_uploaded_media($post->image);
+            $data['image'] = store_public_upload($request->file('image'), 'posts');
         }
 
         $post->update($data);
@@ -296,9 +293,7 @@ class PostController extends Controller
     public function destroy($id)
     {
         $post = Post::findOrFail($id);
-        if ($post->image) {
-            Storage::disk('public')->delete($post->image);
-        }
+        delete_uploaded_media($post->image);
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully!');
     }

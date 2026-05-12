@@ -1,13 +1,25 @@
 <?php
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 if (! function_exists('front_home_url')) {
     /**
      * ফ্রন্ট হোমপেজের সম্পূর্ণ URL (সাবডিরেক্টরি যেমন …/public/ সহ)।
-     * ১) config('app.url') / .env এর APP_URL — এটাই মূল সোর্স; …/public দিয়ে সেট করলে এখানেই ফিরবে।
-     * ২) খালি থাকলে request()->root() (কিছু হোস্টে /public ছাড়া; তাই ১ নম্বর গুরুত্বপূর্ণ)।
+     * ওয়েব রিকোয়েস্টে `url('/')` — URL::forceRootUrl() থাকলে লোগো/লিংক ব্রাউজারের হোস্টের সাথে মিলবে।
+     * কনসোলে config('app.url') প্রাধান্য।
      */
     function front_home_url(): string
     {
+        if (! app()->runningInConsole()) {
+            try {
+                return rtrim((string) url('/'), '/').'/';
+            } catch (\Throwable) {
+                // fall through
+            }
+        }
+
         $configured = rtrim((string) config('app.url', ''), '/');
         if ($configured !== '') {
             return $configured.'/';
@@ -24,25 +36,74 @@ if (! function_exists('front_home_url')) {
             }
         }
 
-        return rtrim((string) url('/'), '/').'/';
+        try {
+            return rtrim((string) url('/'), '/').'/';
+        } catch (\Throwable) {
+            return '/';
+        }
     }
 }
 
 if (! function_exists('storage_image_url')) {
     /**
-     * Public URL for files stored on the public disk (post/gallery/video images).
-     * Database এ path যেমন 'posts/xyz.jpg' সেভ থাকে, এটা দিয়ে সঠিক URL বের করে।
+     * ইমেজ URL: আগে storage/app/public (symlink /storage/...) এ ছিল; এখন public/{dir} এ থাকলে সেখান থেকে।
      */
     function storage_image_url(?string $path): string
     {
         if (! $path) {
             return '';
         }
-        if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])) {
+        if (Str::startsWith($path, ['http://', 'https://'])) {
             return $path;
         }
 
-        return asset('storage/'.ltrim($path, '/'));
+        $path = ltrim($path, '/');
+
+        if (is_file(public_path($path))) {
+            return asset($path);
+        }
+
+        return asset('storage/'.$path);
+    }
+}
+
+if (! function_exists('store_public_upload')) {
+    /**
+     * আপলোড ফাইল public/{directory}/ এ সেভ করে DB তে রাখার জন্য রিলেটিভ পাথ রিটার্ন করে।
+     */
+    function store_public_upload(UploadedFile $file, string $directory): string
+    {
+        $directory = trim($directory, '/');
+        $targetDir = public_path($directory);
+        if (! is_dir($targetDir)) {
+            mkdir($targetDir, 0755, true);
+        }
+        $filename = $file->hashName();
+        $file->move($targetDir, $filename);
+
+        return $directory.'/'.$filename;
+    }
+}
+
+if (! function_exists('delete_uploaded_media')) {
+    /**
+     * public/ বা পুরনো storage disk — যেখানে ফাইল আছে সেখান থেকে মুছে দেয়।
+     */
+    function delete_uploaded_media(?string $path): void
+    {
+        if (! $path || Str::startsWith($path, ['http://', 'https://'])) {
+            return;
+        }
+        $path = ltrim($path, '/');
+        $full = public_path($path);
+        if (is_file($full)) {
+            @unlink($full);
+
+            return;
+        }
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
     }
 }
 

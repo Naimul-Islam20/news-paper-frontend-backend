@@ -69,7 +69,7 @@
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Video Thumbnail</label>
                             <div class="relative h-28 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-1.5 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-xs shadow-sm">
                                 @if($video->image)
-                                    <img id="imagePreview" src="{{ Storage::url($video->image) }}" class="absolute inset-0 w-full h-full object-cover">
+                                    <img id="imagePreview" src="{{ storage_image_url($video->image) }}" class="absolute inset-0 w-full h-full object-cover">
                                     <div id="imagePlaceholder" class="hidden flex-col items-center justify-center gap-1.5">
                                         <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                         <span>Choose Image</span>

@@ -116,7 +116,7 @@
                                 <label class="block text-[10px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest ml-1 text-black">Image (পরিবর্তন করতে নতুন ছবি চয়ন করুন)</label>
                                 <div class="relative h-32 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center gap-1.5 overflow-hidden shadow-inner">
                                     <input type="file" name="existing_image[{{ $img->id }}]" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewExistingImage(this, {{ $img->id }})">
-                                    <img id="existing-preview-{{ $img->id }}" src="{{ Storage::url($img->image) }}" class="absolute inset-0 w-full h-full object-cover" alt="">
+                                    <img id="existing-preview-{{ $img->id }}" src="{{ storage_image_url($img->image) }}" class="absolute inset-0 w-full h-full object-cover" alt="">
                                     <div id="existing-placeholder-{{ $img->id }}" class="hidden absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-slate-100 text-slate-500 text-[10px] uppercase">
                                         <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>

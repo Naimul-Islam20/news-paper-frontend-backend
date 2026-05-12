@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Reporter;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class ReporterController extends Controller
 {
@@ -129,7 +129,7 @@ class ReporterController extends Controller
         $reporter = Reporter::findOrFail($id);
         
         if ($reporter->image) {
-            Storage::disk('public')->delete($reporter->image);
+            delete_uploaded_media($reporter->image);
         }
 
         $reporter->delete();

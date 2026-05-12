@@ -53,7 +53,7 @@
                         <td class="py-3 px-4">
                             <div class="h-10 w-16 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-50 flex items-center justify-center">
                                 @if($video->image)
-                                    <img src="{{ Storage::url($video->image) }}" class="h-full w-full object-cover" alt="Thumb">
+                                    <img src="{{ storage_image_url($video->image) }}" class="h-full w-full object-cover" alt="Thumb">
                                 @else
                                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 @endif

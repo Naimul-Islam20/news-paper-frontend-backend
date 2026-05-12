@@ -67,7 +67,7 @@
     @endif
     @endif
 
-    <!-- Fonts (Solaiman আলাদা link — app.css-এ @import থাকলে ফন্ট সার্ভার সমস্যায় পুরো Tailwind বন্ধ হতে পারে) -->
+    <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.maateen.me/solaiman-lipi/font.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

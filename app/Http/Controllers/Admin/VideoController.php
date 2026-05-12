@@ -8,7 +8,6 @@ use App\Models\Reporter;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -83,7 +82,7 @@ class VideoController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('videos', 'public');
+            $data['image'] = store_public_upload($request->file('image'), 'videos');
         }
 
         Video::create($data);
@@ -127,10 +126,8 @@ class VideoController extends Controller
         $video->is_main_video = $request->is_main_video;
 
         if ($request->hasFile('image')) {
-            if ($video->image) {
-                Storage::disk('public')->delete($video->image);
-            }
-            $video->image = $request->file('image')->store('videos', 'public');
+            delete_uploaded_media($video->image);
+            $video->image = store_public_upload($request->file('image'), 'videos');
         }
 
         $video->save();
@@ -142,9 +139,7 @@ class VideoController extends Controller
     {
         $video = Video::findOrFail($id);
 
-        if ($video->image) {
-            Storage::disk('public')->delete($video->image);
-        }
+        delete_uploaded_media($video->image);
 
         $video->delete();
 

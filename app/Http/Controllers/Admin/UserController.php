@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -146,7 +145,7 @@ class UserController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('users', 'public');
+            $data['image'] = store_public_upload($request->file('image'), 'users');
         }
 
         User::create($data);
@@ -215,10 +214,8 @@ class UserController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            if ($user->image) {
-                Storage::disk('public')->delete($user->image);
-            }
-            $data['image'] = $request->file('image')->store('users', 'public');
+            delete_uploaded_media($user->image);
+            $data['image'] = store_public_upload($request->file('image'), 'users');
         }
 
         $user->update($data);
@@ -237,9 +234,7 @@ class UserController extends Controller
 
         $user = User::findOrFail($id);
 
-        if ($user->image) {
-            Storage::disk('public')->delete($user->image);
-        }
+        delete_uploaded_media($user->image);
 
         $user->delete();
 

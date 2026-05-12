@@ -34,7 +34,7 @@
                                 onload="this.parentElement.classList.remove('img-placeholder')">
                             @endif
                         </div>
-                        <h4 class="text-xl lg:text-2xl font-semibold serif leading-snug group-hover:text-rose-600 transition-colors mt-1 text-left text-title">
+                        <h4 class="text-xl lg:text-2xl font- serif leading-snug group-hover:text-rose-600 transition-colors mt-1 text-left text-title">
                             {{ $post->title }}
                         </h4>
                         @php

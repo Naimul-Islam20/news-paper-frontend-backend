@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class UserSettingsController extends Controller
@@ -40,15 +39,11 @@ class UserSettingsController extends Controller
         $user->email = $validated['email'];
 
         if (! empty($validated['remove_image']) && $user->image) {
-            if (Storage::disk('public')->exists($user->image)) {
-                Storage::disk('public')->delete($user->image);
-            }
+            delete_uploaded_media($user->image);
             $user->image = null;
         } elseif ($request->hasFile('image')) {
-            if ($user->image && Storage::disk('public')->exists($user->image)) {
-                Storage::disk('public')->delete($user->image);
-            }
-            $user->image = $request->file('image')->store('users', 'public');
+            delete_uploaded_media($user->image);
+            $user->image = store_public_upload($request->file('image'), 'users');
         }
 
         $user->save();

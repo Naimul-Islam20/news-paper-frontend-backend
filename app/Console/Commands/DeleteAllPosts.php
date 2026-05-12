@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Post;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 
 class DeleteAllPosts extends Command
 {
@@ -48,7 +47,7 @@ class DeleteAllPosts extends Command
         foreach ($posts as $post) {
             if ($withImages && $post->image) {
                 try {
-                    Storage::disk('public')->delete($post->image);
+                    delete_uploaded_media($post->image);
                 } catch (\Throwable) {
                     // ignore missing file
                 }

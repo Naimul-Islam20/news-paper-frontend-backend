@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -94,7 +93,7 @@ class PageController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('pages', 'public');
+            $data['image'] = store_public_upload($request->file('image'), 'pages');
         }
 
         Page::create($data);
@@ -133,10 +132,8 @@ class PageController extends Controller
         $page->title = $request->title ?: $category->name;
 
         if ($request->hasFile('image')) {
-            if ($page->image) {
-                Storage::disk('public')->delete($page->image);
-            }
-            $page->image = $request->file('image')->store('pages', 'public');
+            delete_uploaded_media($page->image);
+            $page->image = store_public_upload($request->file('image'), 'pages');
         }
 
         $page->save();
@@ -148,9 +145,7 @@ class PageController extends Controller
     {
         $page = Page::findOrFail($id);
 
-        if ($page->image) {
-            Storage::disk('public')->delete($page->image);
-        }
+        delete_uploaded_media($page->image);
 
         $page->delete();
 
