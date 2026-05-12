@@ -42,7 +42,7 @@ class HomepageController extends Controller
 
         $sections = $sectionCategories->map(function (Category $category) {
             $posts = Post::with(['categories', 'reporter'])
-                ->whereHas('categories', fn ($q) => $q->where('categories.id', $category->id))
+                ->whereHas('categories', fn($q) => $q->where('categories.id', $category->id))
                 ->where('status', 'published')
                 ->latest()
                 ->take(8)
@@ -110,4 +110,3 @@ class HomepageController extends Controller
 
     // Note: Post and Video transformations are handled by API Resources.
 }
-

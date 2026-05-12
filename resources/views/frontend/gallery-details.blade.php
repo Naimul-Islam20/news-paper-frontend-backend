@@ -183,7 +183,7 @@ $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gal
                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest p-2 block bg-white/50 text-center">বিজ্ঞাপন</span>
                             <a href="{{ $adSidebarList->link ?? '#' }}" class="block hover:opacity-95 transition-opacity" target="_blank" rel="noopener">
                                 <div class="img-placeholder w-full aspect-[4/3] overflow-hidden">
-                                    <img src="{{ storage_image_url($adSidebarList->image) }}" alt="{{ $adSidebarList->caption ?? 'বিজ্ঞাপন' }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
+                                    <x-ad-picture :ad="$adSidebarList" class="w-full h-full object-cover" />
                                 </div>
                             </a>
                         </div>

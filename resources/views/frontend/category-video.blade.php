@@ -162,7 +162,7 @@
                         </div>
                         <a href="{{ $adSidebarList->link ?? '#' }}" target="_blank" rel="noopener" class="block overflow-hidden border border-slate-200 shadow-sm transition-all group">
                             <div class="img-placeholder aspect-[4/3] w-full overflow-hidden">
-                                <img src="{{ storage_image_url($adSidebarList->image) }}" alt="{{ $adSidebarList->caption ?? 'বিজ্ঞাপন' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                <x-ad-picture :ad="$adSidebarList" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                             </div>
                         </a>
                     </div>

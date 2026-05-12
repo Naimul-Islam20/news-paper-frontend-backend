@@ -12,7 +12,7 @@
 
                     <div class="flex items-center gap-1 text-sm font-bold text-slate-500 mb-6">
                         <!-- Home Icon -->
-                        <a href="/" class="text-slate-500 hover:text-rose-600 transition-all">
+                        <a href="{{ front_home_url() }}" class="text-slate-500 hover:text-rose-600 transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -91,7 +91,7 @@
                                 <a href="{{ url('/news/' . $featured->slug) }}">
                                     <div class="img-placeholder w-full aspect-video md:aspect-auto md:w-[625px] md:h-[355px]">
                                         <img
-                                            src="{{ Storage::url($featured->image) }}"
+                                            src="{{ storage_image_url($featured->image) }}"
                                             alt="{{ $featured->title }}"
                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             onload="this.parentElement.classList.remove('img-placeholder')">
@@ -107,7 +107,7 @@
                             @foreach($gridPosts as $index => $post)
                             <article class="flex flex-row-reverse md:flex-col gap-2 md:gap-3 pb-4 border-b border-gray-100 md:border-b-0 md:pb-0 {{ $index < 2 ? 'md:pr-3 md:border-r md:border-slate-200' : 'md:pl-3' }}">
                                 <a href="{{ url('/news/' . $post->slug) }}" class="group overflow-hidden shrink-0">
-                                    <div class="img-placeholder w-36 h-24 md:w-full md:h-[100px]"><img src="{{ Storage::url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')"></div>
+                                    <div class="img-placeholder w-36 h-24 md:w-full md:h-[100px]"><img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')"></div>
                                 </a>
                                 <div class="flex flex-col gap-1 flex-1">
                                     <a href="{{ url('/news/' . $post->slug) }}">
@@ -157,7 +157,7 @@
                                     <h4 class="text-base font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
                                 </div>
                                 <div class="overflow-hidden shrink-0 border border-gray-100 shadow-sm" style="width:96px; height:72px; min-width:96px; min-height:72px;">
-                                    <img src="{{ Storage::url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                 </div>
                             </a>
                             @empty
@@ -175,7 +175,7 @@
                                     <h4 class="text-base font-bold serif leading-snug group-hover:text-rose-600 transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
                                 </div>
                                 <div class="overflow-hidden shrink-0 border border-gray-100 shadow-sm" style="width:96px; height:72px; min-width:96px; min-height:72px;">
-                                    <img src="{{ Storage::url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                 </div>
                             </a>
                             @empty
@@ -223,7 +223,7 @@
                             @foreach($belowPosts as $post)
                                 <article class="flex flex-row-reverse md:flex-row-reverse gap-2 md:gap-4 py-3 md:py-4 border-b border-gray-100 last:border-0">
                                     <a href="{{ url('/news/' . $post->slug) }}" class="flex-shrink-0">
-                                        <div class="img-placeholder w-36 h-24 md:w-[305px] md:h-[170px]"><img src="{{ Storage::url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')"></div>
+                                        <div class="img-placeholder w-36 h-24 md:w-[305px] md:h-[170px]"><img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')"></div>
                                     </a>
                                     <div class="flex flex-col justify-start gap-1 md:gap-2 pt-0 md:pt-1 md:px-0 flex-1">
                                         <a href="{{ url('/news/' . $post->slug) }}">

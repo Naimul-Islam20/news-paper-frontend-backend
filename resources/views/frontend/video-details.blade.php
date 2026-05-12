@@ -242,7 +242,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                             <span class="text-[10px] uppercase font-bold text-slate-400 p-2 block text-center border-b border-slate-100">বিজ্ঞাপন</span>
                             <a href="{{ $adSidebarList->link ?? '#' }}" class="block hover:opacity-95 transition-opacity" target="_blank" rel="noopener">
                                 <div class="img-placeholder w-full aspect-[4/3] overflow-hidden">
-                                    <img src="{{ storage_image_url($adSidebarList->image) }}" alt="{{ $adSidebarList->caption ?? 'বিজ্ঞাপন' }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
+                                    <x-ad-picture :ad="$adSidebarList" class="w-full h-full object-cover" />
                                 </div>
                             </a>
                         </div>

@@ -261,10 +261,7 @@
                         <div class="my-6 w-full flex justify-center ad-section">
                             <a href="{{ $adPostTop->link ?? '#' }}" class="w-[80%] max-w-[1000px] flex justify-center shrink-0" target="_blank" rel="noopener">
                                 <div class="img-placeholder w-full h-[90px] overflow-hidden flex items-center justify-center">
-                                    <img src="{{ storage_image_url($adPostTop->image) }}"
-                                        alt="{{ $adPostTop->caption ?? 'Advertisement' }}"
-                                        class="max-w-full max-h-full w-auto h-full object-contain shadow-sm"
-                                        onload="this.parentElement.classList.remove('img-placeholder')">
+                                    <x-ad-picture :ad="$adPostTop" class="max-w-full max-h-full w-auto h-full object-contain shadow-sm" />
                                 </div>
                             </a>
                         </div>
@@ -304,7 +301,7 @@
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest p-2 block bg-white/50 text-center">বিজ্ঞাপন</span>
                                 <a href="{{ $adSidebar1->link ?? '#' }}" class="block hover:opacity-95 transition-opacity" target="_blank" rel="noopener">
                                     <div class="img-placeholder w-full aspect-[4/3] overflow-hidden">
-                                        <img src="{{ storage_image_url($adSidebar1->image) }}" alt="{{ $adSidebar1->caption ?? 'বিজ্ঞাপন' }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <x-ad-picture :ad="$adSidebar1" class="w-full h-full object-cover" />
                                     </div>
                                 </a>
                             </div>
@@ -314,7 +311,7 @@
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest p-2 block bg-white/50 text-center">বিজ্ঞাপন</span>
                                 <a href="{{ $adSidebar2->link ?? '#' }}" class="block hover:opacity-95 transition-opacity" target="_blank" rel="noopener">
                                     <div class="img-placeholder w-full aspect-[4/3] overflow-hidden">
-                                        <img src="{{ storage_image_url($adSidebar2->image) }}" alt="{{ $adSidebar2->caption ?? 'বিজ্ঞাপন' }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <x-ad-picture :ad="$adSidebar2" class="w-full h-full object-cover" />
                                     </div>
                                 </a>
                             </div>

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Panel')</title>
+    <link rel="stylesheet" href="https://fonts.maateen.me/solaiman-lipi/font.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* মোবাইলে সাইডবার লুকানো; মেনু খুললে .sidebar-open দিয়ে দেখানো। টেইলউইন্ডের ওপর নির্ভর না করে নিশ্চিত কাজের জন্য। */
@@ -708,23 +709,36 @@
     @endif
 
     <style>
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .btn-spinner-svg { animation: spin 1s linear infinite; height: 18px; width: 18px; }
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-spinner-svg {
+            animation: spin 1s linear infinite;
+            height: 18px;
+            width: 18px;
+        }
     </style>
 
     <script>
         document.addEventListener('submit', function(e) {
             const form = e.target;
             const btn = form.querySelector('button[type="submit"]');
-            
+
             if (btn && !btn.hasAttribute('onclick')) {
                 // Save original content to restore if needed (though page usually reloads)
                 const originalContent = btn.innerHTML;
-                
+
                 // Set loading state
                 btn.style.pointerEvents = 'none';
                 btn.style.opacity = '0.7';
-                
+
                 // Simple pattern matching React-style loader
                 btn.innerHTML = `
                     <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">

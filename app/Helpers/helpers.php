@@ -1,6 +1,34 @@
 <?php
 
-if (!function_exists('storage_image_url')) {
+if (! function_exists('front_home_url')) {
+    /**
+     * ফ্রন্ট হোমপেজের সম্পূর্ণ URL (সাবডিরেক্টরি যেমন …/public/ সহ)।
+     * ১) config('app.url') / .env এর APP_URL — এটাই মূল সোর্স; …/public দিয়ে সেট করলে এখানেই ফিরবে।
+     * ২) খালি থাকলে request()->root() (কিছু হোস্টে /public ছাড়া; তাই ১ নম্বর গুরুত্বপূর্ণ)।
+     */
+    function front_home_url(): string
+    {
+        $configured = rtrim((string) config('app.url', ''), '/');
+        if ($configured !== '') {
+            return $configured.'/';
+        }
+
+        if (! app()->runningInConsole()) {
+            try {
+                $root = request()->root();
+                if (is_string($root) && $root !== '') {
+                    return rtrim($root, '/').'/';
+                }
+            } catch (\Throwable) {
+                // fall through
+            }
+        }
+
+        return rtrim((string) url('/'), '/').'/';
+    }
+}
+
+if (! function_exists('storage_image_url')) {
     /**
      * Public URL for files stored on the public disk (post/gallery/video images).
      * Database এ path যেমন 'posts/xyz.jpg' সেভ থাকে, এটা দিয়ে সঠিক URL বের করে।
@@ -13,11 +41,12 @@ if (!function_exists('storage_image_url')) {
         if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])) {
             return $path;
         }
-        return asset('storage/' . ltrim($path, '/'));
+
+        return asset('storage/'.ltrim($path, '/'));
     }
 }
 
-if (!function_exists('published_at')) {
+if (! function_exists('published_at')) {
     /**
      * Format published date/time for detail pages. Database এ যে মান সেভ আছে সেটাই দেখায় (কোনো টাইমজোন পরিবর্তন নেই).
      * $date null হলে খালি স্ট্রিং রিটার্ন করে।
@@ -27,11 +56,12 @@ if (!function_exists('published_at')) {
         if (! $date) {
             return '';
         }
+
         return $date->format($format);
     }
 }
 
-if (!function_exists('category_url')) {
+if (! function_exists('category_url')) {
     /**
      * Build category listing page URL (parent or child category).
      */
@@ -43,11 +73,12 @@ if (!function_exists('category_url')) {
         if ($category->parent_id && $category->relationLoaded('parent') && $category->parent) {
             return route('category.show.child', [$category->parent->slug, $category->slug]);
         }
+
         return route('category.show', $category->slug);
     }
 }
 
-if (!function_exists('ad_slot')) {
+if (! function_exists('ad_slot')) {
     /**
      * Get ad slot by slug for frontend display.
      * Returns the Advertisement model or null.
@@ -58,15 +89,16 @@ if (!function_exists('ad_slot')) {
     }
 }
 
-if (!function_exists('news_url')) {
+if (! function_exists('news_url')) {
     /**
      * Build simple news post URL (/{slug}).
      */
     function news_url($post): string
     {
-        if (!$post || !$post->slug) {
+        if (! $post || ! $post->slug) {
             return url('/');
         }
+
         return route('news.show', [$post->slug]);
     }
 }

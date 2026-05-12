@@ -3,7 +3,7 @@
         <!-- Logo + Email Subscribe Row -->
         <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-4 pb-4 border-b border-gray-300">
             <!-- Logo (Left) -->
-            <a href="/" class="shrink-0 text-left">
+            <a href="{{ front_home_url() }}" class="shrink-0 text-left">
                 @if(!empty(optional($siteMeta)->site_logo))
                 <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="{{ optional($siteMeta)->site_name ?? 'Logo' }}" class="h-14 md:h-20 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling && this.nextElementSibling.classList.remove('hidden');">
                 <h2 class="text-4xl md:text-5xl font-black serif tracking-tighter uppercase underline decoration-rose-500 underline-offset-8 decoration-4 hidden">
@@ -63,8 +63,8 @@
                 </div>
                 @else
                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-2 text-base font-semibold">
-                    <a href="/gallery" class="hover:text-rose-600 transition-colors">ছবি</a>
-                    <a href="/videos" class="hover:text-rose-600 transition-colors">ভিডিও</a>
+                    <a href="{{ route('gallery.index') }}" class="hover:text-rose-600 transition-colors">ছবি</a>
+                    <a href="{{ route('videos.index') }}" class="hover:text-rose-600 transition-colors">ভিডিও</a>
                 </div>
                 @endif
             </div>
@@ -81,8 +81,8 @@
                 <ul class="space-y-4 text-base font-semibold">
                     <li><a href="#" class="hover:text-rose-600 transition-colors">বিজ্ঞাপন</a></li>
                     <li><a href="#" class="hover:text-rose-600 transition-colors">যোগাযোগ</a></li>
-                    <li><a href="/privacy-policy" class="hover:text-rose-600 transition-colors">গোপনীয়তা নীতি</a></li>
-                    <li><a href="/terms" class="hover:text-rose-600 transition-colors">শর্তাবলী</a></li>
+                    <li><a href="{{ route('privacy-policy') }}" class="hover:text-rose-600 transition-colors">গোপনীয়তা নীতি</a></li>
+                    <li><a href="{{ route('terms') }}" class="hover:text-rose-600 transition-colors">শর্তাবলী</a></li>
                 </ul>
                 @endif
             </div>
@@ -114,4 +114,3 @@
         </div>
     </div>
 </footer>
-
