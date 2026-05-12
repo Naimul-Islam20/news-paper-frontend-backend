@@ -49,7 +49,7 @@
                         <td class="py-1 px-2">
                             <div class="h-10 w-10 mx-auto rounded-full bg-slate-100 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
                                 @if($reporter->image)
-                                    <img src="{{ asset('storage/' . $reporter->image) }}" class="h-full w-full object-cover" alt="">
+                                    <img src="{{ storage_image_url($reporter->image) }}" class="h-full w-full object-cover" alt="">
                                 @else
                                     <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                 @endif

@@ -46,7 +46,8 @@ if (! function_exists('front_home_url')) {
 
 if (! function_exists('storage_image_url')) {
     /**
-     * ইমেজ URL: আগে storage/app/public (symlink /storage/...) এ ছিল; এখন public/{dir} এ থাকলে সেখান থেকে।
+     * ইমেজ URL: নতুন আপলোড public/posts ইত্যাদিতে; পুরনো storage/app/public → /storage/...
+     * শুধু is_file() নির্ভর না — কিছু সার্ভারে false হলেও ফাইল public এ থাকে, তখন ভুলে /storage/ চলে যেত।
      */
     function storage_image_url(?string $path): string
     {
@@ -59,7 +60,24 @@ if (! function_exists('storage_image_url')) {
 
         $path = ltrim($path, '/');
 
-        if (is_file(public_path($path))) {
+        $directPublicPrefixes = ['posts/', 'videos/', 'galleries/', 'users/', 'advertisements/', 'pages/', 'meta/'];
+        $isManagedUploadPath = false;
+        foreach ($directPublicPrefixes as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                $isManagedUploadPath = true;
+                break;
+            }
+        }
+
+        if ($isManagedUploadPath && is_file(public_path($path))) {
+            return asset($path);
+        }
+
+        if (Storage::disk('public')->exists($path)) {
+            return asset('storage/'.$path);
+        }
+
+        if ($isManagedUploadPath) {
             return asset($path);
         }
 

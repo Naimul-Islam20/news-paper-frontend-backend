@@ -4,7 +4,7 @@
         href="{{ route('news.show', [$post->slug]) }}"
         class="w-full md:w-auto flex-shrink-0">
         <div class="img-placeholder w-full md:w-[305px] h-[200px] md:h-[170px] overflow-hidden">
-            <img src="{{ $post->image ? asset('storage/'.$post->image) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600' }}"
+            <img src="{{ $post->image ? storage_image_url($post->image) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600' }}"
                 alt="{{ $post->title }}"
                 class="w-full h-full object-cover"
                 onload="this.parentElement.classList.remove('img-placeholder')">

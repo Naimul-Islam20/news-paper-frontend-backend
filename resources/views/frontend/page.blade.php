@@ -42,7 +42,7 @@
                     <div class="w-full mb-6 md:mb-8">
                         <div class="img-placeholder w-full aspect-[3/1.4] overflow-hidden shadow-md rounded md:rounded-none">
                             <img
-                                src="{{ \Illuminate\Support\Str::startsWith($page->image, ['http://', 'https://']) ? $page->image : asset('storage/'.$page->image) }}"
+                                src="{{ \Illuminate\Support\Str::startsWith($page->image, ['http://', 'https://']) ? $page->image : storage_image_url($page->image) }}"
                                 alt="{{ $page->title }}"
                                 class="w-full h-full object-cover"
                                 onload="this.parentElement.classList.remove('img-placeholder')"

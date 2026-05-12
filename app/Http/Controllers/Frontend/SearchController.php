@@ -73,7 +73,7 @@ class SearchController extends Controller
                     'type'       => 'post',
                     'url'        => news_url($post),
                     'title'      => $post->title,
-                    'image'      => $post->image ? asset('storage/' . ltrim($post->image, '/')) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600',
+                    'image'      => $post->image ? storage_image_url($post->image) : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600',
                     'snippet'    => $subTitle ?: html_entity_decode(Str::limit(strip_tags((string) $post->description ?? ''), 160)),
                     'created_at' => $post->created_at,
                 ]);
@@ -94,7 +94,7 @@ class SearchController extends Controller
                 foreach ($galleries as $gallery) {
                     $firstImage = $gallery->images->first();
                     $imageUrl = $firstImage && $firstImage->image
-                        ? asset('storage/' . ltrim($firstImage->image, '/'))
+                        ? storage_image_url($firstImage->image)
                         : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';
                     $items->push((object) [
                         'type'       => 'gallery',
@@ -118,7 +118,7 @@ class SearchController extends Controller
 
                 foreach ($videos as $video) {
                     $imageUrl = $video->image
-                        ? asset('storage/' . ltrim($video->image, '/'))
+                        ? storage_image_url($video->image)
                         : 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';
                     $items->push((object) [
                         'type'       => 'video',

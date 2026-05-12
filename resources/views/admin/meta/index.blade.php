@@ -62,7 +62,7 @@
                                 <div class="relative h-24 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center gap-1.5 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-[10px] shadow-sm">
                                     <input type="file" name="site_logo" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10">
                                     @if(!empty($meta->site_logo))
-                                    <img src="{{ asset('storage/'.$meta->site_logo) }}" alt="Logo" class="absolute inset-0 w-full h-full object-contain p-1">
+                                    <img src="{{ storage_image_url($meta->site_logo) }}" alt="Logo" class="absolute inset-0 w-full h-full object-contain p-1">
                                     @endif
                                     <svg class="w-5 h-5 text-indigo-500 {{ !empty($meta->site_logo) ? 'opacity-50' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     <span>{{ !empty($meta->site_logo) ? 'Change Logo' : 'Upload Logo' }}</span>
@@ -73,7 +73,7 @@
                                 <div class="relative h-24 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center gap-1.5 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-[10px] shadow-sm">
                                     <input type="file" name="site_icon" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10">
                                     @if(!empty($meta->site_icon))
-                                    <img src="{{ asset('storage/'.$meta->site_icon) }}" alt="Favicon" class="absolute inset-0 w-full h-full object-contain p-1">
+                                    <img src="{{ storage_image_url($meta->site_icon) }}" alt="Favicon" class="absolute inset-0 w-full h-full object-contain p-1">
                                     @endif
                                     <svg class="w-5 h-5 text-indigo-500 {{ !empty($meta->site_icon) ? 'opacity-50' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     <span>{{ !empty($meta->site_icon) ? 'Change Icon' : 'Upload Icon' }}</span>

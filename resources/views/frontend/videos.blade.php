@@ -54,7 +54,7 @@
                         if ($video->image) {
                         $thumb = \Illuminate\Support\Str::startsWith($video->image, ['http://', 'https://'])
                         ? $video->image
-                        : asset('storage/'.$video->image);
+                        : storage_image_url($video->image);
                         } elseif ($video->youtube_link) {
                         if (preg_match('/(?:youtube\\.com\\/(?:[^\\/]+\\/.+\\/|(?:v|e(?:mbed)?)\\/|.*[?&]v=)|youtu\\.be\\/)([^\"&?\\/\\s]{11})/i', $video->youtube_link, $matches)) {
                         $thumb = 'https://img.youtube.com/vi/'.$matches[1].'/hqdefault.jpg';
