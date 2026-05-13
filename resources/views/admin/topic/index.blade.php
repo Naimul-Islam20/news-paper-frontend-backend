@@ -88,7 +88,7 @@
 {{-- ADD TOPIC MODAL --}}
 <div id="addTopicModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeModal('addTopicModal', 'modalContainer')"></div>
-    <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div class="fixed inset-0 flex items-center justify-center p-4" onclick="modalBackdropClose(event, 'addTopicModal', 'modalContainer')">
         <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 transition-all scale-95 opacity-0 duration-300" id="modalContainer">
             <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
                 <div>
@@ -121,7 +121,7 @@
 {{-- EDIT TOPIC MODAL --}}
 <div id="editTopicModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeModal('editTopicModal', 'editModalContainer')"></div>
-    <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div class="fixed inset-0 flex items-center justify-center p-4" onclick="modalBackdropClose(event, 'editTopicModal', 'editModalContainer')">
         <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 transition-all scale-95 opacity-0 duration-300" id="editModalContainer">
             <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
                 <div>

@@ -75,7 +75,7 @@
                                     data-id="{{ $category->id }}"
                                     data-name="{{ $category->name }}"
                                     data-type="{{ $category->type ?? 'post' }}"
-                                    data-description="{{ $category->description ?? '' }}"
+                                    data-description="{{ e($category->description ?? '') }}"
                                     data-status="{{ $category->status }}"
                                     data-slug="{{ $category->slug }}"
                                 >
@@ -112,7 +112,7 @@
 {{-- ============================================================ --}}
 <div id="addCategoryModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeModal('addCategoryModal', 'modalContainer')"></div>
-    <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div class="fixed inset-0 flex items-center justify-center p-4" onclick="modalBackdropClose(event, 'addCategoryModal', 'modalContainer')">
         <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 transition-all scale-95 opacity-0 duration-300" id="modalContainer">
             <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
                 <div>
@@ -178,7 +178,7 @@
 {{-- ============================================================ --}}
 <div id="editCategoryModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeModal('editCategoryModal', 'editModalContainer')"></div>
-    <div class="fixed inset-0 flex items-center justify-center p-4">
+    <div class="fixed inset-0 flex items-center justify-center p-4" onclick="modalBackdropClose(event, 'editCategoryModal', 'editModalContainer')">
         <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 transition-all scale-95 opacity-0 duration-300" id="editModalContainer">
             <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
                 <div>
@@ -199,6 +199,10 @@
                 <div>
                     <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Slug</label>
                     <input type="text" name="slug" id="editCategorySlug" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-500 dark:text-slate-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Description</label>
+                    <textarea name="description" id="editCategoryDescription" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white"></textarea>
                 </div>
                 <div id="editCategoryTypeBlock">
                     <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Category Type <span class="text-rose-500">*</span></label>
@@ -238,10 +242,13 @@
     function openEditModal(id, name, type, description, status, isSubCategory = false, slug = '') {
         document.getElementById('editCategoryName').value = name;
         document.getElementById('editCategoryType').value = type;
-        document.getElementById('editCategoryDescription').value = description;
+        const descEl = document.getElementById('editCategoryDescription');
+        if (descEl) {
+            descEl.value = description;
+        }
         document.getElementById('editCategoryStatus').value = status;
         document.getElementById('editCategorySlug').value = slug || '';
-        document.getElementById('editCategoryForm').action = '/admin/categories/' + id;
+        document.getElementById('editCategoryForm').action = '{{ url('/admin/categories') }}/' + id;
         
         // Hide type selector if it's a sub category (inherits from parent)
         const typeBlock = document.getElementById('editCategoryTypeBlock');

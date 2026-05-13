@@ -22,6 +22,13 @@
                     modal.classList.add('hidden');
                 }, 300);
             }
+
+            /** মোডালের বাইরে (অর্ধ-স্বচ্ছ এলাকা / প্যাডিং) ক্লিক করলে বন্ধ */
+            function modalBackdropClose(event, modalId, containerId) {
+                if (event.target === event.currentTarget) {
+                    closeModal(modalId, containerId);
+                }
+            }
         </script>
     @endpush
 @endonce
