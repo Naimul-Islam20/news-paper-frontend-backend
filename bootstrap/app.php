@@ -13,13 +13,16 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role'           => \App\Http\Middleware\EnsureUserHasRole::class,
+            'role' => \App\Http\Middleware\EnsureUserHasRole::class,
             'track.visitors' => \App\Http\Middleware\TrackVisitorStats::class,
-            'feature'        => \App\Http\Middleware\EnsureUserCanFeature::class,
+            'feature' => \App\Http\Middleware\EnsureUserCanFeature::class,
         ]);
 
         // Track visitors on all web routes (frontend only; middleware itself skips /admin)
         $middleware->appendToGroup('web', \App\Http\Middleware\TrackVisitorStats::class);
+
+        // সাইট মেটা (primary_color সহ) প্রতি রিকোয়েস্টে রিফ্রেশ — cPanel/Octane এ boot()-এ share স্টেল হলে রঙ আপডেট দেখা যায় না
+        $middleware->prependToGroup('web', \App\Http\Middleware\ShareSiteMeta::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

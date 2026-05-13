@@ -80,7 +80,7 @@
         $__primaryOk = is_string($__primary) && preg_match('/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/', $__primary);
     @endphp
     @if ($__primaryOk)
-    <style>:root { --color-primary: {{ $__primary }}; }</style>
+    <style>:root { --color-primary: {{ $__primary }} !important; }</style>
     @endif
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>

@@ -1720,7 +1720,7 @@
                                     }
                                     @endphp
                                     <a href="{{ route('videos.show', $video->slug) }}" class="group cursor-pointer flex gap-2 lg:block pb-3 border-b border-custom last:border-0 lg:border-0 lg:pb-0">
-                                        <div class="{{ $sideThumb ? 'img-placeholder' : '' }} w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 relative overflow-hidden bg-black shadow-sm mb-0 lg:mb-2">
+                                        <div class="{{ $sideThumb ? 'img-placeholder' : '' }} w-36 h-24 lg:w-full lg:h-auto lg:aspect-[3/2] shrink-0 relative overflow-hidden bg-black shadow-sm mb-0 lg:mb-2">
                                             @if($sideThumb)
                                             <img src="{{ $sideThumb }}" alt="{{ $video->title }}"
                                                 class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"
