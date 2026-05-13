@@ -154,7 +154,7 @@
                     </div>
 
                     <div>
-                        <label for="image" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ডেস্কটপ / সাধারণ ইমেজ</label>
+                        <label for="image" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ডেস্কটপ / সাধারণ ইমেজ <span class="text-rose-600 dark:text-rose-400">*</span></label>
                         <div class="flex items-center gap-4 flex-wrap">
                             @if(($adFormDisplay ?? $advertisement)->image)
                             <div class="w-32 h-20 rounded border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">

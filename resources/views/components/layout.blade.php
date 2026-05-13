@@ -75,6 +75,13 @@
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @php
+        $__primary = optional($siteMeta)->primary_color ?? null;
+        $__primaryOk = is_string($__primary) && preg_match('/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/', $__primary);
+    @endphp
+    @if ($__primaryOk)
+    <style>:root { --color-primary: {{ $__primary }}; }</style>
+    @endif
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 

@@ -42,6 +42,17 @@
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Website Title</label>
                             <input type="text" name="site_title" value="{{ old('site_title', $meta->site_title ?? '') }}" placeholder="SEO Title" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
+                        <div>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">ফ্রন্টএন্ড প্রাইমারি রঙ</label>
+                            
+                            <div class="flex flex-wrap items-center gap-3">
+                                <input type="color" id="primary_color_picker" value="{{ old('primary_color', $meta->primary_color ?? '') ?: '#2563eb' }}" class="h-10 w-14 cursor-pointer rounded border border-slate-200 dark:border-slate-700 bg-white p-0.5" title="রঙ বাছাই" aria-label="Primary color picker">
+                                <input type="text" name="primary_color" id="primary_color_hex" value="{{ old('primary_color', $meta->primary_color ?? '') }}" placeholder="#2563eb (ঐচ্ছিক)" maxlength="7" autocomplete="off" class="w-40 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-mono text-sm text-slate-900">
+                            </div>
+                            @error('primary_color')
+                            <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Website Keywords</label>
                             <input type="text" name="site_keywords" value="{{ old('site_keywords', $meta->site_keywords ?? '') }}" placeholder="Keyword1, Keyword2, Keyword3" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
@@ -232,5 +243,21 @@
     } else {
         window.addEventListener('load', initCKEditor);
     }
+
+    (function () {
+        var picker = document.getElementById('primary_color_picker');
+        var hex = document.getElementById('primary_color_hex');
+        if (!picker || !hex) return;
+        function validHex(v) {
+            return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test((v || '').trim());
+        }
+        function syncPicker() {
+            var v = hex.value.trim();
+            if (validHex(v)) picker.value = v.length === 4 ? ('#' + v[1] + v[1] + v[2] + v[2] + v[3] + v[3]) : v;
+        }
+        picker.addEventListener('input', function () { hex.value = picker.value; });
+        hex.addEventListener('input', syncPicker);
+        syncPicker();
+    })();
 </script>
 @endpush

@@ -80,6 +80,14 @@ class AdvertisementController extends Controller
             $data['video_youtube_id'] = $this->normalizeYoutubeId($request->input('video_youtube_id'));
             $data['link'] = $request->input('link');
         } else {
+            $removingDesktop = $request->boolean('remove_image');
+            $hasNewDesktop = $request->hasFile('image');
+            if ((! filled($advertisement->image) || $removingDesktop) && ! $hasNewDesktop) {
+                return redirect()->back()
+                    ->withErrors(['image' => 'ডেস্কটপ ইমেজ আপলোড করুন — ইমেজ স্লটের জন্য এটি বাধ্যতামূলক।'])
+                    ->withInput();
+            }
+
             $data = [
                 'link' => $request->input('link'),
                 'caption' => $request->input('caption'),
