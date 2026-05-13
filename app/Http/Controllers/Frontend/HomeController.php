@@ -140,7 +140,7 @@ class HomeController extends Controller
         $sectionVideos = collect();
         $videoSection = $sections->get('section-video');
         if ($videoSection && $videoSection->category_id) {
-            $videoLimit = $slotConfig['section-video'] ?? 4;
+            $videoLimit = $slotConfig['section-video'] ?? 5;
             $sectionVideos = Video::with('category')
                 ->where('category_id', $videoSection->category_id)
                 ->where('status', 'active')

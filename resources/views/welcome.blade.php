@@ -1662,6 +1662,7 @@
                 $side1 = $videoList->get(1);
                 $side2 = $videoList->get(2);
                 $side3 = $videoList->get(3);
+                $side4 = $videoList->get(4);
                 @endphp
                 <section class="py-8 border-t border-custom mt-4">
                     <div class="">
@@ -1709,7 +1710,7 @@
                             <!-- Side Videos: 5 Cols -->
                             <div class="lg:col-span-5">
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-y-3 lg:gap-4">
-                                    @foreach([$side1, $side2, $side3] as $video)
+                                    @foreach([$side1, $side2, $side3, $side4] as $video)
                                     @if($video)
                                     @php
                                     $sideThumb = null;
@@ -1720,7 +1721,7 @@
                                     }
                                     @endphp
                                     <a href="{{ route('videos.show', $video->slug) }}" class="group cursor-pointer flex gap-2 lg:block pb-3 border-b border-custom last:border-0 lg:border-0 lg:pb-0">
-                                        <div class="{{ $sideThumb ? 'img-placeholder' : '' }} w-36 h-24 lg:w-full lg:h-auto lg:aspect-[3/2] shrink-0 relative overflow-hidden bg-black shadow-sm mb-0 lg:mb-2">
+                                        <div class="{{ $sideThumb ? 'img-placeholder' : '' }} w-36 h-24 lg:w-full lg:h-auto lg:aspect-[4/3] shrink-0 relative overflow-hidden bg-black shadow-sm mb-0 lg:mb-2">
                                             @if($sideThumb)
                                             <img src="{{ $sideThumb }}" alt="{{ $video->title }}"
                                                 class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"

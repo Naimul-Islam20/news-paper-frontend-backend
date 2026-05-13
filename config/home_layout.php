@@ -26,7 +26,7 @@ return [
         'section-generation' => 9,
         'section-campus'     => 9,
         'section-job'        => 9,
-        'section-video'      => 4,
+        'section-video'      => 5, // 1 main + 2×2 side grid on welcome
         'section-gallery'    => 4,
     ],
 ];

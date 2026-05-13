@@ -156,18 +156,20 @@
                     <div>
                         <label for="image" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ডেস্কটপ / সাধারণ ইমেজ <span class="text-rose-600 dark:text-rose-400">*</span></label>
                         <div class="flex items-center gap-4 flex-wrap">
-                            @if(($adFormDisplay ?? $advertisement)->image)
-                            <div class="w-32 h-20 rounded border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                                <img src="{{ storage_image_url(($adFormDisplay ?? $advertisement)->image) }}" alt="Current" class="w-full h-full object-contain">
+                            <div id="ad-desktop-thumb-wrap" class="{{ ($adFormDisplay ?? $advertisement)->image ? 'flex items-center gap-4 flex-wrap shrink-0' : 'hidden' }}">
+                                @if(($adFormDisplay ?? $advertisement)->image)
+                                <div class="w-32 h-20 rounded border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                                    <img src="{{ storage_image_url(($adFormDisplay ?? $advertisement)->image) }}" alt="Current" class="w-full h-full object-contain">
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <p class="text-xs text-slate-500">নতুন ইমেজ আপলোড করলে বর্তমানটি প্রতিস্থাপিত হবে।</p>
+                                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" name="remove_image" value="1" {{ old('remove_image') ? 'checked' : '' }} class="rounded border-slate-300 dark:border-slate-600 text-rose-600 focus:ring-rose-500">
+                                        <span class="text-sm text-slate-700 dark:text-slate-300">বর্তমান ইমেজ মুছুন</span>
+                                    </label>
+                                </div>
+                                @endif
                             </div>
-                            <div class="flex flex-col gap-1">
-                                <p class="text-xs text-slate-500">নতুন ইমেজ আপলোড করলে বর্তমানটি প্রতিস্থাপিত হবে।</p>
-                                <label class="inline-flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="remove_image" value="1" {{ old('remove_image') ? 'checked' : '' }} class="rounded border-slate-300 dark:border-slate-600 text-rose-600 focus:ring-rose-500">
-                                    <span class="text-sm text-slate-700 dark:text-slate-300">বর্তমান ইমেজ মুছুন</span>
-                                </label>
-                            </div>
-                            @endif
                             <input type="file" name="image" id="image" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" class="text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-300">
                         </div>
                         @error('image')
@@ -178,18 +180,20 @@
                     <div>
                         <label for="image_mobile" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">মোবাইল ইমেজ <span class="text-slate-400 font-normal">(ঐচ্ছিক — না দিলে ডেস্কটপ ইমেজই দেখাবে)</span></label>
                         <div class="flex items-center gap-4 flex-wrap">
-                            @if(($adFormDisplay ?? $advertisement)->image_mobile)
-                            <div class="w-24 h-36 rounded border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                                <img src="{{ storage_image_url(($adFormDisplay ?? $advertisement)->image_mobile) }}" alt="Mobile current" class="w-full h-full object-contain">
+                            <div id="ad-mobile-thumb-wrap" class="{{ ($adFormDisplay ?? $advertisement)->image_mobile ? 'flex items-center gap-4 flex-wrap shrink-0' : 'hidden' }}">
+                                @if(($adFormDisplay ?? $advertisement)->image_mobile)
+                                <div class="w-24 h-36 rounded border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                                    <img src="{{ storage_image_url(($adFormDisplay ?? $advertisement)->image_mobile) }}" alt="Mobile current" class="w-full h-full object-contain">
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <p class="text-xs text-slate-500">ছোট স্ক্রিনে (৭৬৭px পর্যন্ত) শুধু এই ছবি ব্যবহার হবে।</p>
+                                    <label class="inline-flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" name="remove_image_mobile" value="1" {{ old('remove_image_mobile') ? 'checked' : '' }} class="rounded border-slate-300 dark:border-slate-600 text-rose-600 focus:ring-rose-500">
+                                        <span class="text-sm text-slate-700 dark:text-slate-300">মোবাইল ইমেজ মুছুন</span>
+                                    </label>
+                                </div>
+                                @endif
                             </div>
-                            <div class="flex flex-col gap-1">
-                                <p class="text-xs text-slate-500">ছোট স্ক্রিনে (৭৬৭px পর্যন্ত) শুধু এই ছবি ব্যবহার হবে।</p>
-                                <label class="inline-flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="remove_image_mobile" value="1" {{ old('remove_image_mobile') ? 'checked' : '' }} class="rounded border-slate-300 dark:border-slate-600 text-rose-600 focus:ring-rose-500">
-                                    <span class="text-sm text-slate-700 dark:text-slate-300">মোবাইল ইমেজ মুছুন</span>
-                                </label>
-                            </div>
-                            @endif
                             <input type="file" name="image_mobile" id="image_mobile" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" class="text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-300">
                         </div>
                         @error('image_mobile')
@@ -218,6 +222,7 @@
                         </div>
                     </div>
 
+                    @if(($queueItemsWaiting ?? collect())->isNotEmpty())
                     <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
                         <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-sm">
                             <thead class="bg-slate-50 dark:bg-slate-800/80">
@@ -232,7 +237,7 @@
                                 </tr>
                             </thead>
                             <tbody id="queue-items-tbody" class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-900">
-                                @forelse(($queueItemsWaiting ?? $queueItems ?? collect()) as $index => $item)
+                                @foreach(($queueItemsWaiting ?? collect()) as $index => $item)
                                 <tr data-queue-id="{{ $item->id }}" class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
                                     <td class="px-3 py-2 text-slate-600 dark:text-slate-400 tabular-nums">{{ $index + 1 }}</td>
                                     <td class="px-3 py-2">
@@ -279,20 +284,19 @@
                                         </form>
                                     </td>
                                 </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="7" class="px-3 py-8 text-center text-slate-500 dark:text-slate-400 text-sm">
-                                        @if($mergedQueueItem ?? null)
-                                        অপেক্ষমান কিউ নেই। ফ্রন্টে চলমান কিউ উপরের ফর্মে; নতুন যোগ করতে <span class="font-medium">আরেকটি অ্যাড যোগ করুন</span> ব্যবহার করুন।
-                                        @else
-                                        কোনো কিউ আইটেম নেই। উপরের বাটনে ক্লিক করে যোগ করুন।
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
+                    @else
+                    <p class="text-sm text-slate-500 dark:text-slate-400 py-4 px-4 rounded-lg border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20">
+                        @if($mergedQueueItem ?? null)
+                        অপেক্ষমান কিউ নেই। ফ্রন্টে চলমান কিউ উপরের ফর্মে; নতুন যোগ করতে <span class="font-medium text-slate-700 dark:text-slate-300">আরেকটি অ্যাড যোগ করুন</span> চাপুন।
+                        @else
+                        কিউ তালিকায় এখন কোনো অ্যাড নেই। যোগ করতে <span class="font-medium text-slate-700 dark:text-slate-300">আরেকটি অ্যাড যোগ করুন</span> ব্যবহার করুন।
+                        @endif
+                    </p>
+                    @endif
 
                     <form id="queue-reorder-form" action="{{ route('admin.advertisements.queue-items.reorder', $advertisement->id) }}" method="POST" class="hidden">
                         @csrf
@@ -429,7 +433,7 @@ window.__fullQueueCount = @json((int) ($queueItems ?? collect())->count());
         var tbody = document.getElementById('queue-items-tbody');
         var reorderForm = document.getElementById('queue-reorder-form');
         var reorderInputs = document.getElementById('queue-reorder-order-inputs');
-        if (!qForm || !tbody || !queueRoot) return;
+        if (!qForm || !queueRoot) return;
 
         function el(id) { return document.getElementById(id); }
 
@@ -488,7 +492,7 @@ window.__fullQueueCount = @json((int) ($queueItems ?? collect())->count());
         }
 
         function submitQueueReorder() {
-            if (!reorderForm || !reorderInputs) return;
+            if (!reorderForm || !reorderInputs || !tbody) return;
             var rows = tbody.querySelectorAll('tr[data-queue-id]');
             var visibleIds = Array.prototype.map.call(rows, function(tr) {
                 return parseInt(tr.getAttribute('data-queue-id'), 10);
@@ -522,7 +526,8 @@ window.__fullQueueCount = @json((int) ($queueItems ?? collect())->count());
             reorderForm.submit();
         }
 
-        document.getElementById('queue-open-create').addEventListener('click', openQueueCreate);
+        var qoc = document.getElementById('queue-open-create');
+        if (qoc) qoc.addEventListener('click', openQueueCreate);
 
         queueRoot.addEventListener('click', function(e) {
             var editBtn = e.target.closest('.queue-open-edit');
@@ -532,6 +537,7 @@ window.__fullQueueCount = @json((int) ($queueItems ?? collect())->count());
             }
             var mv = e.target.closest('.queue-move');
             if (!mv || mv.disabled) return;
+            if (!tbody) return;
             var tr = mv.closest('tr[data-queue-id]');
             if (!tr || !tbody.contains(tr)) return;
             var dir = parseInt(mv.getAttribute('data-dir'), 10);
@@ -547,20 +553,28 @@ window.__fullQueueCount = @json((int) ($queueItems ?? collect())->count());
         });
     })();
 
-    document.getElementById('ad-form-clear').addEventListener('click', function() {
+    var adClearBtn = document.getElementById('ad-form-clear');
+    if (adClearBtn) adClearBtn.addEventListener('click', function() {
         var form = document.getElementById('ad-edit-form');
         if (!form) return;
         form.querySelectorAll('input[type="text"], input[type="url"]').forEach(function(inp) {
             if (inp.name && inp.name !== '_token' && inp.name !== '_method') inp.value = '';
         });
-        form.querySelectorAll('#slot_duration_days, #slot_duration_hours').forEach(function(sel) {
-            sel.value = '0';
-        });
+        var sd = form.querySelector('#slot_duration_days');
+        var sh = form.querySelector('#slot_duration_hours');
+        if (sd) sd.value = '1';
+        if (sh) sh.value = '0';
         form.querySelectorAll('input[type="file"]').forEach(function(inp) {
             inp.value = '';
         });
+        var dtw = document.getElementById('ad-desktop-thumb-wrap');
+        var mtw = document.getElementById('ad-mobile-thumb-wrap');
+        if (dtw) dtw.classList.add('hidden');
+        if (mtw) mtw.classList.add('hidden');
         var removeImage = form.querySelector('input[name="remove_image"]');
         if (removeImage) removeImage.checked = true;
+        var removeImageMob = form.querySelector('input[name="remove_image_mobile"]');
+        if (removeImageMob) removeImageMob.checked = true;
         form.querySelectorAll('input[type="checkbox"]').forEach(function(inp) {
             if (['remove_image', 'remove_image_mobile'].indexOf(inp.name) === -1) inp.checked = false;
         });
