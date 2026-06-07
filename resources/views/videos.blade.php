@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot:title>ভিডিও - দ্য ডেইলি নিউজ</x-slot>
+    <x-slot:title>ভিডিও - {{ site_name() }}</x-slot>
 
         <div class="py-4 md:py-10 min-h-screen">
             <div class="container">

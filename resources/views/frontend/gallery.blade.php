@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot:title>গ্যালারি - {{ optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান' }}</x-slot>
+    <x-slot:title>গ্যালারি - {{ site_name() }}</x-slot>
 
         <div class="py-4 md:py-10 min-h-screen">
             <div class="container">

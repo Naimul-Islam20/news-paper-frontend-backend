@@ -159,7 +159,7 @@ header nav ul a {
     overflow: hidden;
 
     &::after {
-        content: "দ্য ডেইলি নিউজ";
+        content: var(--site-name, "");
         position: absolute;
         top: 50%;
         left: 50%;

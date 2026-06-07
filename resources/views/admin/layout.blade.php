@@ -9,6 +9,7 @@
     <x-admin.theme-init />
     @vite(['resources/css/app.css', 'resources/js/admin-theme.js'])
     <style>
+        :root { --site-name: "{{ site_name() }}"; }
         /* মোবাইলে সাইডবার লুকানো; মেনু খুললে .sidebar-open দিয়ে দেখানো। টেইলউইন্ডের ওপর নির্ভর না করে নিশ্চিত কাজের জন্য। */
         @media (max-width: 767px) {
             #admin-sidebar {

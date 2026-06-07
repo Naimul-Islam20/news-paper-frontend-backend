@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot:title>শর্তাবলী - The Daily News</x-slot>
+    <x-slot:title>শর্তাবলী - {{ site_name() }}</x-slot>
 
     <div class="py-4 md:py-10 min-h-screen">
         <div class="container">

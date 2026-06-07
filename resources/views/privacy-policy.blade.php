@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot:title>Privacy Policy - The Daily News</x-slot>
+    <x-slot:title>Privacy Policy - {{ site_name() }}</x-slot>
 
     <div class="py-4 md:py-10 min-h-screen">
         <div class="container">

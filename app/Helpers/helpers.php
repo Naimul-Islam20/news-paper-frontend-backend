@@ -422,6 +422,62 @@ if (! function_exists('share_meta_description')) {
     }
 }
 
+if (! function_exists('site_meta_record')) {
+    function site_meta_record(): ?\App\Models\SiteMeta
+    {
+        static $meta = null;
+        static $resolved = false;
+
+        if ($resolved) {
+            return $meta;
+        }
+
+        $resolved = true;
+
+        if (! app()->runningInConsole()) {
+            try {
+                $shared = view()->shared('siteMeta');
+                if ($shared instanceof \App\Models\SiteMeta) {
+                    return $meta = $shared;
+                }
+            } catch (\Throwable) {
+            }
+        }
+
+        return $meta = \App\Models\SiteMeta::first();
+    }
+}
+
+if (! function_exists('site_name')) {
+    /** Site metadata থেকে site_name (না থাকলে site_title)। */
+    function site_name(): string
+    {
+        $meta = site_meta_record();
+        $name = trim((string) (optional($meta)->site_name ?? ''));
+
+        if ($name !== '') {
+            return $name;
+        }
+
+        return trim((string) (optional($meta)->site_title ?? ''));
+    }
+}
+
+if (! function_exists('site_browser_title')) {
+    /** Browser tab title — site_title প্রাধান্য, না থাকলে site_name। */
+    function site_browser_title(): string
+    {
+        $meta = site_meta_record();
+        $title = trim((string) (optional($meta)->site_title ?? ''));
+
+        if ($title !== '') {
+            return $title;
+        }
+
+        return site_name();
+    }
+}
+
 if (! function_exists('share_site_label')) {
     /**
      * Share preview-তে title-এর নিচে site domain দেখানো (article excerpt নয়)।

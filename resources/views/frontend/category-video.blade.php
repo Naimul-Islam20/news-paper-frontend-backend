@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot:title>{{ $category->name }} - {{ optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান' }}</x-slot>
+    <x-slot:title>{{ $category->name }} - {{ site_name() }}</x-slot>
 
         @php $adCategoryBelowMenu = ad_slot('category_below_menu'); @endphp
         @if($adCategoryBelowMenu && ad_has_media($adCategoryBelowMenu))

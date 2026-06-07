@@ -144,7 +144,7 @@
                             @if(!empty(optional($siteMeta)->site_logo))
                             <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="{{ optional($siteMeta)->site_name ?? 'Logo' }}" class="h-8 md:h-18 w-auto object-contain" onerror="this.src='{{ asset('logo.svg') }}'; this.onerror=null;">
                             @else
-                            <img src="{{ asset('logo.svg') }}" alt="{{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}" class="h-8 md:h-18 w-auto object-contain">
+                            <img src="{{ asset('logo.svg') }}" alt="{{ site_name() }}" class="h-8 md:h-18 w-auto object-contain">
                             @endif
                         </a>
                     </div>

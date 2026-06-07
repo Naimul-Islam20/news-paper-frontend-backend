@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot:title>জাতীয় - দ্য ডেইলি নিউজ</x-slot>
+    <x-slot:title>জাতীয় - {{ site_name() }}</x-slot>
 
         <div class="py-4 md:py-10 min-h-screen">
             <div class="container">

@@ -1,5 +1,5 @@
 @php
-$postShareTitle = $post->title . ' - ' . (optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান');
+$postShareTitle = $post->title . ' - ' . (site_name());
 $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : null;
 @endphp
 <x-layout>
@@ -190,7 +190,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                 @if(!empty(optional($siteMeta)->site_logo))
                                 <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="Logo" style="height: 80px; width: auto;">
                                 @else
-                                <h1 style="font-size: 24px; font-weight: bold; color: #e11d48;">{{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}</h1>
+                                <h1 style="font-size: 24px; font-weight: bold; color: #e11d48;">{{ site_name() }}</h1>
                                 @endif
                             </div>
 

@@ -8,7 +8,7 @@ if ($video->youtube_link) {
 }
 $categoryName = $video->category->name ?? 'ভিডিও';
 
-$videoShareTitle = $video->title . ' - ' . (optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান');
+$videoShareTitle = $video->title . ' - ' . (site_name());
 
 $videoThumb = $video->image ? storage_image_url($video->image) : null;
 if (!$videoThumb && $youtubeId) {
@@ -126,7 +126,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                     @if(!empty(optional($siteMeta)->site_logo))
                         <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="Logo" style="height: 80px; width: auto;">
                     @else
-                        <h1 style="font-size: 24px; font-weight: bold; color: #e11d48;">{{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}</h1>
+                        <h1 style="font-size: 24px; font-weight: bold; color: #e11d48;">{{ site_name() }}</h1>
                     @endif
                 </div>
 

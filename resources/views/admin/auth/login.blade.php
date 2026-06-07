@@ -4,7 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <x-font-preload />
-    <title>Admin Login - The Daily News</title>
+    @php
+        $loginSiteName = site_name();
+        $loginPageTitle = 'Admin Login - ' . $loginSiteName;
+        $loginPageUrl = url()->current();
+        $loginSiteHost = share_site_label($loginPageUrl);
+    @endphp
+    <title>{{ $loginPageTitle }}</title>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ $loginPageUrl }}">
+    <meta property="og:title" content="{{ $loginPageTitle }}">
+    @if($loginSiteHost !== '')
+    <meta property="og:description" content="{{ $loginSiteHost }}">
+    @endif
+    <meta property="og:site_name" content="{{ $loginSiteName }}">
+    @if(!empty(optional($siteMeta)->site_logo))
+    <meta property="og:image" content="{{ storage_image_url($siteMeta->site_logo) }}">
+    @endif
+    @if(!empty(optional($siteMeta)->site_icon))
+    <link rel="icon" href="{{ storage_image_url($siteMeta->site_icon) }}" type="image/png">
+    @endif
+    <style>:root { --site-name: "{{ site_name() }}"; }</style>
     <x-admin.theme-init />
     @vite(['resources/css/app.css', 'resources/js/admin-theme.js'])
 </head>

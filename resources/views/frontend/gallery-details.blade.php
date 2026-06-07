@@ -2,7 +2,7 @@
 \Carbon\Carbon::setLocale('bn');
 $categoryName = $gallery->category->name ?? 'গ্যালারি';
 
-$galleryShareTitle = $gallery->title . ' - ' . (optional($siteMeta)->site_name ?? 'ডেইলি অনুসন্ধান');
+$galleryShareTitle = $gallery->title . ' - ' . (site_name());
 $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gallery->images->first()->image))) : null;
 @endphp
 <x-layout>
@@ -107,7 +107,7 @@ $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gal
                     @if(!empty(optional($siteMeta)->site_logo))
                         <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="Logo" style="height: 80px; width: auto;">
                     @else
-                        <h1 style="font-size: 24px; font-weight: bold; color: #e11d48;">{{ optional($siteMeta)->site_name ?? 'দ্য ডেইলি নিউজ' }}</h1>
+                        <h1 style="font-size: 24px; font-weight: bold; color: #e11d48;">{{ site_name() }}</h1>
                     @endif
                 </div>
 

@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <x-font-preload />
-    <title>{{ $title ?? (optional($siteMeta)->site_title ?? optional($siteMeta)->site_name ?? 'The Daily News') }}</title>
+    <title>{{ $title ?? site_browser_title() }}</title>
     @if(!empty(optional($siteMeta)->site_keywords))
     <meta name="keywords" content="{{ $siteMeta->site_keywords }}">
     @endif
@@ -19,7 +19,7 @@
     {{-- Open Graph & Twitter Card: শেয়ার প্রিভিউ — ইমেজ + টাইটেল + site domain --}}
     @php
         $hasShareMeta = (isset($metaImage) && $metaImage !== '') || isset($ogTitle);
-        $shareTitle = $ogTitle ?? $title ?? (optional($siteMeta)->site_name ?? 'The Daily News');
+        $shareTitle = $ogTitle ?? $title ?? site_name();
         $sharePageUrl = isset($shareUrl) && trim((string) $shareUrl) !== '' ? trim((string) $shareUrl) : url()->current();
         $shareSiteLabel = share_site_label($sharePageUrl);
     @endphp
@@ -43,7 +43,7 @@
     <meta property="og:image:height" content="630">
     <meta name="twitter:image" content="{{ $shareImageUrlHttps }}">
     @endif
-    <meta property="og:site_name" content="{{ optional($siteMeta)->site_name ?? 'The Daily News' }}">
+    <meta property="og:site_name" content="{{ site_name() }}">
     <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $shareTitle }}">
@@ -54,17 +54,17 @@
     {{-- সাধারণ পেজ: শেয়ার করলে সাইটের ডিফল্ট --}}
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="{{ $title ?? (optional($siteMeta)->site_name ?? 'The Daily News') }}">
+    <meta property="og:title" content="{{ $title ?? site_name() }}">
     @if(!empty(optional($siteMeta)->site_description))
     <meta property="og:description" content="{{ $siteMeta->site_description }}">
     @endif
     @if(!empty(optional($siteMeta)->site_logo))
     <meta property="og:image" content="{{ storage_image_url($siteMeta->site_logo) }}">
     @endif
-    <meta property="og:site_name" content="{{ optional($siteMeta)->site_name ?? 'The Daily News' }}">
+    <meta property="og:site_name" content="{{ site_name() }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ url()->current() }}">
-    <meta name="twitter:title" content="{{ $title ?? (optional($siteMeta)->site_name ?? 'The Daily News') }}">
+    <meta name="twitter:title" content="{{ $title ?? site_name() }}">
     @if(!empty(optional($siteMeta)->site_description))
     <meta name="twitter:description" content="{{ $siteMeta->site_description }}">
     @endif
@@ -80,7 +80,9 @@
         $__primaryOk = is_string($__primary) && preg_match('/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/', $__primary);
     @endphp
     @if ($__primaryOk)
-    <style>:root { --color-primary: {{ $__primary }} !important; }</style>
+    <style>:root { --color-primary: {{ $__primary }} !important; --site-name: "{{ site_name() }}"; }</style>
+    @else
+    <style>:root { --site-name: "{{ site_name() }}"; }</style>
     @endif
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
