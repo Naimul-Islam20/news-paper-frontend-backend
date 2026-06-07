@@ -91,14 +91,16 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Featured Image <span class="text-rose-500">*</span></label>
-                                <div class="relative h-32 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-1.5 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-xs shadow-sm bg-white dark:bg-slate-900">
-                                    <input type="file" name="image" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewMainImage(this)">
-                                    <img id="mainImagePreview" class="absolute inset-0 w-full h-full object-cover hidden">
-                                    <div id="mainImagePlaceholder" class="flex flex-col items-center justify-center gap-1.5">
+                                <div class="relative w-full h-32 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-xs shadow-sm bg-white dark:bg-slate-900" data-main-image-upload>
+                                    <img id="mainImagePreview" class="absolute inset-0 z-[1] w-full h-full object-cover hidden" alt="">
+                                    <div id="mainImagePlaceholder" class="absolute inset-0 z-0 flex flex-col items-center justify-center gap-1.5">
                                         <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                         <span>Choose Image</span>
                                     </div>
+                                    <input type="file" name="image" id="mainImageInput" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" class="absolute inset-0 z-20 opacity-0 cursor-pointer">
                                 </div>
+                                <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">ছবির অনুপাত: <span class="font-medium text-slate-600 dark:text-slate-300">১৬:৯</span> (উদাহরণ: ১২০০×৬৭৫ px)</p>
+                                @error('image') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Image Caption</label>
@@ -354,6 +356,7 @@
 
         initSubTitlePoints();
         initTopicsSelection();
+        initMainImagePreview();
     });
 
     function initTopicsSelection() {
@@ -669,19 +672,37 @@
         initHeroLayerCheckboxes();
     }
 
-    function previewMainImage(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('mainImagePreview');
-                const placeholder = document.getElementById('mainImagePlaceholder');
-                preview.src = e.target.result;
-                preview.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
+    function initMainImagePreview() {
+        const input = document.getElementById('mainImageInput');
+        if (!input) return;
+        input.addEventListener('change', function () {
+            previewMainImage(this);
+        });
     }
+
+    function previewMainImage(input) {
+        const box = input.closest('[data-main-image-upload]');
+        const preview = box ? box.querySelector('#mainImagePreview') : document.getElementById('mainImagePreview');
+        const placeholder = box ? box.querySelector('#mainImagePlaceholder') : document.getElementById('mainImagePlaceholder');
+        const file = input.files && input.files[0];
+
+        if (!file || !preview) return;
+
+        if (!file.type.startsWith('image/')) {
+            input.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    window.previewMainImage = previewMainImage;
 
     function initCKEditor() {
         if (typeof CKEDITOR !== 'undefined' && document.getElementById('editor')) {

@@ -85,8 +85,7 @@ Route::prefix('admin')
                 ->name('login');
 
             Route::post('login', [AdminAuthController::class, 'login'])
-                // Simple numeric throttle to avoid custom rate limiter config
-                ->middleware('throttle:5,1')
+                ->middleware('throttle:10,1')
                 ->name('login.attempt');
         });
 

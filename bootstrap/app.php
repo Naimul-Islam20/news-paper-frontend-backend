@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\PostTooLargeException;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -39,5 +40,19 @@ return Application::configure(basePath: dirname(__DIR__))
             return redirect()->back()
                 ->withInput($request->except(['image', 'image_mobile', 'video', 'video_mobile', '_token']))
                 ->withErrors(['video' => $message]);
+        });
+
+        $exceptions->render(function (ThrottleRequestsException $e, Request $request) {
+            if (! $request->is('admin/login') || ! $request->isMethod('POST')) {
+                return null;
+            }
+
+            $retryAfter = (int) ($e->getHeaders()['Retry-After'] ?? 60);
+
+            return redirect()->route('admin.login')
+                ->withInput($request->only('email'))
+                ->withErrors([
+                    'email' => "অনেকবার ভুল লগইন চেষ্টা হয়েছে। {$retryAfter} সেকেন্ড পর আবার চেষ্টা করুন।",
+                ]);
         });
     })->create();
