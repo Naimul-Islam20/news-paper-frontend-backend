@@ -50,7 +50,7 @@
 
                     @media (min-width: 768px) {
                         .national-grid {
-                            grid-template-columns: 1.7fr 7.4fr 2.9fr;
+                            grid-template-columns: 1.7fr 7.4fr;
                         }
                     }
                 </style>
@@ -68,9 +68,9 @@
                         {{-- প্রধান নিউজ কার্ড (Featured Article) – নতুন প্রথমে --}}
                         <article class="flex flex-col-reverse md:flex-row gap-3 pb-3 last:border-0 text-left border-b border-gray-100">
                             <div class="flex flex-col justify-start gap-3 flex-1">
-                                <a href="{{ url('/news/' . $featured->slug) }}">
+                                <a href="{{ news_url($featured) }}">
                                     <h3 class="text-2xl md:text-3xl font-bold serif text-title leading-snug hover:text-primary transition-colors">
-                                        <span style="color: red !important;">{{ $categoryName }} /</span> {{ $featured->title }}
+                                        <span class="text-primary">{{ $categoryName }} /</span> {{ $featured->title }}
                                     </h3>
                                 </a>
                                 <p class="text-base font-normal text-desc leading-relaxed md:hidden">
@@ -88,7 +88,7 @@
                                 </div>
                             </div>
                             <div class="flex-shrink-0 group overflow-hidden w-full md:w-auto">
-                                <a href="{{ url('/news/' . $featured->slug) }}">
+                                <a href="{{ news_url($featured) }}">
                                     <div class="img-placeholder w-full aspect-video md:aspect-auto md:w-[625px] md:h-[355px]">
                                         <img
                                             src="{{ storage_image_url($featured->image) }}"
@@ -106,11 +106,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-0 pt-3">
                             @foreach($gridPosts as $index => $post)
                             <article class="flex flex-row-reverse md:flex-col gap-2 md:gap-3 pb-4 border-b border-gray-100 md:border-b-0 md:pb-0 {{ $index < 2 ? 'md:pr-3 md:border-r md:border-slate-200' : 'md:pl-3' }}">
-                                <a href="{{ url('/news/' . $post->slug) }}" class="group overflow-hidden shrink-0">
+                                <a href="{{ news_url($post) }}" class="group overflow-hidden shrink-0">
                                     <div class="img-placeholder w-36 h-24 md:w-full md:h-[100px]"><img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')"></div>
                                 </a>
                                 <div class="flex flex-col gap-1 flex-1">
-                                    <a href="{{ url('/news/' . $post->slug) }}">
+                                    <a href="{{ news_url($post) }}">
                                         <h4 class="text-base md:text-xl font-bold serif text-title leading-snug hover:text-primary transition-colors line-clamp-1">{{ $post->title }}</h4>
                                     </a>
                                     <p class="hidden md:block text-sm md:text-base font-medium text-desc leading-relaxed line-clamp-1">{{ html_entity_decode(\Illuminate\Support\Str::limit(strip_tags($post->description), 100)) }}</p>
@@ -142,7 +142,7 @@
                             <button id="sp-tab-latest" onclick="switchSpTab('latest')" class="flex-1 text-lg font-bold py-2 border-b-2 border-primary text-primary -mb-px transition-all duration-200 text-center">
                                 সর্বশেষ
                             </button>
-                            <button id="sp-tab-popular" onclick="switchSpTab('popular')" class="flex-1 text-lg font-bold py-2 border-b-2 border-transparent text-gray-400 -mb-px hover:text-gray-600 transition-all duration-200 text-center">
+                            <button id="sp-tab-popular" onclick="switchSpTab('popular')" class="flex-1 text-lg font-bold py-2 border-b-2 border-transparent text-gray-400 -mb-px hover:text-primary transition-all duration-200 text-center">
                                 পঠিত
                             </button>
                         </div>
@@ -151,7 +151,7 @@
                         <div id="sp-panel-latest" class="space-y-4">
                             @forelse(isset($latestSidebarPosts) ? $latestSidebarPosts : [] as $index => $post)
                             @php $bn = ['১','২','৩','৪','৫','৬']; $num = $bn[$index] ?? ($index + 1); @endphp
-                            <a href="{{ url('/news/' . $post->slug) }}" class="group cursor-pointer flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0 block">
+                            <a href="{{ news_url($post) }}" class="group cursor-pointer flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0 block">
                                 <span class="text-2xl font-bold text-gray-400 serif shrink-0 leading-none">{{ $num }}.</span>
                                 <div class="flex-1">
                                     <h4 class="text-base font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
@@ -169,7 +169,7 @@
                         <div id="sp-panel-popular" class="space-y-4 hidden">
                             @forelse(isset($popularSidebarPosts) ? $popularSidebarPosts : [] as $index => $post)
                             @php $bn = ['১','২','৩','৪','৫','৬']; $num = $bn[$index] ?? ($index + 1); @endphp
-                            <a href="{{ url('/news/' . $post->slug) }}" class="group cursor-pointer flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0 block">
+                            <a href="{{ news_url($post) }}" class="group cursor-pointer flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0 block">
                                 <span class="text-2xl font-bold text-gray-400 serif shrink-0 leading-none">{{ $num }}.</span>
                                 <div class="flex-1">
                                     <h4 class="text-base font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
@@ -186,7 +186,7 @@
 
                         <!-- কমন আরও বাটন -->
                         <div class="pt-4">
-                            <a href="#" style="display:block; width:100%; text-align:center; background-color:#dc2626; color:white; font-weight:700; font-size:0.875rem; padding:0.5rem 0; border-radius:4px;" onmouseover="this.style.backgroundColor='#b91c1c'" onmouseout="this.style.backgroundColor='#dc2626'">
+                            <a href="{{ route('latest') }}" class="block w-full text-center bg-primary hover:opacity-90 text-white font-bold text-sm py-2 rounded transition-opacity">
                                 আরও →
                             </a>
                         </div>
@@ -195,8 +195,8 @@
                             function switchSpTab(tab) {
                                 document.getElementById('sp-panel-latest').classList.toggle('hidden', tab !== 'latest');
                                 document.getElementById('sp-panel-popular').classList.toggle('hidden', tab !== 'popular');
-                                document.getElementById('sp-tab-latest').className = 'flex-1 text-lg font-bold py-2 border-b-2 -mb-px transition-all duration-200 text-center ' + (tab === 'latest' ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-gray-600');
-                                document.getElementById('sp-tab-popular').className = 'flex-1 text-lg font-bold py-2 border-b-2 -mb-px transition-all duration-200 text-center ' + (tab === 'popular' ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-gray-600');
+                                document.getElementById('sp-tab-latest').className = 'flex-1 text-lg font-bold py-2 border-b-2 -mb-px transition-all duration-200 text-center ' + (tab === 'latest' ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-primary');
+                                document.getElementById('sp-tab-popular').className = 'flex-1 text-lg font-bold py-2 border-b-2 -mb-px transition-all duration-200 text-center ' + (tab === 'popular' ? 'border-primary text-primary' : 'border-transparent text-gray-400 hover:text-primary');
                             }
                         </script>
 
@@ -222,11 +222,11 @@
                         @if($belowPosts->count() > 0)
                             @foreach($belowPosts as $post)
                                 <article class="flex flex-row-reverse md:flex-row-reverse gap-2 md:gap-4 py-3 md:py-4 border-b border-gray-100 last:border-0">
-                                    <a href="{{ url('/news/' . $post->slug) }}" class="flex-shrink-0">
+                                    <a href="{{ news_url($post) }}" class="flex-shrink-0">
                                         <div class="img-placeholder w-36 h-24 md:w-[305px] md:h-[170px]"><img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')"></div>
                                     </a>
                                     <div class="flex flex-col justify-start gap-1 md:gap-2 pt-0 md:pt-1 md:px-0 flex-1">
-                                        <a href="{{ url('/news/' . $post->slug) }}">
+                                        <a href="{{ news_url($post) }}">
                                             <h3 class="text-lg md:text-xl font-bold serif text-title leading-snug hover:text-primary transition-colors line-clamp-1">{{ $post->title }}</h3>
                                         </a>
                                         <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-1">{{ html_entity_decode(\Illuminate\Support\Str::limit(strip_tags($post->description), 100)) }}</p>
@@ -251,47 +251,6 @@
                                 </div>
                             @endfor
                         @endif
-
-                    </div>
-
-                    <!-- ডান পাশের কলাম: বিজ্ঞাপন -->
-                    <div class="flex flex-col gap-4">
-
-                        {{-- বিজ্ঞাপন লেবেল --}}
-                        <div class="flex items-center gap-2 mb-1">
-                            <div class="h-px flex-1 bg-slate-200"></div>
-                            <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">বিজ্ঞাপন</span>
-                            <div class="h-px flex-1 bg-slate-200"></div>
-                        </div>
-
-                        {{-- বিজ্ঞাপন ১: বড় ব্যানার --}}
-                        <a href="#" class="block overflow-hidden border border-slate-200 shadow-sm transition-all group relative">
-                            <div class="relative h-[100px] w-full overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&auto=format&fit=crop&q=80"
-                                    alt="বিজ্ঞাপন"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-                                <div class="absolute bottom-0 left-0 right-0 p-4 text-center">
-                                    <p class="text-white font-bold text-base leading-tight mb-2">আপনার ব্যবসার প্রসারে<br>আমাদের সাথে যোগ দিন</p>
-                                    <span class="inline-block px-4 py-1.5 bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors">বিজ্ঞাপন দিন →</span>
-                                </div>
-                            </div>
-                        </a>
-
-                        {{-- বিজ্ঞাপন ২: মাঝারি ব্যানার --}}
-                        <a href="#" class="block overflow-hidden border border-slate-200 shadow-sm transition-all group relative mt-4">
-                            <div class="relative h-[100px] w-full overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&auto=format&fit=crop&q=80"
-                                    alt="স্পনসরড"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
-                                <div class="absolute bottom-0 left-0 right-0 p-3 text-center">
-                                    <p class="text-white font-bold text-sm mb-1">স্পনসরড পোস্ট</p>
-                                    <p class="text-gray-200 text-[11px] mb-2">সবচেয়ে কম মূল্যে আপনার পণ্য প্রচার করুন</p>
-                                    <span class="inline-block px-3 py-1 bg-white/20 border border-white/40 text-white text-[10px] font-bold backdrop-blur-sm">বিস্তারিত দেখুন</span>
-                                </div>
-                            </div>
-                        </a>
 
                     </div>
                 </section>
