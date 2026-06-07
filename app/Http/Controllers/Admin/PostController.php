@@ -1,0 +1,353 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\Post;
+use App\Models\Reporter;
+use App\Models\Topic;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class PostController extends Controller
+{
+    public function index(Request $request): View
+    {
+        // Base query with relationships and default ordering (latest first)
+        $baseQuery = Post::with(['categories', 'reporter'])->latest();
+
+        // Filter by category (if selected)
+        if ($request->filled('category_id') && $request->category_id !== 'all') {
+            $baseQuery->whereHas('categories', function ($q) use ($request) {
+                $q->where('categories.id', $request->category_id);
+            });
+        }
+
+        // Filter by status (if selected)
+        if ($request->filled('status') && $request->status !== 'all') {
+            $baseQuery->where('status', $request->status);
+        }
+
+        // Clone for applying search / serial logic on top of the same base query
+        $query = clone $baseQuery;
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            // If only digits given, treat as serial number (SL)
+            if ($search !== '' && ctype_digit($search)) {
+                $serial = (int) $search;
+
+                if ($serial > 0) {
+                    // Find the N-th post (respecting filters + ordering), then filter by that id
+                    $targetPost = (clone $baseQuery)
+                        ->skip($serial - 1)
+                        ->take(1)
+                        ->first();
+
+                    if ($targetPost) {
+                        $query->whereKey($targetPost->id);
+                    } else {
+                        // No such serial exists in current filtered list
+                        $query->whereRaw('1 = 0');
+                    }
+                }
+            } else {
+                // Text search: match by title
+                $query->where('title', 'like', '%' . $search . '%');
+            }
+        }
+
+        $posts = $query->paginate(10)->withQueryString();
+
+        $categories = Category::where('type', 'post')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.posts.index', compact('posts', 'categories'));
+    }
+
+    public function create(): View
+    {
+        $categories = Category::where('type', 'post')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        $reporters = $this->reportersForCurrentUser();
+        $topics = Topic::orderBy('can_delete', 'asc')->orderBy('name', 'asc')->get();
+
+        return view('admin.posts.create', compact('categories', 'reporters', 'topics'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title'              => 'required|string|max:255',
+            'sub_title_points'   => 'nullable|array',
+            'sub_title_points.*' => 'nullable|string|max:255',
+            'category_ids'      => 'required|array',
+            'category_ids.*'    => 'exists:categories,id',
+            'image'              => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'image_caption'      => 'nullable|string',
+            'description'        => 'required|string',
+            'reporter_id'        => 'required|exists:reporters,id',
+            'seo_keywords'       => 'nullable|string',
+            'status'             => 'required|in:published,draft,pending',
+            'hero_layer'         => 'nullable|in:1,2,3,4',
+        ], [
+            'title.required'       => 'শিরোনাম অবশ্যই দিতে হবে।',
+            'category_ids.required' => 'ক্যাটাগরি নির্বাচন করুন।',
+            'image.required'       => 'ছবি আপলোড করুন।',
+            'description.required' => 'বিবরণ লিখুন।',
+            'reporter_id.required' => 'রিপোর্টার নির্বাচন করুন।',
+        ]);
+
+        $data = $request->only([
+            'title', 'description', 'image_caption',
+            'seo_keywords', 'status', 'hero_layer'
+        ]);
+
+        // Sub title points -> JSON string in sub_title column
+        $points = collect($request->input('sub_title_points', []))
+            ->map(function ($value) {
+                return is_string($value) ? trim($value) : '';
+            })
+            ->filter(function ($value) {
+                return $value !== '';
+            })
+            ->values()
+            ->all();
+
+        $data['sub_title'] = !empty($points)
+            ? json_encode($points, JSON_UNESCAPED_UNICODE)
+            : null;
+        $data['reporter_id'] = $this->resolveReporterId($request->reporter_id);
+        $data['is_special_news'] = $request->boolean('is_special_news');
+
+        // Slug: from SEO keywords (auto = title) or title. Title Bangla হলে slug ও Bangla থাকবে (slugifyUnicode).
+        $slugSource = $request->seo_keywords ?: $request->title;
+        $data['slug'] = $this->makePostSlug($slugSource);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = store_public_upload($request->file('image'), 'posts');
+        }
+
+        $post = Post::create($data);
+
+        // Sync categories
+        if ($request->has('category_ids')) {
+            $post->categories()->sync($request->category_ids);
+        }
+
+        // Sync topics
+        if ($request->has('topic_ids')) {
+            $post->topics()->sync($request->topic_ids);
+        }
+
+        return redirect()->route('admin.posts.index')->with('success', 'Post published successfully!');
+    }
+
+    public function edit($id): View
+    {
+        $post = Post::with('categories')->findOrFail($id);
+
+        $categories = Category::where('type', 'post')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
+
+        $reporters = $this->reportersForCurrentUser();
+        $topics = Topic::orderBy('can_delete', 'asc')->orderBy('name', 'asc')->get();
+
+        return view('admin.posts.edit', compact('post', 'categories', 'reporters', 'topics'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $post = Post::findOrFail($id);
+
+        $request->validate([
+            'title'              => 'required|string|max:255',
+            'sub_title_points'   => 'nullable|array',
+            'sub_title_points.*' => 'nullable|string|max:255',
+            'category_ids'      => 'required|array',
+            'category_ids.*'    => 'exists:categories,id',
+            'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'image_caption'      => 'nullable|string',
+            'description'        => 'required|string',
+            'reporter_id'        => 'required|exists:reporters,id',
+            'seo_keywords'       => 'nullable|string',
+            'status'             => 'required|in:published,draft,pending',
+            'hero_layer'         => 'nullable|in:1,2,3,4',
+        ], [
+            'title.required'       => 'শিরোনাম অবশ্যই দিতে হবে।',
+            'category_ids.required' => 'ক্যাটাগরি নির্বাচন করুন।',
+            'description.required' => 'বিবরণ লিখুন।',
+            'reporter_id.required' => 'রিপোর্টার নির্বাচন করুন।',
+        ]);
+
+        $data = $request->only([
+            'title', 'description', 'image_caption',
+            'seo_keywords', 'status', 'hero_layer'
+        ]);
+
+        // Sub title points -> JSON string in sub_title column
+        $points = collect($request->input('sub_title_points', []))
+            ->map(function ($value) {
+                return is_string($value) ? trim($value) : '';
+            })
+            ->filter(function ($value) {
+                return $value !== '';
+            })
+            ->values()
+            ->all();
+
+        $data['sub_title'] = !empty($points)
+            ? json_encode($points, JSON_UNESCAPED_UNICODE)
+            : null;
+        $data['reporter_id'] = $this->resolveReporterId($request->reporter_id);
+        $data['is_special_news'] = $request->boolean('is_special_news');
+
+        // Slug: from SEO keywords (auto = title) or title. Title Bangla হলে slug ও Bangla থাকবে (slugifyUnicode).
+        $slugSource = $request->seo_keywords ?: $request->title;
+        $data['slug'] = $this->makePostSlug($slugSource, $post->id);
+
+        if ($request->hasFile('image')) {
+            delete_uploaded_media($post->image);
+            $data['image'] = store_public_upload($request->file('image'), 'posts');
+        }
+
+        $post->update($data);
+
+        // Sync categories
+        if ($request->has('category_ids')) {
+            $post->categories()->sync($request->category_ids);
+        } else {
+            $post->categories()->sync([]);
+        }
+
+        // Sync topics
+        if ($request->has('topic_ids')) {
+            $post->topics()->sync($request->topic_ids);
+        } else {
+            $post->topics()->sync([]);
+        }
+
+        return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully!');
+    }
+
+    /**
+     * Build a unique slug for posts.
+     *
+     * - Keeps Bangla characters (and other Unicode letters) intact
+     * - Converts spaces/underscores to single hyphens
+     * - Ensures uniqueness in posts.slug column
+     */
+    protected function makePostSlug(string $source, ?int $ignoreId = null): string
+    {
+        $slug = $this->slugifyUnicode($source);
+
+        if ($slug === '') {
+            $slug = 'post';
+        }
+
+        $original = $slug;
+        $i = 2;
+
+        while (
+            Post::where('slug', $slug)
+                ->when($ignoreId, function ($query, $id) {
+                    return $query->where('id', '!=', $id);
+                })
+                ->exists()
+        ) {
+            $slug = $original . '-' . $i++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Slugify but keep Unicode letters + marks (e.g. Bangla যুক্তাক্ষর/কার). Title যেমন লিখা তেমন slug; ASCII ফোর্স করা হয় না।
+     */
+    protected function slugifyUnicode(string $value): string
+    {
+        $value = trim($value);
+
+        // Keep letters, numbers, marks (বাংলা কার/মাত্রা), spaces, underscores, hyphens. Strip only punctuation/symbols.
+        $value = preg_replace('/[^\pL\pN\pM\s_-]+/u', '', $value);
+
+        // Replace spaces/underscores with single hyphen
+        $value = preg_replace('/[\s_-]+/u', '-', $value);
+
+        // Trim hyphens from both ends
+        $value = trim($value, '-');
+
+        // Lowercase (supports multibyte)
+        return function_exists('mb_strtolower') ? mb_strtolower($value, 'UTF-8') : strtolower($value);
+    }
+
+    public function destroy($id)
+    {
+        $post = Post::findOrFail($id);
+        delete_uploaded_media($post->image);
+        $post->delete();
+        return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully!');
+    }
+
+    /** Reporter লগইন থাকলে শুধু ওই রিপোর্টার; Sub Editor হলে শুধু নিজের reporter desk; নাহলে সব active reporter */
+    protected function reportersForCurrentUser()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return Reporter::where('status', 'active')->orderBy('name')->get();
+        }
+
+        // Reporter role হলে: শুধু নিজের reporter row
+        if ($user->role === 'reporter' && $user->reporter_id) {
+            return Reporter::where('id', $user->reporter_id)->get();
+        }
+
+        // Sub Editor হলে: শুধুমাত্র তার sub_editor_id মেলা reporter desk গুলো
+        if ($user->role === 'sub editor') {
+            return Reporter::where('status', 'active')
+                ->where('sub_editor_id', $user->id)
+                ->orderBy('name')
+                ->get();
+        }
+
+        // Admin / Senior editor ইত্যাদি: সব active reporter
+        return Reporter::where('status', 'active')->orderBy('name')->get();
+    }
+
+    /** Reporter/Sub Editor role থাকলে শুধু নিজের desk-এর id সেট হয়; অন্যথায় request থেকে */
+    protected function resolveReporterId($requestReporterId)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return $requestReporterId;
+        }
+
+        // Reporter role: সব সময় নিজের reporter_id
+        if ($user && $user->role === 'reporter' && $user->reporter_id) {
+            return $user->reporter_id;
+        }
+
+        // Sub Editor role: শুধু তার sub_editor_id মেলা reporter id (থাকলে)
+        if ($user->role === 'sub editor') {
+            $ownReporter = Reporter::where('status', 'active')
+                ->where('sub_editor_id', $user->id)
+                ->first();
+
+            if ($ownReporter) {
+                return $ownReporter->id;
+            }
+        }
+
+        // অন্য সব ক্ষেত্রে form থেকে যা আসছে সেটা রাখি (admin / senior editor ইত্যাদি)
+        return $requestReporterId;
+    }
+}

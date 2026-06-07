@@ -1,0 +1,243 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
+
+class UserController extends Controller
+{
+    /**
+     * লগইন করা user-এর role চেক করে permission দেওয়া হবে।
+     */
+    private function checkPermission(string $action, ?User $targetUser = null): bool
+    {
+        $authUser = auth()->user();
+
+        // Sub Editor কিছুই করতে পারবে না
+        if ($authUser->role === 'sub editor') {
+            return false;
+        }
+
+        // Admin সব কিছু করতে পারবে
+        if ($authUser->role === 'admin') {
+            return true;
+        }
+
+        // Senior Editor - শুধু Sub Editor create/edit করতে পারবে
+        if ($authUser->role === 'senior editor') {
+            if ($action === 'create') return true;
+            if ($action === 'edit' && $targetUser && $targetUser->role === 'sub editor') return true;
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Display a listing of the users.
+     */
+    public function index(Request $request)
+    {
+        $authUser = auth()->user();
+
+        // Sub Editor - কোনো access নেই
+        if ($authUser->role === 'sub editor') {
+            return redirect()->route('admin.dashboard')->with('error', 'You do not have permission to access this section.');
+        }
+
+        // Senior Editor - শুধু Sub Editor দেখবে
+        if ($authUser->role === 'senior editor') {
+            $baseQuery = User::where('role', 'sub editor')->latest();
+        } else {
+            // Admin - সবাইকে দেখবে
+            $baseQuery = User::latest();
+        }
+
+        $query = clone $baseQuery;
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            if ($search !== '' && ctype_digit($search)) {
+                $serial = (int) $search;
+
+                if ($serial > 0) {
+                    $target = (clone $baseQuery)
+                        ->skip($serial - 1)
+                        ->take(1)
+                        ->first();
+
+                    if ($target) {
+                        $query->whereKey($target->id);
+                    } else {
+                        $query->whereRaw('1 = 0');
+                    }
+                }
+            } else {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('email', 'like', '%' . $search . '%')
+                      ->orWhere('phone', 'like', '%' . $search . '%');
+                });
+            }
+        }
+
+        $users = $query->paginate(10)->withQueryString();
+
+        return view('admin.users.index', compact('users'));
+    }
+
+    /**
+     * Show the form for creating a new user.
+     */
+    public function create()
+    {
+        if (!$this->checkPermission('create')) {
+            return redirect()->route('admin.dashboard')->with('error', 'You do not have permission to perform this action.');
+        }
+
+        $authUser = auth()->user();
+
+        // Admin সব রোল (Reporter ছাড়া); Senior Editor শুধু Sub Editor বানাতে পারবে
+        $allowedRoles = $authUser->role === 'admin'
+            ? ['admin' => 'Admin', 'senior editor' => 'Senior Editor', 'sub editor' => 'Sub Editor']
+            : ['sub editor' => 'Sub Editor'];
+
+        return view('admin.users.create', compact('allowedRoles'));
+    }
+
+    /**
+     * Store a newly created user in storage.
+     */
+    public function store(Request $request)
+    {
+        if (!$this->checkPermission('create')) {
+            return redirect()->route('admin.dashboard')->with('error', 'You do not have permission to perform this action.');
+        }
+
+        $authUser = auth()->user();
+        $allowedRoleValues = $authUser->role === 'admin'
+            ? 'admin,senior editor,sub editor'
+            : 'sub editor';
+
+        $rules = [
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users',
+            'password' => 'required|min:8',
+            'role'     => 'required|in:' . $allowedRoleValues,
+            'phone'    => 'nullable',
+            'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ];
+        $request->validate($rules);
+
+        $data = $request->except('password', 'image');
+        $data['password'] = Hash::make($request->password);
+        $data['status'] = $request->has('status');
+        $data['reporter_id'] = null;
+
+        // Admin সবসময় active
+        if ($data['role'] === 'admin') {
+            $data['status'] = true;
+        }
+
+        if ($request->hasFile('image')) {
+            $data['image'] = store_public_upload($request->file('image'), 'users');
+        }
+
+        User::create($data);
+
+        return redirect()->route('admin.users.index')->with('success', 'User created successfully!');
+    }
+
+    /**
+     * Show the form for editing the specified user.
+     */
+    public function edit($id)
+    {
+        $user = User::findOrFail($id);
+
+        if (!$this->checkPermission('edit', $user)) {
+            return redirect()->route('admin.dashboard')->with('error', 'You do not have permission to edit this user.');
+        }
+
+        $authUser = auth()->user();
+
+        $allowedRoles = $authUser->role === 'admin'
+            ? ['admin' => 'Admin', 'senior editor' => 'Senior Editor', 'sub editor' => 'Sub Editor']
+            : ['sub editor' => 'Sub Editor'];
+
+        return view('admin.users.edit', compact('user', 'allowedRoles'));
+    }
+
+    /**
+     * Update the specified user in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        if (!$this->checkPermission('edit', $user)) {
+            return redirect()->route('admin.dashboard')->with('error', 'You do not have permission to edit this user.');
+        }
+
+        $authUser = auth()->user();
+        $allowedRoleValues = $authUser->role === 'admin'
+            ? 'admin,senior editor,sub editor'
+            : 'sub editor';
+
+        $rules = [
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users,email,' . $id,
+            'password' => 'nullable|min:8',
+            'role'     => 'required|in:' . $allowedRoleValues,
+            'phone'    => 'nullable',
+            'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ];
+        $request->validate($rules);
+
+        $data = $request->except('password', 'image');
+        $data['reporter_id'] = null;
+
+        if ($request->password) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $data['status'] = $request->has('status');
+
+        // Admin সবসময় active থাকবে
+        if (($data['role'] ?? $user->role) === 'admin') {
+            $data['status'] = true;
+        }
+
+        if ($request->hasFile('image')) {
+            delete_uploaded_media($user->image);
+            $data['image'] = store_public_upload($request->file('image'), 'users');
+        }
+
+        $user->update($data);
+
+        return redirect()->route('admin.users.index')->with('success', 'User updated successfully!');
+    }
+
+    /**
+     * Remove the specified user from storage.
+     */
+    public function destroy($id)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->route('admin.dashboard')->with('error', 'You do not have permission to perform this action.');
+        }
+
+        $user = User::findOrFail($id);
+
+        delete_uploaded_media($user->image);
+
+        $user->delete();
+
+        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully!');
+    }
+}

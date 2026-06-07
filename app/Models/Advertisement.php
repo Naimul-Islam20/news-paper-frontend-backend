@@ -1,0 +1,343 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Advertisement extends Model
+{
+    protected $fillable = [
+        'slug',
+        'name',
+        'image',
+        'image_mobile',
+        'video',
+        'video_mobile',
+        'link',
+        'caption',
+        'video_youtube_id',
+        'starts_at',
+        'ends_at',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * ফ্রন্ট/API: স্লটের ক্যালেন্ডার উইন্ডোর মধ্যে, অথবা উইন্ডো শেষ হয়ে গেলেও কিউতে অপেক্ষমান আইটেম থাকলে।
+     */
+    public function scopeActiveForDisplay(Builder $query): Builder
+    {
+        $now = now();
+
+        return $query
+            ->whereNotNull('starts_at')
+            ->whereNotNull('ends_at')
+            ->where(function (Builder $q) use ($now) {
+                $q->where(function (Builder $w) use ($now) {
+                    $w->where('starts_at', '<=', $now)
+                        ->where('ends_at', '>=', $now);
+                })->orWhere(function (Builder $w) use ($now) {
+                    $w->where('ends_at', '<', $now)
+                        ->whereHas('queueItems', function (Builder $qi) {
+                            $qi->whereNull('expired_at');
+                        });
+                });
+            });
+    }
+
+    public function isActiveForDisplay(): bool
+    {
+        if (! $this->starts_at || ! $this->ends_at) {
+            return false;
+        }
+
+        $now = now();
+        if ($this->starts_at->gt($now)) {
+            return false;
+        }
+
+        if ($this->ends_at->gte($now)) {
+            return true;
+        }
+
+        return $this->hasActiveQueueItems();
+    }
+
+    /** অপেক্ষমান (মেয়াদ শেষ নয় এমন) কিউ আইটেম আছে কিনা */
+    public function hasActiveQueueItems(): bool
+    {
+        return $this->queueItems()->whereNull('expired_at')->exists();
+    }
+
+    /** মূল স্লট ফর্মের ক্যালেন্ডার উইন্ডো এখন চলছে কিনা (এই সময় কিউ ফ্রন্টে মিলাব না) */
+    public function isWithinSlotScheduleWindow(): bool
+    {
+        if (! $this->starts_at || ! $this->ends_at) {
+            return false;
+        }
+
+        $now = now();
+
+        return $this->starts_at->lte($now) && $this->ends_at->gte($now);
+    }
+
+    /**
+     * স্লটের মেয়াদ শেষ হলে কনটেন্ট পুরনো তালিকায় (expired কিউ আইটেম) সরিয়ে ফর্ম খালি রাখে।
+     */
+    public function archiveExpiredSlotIfNeeded(): bool
+    {
+        if (! $this->ends_at || $this->ends_at->gte(now())) {
+            return false;
+        }
+
+        if ($this->starts_at && ($this->hasDisplayableMedia() || filled($this->link))) {
+            $totalH = max(1, (int) round($this->starts_at->floatDiffInHours($this->ends_at)));
+            $days = intdiv($totalH, 24);
+            $hours = $totalH % 24;
+
+            AdvertisementQueueItem::query()->create([
+                'advertisement_id' => $this->id,
+                'sort_order' => 9999,
+                'title' => 'স্লট অ্যাড ('.$this->starts_at->format('d M Y, H:i').' – '.$this->ends_at->format('d M Y, H:i').')',
+                'image' => $this->image,
+                'image_mobile' => $this->image_mobile,
+                'video' => $this->video,
+                'video_mobile' => $this->video_mobile,
+                'link' => $this->link,
+                'caption' => $this->caption,
+                'video_youtube_id' => $this->video_youtube_id,
+                'starts_at' => $this->starts_at,
+                'ends_at' => $this->ends_at,
+                'display_started_at' => $this->starts_at,
+                'duration_days' => $days,
+                'duration_hours' => $hours,
+                'expired_at' => now(),
+                'views_count' => (int) ($this->views_count ?? 0),
+                'clicks_count' => (int) ($this->clicks_count ?? 0),
+            ]);
+        }
+
+        $this->clearSlotContent();
+
+        return true;
+    }
+
+    public static function archiveExpiredSlotForId(int $advertisementId): void
+    {
+        $ad = static::query()->find($advertisementId);
+        if ($ad) {
+            $ad->archiveExpiredSlotIfNeeded();
+        }
+    }
+
+    public function clearSlotContent(): void
+    {
+        $this->update([
+            'image' => null,
+            'image_mobile' => null,
+            'video' => null,
+            'video_mobile' => null,
+            'link' => null,
+            'caption' => null,
+            'video_youtube_id' => null,
+            'starts_at' => null,
+            'ends_at' => null,
+            'views_count' => 0,
+            'clicks_count' => 0,
+        ]);
+    }
+
+    public function queueItems(): HasMany
+    {
+        return $this->hasMany(AdvertisementQueueItem::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    /**
+     * অ্যাডমিন/ড্যাশবোর্ড: ফ্রন্টে এখন কোন কিউ আইটেমের মেয়াদ চলছে (মিউটেশন ছাড়া)।
+     * স্লটের ক্যালেন্ডার উইন্ডো চলাকালীন ফ্রন্টে কিউ মিলে না — এখানেও null যেন একই সময়ে দুই স্তর «চলছে» না দেখায়।
+     */
+    public function currentRotatingQueueItem(): ?AdvertisementQueueItem
+    {
+        if ($this->isWithinSlotScheduleWindow()) {
+            return null;
+        }
+
+        $items = AdvertisementQueueItem::query()
+            ->where('advertisement_id', $this->id)
+            ->whereNull('expired_at')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+
+        foreach ($items as $i => $item) {
+            $next = $items[$i + 1] ?? null;
+
+            if (! $item->hasDisplayableMedia()) {
+                continue;
+            }
+
+            if ($item->starts_at && $item->starts_at->gt(now())) {
+                continue;
+            }
+
+            if ($item->usesDurationRotation()) {
+                if (! $item->display_started_at) {
+                    continue;
+                }
+                $end = $item->displayRunEndsAt();
+                if (! $end || now()->gte($end)) {
+                    continue;
+                }
+
+                return $item;
+            }
+
+            if (! $item->isLiveInQueuedRotation($next)) {
+                continue;
+            }
+
+            return $item;
+        }
+
+        return null;
+    }
+
+    /**
+     * একই স্লটে কিউ: দিন+ঘণ্টা মেয়াদ শেষ হলে পরের অ্যাড replace; প্রথম দেখানোর সময় থেকে মেয়াদ গণনা।
+     * পুরনো ক্যালেন্ডার-মাত্র আইটেম (দিন/ঘণ্টা ০) আগের isLiveInQueuedRotation লজিক।
+     *
+     * @param  bool  $forAdminPreview  true হলে শুধু মেমোরিতে মার্জ (অ্যাডমিন ফর্মে ফ্রন্টের মতো দেখানো); reconcile / display_started_at DB / ভিউ-ম্যাপ স্পর্শ করে না।
+     */
+    public function applyQueueItemDisplayOverride(bool $forAdminPreview = false): void
+    {
+        if (! $forAdminPreview) {
+            $this->archiveExpiredSlotIfNeeded();
+            $this->refresh();
+            AdvertisementQueueItem::reconcileExpiredForAdvertisementId((int) $this->id);
+        }
+
+        // স্লটের উপরের সময়সূচি উইন্ডো চলাকালীন ফ্রন্টে শুধু মূল স্লট (ফর্ম) এর ডেটা; কিউ এখানে মিলবে না।
+        if ($this->isWithinSlotScheduleWindow()) {
+            return;
+        }
+
+        $item = $this->findQueueItemForFrontDisplayMerge();
+        if (! $item) {
+            return;
+        }
+
+        if ($item->usesDurationRotation() && ! $item->display_started_at) {
+            if (! $forAdminPreview) {
+                AdvertisementQueueItem::query()->whereKey($item->id)->update(['display_started_at' => now()]);
+                $item->display_started_at = now();
+            }
+        }
+
+        $this->mergeQueueItemDisplayFrom($item);
+        if (! $forAdminPreview) {
+            ad_queue_display_set($this, (int) $item->id);
+        }
+    }
+
+    /**
+     * ফ্রন্টে `applyQueueItemDisplayOverride` যে সারিটির সঙ্গে মিলাবে তার মডেল (কোনো DB রাইট ছাড়া)।
+     */
+    public function findQueueItemForFrontDisplayMerge(): ?AdvertisementQueueItem
+    {
+        if ($this->isWithinSlotScheduleWindow()) {
+            return null;
+        }
+
+        $items = AdvertisementQueueItem::query()
+            ->where('advertisement_id', $this->id)
+            ->whereNull('expired_at')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+
+        foreach ($items as $i => $item) {
+            $next = $items[$i + 1] ?? null;
+
+            if (! $item->hasDisplayableMedia()) {
+                continue;
+            }
+
+            if ($item->starts_at && $item->starts_at->gt(now())) {
+                continue;
+            }
+
+            if ($item->usesDurationRotation()) {
+                if ($item->display_started_at) {
+                    $end = $item->displayRunEndsAt();
+                    if ($end && now()->gte($end)) {
+                        continue;
+                    }
+                }
+            } elseif (! $item->isLiveInQueuedRotation($next)) {
+                continue;
+            }
+
+            return $item;
+        }
+
+        return null;
+    }
+
+    protected function mergeQueueItemDisplayFrom(AdvertisementQueueItem $item): void
+    {
+        $this->setAttribute('image', $item->image);
+        $this->setAttribute('image_mobile', $item->image_mobile);
+        $this->setAttribute('video', $item->video);
+        $this->setAttribute('video_mobile', $item->video_mobile);
+        $this->setAttribute('link', $item->link);
+        $this->setAttribute('caption', $item->caption);
+        $this->setAttribute('video_youtube_id', $item->video_youtube_id);
+        $this->setAttribute('views_count', (int) ($item->views_count ?? 0));
+        $this->setAttribute('clicks_count', (int) ($item->clicks_count ?? 0));
+    }
+
+    /**
+     * Get ad slot by slug (for frontend and views) — শিডিউলের মধ্যে থাকলে।
+     */
+    public static function getBySlug(string $slug): ?self
+    {
+        $ad = static::query()
+            ->where('slug', $slug)
+            ->with(['queueItems' => fn ($q) => $q->whereNull('expired_at')->orderBy('sort_order')->orderBy('id')])
+            ->activeForDisplay()
+            ->first();
+        if ($ad) {
+            $ad->applyQueueItemDisplayOverride();
+        }
+
+        return $ad;
+    }
+
+    public function hasDisplayableMedia(): bool
+    {
+        return filled($this->video_youtube_id)
+            || filled($this->video)
+            || filled($this->video_mobile)
+            || filled($this->image);
+    }
+
+    public function resolvedMediaType(): string
+    {
+        if (filled($this->video_youtube_id)) {
+            return 'youtube';
+        }
+        if (filled($this->video) || filled($this->video_mobile)) {
+            return 'video';
+        }
+
+        return 'image';
+    }
+}
