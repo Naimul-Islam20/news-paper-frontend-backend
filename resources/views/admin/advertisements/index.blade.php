@@ -22,6 +22,7 @@
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider w-24">Banner</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">Name</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">Location (slug)</th>
+                        <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">রেশিও / সাইজ</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">URL</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">সময়সূচি</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider text-right w-28">Action</th>
@@ -58,6 +59,14 @@
                             <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] font-mono">{{ $ad->slug }}</span>
                         </td>
                         <td class="py-3 px-4">
+                            @if($spec = $ad->mediaSpec())
+                            <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400">{{ $spec['ratio'] }}</span>
+                            <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{{ $spec['size'] }}</span>
+                            @else
+                            <span class="text-xs text-slate-400">—</span>
+                            @endif
+                        </td>
+                        <td class="py-3 px-4">
                             @if($preview?->link)
                             <a href="{{ $preview->link }}" target="_blank" rel="noopener" class="text-xs text-indigo-500 hover:text-indigo-700 underline truncate max-w-[150px] inline-block">{{ $preview->link }}</a>
                             @else
@@ -66,11 +75,11 @@
                         </td>
                         <td class="py-3 px-4">
                             @php
-                                $s = $ad->starts_at;
-                                $e = $ad->ends_at;
-                                $active = $ad->isActiveForDisplay();
-                                $slotWindowPast = $s && $e && $e->isPast();
-                                $hasQueue = $ad->hasActiveQueueItems();
+                            $s = $ad->starts_at;
+                            $e = $ad->ends_at;
+                            $active = $ad->isActiveForDisplay();
+                            $slotWindowPast = $s && $e && $e->isPast();
+                            $hasQueue = $ad->hasActiveQueueItems();
                             @endphp
                             @if(!$s || !$e)
                             <span class="text-xs font-medium text-amber-700 dark:text-amber-400">মেয়াদ নেই — ফ্রন্টে দেখাবে না</span>
@@ -103,7 +112,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="py-8 px-4 text-center text-slate-500 dark:text-slate-400 text-sm">কোনো অ্যাড স্লট নেই। সিডার চালান: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">php artisan db:seed --class=AdvertisementSeeder</code></td>
+                        <td colspan="8" class="py-8 px-4 text-center text-slate-500 dark:text-slate-400 text-sm">কোনো অ্যাড স্লট নেই। সিডার চালান: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">php artisan db:seed --class=AdvertisementSeeder</code></td>
                     </tr>
                     @endforelse
                 </tbody>

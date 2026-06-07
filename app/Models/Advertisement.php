@@ -398,4 +398,25 @@ class Advertisement extends Model
 
         return 'image';
     }
+
+    /**
+     * @return array{ratio: string, size: string, note: string}|null
+     */
+    public function mediaSpec(): ?array
+    {
+        $spec = config('advertisement_slots.media_specs.'.$this->slug);
+
+        return is_array($spec) ? $spec : null;
+    }
+
+    public function mediaSpecLabel(): ?string
+    {
+        $spec = $this->mediaSpec();
+
+        if (! $spec) {
+            return null;
+        }
+
+        return 'রেশিও '.$spec['ratio'].' · '.$spec['size'];
+    }
 }

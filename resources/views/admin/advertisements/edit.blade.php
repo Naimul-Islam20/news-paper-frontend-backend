@@ -13,53 +13,34 @@
                         <h2 class="text-xl font-semibold text-slate-800 dark:text-white">অ্যাড স্লট সম্পাদনা</h2>
                         <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $advertisement->name }} <span class="text-slate-400">({{ $advertisement->slug }})</span></p>
                     </div>
-                    <button type="button" id="ad-form-clear" class="px-4 py-2 border border-amber-500 dark:border-amber-600 rounded-md text-sm font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition">Clear (মুছুন)</button>
+                    <div class="flex flex-wrap items-center gap-3">
+                        @if($spec = $advertisement->mediaSpec())
+                        <p class="text-sm text-emerald-800 dark:text-emerald-300">
+                            Aspect ratio: {{ $spec['ratio'] }} | সাইজ: {{ $spec['size'] }}
+                        </p>
+                        @endif
+                        <button type="button" id="ad-form-clear" class="px-4 py-2 border border-amber-500 dark:border-amber-600 rounded-md text-sm font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition shrink-0">Clear (মুছুন)</button>
+                    </div>
                 </div>
 
                 <form id="ad-edit-form" action="{{ route('admin.advertisements.update', $advertisement->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
 
-                    @if(!($slotFormDisplay ?? null))
-                    <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/40 px-4 py-3 text-sm text-slate-700 dark:text-slate-300">
-                        <p class="leading-relaxed">সক্রিয় স্লট উইন্ডো নেই — ফর্ম <span class="font-medium">খালি</span>। মেয়াদ শেষ হওয়া অ্যাড <span class="font-medium">পুরনো অ্যাড তালিকা</span>য় চলে গেছে। নতুন অ্যাড দিতে মেয়াদ + মিডিয়া সেট করে সংরক্ষণ করুন।</p>
-                    </div>
-                    @endif
-
-                    {{-- Name / Location: read-only --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">স্লটের নাম (পরিবর্তনযোগ্য নয়)</label>
-                            <div class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 text-sm">{{ $advertisement->name }}</div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">লোকেশন (slug)</label>
-                            <div class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 text-sm font-mono">{{ $advertisement->slug }}</div>
-                        </div>
-                    </div>
-
                     @php
-                        $hasActiveSlotWindow = $advertisement->isWithinSlotScheduleWindow();
-                        $slotDurDaysRaw = 0;
-                        $slotDurHoursRaw = 0;
-                        if ($advertisement->starts_at && $advertisement->ends_at) {
-                            $totalH = max(1, (int) round($advertisement->starts_at->floatDiffInHours($advertisement->ends_at)));
-                            $slotDurDaysRaw = intdiv($totalH, 24);
-                            $slotDurHoursRaw = $totalH % 24;
-                        }
-                        $slotDurDays = (int) old('slot_duration_days', $slotDurDaysRaw);
-                        $slotDurHours = (int) old('slot_duration_hours', $slotDurHoursRaw);
-                        $noSlotSchedule = ! $advertisement->starts_at && ! $advertisement->ends_at;
+                    $hasActiveSlotWindow = $advertisement->isWithinSlotScheduleWindow();
+                    $slotDurDaysRaw = 0;
+                    $slotDurHoursRaw = 0;
+                    if ($advertisement->starts_at && $advertisement->ends_at) {
+                    $totalH = max(1, (int) round($advertisement->starts_at->floatDiffInHours($advertisement->ends_at)));
+                    $slotDurDaysRaw = intdiv($totalH, 24);
+                    $slotDurHoursRaw = $totalH % 24;
+                    }
+                    $slotDurDays = (int) old('slot_duration_days', $slotDurDaysRaw);
+                    $slotDurHours = (int) old('slot_duration_hours', $slotDurHoursRaw);
                     @endphp
                     <div class="p-4 rounded-lg border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/50 dark:bg-indigo-950/20 space-y-4">
                         <h3 class="text-sm font-semibold text-slate-800 dark:text-white">ফ্রন্টে দেখানোর সময়সূচি</h3>
-                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">কমপক্ষে <span class="font-semibold">১ ঘণ্টা</span> অথবা <span class="font-semibold">১ দিন</span> দিতে হবে; <span class="font-semibold">সংরক্ষণের সময়</span> থেকে মেয়াদ গণনা। দিন ও ঘণ্টা দুটোই শূন্য হলে সংরক্ষণ হবে না এবং ফ্রন্টে স্লট দেখাবে না। টাইমজোন: <span class="font-mono">{{ config('app.timezone') }}</span></p>
-                        <p class="text-xs text-indigo-800 dark:text-indigo-200 rounded-md border border-indigo-200/80 dark:border-indigo-800/50 bg-indigo-50/70 dark:bg-indigo-950/30 px-3 py-2 leading-relaxed mt-2"><span class="font-semibold">নিয়ম:</span> উপরের ফর্মের বর্তমান উইন্ডো <strong>চলাকালীন</strong> ফ্রন্টে শুধু ওই ফর্মের ডেটাই দেখাবে। এই সময়ে কিউ ফ্রন্টে আসবে না এবং কিউর মেয়াদ/ক্যালেন্ডার <strong>গণনা বন্ধ</strong> থাকবে। উইন্ডো <strong>শেষ</strong> হলেই কিউ শুরু হবে ও মেয়াদ ঘড়ি চলবে; কোনো কিউ আইটেমের মেয়াদ শেষ হলে পরের কিউ স্বয়ংক্রিয়ভাবে ফ্রন্টে আসবে।</p>
-                        @if($noSlotSchedule)
-                        <p class="text-xs text-amber-900 dark:text-amber-100 rounded-md border border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 leading-relaxed">
-                            <span class="font-semibold">সতর্কতা:</span> এখনও মেয়াদ সেভ করা নেই — ফ্রন্টে এই স্লটের অ্যাড <strong>দেখাবে না</strong>। নিচে দিন বা ঘণ্টা সেট করে সংরক্ষণ করুন।
-                        </p>
-                        @endif
                         @if($advertisement->starts_at && $advertisement->ends_at)
                         <p class="text-xs text-slate-700 dark:text-slate-300 rounded-md border border-indigo-200/80 dark:border-indigo-800/50 bg-white/60 dark:bg-slate-900/40 px-3 py-2">
                             বর্তমান উইন্ডো: <span class="font-medium tabular-nums">{{ $advertisement->starts_at->format('d M Y, H:i') }}</span>
@@ -78,8 +59,8 @@
                                     <label for="slot_duration_days" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">দিন</label>
                                     <select name="slot_duration_days" id="slot_duration_days" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm">
                                         @for($d = 0; $d <= 365; $d++)
-                                            <option value="{{ $d }}" @selected((int) old('slot_duration_days', $slotDurDays) === $d)>{{ $d }} দিন</option>
-                                        @endfor
+                                            <option value="{{ $d }}" @selected((int) old('slot_duration_days', $slotDurDays)===$d)>{{ $d }} দিন</option>
+                                            @endfor
                                     </select>
                                     @error('slot_duration_days')
                                     <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
@@ -89,8 +70,8 @@
                                     <label for="slot_duration_hours" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ঘণ্টা</label>
                                     <select name="slot_duration_hours" id="slot_duration_hours" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm">
                                         @for($h = 0; $h <= 23; $h++)
-                                            <option value="{{ $h }}" @selected((int) old('slot_duration_hours', $slotDurHours) === $h)>{{ $h }} ঘণ্টা</option>
-                                        @endfor
+                                            <option value="{{ $h }}" @selected((int) old('slot_duration_hours', $slotDurHours)===$h)>{{ $h }} ঘণ্টা</option>
+                                            @endfor
                                     </select>
                                     @error('slot_duration_hours')
                                     <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
@@ -117,13 +98,14 @@
                     @endif
 
                     @include('admin.advertisements.partials.media-fields', [
-                        'display' => $slotFormDisplay,
-                        'idPrefix' => '',
+                    'display' => $slotFormDisplay,
+                    'idPrefix' => '',
+                    'mediaSpec' => $advertisement->mediaSpec(),
                     ])
                     @foreach(['image', 'image_mobile', 'video', 'video_mobile', 'video_youtube_id', 'media_type', 'link', 'caption'] as $mediaField)
-                        @error($mediaField)
-                        <p class="text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
-                        @enderror
+                    @error($mediaField)
+                    <p class="text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                    @enderror
                     @endforeach
 
                     <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
@@ -136,7 +118,6 @@
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                         <div>
                             <h3 class="text-lg font-semibold text-slate-800 dark:text-white">অতিরিক্ত অ্যাড কিউ</h3>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">উপরের স্লট ফর্মের উইন্ডো চলাকালীন ফ্রন্টে শুধু সেই অ্যাড; উইন্ডো শেষ হলে নিচের কিউ ক্রমে চলবে। মেয়াদ শেষ হওয়া অ্যাড <span class="font-medium">পুরনো অ্যাড তালিকা</span>য় যাবে।</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
                             <button type="button" id="queue-open-create" class="px-4 py-2 bg-emerald-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition">
@@ -182,16 +163,16 @@
                                     </td>
                                     <td class="px-3 py-2 text-slate-500 dark:text-slate-400 text-xs hidden md:table-cell">
                                         @if($item->usesDurationRotation())
-                                            <span class="tabular-nums">{{ (int) $item->duration_days }} দিন {{ (int) $item->duration_hours }} ঘণ্টা</span>
-                                            @if($item->display_started_at)
-                                                <span class="block text-[10px] text-slate-400 mt-0.5">চালু: {{ $item->display_started_at->format('d M, H:i') }}</span>
-                                            @else
-                                                <span class="block text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">এখনো চালু হয়নি</span>
-                                            @endif
-                                        @elseif($item->starts_at || $item->ends_at)
-                                            {{ optional($item->starts_at)->format('d M H:i') }} → {{ optional($item->ends_at)->format('d M H:i') }}
+                                        <span class="tabular-nums">{{ (int) $item->duration_days }} দিন {{ (int) $item->duration_hours }} ঘণ্টা</span>
+                                        @if($item->display_started_at)
+                                        <span class="block text-[10px] text-slate-400 mt-0.5">চালু: {{ $item->display_started_at->format('d M, H:i') }}</span>
                                         @else
-                                            <span class="text-slate-400">—</span>
+                                        <span class="block text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">এখনো চালু হয়নি</span>
+                                        @endif
+                                        @elseif($item->starts_at || $item->ends_at)
+                                        {{ optional($item->starts_at)->format('d M H:i') }} → {{ optional($item->ends_at)->format('d M H:i') }}
+                                        @else
+                                        <span class="text-slate-400">—</span>
                                         @endif
                                     </td>
                                     <td class="px-3 py-2 text-right tabular-nums text-slate-600 dark:text-slate-300">{{ number_format((int) $item->views_count) }} / {{ number_format((int) $item->clicks_count) }}</td>
@@ -253,11 +234,11 @@
                                         <td class="px-3 py-2 text-slate-700 dark:text-slate-300 max-w-[14rem] truncate">{{ $item->title ?: '—' }}</td>
                                         <td class="px-3 py-2 text-slate-500 dark:text-slate-400 text-xs hidden md:table-cell tabular-nums">
                                             @if($item->display_started_at)
-                                                {{ $item->display_started_at->format('d M Y, H:i') }}
+                                            {{ $item->display_started_at->format('d M Y, H:i') }}
                                             @elseif($item->starts_at)
-                                                {{ $item->starts_at->format('d M Y, H:i') }}
+                                            {{ $item->starts_at->format('d M Y, H:i') }}
                                             @else
-                                                —
+                                            —
                                             @endif
                                         </td>
                                         <td class="px-3 py-2 text-slate-500 dark:text-slate-400 text-xs hidden md:table-cell tabular-nums">
@@ -289,10 +270,11 @@
                         <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800 shrink-0">
                             <div>
                                 <h3 id="queue-dialog-title" class="text-base font-semibold text-slate-900 dark:text-white">নতুন কিউ আইটেম</h3>
-                                <p id="queue-dialog-subtitle" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">অতিরিক্ত অ্যাড কিউতে নতুন আইটেম যোগ করুন।</p>
                             </div>
                             <button type="button" onclick="closeModal('adQueueModal', 'adQueueModalContainer')" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all" aria-label="বন্ধ">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
                             </button>
                         </div>
                     </x-slot>
@@ -307,14 +289,14 @@
                         </div>
 
                         <div class="p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/50 dark:bg-indigo-950/20 space-y-3">
-                            <p class="text-xs font-medium text-slate-700 dark:text-slate-300 leading-relaxed">কতক্ষণ চলবে <span class="text-indigo-700 dark:text-indigo-300">(দিন + ঘণ্টা)</span> — মেয়াদ শেষে ক্রমে পরের অ্যাড একই জায়গায় চলে আসবে। গণনা <span class="font-semibold">প্রথম দেখানোর সময়</span> থেকে শুরু।</p>
+                            <p class="text-xs font-medium text-slate-700 dark:text-slate-300">মেয়াদ (দিন + ঘণ্টা)</p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label for="q_duration_days" class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">দিন</label>
                                     <select name="duration_days" id="q_duration_days" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm focus:ring-1 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white">
                                         @for($d = 0; $d <= 60; $d++)
                                             <option value="{{ $d }}">{{ $d }} দিন</option>
-                                        @endfor
+                                            @endfor
                                     </select>
                                 </div>
                                 <div>
@@ -322,15 +304,16 @@
                                     <select name="duration_hours" id="q_duration_hours" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm focus:ring-1 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white">
                                         @for($h = 0; $h <= 23; $h++)
                                             <option value="{{ $h }}">{{ $h }} ঘণ্টা</option>
-                                        @endfor
+                                            @endfor
                                     </select>
                                 </div>
                             </div>
                         </div>
 
                         @include('admin.advertisements.partials.media-fields', [
-                            'display' => null,
-                            'idPrefix' => 'q_',
+                        'display' => null,
+                        'idPrefix' => 'q_',
+                        'mediaSpec' => $advertisement->mediaSpec(),
                         ])
 
                         <div class="flex items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
@@ -344,26 +327,26 @@
     </div>
 </div>
 @php
-    $queueItemUpdateUrls = $queueItems->mapWithKeys(fn ($i) => [
-        $i->id => route('admin.advertisements.queue-items.update', ['id' => $advertisement->id, 'itemId' => $i->id]),
-    ]);
-    $queueItemsPayload = $queueItems->mapWithKeys(fn ($i) => [
-        $i->id => [
-            'id' => $i->id,
-            'title' => $i->title,
-            'link' => $i->link,
-            'caption' => $i->caption,
-            'video_youtube_id' => $i->video_youtube_id,
-            'media_type' => $i->resolvedMediaType(),
-            'duration_days' => (int) ($i->duration_days ?? 0),
-            'duration_hours' => (int) ($i->duration_hours ?? 0),
-        ],
-    ]);
+$queueItemUpdateUrls = $queueItems->mapWithKeys(fn ($i) => [
+$i->id => route('admin.advertisements.queue-items.update', ['id' => $advertisement->id, 'itemId' => $i->id]),
+]);
+$queueItemsPayload = $queueItems->mapWithKeys(fn ($i) => [
+$i->id => [
+'id' => $i->id,
+'title' => $i->title,
+'link' => $i->link,
+'caption' => $i->caption,
+'video_youtube_id' => $i->video_youtube_id,
+'media_type' => $i->resolvedMediaType(),
+'duration_days' => (int) ($i->duration_days ?? 0),
+'duration_hours' => (int) ($i->duration_hours ?? 0),
+],
+]);
 @endphp
 <script>
-window.__queueItemUpdateUrls = @json($queueItemUpdateUrls);
-window.__queueItemsPayload = @json($queueItemsPayload);
-window.__queueStoreUrl = @json(route('admin.advertisements.queue-items.store', $advertisement->id));
+    window.__queueItemUpdateUrls = @json($queueItemUpdateUrls);
+    window.__queueItemsPayload = @json($queueItemsPayload);
+    window.__queueStoreUrl = @json(route('admin.advertisements.queue-items.store', $advertisement->id));
 </script>
 <script>
     (function() {
@@ -375,7 +358,9 @@ window.__queueStoreUrl = @json(route('admin.advertisements.queue-items.store', $
         var reorderInputs = document.getElementById('queue-reorder-order-inputs');
         if (!qForm || !queueRoot) return;
 
-        function el(id) { return document.getElementById(id); }
+        function el(id) {
+            return document.getElementById(id);
+        }
 
         function toggleMediaPanels(prefix) {
             var typeEl = el(prefix + 'media_type');

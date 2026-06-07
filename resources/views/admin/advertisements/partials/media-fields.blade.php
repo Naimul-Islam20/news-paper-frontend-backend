@@ -1,18 +1,18 @@
 @php
-    $display = $display ?? null;
-    $mediaType = old('media_type', $display?->resolvedMediaType() ?? 'image');
-    $idPrefix = $idPrefix ?? '';
+$display = $display ?? null;
+$mediaType = old('media_type', $display?->resolvedMediaType() ?? 'image');
+$idPrefix = $idPrefix ?? '';
+$mediaSpec = $mediaSpec ?? null;
 @endphp
 
 <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 space-y-4">
-    <p class="text-sm text-slate-600 dark:text-slate-400">ইমেজ, GIF, আপলোডেড ভিডিও বা YouTube — যেকোনো একটি বেছে নিন।</p>
 
     <div>
         <label for="{{ $idPrefix }}media_type" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">মিডিয়া ধরন</label>
         <select name="media_type" id="{{ $idPrefix }}media_type" class="ad-media-type-select w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm" data-prefix="{{ $idPrefix }}">
-            <option value="image" @selected($mediaType === 'image')>ইমেজ / GIF</option>
-            <option value="video" @selected($mediaType === 'video')>ভিডিও ফাইল (MP4, WebM)</option>
-            <option value="youtube" @selected($mediaType === 'youtube')>YouTube</option>
+            <option value="image" @selected($mediaType==='image' )>ইমেজ / GIF</option>
+            <option value="video" @selected($mediaType==='video' )>ভিডিও ফাইল (MP4, WebM)</option>
+            <option value="youtube" @selected($mediaType==='youtube' )>YouTube</option>
         </select>
     </div>
 
