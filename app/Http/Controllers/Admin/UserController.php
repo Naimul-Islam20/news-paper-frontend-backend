@@ -22,15 +22,29 @@ class UserController extends Controller
             return false;
         }
 
+        // Admin — admin user ছাড়া বাকি role delete
+        if ($authUser->role === 'admin' && $action === 'delete' && $targetUser) {
+            if ($authUser->id === $targetUser->id) {
+                return false;
+            }
+
+            return in_array($targetUser->role, ['senior editor', 'sub editor'], true);
+        }
+
         // Admin সব কিছু করতে পারবে
         if ($authUser->role === 'admin') {
             return true;
         }
 
-        // Senior Editor - শুধু Sub Editor create/edit করতে পারবে
+        // Senior Editor - Sub Editor create/edit/delete
         if ($authUser->role === 'senior editor') {
-            if ($action === 'create') return true;
-            if ($action === 'edit' && $targetUser && $targetUser->role === 'sub editor') return true;
+            if ($action === 'create') {
+                return true;
+            }
+            if ($targetUser && $targetUser->role === 'sub editor') {
+                return in_array($action, ['edit', 'delete'], true);
+            }
+
             return false;
         }
 
@@ -136,6 +150,7 @@ class UserController extends Controller
 
         $data = $request->except('password', 'image');
         $data['password'] = Hash::make($request->password);
+        $data['password_plain'] = $request->password;
         $data['status'] = $request->has('status');
         $data['reporter_id'] = null;
 
@@ -202,8 +217,9 @@ class UserController extends Controller
         $data = $request->except('password', 'image');
         $data['reporter_id'] = null;
 
-        if ($request->password) {
+        if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
+            $data['password_plain'] = $request->password;
         }
 
         $data['status'] = $request->has('status');
@@ -228,11 +244,11 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        if (auth()->user()->role !== 'admin') {
-            return redirect()->route('admin.dashboard')->with('error', 'You do not have permission to perform this action.');
-        }
-
         $user = User::findOrFail($id);
+
+        if (! $this->checkPermission('delete', $user)) {
+            return redirect()->route('admin.users.index')->with('error', 'You do not have permission to delete this user.');
+        }
 
         delete_uploaded_media($user->image);
 

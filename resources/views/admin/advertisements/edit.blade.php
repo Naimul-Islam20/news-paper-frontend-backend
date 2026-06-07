@@ -100,9 +100,9 @@
                         </div>
                     </div>
 
+                    @if($slotFormDisplay ?? null)
                     <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50">
-                        <h3 class="text-sm font-semibold text-slate-800 dark:text-white mb-2">পরিসংখ্যান </h3>
-                        
+                        <h3 class="text-sm font-semibold text-slate-800 dark:text-white mb-2">পরিসংখ্যান (চলমান স্লট)</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="rounded-md border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 px-4 py-3">
                                 <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">ভিউ</p>
@@ -114,6 +114,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     @include('admin.advertisements.partials.media-fields', [
                         'display' => $slotFormDisplay,

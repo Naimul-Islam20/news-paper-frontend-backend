@@ -20,6 +20,8 @@ class Advertisement extends Model
         'video_youtube_id',
         'starts_at',
         'ends_at',
+        'views_count',
+        'clicks_count',
     ];
 
     protected function casts(): array
@@ -90,44 +92,80 @@ class Advertisement extends Model
     }
 
     /**
-     * স্লটের মেয়াদ শেষ হলে কনটেন্ট পুরনো তালিকায় (expired কিউ আইটেম) সরিয়ে ফর্ম খালি রাখে।
+     * স্লটের মেয়াদ শেষ বা সক্রিয় উইন্ডো বাইরে থাকা কনটেন্ট পুরনো তালিকায় সরিয়ে ফর্ম খালি রাখে।
      */
     public function archiveExpiredSlotIfNeeded(): bool
     {
-        if (! $this->ends_at || $this->ends_at->gte(now())) {
+        if ($this->isWithinSlotScheduleWindow()) {
             return false;
         }
 
-        if ($this->starts_at && ($this->hasDisplayableMedia() || filled($this->link))) {
-            $totalH = max(1, (int) round($this->starts_at->floatDiffInHours($this->ends_at)));
-            $days = intdiv($totalH, 24);
-            $hours = $totalH % 24;
+        // আসন্ন বা এখনও চলবে এমন উইন্ডো — স্পর্শ করব না
+        if ($this->starts_at && $this->starts_at->gt(now())) {
+            return false;
+        }
+        if ($this->ends_at && $this->ends_at->gte(now())) {
+            return false;
+        }
 
-            AdvertisementQueueItem::query()->create([
-                'advertisement_id' => $this->id,
-                'sort_order' => 9999,
-                'title' => 'স্লট অ্যাড ('.$this->starts_at->format('d M Y, H:i').' – '.$this->ends_at->format('d M Y, H:i').')',
-                'image' => $this->image,
-                'image_mobile' => $this->image_mobile,
-                'video' => $this->video,
-                'video_mobile' => $this->video_mobile,
-                'link' => $this->link,
-                'caption' => $this->caption,
-                'video_youtube_id' => $this->video_youtube_id,
-                'starts_at' => $this->starts_at,
-                'ends_at' => $this->ends_at,
-                'display_started_at' => $this->starts_at,
-                'duration_days' => $days,
-                'duration_hours' => $hours,
-                'expired_at' => now(),
-                'views_count' => (int) ($this->views_count ?? 0),
-                'clicks_count' => (int) ($this->clicks_count ?? 0),
-            ]);
+        $hasContent = $this->hasDisplayableMedia() || filled($this->link);
+        $hasSchedule = $this->starts_at !== null || $this->ends_at !== null;
+
+        if (! $hasContent && ! $hasSchedule) {
+            return false;
+        }
+
+        if ($hasContent) {
+            $this->archiveSlotContentToHistory();
         }
 
         $this->clearSlotContent();
 
         return true;
+    }
+
+    protected function archiveSlotContentToHistory(): void
+    {
+        if (! $this->hasDisplayableMedia() && ! filled($this->link)) {
+            return;
+        }
+
+        $totalH = 1;
+        $days = 0;
+        $hours = 1;
+        if ($this->starts_at && $this->ends_at) {
+            $totalH = max(1, (int) round($this->starts_at->floatDiffInHours($this->ends_at)));
+            $days = intdiv($totalH, 24);
+            $hours = $totalH % 24;
+        }
+
+        $title = 'স্লট অ্যাড';
+        if ($this->starts_at && $this->ends_at) {
+            $title .= ' ('.$this->starts_at->format('d M Y, H:i').' – '.$this->ends_at->format('d M Y, H:i').')';
+        } elseif ($this->ends_at) {
+            $title .= ' (মেয়াদ শেষ '.$this->ends_at->format('d M Y, H:i').')';
+        }
+
+        AdvertisementQueueItem::query()->create([
+            'advertisement_id' => $this->id,
+            'sort_order' => 9999,
+            'title' => $title,
+            'image' => $this->image,
+            'image_mobile' => $this->image_mobile,
+            'video' => $this->video,
+            'video_mobile' => $this->video_mobile,
+            'link' => $this->link,
+            'caption' => $this->caption,
+            'video_youtube_id' => $this->video_youtube_id,
+            'starts_at' => $this->starts_at,
+            'ends_at' => $this->ends_at,
+            'display_started_at' => $this->starts_at,
+            'duration_days' => $days,
+            'duration_hours' => $hours,
+            'expired_at' => now(),
+            'views_count' => (int) ($this->views_count ?? 0),
+            'clicks_count' => (int) ($this->clicks_count ?? 0),
+        ]);
     }
 
     public static function archiveExpiredSlotForId(int $advertisementId): void
@@ -136,6 +174,26 @@ class Advertisement extends Model
         if ($ad) {
             $ad->archiveExpiredSlotIfNeeded();
         }
+    }
+
+    /** অ্যাডমিন তালিকা/ফ্রন্ট লোডের আগে সব নিষ্ক্রিয় স্লট পরিষ্কার */
+    public static function archiveAllExpiredSlots(): void
+    {
+        static::query()
+            ->orderBy('id')
+            ->each(fn (self $ad) => $ad->archiveExpiredSlotIfNeeded());
+    }
+
+    /**
+     * অ্যাডমিন তালিকায় প্রিভিউ: শুধু চলমান স্লট উইন্ডোর মিডিয়া (কিউ/মেয়াদোত্তীর্ণ স্লট নয়)।
+     */
+    public function adminListPreview(): ?self
+    {
+        if ($this->isWithinSlotScheduleWindow() && $this->hasDisplayableMedia()) {
+            return $this;
+        }
+
+        return null;
     }
 
     public function clearSlotContent(): void

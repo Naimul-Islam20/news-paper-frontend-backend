@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Reporter;
 use App\Models\Topic;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -82,8 +83,12 @@ class PostController extends Controller
         return view('admin.posts.create', compact('categories', 'reporters', 'topics'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
+        if ($request->boolean('bulk_delete')) {
+            return $this->bulkDestroy($request);
+        }
+
         $request->validate([
             'title'              => 'required|string|max:255',
             'sub_title_points'   => 'nullable|array',
@@ -296,6 +301,34 @@ class PostController extends Controller
         delete_uploaded_media($post->image);
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully!');
+    }
+
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:posts,id',
+        ], [
+            'ids.required' => 'কমপক্ষে একটি পোস্ট নির্বাচন করুন।',
+            'ids.min' => 'কমপক্ষে একটি পোস্ট নির্বাচন করুন।',
+        ]);
+
+        $ids = array_values(array_unique(array_map('intval', $validated['ids'])));
+        $deleted = 0;
+
+        foreach (Post::whereIn('id', $ids)->get() as $post) {
+            delete_uploaded_media($post->image);
+            $post->delete();
+            $deleted++;
+        }
+
+        $message = $deleted === 1
+            ? '১টি পোস্ট মুছে ফেলা হয়েছে।'
+            : "{$deleted}টি পোস্ট মুছে ফেলা হয়েছে।";
+
+        return redirect()
+            ->route('admin.posts.index', $request->only(['search', 'category_id', 'status']))
+            ->with('success', $message);
     }
 
     /** Reporter লগইন থাকলে শুধু ওই রিপোর্টার; Sub Editor হলে শুধু নিজের reporter desk; নাহলে সব active reporter */

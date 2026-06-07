@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\PostTooLargeException;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -25,5 +27,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToGroup('web', \App\Http\Middleware\ShareSiteMeta::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (PostTooLargeException $e, Request $request) {
+            if (! $request->is('admin/*')) {
+                return null;
+            }
+
+            $message = 'আপলোড ব্যর্থ: ফাইল বা ফর্ম ডেটা সার্ভারের সীমা (post_max_size) ছাড়িয়ে গেছে। '
+                .'২৪MB+ ভিডিওর জন্য হোস্টিং/cPanel এ upload_max_filesize ও post_max_size কমপক্ষে 64M সেট করুন। '
+                .'(Nginx হলে client_max_body_size 64M)';
+
+            return redirect()->back()
+                ->withInput($request->except(['image', 'image_mobile', 'video', 'video_mobile', '_token']))
+                ->withErrors(['video' => $message]);
+        });
     })->create();

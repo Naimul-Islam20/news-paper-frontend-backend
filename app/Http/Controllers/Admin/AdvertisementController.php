@@ -14,6 +14,8 @@ class AdvertisementController extends Controller
 {
     public function index(): View
     {
+        Advertisement::archiveAllExpiredSlots();
+
         $advertisements = Advertisement::orderBy('slug')->get();
 
         return view('admin.advertisements.index', compact('advertisements'));
@@ -25,6 +27,12 @@ class AdvertisementController extends Controller
 
         Advertisement::archiveExpiredSlotForId((int) $advertisement->id);
         $advertisement->refresh();
+
+        if (! $advertisement->isWithinSlotScheduleWindow()
+            && ((int) ($advertisement->views_count ?? 0) > 0 || (int) ($advertisement->clicks_count ?? 0) > 0)) {
+            $advertisement->update(['views_count' => 0, 'clicks_count' => 0]);
+            $advertisement->refresh();
+        }
 
         AdvertisementQueueItem::reconcileExpiredForAdvertisementId((int) $advertisement->id);
 
