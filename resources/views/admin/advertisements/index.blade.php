@@ -81,7 +81,9 @@
                             $slotWindowPast = $s && $e && $e->isPast();
                             $hasQueue = $ad->hasActiveQueueItems();
                             @endphp
-                            @if(!$s || !$e)
+                            @if($ad->is_auto && $s)
+                            <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">Auto · চলছে</span>
+                            @elseif(!$s || (!$e && ! $ad->is_auto))
                             <span class="text-xs font-medium text-amber-700 dark:text-amber-400">মেয়াদ নেই — ফ্রন্টে দেখাবে না</span>
                             @elseif($active && $slotWindowPast && $hasQueue)
                             <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400">স্লট মেয়াদ শেষ · কিউ চলছে</span>
@@ -94,10 +96,12 @@
                             @else
                             <span class="text-xs text-slate-400">—</span>
                             @endif
-                            @if($s || $e)
+                            @if($s || $e || $ad->is_auto)
                             <div class="text-[10px] text-slate-400 mt-0.5 font-mono leading-tight">
                                 @if($s)<span>থেকে {{ $s->format('d M, H:i') }}</span>@endif
-                                @if($e)<span class="block">পর্যন্ত {{ $e->format('d M, H:i') }}</span>@endif
+                                @if($ad->is_auto)
+                                <span class="block">Auto</span>
+                                @elseif($e)<span class="block">পর্যন্ত {{ $e->format('d M, H:i') }}</span>@endif
                             </div>
                             @endif
                         </td>

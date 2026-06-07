@@ -20,6 +20,7 @@ class Advertisement extends Model
         'video_youtube_id',
         'starts_at',
         'ends_at',
+        'is_auto',
         'views_count',
         'clicks_count',
     ];
@@ -29,6 +30,7 @@ class Advertisement extends Model
         return [
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            'is_auto' => 'boolean',
         ];
     }
 
@@ -41,15 +43,22 @@ class Advertisement extends Model
 
         return $query
             ->whereNotNull('starts_at')
-            ->whereNotNull('ends_at')
             ->where(function (Builder $q) use ($now) {
                 $q->where(function (Builder $w) use ($now) {
-                    $w->where('starts_at', '<=', $now)
-                        ->where('ends_at', '>=', $now);
+                    $w->where('is_auto', true)
+                        ->where('starts_at', '<=', $now);
                 })->orWhere(function (Builder $w) use ($now) {
-                    $w->where('ends_at', '<', $now)
-                        ->whereHas('queueItems', function (Builder $qi) {
-                            $qi->whereNull('expired_at');
+                    $w->whereNotNull('ends_at')
+                        ->where(function (Builder $inner) use ($now) {
+                            $inner->where(function (Builder $live) use ($now) {
+                                $live->where('starts_at', '<=', $now)
+                                    ->where('ends_at', '>=', $now);
+                            })->orWhere(function (Builder $past) use ($now) {
+                                $past->where('ends_at', '<', $now)
+                                    ->whereHas('queueItems', function (Builder $qi) {
+                                        $qi->whereNull('expired_at');
+                                    });
+                            });
                         });
                 });
             });
@@ -57,12 +66,20 @@ class Advertisement extends Model
 
     public function isActiveForDisplay(): bool
     {
-        if (! $this->starts_at || ! $this->ends_at) {
+        if (! $this->starts_at) {
             return false;
         }
 
         $now = now();
         if ($this->starts_at->gt($now)) {
+            return false;
+        }
+
+        if ($this->is_auto) {
+            return true;
+        }
+
+        if (! $this->ends_at) {
             return false;
         }
 
@@ -82,11 +99,19 @@ class Advertisement extends Model
     /** মূল স্লট ফর্মের ক্যালেন্ডার উইন্ডো এখন চলছে কিনা (এই সময় কিউ ফ্রন্টে মিলাব না) */
     public function isWithinSlotScheduleWindow(): bool
     {
-        if (! $this->starts_at || ! $this->ends_at) {
+        if (! $this->starts_at) {
             return false;
         }
 
         $now = now();
+
+        if ($this->is_auto) {
+            return $this->starts_at->lte($now);
+        }
+
+        if (! $this->ends_at) {
+            return false;
+        }
 
         return $this->starts_at->lte($now) && $this->ends_at->gte($now);
     }
@@ -96,7 +121,7 @@ class Advertisement extends Model
      */
     public function archiveExpiredSlotIfNeeded(): bool
     {
-        if ($this->isWithinSlotScheduleWindow()) {
+        if ($this->is_auto || $this->isWithinSlotScheduleWindow()) {
             return false;
         }
 
@@ -208,6 +233,7 @@ class Advertisement extends Model
             'video_youtube_id' => null,
             'starts_at' => null,
             'ends_at' => null,
+            'is_auto' => false,
             'views_count' => 0,
             'clicks_count' => 0,
         ]);

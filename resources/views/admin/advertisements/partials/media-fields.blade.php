@@ -5,7 +5,7 @@ $idPrefix = $idPrefix ?? '';
 $mediaSpec = $mediaSpec ?? null;
 @endphp
 
-<div class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 space-y-4">
+<div class="space-y-4">
 
     <div>
         <label for="{{ $idPrefix }}media_type" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">মিডিয়া ধরন</label>

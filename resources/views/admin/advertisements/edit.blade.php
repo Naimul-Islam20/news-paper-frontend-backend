@@ -28,7 +28,6 @@
                     @method('PUT')
 
                     @php
-                    $hasActiveSlotWindow = $advertisement->isWithinSlotScheduleWindow();
                     $slotDurDaysRaw = 0;
                     $slotDurHoursRaw = 0;
                     if ($advertisement->starts_at && $advertisement->ends_at) {
@@ -38,45 +37,45 @@
                     }
                     $slotDurDays = (int) old('slot_duration_days', $slotDurDaysRaw);
                     $slotDurHours = (int) old('slot_duration_hours', $slotDurHoursRaw);
+                    $slotAuto = old('slot_auto', $advertisement->is_auto ? '1' : '0') === '1';
                     @endphp
-                    <div class="p-4 rounded-lg border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/50 dark:bg-indigo-950/20 space-y-4">
-                        <h3 class="text-sm font-semibold text-slate-800 dark:text-white">ফ্রন্টে দেখানোর সময়সূচি</h3>
-                        @if($advertisement->starts_at && $advertisement->ends_at)
-                        <p class="text-xs text-slate-700 dark:text-slate-300 rounded-md border border-indigo-200/80 dark:border-indigo-800/50 bg-white/60 dark:bg-slate-900/40 px-3 py-2">
-                            বর্তমান উইন্ডো: <span class="font-medium tabular-nums">{{ $advertisement->starts_at->format('d M Y, H:i') }}</span>
-                            → <span class="font-medium tabular-nums">{{ $advertisement->ends_at->format('d M Y, H:i') }}</span>
-                            @if($hasActiveSlotWindow)
-                            <span class="text-emerald-600 dark:text-emerald-400">(সক্রিয়)</span>
-                            @else
-                            <span class="text-slate-500">(শেষ)</span>
-                            @endif
-                        </p>
-                        @endif
-                        <div class="p-3 rounded-lg border border-indigo-100 dark:border-indigo-900/40 bg-white/70 dark:bg-slate-900/30 space-y-3">
-                            <p class="text-xs font-medium text-slate-700 dark:text-slate-300">মেয়াদ (দিন + ঘণ্টা) <span class="text-rose-600 dark:text-rose-400 font-normal">*</span></p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="slot_duration_days" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">দিন</label>
-                                    <select name="slot_duration_days" id="slot_duration_days" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm">
-                                        @for($d = 0; $d <= 365; $d++)
-                                            <option value="{{ $d }}" @selected((int) old('slot_duration_days', $slotDurDays)===$d)>{{ $d }} দিন</option>
-                                            @endfor
-                                    </select>
-                                    @error('slot_duration_days')
-                                    <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                                <div>
-                                    <label for="slot_duration_hours" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ঘণ্টা</label>
-                                    <select name="slot_duration_hours" id="slot_duration_hours" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm">
-                                        @for($h = 0; $h <= 23; $h++)
-                                            <option value="{{ $h }}" @selected((int) old('slot_duration_hours', $slotDurHours)===$h)>{{ $h }} ঘণ্টা</option>
-                                            @endfor
-                                    </select>
-                                    @error('slot_duration_hours')
-                                    <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                    <div class="space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <p class="text-xs font-medium text-slate-700 dark:text-slate-300">
+                                মেয়াদ (দিন + ঘণ্টা)
+                                <span id="slot-duration-required" class="text-rose-600 dark:text-rose-400 font-normal {{ $slotAuto ? 'hidden' : '' }}">*</span>
+                            </p>
+                            <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                <input type="hidden" name="slot_auto" value="0">
+                                <input type="checkbox" name="slot_auto" id="slot_auto" value="1" class="sr-only" {{ $slotAuto ? 'checked' : '' }}>
+                                <span id="slot_auto_track" aria-hidden="true" class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors duration-200 {{ $slotAuto ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600' }}">
+                                    <span id="slot_auto_knob" class="block h-5 w-5 shrink-0 rounded-full bg-white border border-slate-200 shadow-sm transition-transform duration-200 ease-in-out dark:border-slate-400" style="transform: translateX({{ $slotAuto ? '20px' : '0px' }});"></span>
+                                </span>
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Auto</span>
+                            </label>
+                        </div>
+                        <div id="slot-duration-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-4 {{ $slotAuto ? 'opacity-50 pointer-events-none' : '' }}">
+                            <div>
+                                <label for="slot_duration_days" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">দিন</label>
+                                <select name="slot_duration_days" id="slot_duration_days" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm">
+                                    @for($d = 0; $d <= 365; $d++)
+                                        <option value="{{ $d }}" @selected((int) old('slot_duration_days', $slotDurDays)===$d)>{{ $d }} দিন</option>
+                                    @endfor
+                                </select>
+                                @error('slot_duration_days')
+                                <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="slot_duration_hours" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ঘণ্টা</label>
+                                <select name="slot_duration_hours" id="slot_duration_hours" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm">
+                                    @for($h = 0; $h <= 23; $h++)
+                                        <option value="{{ $h }}" @selected((int) old('slot_duration_hours', $slotDurHours)===$h)>{{ $h }} ঘণ্টা</option>
+                                    @endfor
+                                </select>
+                                @error('slot_duration_hours')
+                                <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -193,10 +192,6 @@
                             </tbody>
                         </table>
                     </div>
-                    @else
-                    <p class="text-sm text-slate-500 dark:text-slate-400 py-4 px-4 rounded-lg border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20">
-                        কিউ তালিকায় এখন কোনো অ্যাড নেই। যোগ করতে <span class="font-medium text-slate-700 dark:text-slate-300">আরেকটি অ্যাড যোগ করুন</span> ব্যবহার করুন।
-                    </p>
                     @endif
 
                     <div class="mt-10 pt-8 border-t border-slate-200 dark:border-slate-800">
@@ -475,6 +470,35 @@ $i->id => [
         });
     })();
 
+    (function() {
+        var checkbox = document.getElementById('slot_auto');
+        var track = document.getElementById('slot_auto_track');
+        var knob = document.getElementById('slot_auto_knob');
+        var fields = document.getElementById('slot-duration-fields');
+        var required = document.getElementById('slot-duration-required');
+        if (!checkbox) return;
+
+        function syncSlotAutoUI() {
+            var on = checkbox.checked;
+            if (track) {
+                track.classList.toggle('bg-emerald-500', on);
+                track.classList.toggle('bg-slate-300', !on);
+                track.classList.toggle('dark:bg-slate-600', !on);
+            }
+            if (knob) {
+                knob.style.transform = on ? 'translateX(20px)' : 'translateX(0px)';
+            }
+            if (fields) {
+                fields.classList.toggle('opacity-50', on);
+                fields.classList.toggle('pointer-events-none', on);
+            }
+            if (required) required.classList.toggle('hidden', on);
+        }
+
+        checkbox.addEventListener('change', syncSlotAutoUI);
+        syncSlotAutoUI();
+    })();
+
     var adClearBtn = document.getElementById('ad-form-clear');
     if (adClearBtn) adClearBtn.addEventListener('click', function() {
         var form = document.getElementById('ad-edit-form');
@@ -486,6 +510,11 @@ $i->id => [
         var sh = form.querySelector('#slot_duration_hours');
         if (sd) sd.value = '1';
         if (sh) sh.value = '0';
+        var slotAuto = form.querySelector('#slot_auto');
+        if (slotAuto) {
+            slotAuto.checked = false;
+            slotAuto.dispatchEvent(new Event('change'));
+        }
         form.querySelectorAll('input[type="file"]').forEach(function(inp) {
             inp.value = '';
         });

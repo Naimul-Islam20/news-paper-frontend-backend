@@ -68,8 +68,9 @@ class AdvertisementController extends Controller
         $advertisement = Advertisement::findOrFail($id);
 
         $request->validate(array_merge($this->mediaValidationRules(), [
-            'slot_duration_days' => 'required|integer|min:0|max:365',
-            'slot_duration_hours' => 'required|integer|min:0|max:23',
+            'slot_auto' => 'nullable|in:0,1',
+            'slot_duration_days' => 'nullable|integer|min:0|max:365',
+            'slot_duration_hours' => 'nullable|integer|min:0|max:23',
         ]));
 
         $data = [
@@ -81,17 +82,28 @@ class AdvertisementController extends Controller
             return $mediaError;
         }
 
-        $days = min(365, max(0, (int) $request->input('slot_duration_days', 0)));
-        $hours = min(23, max(0, (int) $request->input('slot_duration_hours', 0)));
+        $isAuto = $request->input('slot_auto', '0') === '1';
 
-        if ($days + $hours === 0) {
-            return redirect()->back()
-                ->withErrors(['slot_duration_hours' => 'কমপক্ষে ১ ঘণ্টা বা ১ দিন মেয়াদ দিতে হবে। নইলে সংরক্ষণ হবে না এবং ফ্রন্টে অ্যাড দেখাবে না।'])
-                ->withInput();
+        if ($isAuto) {
+            $data['is_auto'] = true;
+            $data['starts_at'] = ($advertisement->is_auto && $advertisement->starts_at)
+                ? $advertisement->starts_at
+                : now();
+            $data['ends_at'] = null;
+        } else {
+            $days = min(365, max(0, (int) $request->input('slot_duration_days', 0)));
+            $hours = min(23, max(0, (int) $request->input('slot_duration_hours', 0)));
+
+            if ($days + $hours === 0) {
+                return redirect()->back()
+                    ->withErrors(['slot_duration_hours' => 'Auto বন্ধ থাকলে কমপক্ষে ১ ঘণ্টা বা ১ দিন মেয়াদ দিন।'])
+                    ->withInput();
+            }
+
+            $data['is_auto'] = false;
+            $data['starts_at'] = now();
+            $data['ends_at'] = now()->copy()->addDays($days)->addHours($hours);
         }
-
-        $data['starts_at'] = now();
-        $data['ends_at'] = now()->copy()->addDays($days)->addHours($hours);
 
         $advertisement->update($data);
 

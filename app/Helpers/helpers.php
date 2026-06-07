@@ -369,6 +369,79 @@ if (! function_exists('inject_post_detail_ads_between_paragraphs')) {
     }
 }
 
+if (! function_exists('share_meta_description')) {
+    /**
+     * Open Graph share description — article excerpt (title duplicate বাদ)।
+     */
+    function share_meta_description(?string $html, ?string $title = null, int $limit = 200): string
+    {
+        $desc = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($html ?? ''))) ?? '');
+
+        if ($desc === '') {
+            return '';
+        }
+
+        if ($title !== null && trim($title) !== '') {
+            $normTitle = mb_strtolower(preg_replace('/\s+/u', ' ', trim($title)));
+            $normDesc = mb_strtolower(preg_replace('/\s+/u', ' ', $desc));
+
+            if ($normDesc === $normTitle) {
+                return '';
+            }
+
+            if (str_starts_with($normDesc, $normTitle)) {
+                $rest = trim(mb_substr($desc, mb_strlen(trim($title))));
+                $rest = ltrim($rest, " \t\n\r\0\x0B.,;:-–—");
+                if (mb_strlen($rest) >= 10) {
+                    $desc = $rest;
+                } else {
+                    $sentences = preg_split('/(?<=[।.!?])\s+/u', $desc) ?: [];
+                    $desc = '';
+                    foreach ($sentences as $sentence) {
+                        $sentence = trim($sentence);
+                        if ($sentence === '' || mb_strtolower($sentence) === $normTitle) {
+                            continue;
+                        }
+                        $desc = $sentence;
+                        break;
+                    }
+                    if ($desc === '') {
+                        return '';
+                    }
+                }
+            }
+        }
+
+        $limited = \Illuminate\Support\Str::limit($desc, $limit);
+
+        if ($title !== null && trim($title) !== '' && mb_strtolower(trim($limited)) === mb_strtolower(trim($title))) {
+            return '';
+        }
+
+        return $limited;
+    }
+}
+
+if (! function_exists('share_site_label')) {
+    /**
+     * Share preview-তে title-এর নিচে site domain দেখানো (article excerpt নয়)।
+     */
+    function share_site_label(?string $pageUrl = null): string
+    {
+        $host = $pageUrl ? parse_url($pageUrl, PHP_URL_HOST) : null;
+        if (is_string($host) && $host !== '') {
+            return $host;
+        }
+
+        $appHost = parse_url(config('app.url', url('/')), PHP_URL_HOST);
+        if (is_string($appHost) && $appHost !== '') {
+            return $appHost;
+        }
+
+        return '';
+    }
+}
+
 if (! function_exists('news_url')) {
     /**
      * Build simple news post URL (/{slug}).

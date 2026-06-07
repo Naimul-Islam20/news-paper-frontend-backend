@@ -9,21 +9,27 @@
     @if(!empty(optional($siteMeta)->site_keywords))
     <meta name="keywords" content="{{ $siteMeta->site_keywords }}">
     @endif
-    @if(!empty(optional($siteMeta)->site_description))
+    @if(!empty(optional($siteMeta)->site_description) && ! isset($ogTitle))
     <meta name="description" content="{{ $siteMeta->site_description }}">
     @endif
     @if(!empty(optional($siteMeta)->site_icon))
     <link rel="icon" href="{{ storage_image_url($siteMeta->site_icon) }}" type="image/png">
     @endif
 
-    {{-- Open Graph & Twitter Card: শেয়ার করলে পোস্টের ইমেজ, টাইটেল, ডিসক্রিপশন প্রিভিউ দেখাবে --}}
-    @php $hasShareMeta = (isset($metaImage) && $metaImage !== '') || (isset($metaDescription) && $metaDescription !== ''); @endphp
+    {{-- Open Graph & Twitter Card: শেয়ার প্রিভিউ — ইমেজ + টাইটেল + site domain --}}
+    @php
+        $hasShareMeta = (isset($metaImage) && $metaImage !== '') || isset($ogTitle);
+        $shareTitle = $ogTitle ?? $title ?? (optional($siteMeta)->site_name ?? 'The Daily News');
+        $sharePageUrl = isset($shareUrl) && trim((string) $shareUrl) !== '' ? trim((string) $shareUrl) : url()->current();
+        $shareSiteLabel = share_site_label($sharePageUrl);
+    @endphp
     @if($hasShareMeta)
+    <link rel="canonical" href="{{ $sharePageUrl }}">
     <meta property="og:type" content="article">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="{{ $ogTitle ?? $title ?? (optional($siteMeta)->site_name ?? 'The Daily News') }}">
-    @if(isset($metaDescription) && $metaDescription !== '')
-    <meta property="og:description" content="{{ $metaDescription }}">
+    <meta property="og:url" content="{{ $sharePageUrl }}">
+    <meta property="og:title" content="{{ $shareTitle }}">
+    @if($shareSiteLabel !== '')
+    <meta property="og:description" content="{{ $shareSiteLabel }}">
     @endif
     @if(isset($metaImage) && trim($metaImage) !== '')
     @php
@@ -40,10 +46,9 @@
     <meta property="og:site_name" content="{{ optional($siteMeta)->site_name ?? 'The Daily News' }}">
     <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="{{ url()->current() }}">
-    <meta name="twitter:title" content="{{ $ogTitle ?? $title ?? (optional($siteMeta)->site_name ?? 'The Daily News') }}">
-    @if(isset($metaDescription) && $metaDescription !== '')
-    <meta name="twitter:description" content="{{ $metaDescription }}">
+    <meta name="twitter:title" content="{{ $shareTitle }}">
+    @if($shareSiteLabel !== '')
+    <meta name="twitter:description" content="{{ $shareSiteLabel }}">
     @endif
     @else
     {{-- সাধারণ পেজ: শেয়ার করলে সাইটের ডিফল্ট --}}
