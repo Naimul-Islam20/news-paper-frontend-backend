@@ -50,7 +50,7 @@
 
                     @media (min-width: 768px) {
                         .national-grid {
-                            grid-template-columns: 1.7fr 7.4fr;
+                            grid-template-columns: 1.7fr 7.4fr 2.9fr;
                         }
                     }
                 </style>
@@ -63,8 +63,8 @@
 
                     <div class="bg-white flex flex-col gap-0 md:border-r md:border-slate-200 pr-0 md:pr-3">
 
-                        @if(isset($posts) && $posts->count() > 0)
-                        @php $featured = $posts->first(); @endphp
+                        @if(isset($heroPosts) && $heroPosts->count() > 0)
+                        @php $featured = $heroPosts->first(); @endphp
                         {{-- প্রধান নিউজ কার্ড (Featured Article) – নতুন প্রথমে --}}
                         <article class="flex flex-col-reverse md:flex-row gap-3 pb-3 last:border-0 text-left border-b border-gray-100">
                             <div class="flex flex-col justify-start gap-3 flex-1">
@@ -101,7 +101,7 @@
                         </article>
 
                         {{-- পরবর্তী ৩টা পোস্ট গ্রিড --}}
-                        @php $gridPosts = $posts->slice(1, 3); @endphp
+                        @php $gridPosts = $heroPosts->slice(1, 3); @endphp
                         @if($gridPosts->count() > 0)
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-0 pt-3">
                             @foreach($gridPosts as $index => $post)
@@ -125,9 +125,6 @@
                             </article>
                             @endforeach
                         </div>
-                        @endif
-                        @if($posts->hasPages())
-                        <div class="mt-6 flex justify-center">{{ $posts->links() }}</div>
                         @endif
                         @else
                         <p class="py-10 text-center text-slate-500">কোন বিশেষ সংবাদ নেই।</p>
@@ -210,13 +207,7 @@
                         {{-- কন্টেন্ট আপাতত খালি --}}
                     </div>
 
-                    <!-- মাঝের কলাম: উপরের ৪টার পর বাকি বিশেষ সংবাদ – নতুন এড হলে উপরে যাবে, উপর থেকে বের হলে এখানে আসবে -->
-                    @php
-                        $belowPosts = isset($posts) && $posts->count() > 4
-                            ? collect($posts->items())->slice(4)->values()
-                            : collect();
-                    @endphp
-
+                    <!-- মাঝের কলাম: হিরোর ৪টার পর বাকি বিশেষ সংবাদ -->
                     <div class="bg-white px-0 md:p-4 flex flex-col gap-0">
 
                         @if($belowPosts->count() > 0)
@@ -237,22 +228,16 @@
                                     </div>
                                 </article>
                             @endforeach
-                        @else
-                            {{-- নিচের কলামে ডাটা নেই – সkeleton --}}
-                            @for($i = 0; $i < 4; $i++)
-                                <div class="flex flex-row-reverse md:flex-row-reverse gap-2 md:gap-4 py-3 md:py-4 border-b border-gray-100 last:border-0">
-                                    <div class="skeleton flex-shrink-0 w-36 h-24 md:w-[305px] md:h-[170px] rounded"></div>
-                                    <div class="flex-1 space-y-2">
-                                        <div class="skeleton h-5 w-full rounded"></div>
-                                        <div class="skeleton h-4 w-full rounded hidden md:block"></div>
-                                        <div class="skeleton h-4 w-4/5 rounded hidden md:block"></div>
-                                        <div class="skeleton h-3 w-24 rounded mt-2"></div>
-                                    </div>
-                                </div>
-                            @endfor
+                        @endif
+
+                        @if($belowPosts->hasPages())
+                        <div class="mt-6 flex justify-center">{{ $belowPosts->links() }}</div>
                         @endif
 
                     </div>
+
+                    <!-- ডান পাশের কলাম: বিজ্ঞাপন স্লট — আপাতত খালি -->
+                    <div class="hidden md:block" aria-hidden="true"></div>
                 </section>
             </div>
         </div>

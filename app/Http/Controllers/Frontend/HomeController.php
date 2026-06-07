@@ -17,11 +17,19 @@ class HomeController extends Controller
      */
     public function specialNews(): View
     {
-        $posts = Post::with(['reporter', 'categories.parent'])
+        $baseQuery = Post::with(['reporter', 'categories.parent'])
             ->where('is_special_news', true)
             ->where('status', 'published')
-            ->latest()
-            ->paginate(10);
+            ->latest();
+
+        // হিরো: সবসময় সর্বশেষ ৪টি — pagination এখানে নয়
+        $heroPosts = (clone $baseQuery)->limit(4)->get();
+
+        // হিরোর বাইরের পুরনো পোস্টগুলো — হিরোর ৪টির আগের/বাদ পড়া ডাটা
+        $belowPosts = (clone $baseQuery)
+            ->whereNotIn('id', $heroPosts->pluck('id'))
+            ->paginate(10)
+            ->withQueryString();
 
         // হোম পেজের মতোই সর্বশেষ ও পঠিত – সব পোস্ট থেকে, একই ডাটা
         $latestSidebarPosts = Post::with('categories.parent')
@@ -36,7 +44,7 @@ class HomeController extends Controller
             ->limit(6)
             ->get();
 
-        return view('special-news', compact('posts', 'latestSidebarPosts', 'popularSidebarPosts'));
+        return view('special-news', compact('heroPosts', 'belowPosts', 'latestSidebarPosts', 'popularSidebarPosts'));
     }
 
     /**
