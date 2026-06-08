@@ -39,8 +39,6 @@
     @endphp
     <meta property="og:image" content="{{ $shareImageUrlHttps }}">
     <meta property="og:image:secure_url" content="{{ $shareImageUrlHttps }}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
     <meta name="twitter:image" content="{{ $shareImageUrlHttps }}">
     @endif
     <meta property="og:site_name" content="{{ site_name() }}">
@@ -163,6 +161,26 @@
                 top: 0,
                 behavior: 'smooth'
             });
+        }
+
+        function shareOnMessenger(event) {
+            event.preventDefault();
+            const url = event.currentTarget.getAttribute('data-share-url');
+            if (!url) return;
+
+            const encoded = encodeURIComponent(url);
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                window.location.href = 'fb-messenger://share/?link=' + encoded;
+                return;
+            }
+
+            window.open(
+                'https://www.facebook.com/dialog/send?link=' + encoded + '&redirect_uri=' + encoded + '&display=popup',
+                'messenger-share-dialog',
+                'width=600,height=520,scrollbars=yes'
+            );
         }
     </script>
 </body>

@@ -4,12 +4,56 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class PostController extends Controller
 {
     /**
-     * Post detail page by slug (/news/{slug}).
+     * Legacy Google index: /news-view/{id} → /{slug}
+     */
+    public function redirectLegacyNewsView(int $id): RedirectResponse
+    {
+        return $this->redirectLegacyPostById($id);
+    }
+
+    /**
+     * Legacy URL: /news/{slug-or-id} → /{slug}
+     */
+    public function redirectLegacyNews(string $slug): RedirectResponse
+    {
+        $post = Post::query()
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->first();
+
+        if ($post) {
+            return redirect()->to(news_url($post), 301);
+        }
+
+        if (ctype_digit($slug)) {
+            return $this->redirectLegacyPostById((int) $slug);
+        }
+
+        abort(404);
+    }
+
+    private function redirectLegacyPostById(int $id): RedirectResponse
+    {
+        $post = Post::query()
+            ->where('id', $id)
+            ->where('status', 'published')
+            ->first();
+
+        if ($post && $post->slug) {
+            return redirect()->to(news_url($post), 301);
+        }
+
+        abort(404);
+    }
+
+    /**
+     * Post detail page by slug (/{slug}).
      */
     public function show(string $slug): View
     {

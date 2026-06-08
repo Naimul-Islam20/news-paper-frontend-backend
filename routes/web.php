@@ -214,6 +214,12 @@ Route::prefix('admin')
         });
     });
 
+// Legacy URLs (Google-এ পুরনো index) → canonical slug URL
+Route::get('/news-view/{id}', [FrontendPostController::class, 'redirectLegacyNewsView'])
+    ->whereNumber('id');
+Route::get('/news/{slug}', [FrontendPostController::class, 'redirectLegacyNews'])
+    ->where('slug', '.+');
+
 // News detail route (fully simplified)
 Route::get('/{slug}', [FrontendPostController::class, 'show'])
     ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|subscribe$|special-news$|videos$|terms$|privacy-policy$|heartbeat$|national$|api$).+')
