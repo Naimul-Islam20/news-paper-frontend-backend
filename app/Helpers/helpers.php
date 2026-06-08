@@ -511,3 +511,17 @@ if (! function_exists('news_url')) {
         return route('news.show', [$post->slug]);
     }
 }
+
+if (! function_exists('news_whatsapp_share_url')) {
+    /**
+     * WhatsApp শেয়ার লিংক — পোস্ট ID (/{id}), slug নয়।
+     */
+    function news_whatsapp_share_url($post): string
+    {
+        if (! $post || ! $post->id) {
+            return url('/');
+        }
+
+        return url('/' . $post->id);
+    }
+}

@@ -8,7 +8,7 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
         <x-slot:metaImage>{{ $postShareImage }}</x-slot>
             @endif
                 <x-slot:ogTitle>{{ $post->title }}</x-slot>
-                <x-slot:shareUrl>{{ news_url($post) }}</x-slot>
+                {{-- shareUrl স্লট নেই: layout url()->current() ব্যবহার করে — slug বা ID যেকোনো লিংকে একই OG প্রিভিউ --}}
 
         @php $adDetailsBelowMenu = ad_slot('details_below_menu'); @endphp
         @if($adDetailsBelowMenu && ad_has_media($adDetailsBelowMenu))
@@ -243,16 +243,28 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
                                                 প্রকাশ : {{ published_at($post->created_at) }}
                                             </span>
 
-                                            @php $shareUrl = news_url($post); @endphp
+                                            @php
+                                                $shareUrl = news_url($post);
+                                                $whatsappShareUrl = news_whatsapp_share_url($post);
+                                            @endphp
                                             <!-- সোশ্যাল শেয়ার আইকনসমূহ -->
                                             <div class="flex items-center gap-3">
                                                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-[#3b5998] hover:text-white transition-all" title="Facebook"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                                         <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z" />
                                                     </svg></a>
-                                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($shareUrl) }}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-[#0084ff] hover:text-white transition-all" title="Messenger"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <a href="#" role="button" data-share-url="{{ $whatsappShareUrl }}" onclick="sharePostOnMessenger(event)" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-[#0084ff] hover:text-white transition-all" title="Messenger" aria-label="Share on Messenger"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                                         <path d="M0 7.76C0 3.301 3.493 0 8 0s8 3.301 8 7.76-3.493 7.76-8 7.76c-.81 0-1.586-.107-2.316-.307a.639.639 0 0 0-.427.03l-1.588.702a.64.64 0 0 1-.898-.566l-.044-1.423a.639.639 0 0 0-.215-.456C.956 12.108 0 10.092 0 7.76zm5.546-1.459-2.35 3.728c-.225.358.214.761.551.506l2.525-1.916a.441.441 0 0 1 .51-.011l1.802 1.307c.51.37 1.158.27 1.55-.223l2.356-3.728c.226-.359-.214-.761-.551-.506l-2.525 1.917a.441.441 0 0 1-.51.011L6.595 5.893a.903.903 0 0 0-1.049.408z" />
                                                     </svg></a>
-                                                <a href="https://wa.me/?text={{ urlencode($shareUrl) }}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all" title="WhatsApp"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.06 3.973L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg></a>
+                                                <a href="#" role="button" data-share-url="{{ $whatsappShareUrl }}" data-share-title="{{ $post->title }}" onclick="sharePostOnWhatsApp(event)" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all" title="WhatsApp" aria-label="Share on WhatsApp"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.06 3.973L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg></a>
+                                                <span class="relative inline-flex shrink-0">
+                                                    <span class="copy-btn-toast" style="position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);z-index:50;padding:6px 12px;border-radius:6px;background:#fff;color:#000;font-size:12px;font-weight:600;line-height:1.2;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,0.12);border:1px solid #e2e8f0;opacity:0;pointer-events:none;transition:opacity 0.2s ease">Copied</span>
+                                                    <button type="button" onclick="copyPostShareLink(this)" data-copy-url="{{ $whatsappShareUrl }}" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition-all" title="লিংক কপি করুন" aria-label="লিংক কপি করুন">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none">
+                                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                                        </svg>
+                                                    </button>
+                                                </span>
                                                 <a href="https://twitter.com/intent/tweet?url={{ urlencode($shareUrl) }}&text={{ urlencode($post->title) }}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-black hover:text-white transition-all" title="X"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                                                         <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z" />
                                                     </svg></a>
@@ -400,4 +412,94 @@ $postShareImage = $post->image ? trim(url(storage_image_url($post->image))) : nu
 
                         </div>
                     </div>
+
+                    <script>
+                        function openWhatsAppShare(url) {
+                            window.open('https://wa.me/?text=' + encodeURIComponent(url), '_blank', 'noopener,noreferrer');
+                        }
+
+                        function sharePostOnWhatsApp(e) {
+                            e.preventDefault();
+                            const url = e.currentTarget.getAttribute('data-share-url');
+                            const title = e.currentTarget.getAttribute('data-share-title') || '';
+                            if (!url) return;
+
+                            if (navigator.share) {
+                                navigator.share({ title: title, url: url }).catch(function () {
+                                    openWhatsAppShare(url);
+                                });
+                                return;
+                            }
+
+                            openWhatsAppShare(url);
+                        }
+
+                        function sharePostOnMessenger(e) {
+                            e.preventDefault();
+                            const url = e.currentTarget.getAttribute('data-share-url');
+                            if (!url) return;
+
+                            const encoded = encodeURIComponent(url);
+                            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+                            if (isMobile) {
+                                window.location.href = 'fb-messenger://share/?link=' + encoded;
+                                return;
+                            }
+
+                            window.open(
+                                'https://www.facebook.com/dialog/send?link=' + encoded + '&redirect_uri=' + encodeURIComponent(window.location.href) + '&display=popup',
+                                'messenger-share-dialog',
+                                'width=600,height=520,scrollbars=yes'
+                            );
+                        }
+
+                        function showCopyLinkToast(btn) {
+                            const toast = btn.parentElement ? btn.parentElement.querySelector('.copy-btn-toast') : null;
+                            if (!toast) return;
+
+                            toast.style.opacity = '1';
+
+                            clearTimeout(btn._copyToastTimer);
+                            btn._copyToastTimer = setTimeout(function () {
+                                toast.style.opacity = '0';
+                            }, 2000);
+                        }
+
+                        function copyPostShareLink(btn) {
+                            const url = btn.getAttribute('data-copy-url');
+                            if (!url) return;
+
+                            const done = function () {
+                                btn.classList.add('bg-primary', 'text-white');
+                                showCopyLinkToast(btn);
+                                clearTimeout(btn._copyBtnTimer);
+                                btn._copyBtnTimer = setTimeout(function () {
+                                    btn.classList.remove('bg-primary', 'text-white');
+                                }, 1500);
+                            };
+
+                            if (navigator.clipboard && navigator.clipboard.writeText) {
+                                navigator.clipboard.writeText(url).then(done).catch(function () {
+                                    fallbackCopy(url, done);
+                                });
+                            } else {
+                                fallbackCopy(url, done);
+                            }
+                        }
+
+                        function fallbackCopy(text, done) {
+                            const ta = document.createElement('textarea');
+                            ta.value = text;
+                            ta.style.position = 'fixed';
+                            ta.style.left = '-9999px';
+                            document.body.appendChild(ta);
+                            ta.select();
+                            try {
+                                document.execCommand('copy');
+                                done();
+                            } catch (e) {}
+                            document.body.removeChild(ta);
+                        }
+                    </script>
 </x-layout>
