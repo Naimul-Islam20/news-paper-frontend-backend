@@ -6,7 +6,8 @@
 @section('content')
 @php
     $existingImageValue = old('existing_image', $pickedImage ?? '');
-    $skipDraftRestore = $errors->any();
+    $skipDraftRestore = $errors->any() || session()->pull('clear_post_create_draft', false);
+    $forceDraftClear = $skipDraftRestore && ! $errors->any();
 @endphp
 <div class="py-1 w-full mx-auto">
     <div class="max-w-6xl mx-auto">
@@ -366,11 +367,12 @@
 <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
     const POST_CREATE_DRAFT = {
-        storageKey: 'admin_post_create_draft_v3',
+        storageKey: 'admin_post_create_draft_v4',
         imageDbName: 'admin_post_create_draft',
         imageStoreName: 'uploaded_images',
         imageRecordKey: 'featured',
         skipRestore: @json($skipDraftRestore),
+        forceClear: @json($forceDraftClear ?? false),
         serverExistingImage: @json($existingImageValue ?? ''),
         serverExistingImageUrl: @json(! empty($existingImageValue) ? storage_image_url($existingImageValue) : ''),
     };
@@ -379,6 +381,7 @@
     let postCreateSaveTimer = null;
     let postCreateTopicAdd = null;
     let postCreateSaveInFlight = null;
+    let postCreateDraftSubmitted = false;
 
     function openPostCreateImageDb() {
         return new Promise(function (resolve, reject) {
@@ -517,6 +520,23 @@
         delete hidden.dataset.previewUrl;
     }
 
+    function resetPostCreateImageUi() {
+        const preview = document.getElementById('mainImagePreview');
+        const placeholder = document.getElementById('mainImagePlaceholder');
+        const fileInput = document.getElementById('mainImageInput');
+        if (preview) {
+            preview.removeAttribute('src');
+            preview.classList.add('hidden');
+        }
+        if (placeholder) {
+            placeholder.classList.remove('hidden');
+        }
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        clearExistingImagePath();
+    }
+
     function applyExistingImagePreview(path, previewUrl) {
         const hidden = document.getElementById('existingImagePath');
         if (!hidden) return;
@@ -635,6 +655,10 @@
     }
 
     async function savePostCreateDraft() {
+        if (postCreateDraftSubmitted) {
+            return;
+        }
+
         if (postCreateSaveInFlight) {
             return postCreateSaveInFlight;
         }
@@ -691,15 +715,28 @@
     }
 
     function schedulePostCreateDraftSave() {
+        if (postCreateDraftSubmitted) {
+            return;
+        }
+
         clearTimeout(postCreateSaveTimer);
         postCreateSaveTimer = setTimeout(function () {
             savePostCreateDraft();
         }, 350);
     }
 
-    function clearPostCreateDraft() {
+    function wipePostCreateDraftStorage(resetUi) {
+        clearTimeout(postCreateSaveTimer);
         localStorage.removeItem(POST_CREATE_DRAFT.storageKey);
         idbClearImage();
+        if (resetUi) {
+            resetPostCreateImageUi();
+        }
+    }
+
+    function clearPostCreateDraft() {
+        postCreateDraftSubmitted = true;
+        wipePostCreateDraftStorage(false);
     }
 
     function showSubTitlePointsSection() {
@@ -743,6 +780,11 @@
         }
 
         const hasIdbImage = await idbGetImage().catch(function () { return null; });
+        if (!draft && hasIdbImage) {
+            await idbClearImage();
+            resetPostCreateImageUi();
+            return;
+        }
         if (!draft && !hasIdbImage) return;
         if (!draft) {
             draft = { has_uploaded_image: true };
@@ -864,15 +906,27 @@
             });
         });
 
-        window.addEventListener('pagehide', savePostCreateDraft);
-        window.addEventListener('beforeunload', savePostCreateDraft);
+        window.addEventListener('pagehide', function () {
+            if (!postCreateDraftSubmitted) {
+                savePostCreateDraft();
+            }
+        });
+        window.addEventListener('beforeunload', function () {
+            if (!postCreateDraftSubmitted) {
+                savePostCreateDraft();
+            }
+        });
         document.addEventListener('visibilitychange', function () {
-            if (document.visibilityState === 'hidden') savePostCreateDraft();
+            if (document.visibilityState === 'hidden' && !postCreateDraftSubmitted) {
+                savePostCreateDraft();
+            }
         });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        if (POST_CREATE_DRAFT.serverExistingImage) {
+        if (POST_CREATE_DRAFT.forceClear) {
+            wipePostCreateDraftStorage(true);
+        } else if (POST_CREATE_DRAFT.serverExistingImage) {
             applyExistingImagePreview(POST_CREATE_DRAFT.serverExistingImage, POST_CREATE_DRAFT.serverExistingImageUrl);
         } else {
             const existingImagePath = document.getElementById('existingImagePath');
@@ -905,9 +959,13 @@
         initTopicsSelection();
         initMainImagePreview();
         initPostCreateDraftAutosave();
-        restorePostCreateDraft().then(function () {
-            setTimeout(savePostCreateDraft, 400);
-        });
+        if (!POST_CREATE_DRAFT.skipRestore) {
+            restorePostCreateDraft().then(function () {
+                if (!postCreateDraftSubmitted) {
+                    setTimeout(savePostCreateDraft, 400);
+                }
+            });
+        }
     });
 
     function initTopicsSelection() {

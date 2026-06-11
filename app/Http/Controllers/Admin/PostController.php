@@ -145,6 +145,8 @@ class PostController extends Controller
             $post->topics()->sync($request->topic_ids);
         }
 
+        session()->put('clear_post_create_draft', true);
+
         return redirect()->route('admin.posts.index')->with('success', 'Post published successfully!');
     }
 
