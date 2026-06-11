@@ -4,7 +4,7 @@
     <!-- Mobile Fixed / Desktop Shared Wrapper -->
     <div id="site-header-shell" class="fixed top-0 left-0 w-full z-50 bg-white md:relative md:z-auto border-b border-slate-100 md:border-b-0 shadow-sm md:shadow-none">
         <!-- Main Header -->
-        <header class="bg-white pt-0 md:pt-1">
+        <header class="bg-white pt-0 md:pt-1 overflow-visible">
             <!-- Sidebar Drawer Contents -->
             <template x-teleport="body">
                 <div>
@@ -36,8 +36,8 @@
                             </button>
                         </div>
 
-                        <ul class="space-y-2">
-                            <li class="border-b border-gray-400 pb-2"><a href="{{ front_home_url() }}" class="block text-lg font-semibold hover:text-primary transition-colors flex items-center gap-2">
+                        <ul class="header-drawer-menu space-y-2">
+                            <li class="border-b border-gray-400 pb-2"><a href="{{ front_home_url() }}" class="block text-lg font-medium hover:text-primary transition-colors flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                         <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -45,12 +45,12 @@
                                     হোম
                                 </a></li>
                             {{-- সর্বশেষ সর্বদা বাম পাশের প্রথম মেনু (স্থান পরিবর্তন হবে না) --}}
-                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('latest') }}" class="block text-xl font-semibold hover:text-primary transition-colors">সর্বশেষ</a></li>
-                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('special-news') }}" class="block text-xl font-semibold hover:text-primary transition-colors">বিশেষ সংবাদ</a></li>
+                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('latest') }}" class="block text-xl font-medium hover:text-primary transition-colors">সর্বশেষ</a></li>
+                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('special-news') }}" class="block text-xl font-medium hover:text-primary transition-colors">বিশেষ সংবাদ</a></li>
                             @if(isset($sideMenuCategories) && $sideMenuCategories->isNotEmpty())
                             @foreach($sideMenuCategories as $cat)
                             <li class="border-b border-gray-400 pb-1">
-                                <a href="{{ route('category.show', $cat->slug) }}" class="block text-xl font-semibold hover:text-primary transition-colors">
+                                <a href="{{ route('category.show', $cat->slug) }}" class="block text-xl font-medium hover:text-primary transition-colors">
                                     {{ $cat->name }}
                                 </a>
                             </li>
@@ -86,20 +86,9 @@
                 </div>
             </template>
 
-            @php $adHeader = ad_slot('header'); @endphp
-            @if($adHeader && ad_has_media($adHeader))
-            <div class="hidden w-full py-1 md:flex md:py-2 justify-center bg-white px-2">
-                <div class="container flex justify-center overflow-hidden">
-                    <a href="{{ advertisement_click_url($adHeader) }}" class="w-full flex justify-center max-w-[1000px]" target="_blank" rel="noopener">
-                        <div class="img-placeholder w-full max-w-[1000px] h-[70px] md:h-[90px] overflow-hidden bg-slate-50 flex items-center justify-center shrink-0">
-                            <x-ad-picture :ad="$adHeader" class="max-w-full max-h-full w-auto h-full object-contain shadow-sm" />
-                        </div>
-                    </a>
-                </div>
-            </div>
-            @endif
+            <x-ad-slot-display slug="header" variant="header" />
 
-            <div class="container pt-1 pb-0 text-center">
+            <div class="container pt-1 pb-0 text-center overflow-visible">
                 <div class="flex items-center justify-between mb-0 md:mb-1">
                     <div class="flex-1 text-left">
                         <div class="hidden md:flex items-center gap-2 md:gap-3">
@@ -149,6 +138,14 @@
                         </a>
                     </div>
                     <div class="flex-1 text-right flex justify-end items-center gap-2">
+                        <div class="md:hidden relative z-[120] flex items-center gap-2">
+                            <a href="{{ route('bangla-converter') }}"
+                                class="flex items-center px-2 py-1 text-slate-700 hover:text-primary transition-colors border border-slate-200 rounded-sm text-xs font-medium bg-white notranslate whitespace-nowrap {{ request()->routeIs('bangla-converter') ? 'text-primary border-primary' : '' }}"
+                                title="Unicode to Bijoy - Bangla text Converter">
+                                বাংলা কনভার্টার
+                            </a>
+                            <x-language-switcher open-up />
+                        </div>
                         <!-- Mobile Search Trigger (Far Right) -->
                         <button @click="showSearch = true" class="md:hidden p-2 hover:bg-slate-100 transition-colors shrink-0 z-10">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-black">
@@ -193,7 +190,7 @@
                 </form>
 
                 <!-- Top Utility Bar -->
-                <div class="flex justify-between items-center text-slate-800 text-sm md:text-base font-medium mb-0 hidden md:flex">
+                <div class="flex justify-between items-center text-slate-800 text-sm md:text-base font-medium mb-0 hidden md:flex relative z-[120]">
                     <div class="flex items-center gap-2 md:gap-2.5 header-date">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-5 md:h-5 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -260,7 +257,13 @@
                             @endphp
                             <span class="leading-normal tracking-normal">{{ $d }}, {{ $dn }} {{ $m }} {{ $yn }}, {{ $bangla_date }} বঙ্গাব্দ</span>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 relative z-[120]">
+                        <a href="{{ route('bangla-converter') }}"
+                            class="flex items-center px-2 py-1 text-slate-700 hover:text-primary transition-colors border border-slate-200 rounded-sm text-sm font-medium bg-white notranslate whitespace-nowrap {{ request()->routeIs('bangla-converter') ? 'text-primary border-primary' : '' }}"
+                            title="Unicode to Bijoy - Bangla text Converter">
+                            বাংলা কনভার্টার
+                        </a>
+                        <x-language-switcher open-up />
                         @if(!empty(optional($siteMeta)->facebook_link))
                         <a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-primary transition-colors" title="Facebook" aria-label="Facebook">
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -328,13 +331,13 @@
                     <div class="flex-1 overflow-x-auto overflow-y-hidden no-scrollbar py-0 flex items-center justify-between">
                         <ul class="flex justify-start items-center gap-3 md:gap-6 text-base md:text-xl whitespace-nowrap py-0.5 md:py-0.5">
                             {{-- সর্বশেষ সর্বদা হেডার মেনুর বাম পাশের প্রথম আইটেম (স্থান অপরিবর্তিত) --}}
-                            <li><a href="{{ route('latest') }}" class="font-semibold hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('latest') ? 'text-primary border-primary' : '' }}">সর্বশেষ</a></li>
-                            <li><a href="{{ route('special-news') }}" class="font-semibold hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('special-news') ? 'text-primary border-primary' : '' }}">বিশেষ সংবাদ</a></li>
+                            <li><a href="{{ route('latest') }}" class="font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('latest') ? 'text-primary border-primary' : '' }}">সর্বশেষ</a></li>
+                            <li><a href="{{ route('special-news') }}" class="font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('special-news') ? 'text-primary border-primary' : '' }}">বিশেষ সংবাদ</a></li>
                             @if(isset($headerCategories) && $headerCategories->isNotEmpty())
                             @foreach($headerCategories as $cat)
                             <li>
                                 <a href="{{ route('category.show', $cat->slug) }}"
-                                    class="font-semibold hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->is('category/'.$cat->slug) ? 'text-primary border-primary' : '' }}">
+                                    class="font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->is('category/'.$cat->slug) ? 'text-primary border-primary' : '' }}">
                                     {{ $cat->name }}
                                 </a>
                             </li>

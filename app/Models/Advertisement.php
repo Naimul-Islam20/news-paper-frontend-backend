@@ -10,6 +10,8 @@ class Advertisement extends Model
 {
     protected $fillable = [
         'slug',
+        'ad_source',
+        'google_ad_slot',
         'name',
         'image',
         'image_mobile',
@@ -388,19 +390,42 @@ class Advertisement extends Model
         $this->setAttribute('clicks_count', (int) ($item->clicks_count ?? 0));
     }
 
+    public function usesGoogleAd(): bool
+    {
+        return $this->ad_source === 'google';
+    }
+
+    public function canShowGoogleAd(): bool
+    {
+        return $this->usesGoogleAd()
+            && filled($this->google_ad_slot)
+            && filled(google_adsense_client());
+    }
+
     /**
-     * Get ad slot by slug (for frontend and views) — শিডিউলের মধ্যে থাকলে।
+     * Get ad slot by slug (for frontend and views).
+     * Google mode: শিডিউল ছাড়াই; Local mode: শিডিউলের মধ্যে থাকলে।
      */
     public static function getBySlug(string $slug): ?self
     {
         $ad = static::query()
             ->where('slug', $slug)
             ->with(['queueItems' => fn ($q) => $q->whereNull('expired_at')->orderBy('sort_order')->orderBy('id')])
-            ->activeForDisplay()
             ->first();
-        if ($ad) {
-            $ad->applyQueueItemDisplayOverride();
+
+        if (! $ad) {
+            return null;
         }
+
+        if ($ad->usesGoogleAd()) {
+            return $ad->canShowGoogleAd() ? $ad : null;
+        }
+
+        if (! $ad->isActiveForDisplay()) {
+            return null;
+        }
+
+        $ad->applyQueueItemDisplayOverride();
 
         return $ad;
     }

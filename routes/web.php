@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserSettingsController;
 use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\AdvertisementClickController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Frontend\CategoryController as FrontendCategoryController;
 use App\Http\Controllers\Frontend\GalleryController as FrontendGalleryController;
 use App\Http\Controllers\Frontend\HomeController as FrontendHomeController;
@@ -25,6 +26,11 @@ use App\Http\Controllers\Frontend\SearchController as FrontendSearchController;
 use App\Http\Controllers\Frontend\VideoController as FrontendVideoController;
 use App\Models\Subscriber;
 use Illuminate\Support\Facades\Route;
+
+// Language switch (cookie + redirect — Google Translate reads googtrans on reload)
+Route::get('/lang/{locale}', [LanguageController::class, 'switch'])
+    ->whereIn('locale', ['bn', 'en'])
+    ->name('lang.switch');
 
 // Public frontend routes (all non-admin, non-API pages)
 Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
@@ -71,6 +77,7 @@ Route::view('/national', 'national');
 Route::get('/special-news', [FrontendHomeController::class, 'specialNews'])->name('special-news');
 Route::view('/terms', 'terms')->name('terms');
 Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
+Route::view('/bangla-converter', 'frontend.bangla-converter')->name('bangla-converter');
 
 // Fallback login route name that Laravel's auth middleware expects
 Route::get('/login', function () {
@@ -119,6 +126,8 @@ Route::prefix('admin')
                 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
             });
             Route::middleware('feature:posts.manage')->group(function (): void {
+                Route::get('/posts/pick-image', [PostController::class, 'pickImage'])->name('posts.pick-image');
+                Route::post('/posts/pick-image', [PostController::class, 'applyPickedImage'])->name('posts.pick-image.apply');
                 Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
                 Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
                 Route::get('/posts/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');
@@ -167,6 +176,7 @@ Route::prefix('admin')
                 Route::get('/advertisements', [App\Http\Controllers\Admin\AdvertisementController::class, 'index'])->name('advertisements.index');
                 Route::get('/advertisements/{id}/edit', [App\Http\Controllers\Admin\AdvertisementController::class, 'edit'])->name('advertisements.edit');
                 Route::put('/advertisements/{id}', [App\Http\Controllers\Admin\AdvertisementController::class, 'update'])->name('advertisements.update');
+                Route::post('/advertisements/{id}/toggle-ad-source', [App\Http\Controllers\Admin\AdvertisementController::class, 'toggleAdSource'])->name('advertisements.toggle-source');
                 Route::post('/advertisements/{id}/queue-items', [App\Http\Controllers\Admin\AdvertisementController::class, 'storeQueueItem'])->name('advertisements.queue-items.store');
                 Route::put('/advertisements/{id}/queue-items/{itemId}', [App\Http\Controllers\Admin\AdvertisementController::class, 'updateQueueItem'])->name('advertisements.queue-items.update');
                 Route::delete('/advertisements/{id}/queue-items/{itemId}', [App\Http\Controllers\Admin\AdvertisementController::class, 'destroyQueueItem'])->name('advertisements.queue-items.destroy');
@@ -220,7 +230,12 @@ Route::get('/news-view/{id}', [FrontendPostController::class, 'redirectLegacyNew
 Route::get('/news/{slug}', [FrontendPostController::class, 'redirectLegacyNews'])
     ->where('slug', '.+');
 
+// Post featured image — full page viewer
+Route::get('/{slug}/photo', [FrontendPostController::class, 'showPhoto'])
+    ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|subscribe$|special-news$|videos$|terms$|privacy-policy$|bangla-converter$|heartbeat$|national$|api$|lang$).+')
+    ->name('news.photo');
+
 // News detail route (fully simplified)
 Route::get('/{slug}', [FrontendPostController::class, 'show'])
-    ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|subscribe$|special-news$|videos$|terms$|privacy-policy$|heartbeat$|national$|api$).+')
+    ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|subscribe$|special-news$|videos$|terms$|privacy-policy$|bangla-converter$|heartbeat$|national$|api$|lang$).+')
     ->name('news.show');

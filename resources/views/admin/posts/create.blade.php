@@ -4,9 +4,13 @@
 @section('header_title', 'Create New Post')
 
 @section('content')
+@php
+    $existingImageValue = old('existing_image', $pickedImage ?? '');
+    $skipDraftRestore = $errors->any();
+@endphp
 <div class="py-1 w-full mx-auto">
     <div class="max-w-6xl mx-auto">
-        <form action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <form id="post-create-form" action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             @csrf
             
             <div class="p-6">
@@ -14,30 +18,59 @@
                     
                     {{-- Left Column: Primary Content --}}
                     <div class="lg:col-span-8 space-y-6">
+                        {{-- Subtitle (above title on frontend) --}}
+                        @php $showSubtitleInput = filled(old('subtitle')); @endphp
+                        <div id="post-subtitle-field">
+                            <div class="mb-2 ml-0.5 flex items-center gap-2">
+                                <span class="text-sm font-normal text-slate-900">Subtitle</span>
+                                <button
+                                    type="button"
+                                    id="toggle-post-subtitle"
+                                    class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-dashed border-slate-300 text-sm font-medium text-slate-600 transition-all hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-600 dark:text-slate-300 {{ $showSubtitleInput ? 'hidden' : '' }}"
+                                    title="Subtitle যোগ করুন">+</button>
+                            </div>
+                            <div id="post-subtitle-input-wrap" class="{{ $showSubtitleInput ? '' : 'hidden' }}">
+                                <input
+                                    type="text"
+                                    name="subtitle"
+                                    id="post_subtitle"
+                                    value="{{ old('subtitle') }}"
+                                    maxlength="150"
+                                    class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-700 text-xs md:text-sm">
+                                @error('subtitle') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
                         {{-- Title --}}
-                        <div>
+                        <div id="post-title-field">
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Title <span class="text-rose-500">*</span></label>
                             <input type="text" name="title" id="post_title" value="{{ old('title') }}" required placeholder="Enter post title..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                             @error('title') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Sub Title Points --}}
-                        <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Sub Title Points</label>
-                            @php
-                                $oldPoints = old('sub_title_points');
-                                if (!is_array($oldPoints) || empty($oldPoints)) {
-                                    $oldPoints = [''];
-                                }
-                            @endphp
-                            <div id="sub-title-points-wrapper" class="space-y-2">
-                                @foreach($oldPoints as $idx => $value)
+                        @php
+                            $oldPoints = old('sub_title_points', []);
+                            $oldPoints = is_array($oldPoints) ? $oldPoints : [];
+                            $showSubTitlePoints = collect($oldPoints)->contains(fn ($value) => trim((string) $value) !== '');
+                            $oldPoints = collect($oldPoints)->filter(fn ($value) => trim((string) $value) !== '')->values()->all();
+                        @endphp
+                        <div id="sub-title-points-field">
+                            <div class="mb-2 ml-0.5">
+                                <button
+                                    type="button"
+                                    id="add-sub-title-point"
+                                    class="inline-flex items-center rounded-md border border-dashed border-slate-300 px-2.5 py-1 text-xs font-normal text-slate-700 transition-all hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-600 dark:text-slate-300">
+                                    + Add point
+                                </button>
+                            </div>
+                            <div id="sub-title-points-wrapper" class="{{ $showSubTitlePoints ? 'space-y-2' : 'hidden space-y-2' }}">
+                                @foreach($oldPoints as $value)
                                     <div class="flex items-center gap-2 sub-title-point-row">
                                         <input
                                             type="text"
                                             name="sub_title_points[]"
                                             value="{{ $value }}"
-                                            placeholder="Sub title point {{ $idx + 1 }}"
                                             class="flex-1 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm"
                                         >
                                         <button
@@ -48,19 +81,12 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <button
-                                type="button"
-                                id="add-sub-title-point"
-                                class="mt-2 inline-flex items-center px-3 py-1.5 rounded-lg border border-dashed border-slate-300 text-xs font-normal text-slate-700 hover:border-indigo-400 hover:text-indigo-600 transition-all"
-                            >
-                                + Add point
-                            </button>
                             @error('sub_title_points') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                             @error('sub_title_points.*') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Category (multiple allowed) --}}
-                        <div>
+                        <div id="post-category-field">
                             <label class="block text-sm font-normal text-slate-900 dark:text-slate-200 mb-2 ml-0.5">Post Category <span class="text-rose-500">*</span></label>
                             <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 max-h-[300px] overflow-y-auto shadow-inner custom-scrollbar">
                                 <div class="columns-1 md:columns-2 gap-x-12">
@@ -89,10 +115,17 @@
 
                         {{-- Image & Caption --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Featured Image <span class="text-rose-500">*</span></label>
+                            <div id="post-image-field">
+                                <div class="mb-2 ml-0.5 flex items-center justify-between gap-2">
+                                    <label class="text-sm font-normal text-slate-900">Featured Image <span class="text-rose-500">*</span></label>
+                                    <a href="{{ route('admin.posts.pick-image', ['context' => 'create']) }}" class="inline-flex items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 dark:border-slate-700 dark:text-indigo-400 dark:hover:bg-indigo-500/10">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        Media
+                                    </a>
+                                </div>
+                                <input type="hidden" name="existing_image" id="existingImagePath" value="{{ $existingImageValue }}" @if($existingImageValue) data-preview-url="{{ storage_image_url($existingImageValue) }}" @endif>
                                 <div class="relative w-full h-32 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-xs shadow-sm bg-white dark:bg-slate-900" data-main-image-upload>
-                                    <img id="mainImagePreview" class="absolute inset-0 z-[1] w-full h-full object-cover hidden" alt="">
+                                    <img id="mainImagePreview" class="absolute inset-0 z-[1] w-full h-full object-contain bg-slate-100 dark:bg-slate-800 hidden" alt="">
                                     <div id="mainImagePlaceholder" class="absolute inset-0 z-0 flex flex-col items-center justify-center gap-1.5">
                                         <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                         <span>Choose Image</span>
@@ -111,11 +144,12 @@
                         </div>
 
                         {{-- Post Content --}}
-                        <div>
+                        <div id="post-description-field">
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Description <span class="text-rose-500">*</span></label>
                             <div class="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-white shadow-sm">
                                 <textarea id="editor" name="description">{{ old('description') }}</textarea>
                             </div>
+                            @error('description') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                     </div>
@@ -124,7 +158,7 @@
                     <div class="lg:col-span-4 space-y-6">
 
                         {{-- Reporter --}}
-                        <div>
+                        <div id="post-reporter-field">
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Reporter <span class="text-rose-500">*</span></label>
                             <div class="relative">
                                 <select name="reporter_id" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 cursor-pointer text-sm">
@@ -137,6 +171,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
+                            @error('reporter_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Division & District (Commented Out) --}}
@@ -157,19 +192,14 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <p class="mt-2 text-[10px] text-slate-400 italic">* যেকোনো একটা সিলেক্ট করুন; একটা সিলেক্ট করলে বাকিগুলো অটো বন্ধ হয়ে যাবে।</p>
                         </div>
 
-                        {{-- বিশেষ সংবাদ – সিলেক্ট করলে এই পোস্ট বিশেষ সংবাদ পেজে দেখাবে, নতুন ডাটা প্রথমে --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-900 mb-2 ml-0.5 uppercase tracking-wider">বিশেষ সংবাদ</label>
-                            <div class="flex items-center gap-2">
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="is_special_news" value="1" class="sr-only peer" {{ old('is_special_news') ? 'checked' : '' }}>
-                                    <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
-                                </label>
-                                <span class="text-sm font-normal text-slate-900">সিলেক্ট করলে এই পোস্ট বিশেষ সংবাদ পেজে দেখাবে (নতুন প্রথমে)</span>
-                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_special_news" value="1" class="sr-only peer" {{ old('is_special_news') ? 'checked' : '' }}>
+                                <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                            </label>
                         </div>
 
                         {{-- Status --}}
@@ -327,15 +357,532 @@
         </form>
     </div>
 </div>
+
+<x-admin.post-image-cropper />
+<x-admin.post-form-scroll-to-error form-id="post-create-form" :require-image="true" />
 @endsection
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    const POST_CREATE_DRAFT = {
+        storageKey: 'admin_post_create_draft_v3',
+        imageDbName: 'admin_post_create_draft',
+        imageStoreName: 'uploaded_images',
+        imageRecordKey: 'featured',
+        skipRestore: @json($skipDraftRestore),
+        serverExistingImage: @json($existingImageValue ?? ''),
+        serverExistingImageUrl: @json(! empty($existingImageValue) ? storage_image_url($existingImageValue) : ''),
+    };
+
+    let isSeoManuallyEdited = false;
+    let postCreateSaveTimer = null;
+    let postCreateTopicAdd = null;
+    let postCreateSaveInFlight = null;
+
+    function openPostCreateImageDb() {
+        return new Promise(function (resolve, reject) {
+            const request = indexedDB.open(POST_CREATE_DRAFT.imageDbName, 1);
+            request.onupgradeneeded = function () {
+                const db = request.result;
+                if (!db.objectStoreNames.contains(POST_CREATE_DRAFT.imageStoreName)) {
+                    db.createObjectStore(POST_CREATE_DRAFT.imageStoreName);
+                }
+            };
+            request.onsuccess = function () { resolve(request.result); };
+            request.onerror = function () { reject(request.error); };
+        });
+    }
+
+    function idbPutImage(record) {
+        return openPostCreateImageDb().then(function (db) {
+            return new Promise(function (resolve, reject) {
+                const tx = db.transaction(POST_CREATE_DRAFT.imageStoreName, 'readwrite');
+                tx.objectStore(POST_CREATE_DRAFT.imageStoreName).put(record, POST_CREATE_DRAFT.imageRecordKey);
+                tx.oncomplete = function () { resolve(); };
+                tx.onerror = function () { reject(tx.error); };
+            });
+        });
+    }
+
+    function idbGetImage() {
+        return openPostCreateImageDb().then(function (db) {
+            return new Promise(function (resolve, reject) {
+                const tx = db.transaction(POST_CREATE_DRAFT.imageStoreName, 'readonly');
+                const req = tx.objectStore(POST_CREATE_DRAFT.imageStoreName).get(POST_CREATE_DRAFT.imageRecordKey);
+                req.onsuccess = function () { resolve(req.result || null); };
+                req.onerror = function () { reject(req.error); };
+            });
+        });
+    }
+
+    function idbClearImage() {
+        return openPostCreateImageDb().then(function (db) {
+            return new Promise(function (resolve, reject) {
+                const tx = db.transaction(POST_CREATE_DRAFT.imageStoreName, 'readwrite');
+                tx.objectStore(POST_CREATE_DRAFT.imageStoreName).delete(POST_CREATE_DRAFT.imageRecordKey);
+                tx.oncomplete = function () { resolve(); };
+                tx.onerror = function () { reject(tx.error); };
+            });
+        }).catch(function () {});
+    }
+
+    function fileToDataUrl(file) {
+        return new Promise(function (resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = function (e) { resolve(e.target.result); };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function compressDataUrlForDraft(dataUrl, maxWidth, quality) {
+        maxWidth = maxWidth || 1280;
+        quality = quality || 0.85;
+        return new Promise(function (resolve, reject) {
+            const img = new Image();
+            img.onload = function () {
+                const scale = Math.min(1, maxWidth / img.width);
+                const width = Math.max(1, Math.round(img.width * scale));
+                const height = Math.max(1, Math.round(img.height * scale));
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = reject;
+            img.src = dataUrl;
+        });
+    }
+
+    async function getCurrentUploadedImagePayload() {
+        const previewEl = document.getElementById('mainImagePreview');
+        const fileInput = document.getElementById('mainImageInput');
+        let dataUrl = '';
+        let fileName = 'featured-image.jpg';
+
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            fileName = fileInput.files[0].name;
+            try {
+                dataUrl = await fileToDataUrl(fileInput.files[0]);
+            } catch (e) {
+                dataUrl = '';
+            }
+        }
+
+        if (!dataUrl && previewEl && !previewEl.classList.contains('hidden') && previewEl.src) {
+            if (previewEl.src.startsWith('data:')) {
+                dataUrl = previewEl.src;
+            } else if (previewEl.src.startsWith('blob:')) {
+                try {
+                    const blob = await fetch(previewEl.src).then(function (r) { return r.blob(); });
+                    dataUrl = await fileToDataUrl(new File([blob], fileName, { type: blob.type || 'image/jpeg' }));
+                } catch (e) {
+                    dataUrl = '';
+                }
+            }
+        }
+
+        if (!dataUrl) {
+            return null;
+        }
+
+        try {
+            dataUrl = await compressDataUrlForDraft(dataUrl);
+        } catch (e) {}
+
+        if (!fileName.match(/\.(jpe?g|png|webp)$/i)) {
+            fileName = fileName.replace(/\.[^.]+$/, '') + '.jpg';
+        }
+
+        return { dataUrl: dataUrl, fileName: fileName };
+    }
+
+    function applyImagePreview(previewUrl) {
+        const preview = document.getElementById('mainImagePreview');
+        const placeholder = document.getElementById('mainImagePlaceholder');
+        if (preview && previewUrl) {
+            preview.src = previewUrl;
+            preview.classList.remove('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+        }
+    }
+
+    function clearExistingImagePath() {
+        const hidden = document.getElementById('existingImagePath');
+        if (!hidden) return;
+        hidden.value = '';
+        delete hidden.dataset.previewUrl;
+    }
+
+    function applyExistingImagePreview(path, previewUrl) {
+        const hidden = document.getElementById('existingImagePath');
+        if (!hidden) return;
+        hidden.value = path || '';
+        if (path && previewUrl) {
+            hidden.dataset.previewUrl = previewUrl;
+            applyImagePreview(previewUrl);
+        } else {
+            delete hidden.dataset.previewUrl;
+        }
+    }
+
+    function setFileOnMainInput(file) {
+        const input = document.getElementById('mainImageInput');
+        if (!input || !file) return;
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+    }
+
+    async function dataUrlToFile(dataUrl, filename) {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const type = blob.type || 'image/jpeg';
+        const ext = type.split('/')[1] || 'jpg';
+        const name = filename || ('featured-image.' + ext);
+        return new File([blob], name, { type: type, lastModified: Date.now() });
+    }
+
+    async function restorePostCreateDraftImage(draft) {
+        if (POST_CREATE_DRAFT.serverExistingImage) {
+            applyExistingImagePreview(POST_CREATE_DRAFT.serverExistingImage, POST_CREATE_DRAFT.serverExistingImageUrl);
+            return;
+        }
+
+        let imageRecord = null;
+        try {
+            imageRecord = await idbGetImage();
+        } catch (e) {
+            imageRecord = null;
+        }
+
+        if (!imageRecord && draft && draft.image_data_url) {
+            imageRecord = {
+                dataUrl: draft.image_data_url,
+                fileName: draft.image_file_name || 'featured-image.jpg',
+            };
+        }
+
+        if (imageRecord && imageRecord.dataUrl) {
+            clearExistingImagePath();
+            try {
+                const file = await dataUrlToFile(imageRecord.dataUrl, imageRecord.fileName);
+                setFileOnMainInput(file);
+                applyImagePreview(imageRecord.dataUrl);
+            } catch (e) {
+                console.warn('Post draft image restore failed', e);
+            }
+            return;
+        }
+
+        if (draft && draft.existing_image) {
+            applyExistingImagePreview(draft.existing_image, draft.existing_image_preview || '');
+        }
+    }
+
+    function collectPostCreateDraft() {
+        const form = document.getElementById('post-create-form');
+        if (!form) return null;
+
+        const topicEntries = Array.from(form.querySelectorAll('#hidden-topic-inputs input[name="topic_ids[]"]')).map(function (input) {
+            const id = input.value;
+            const chip = document.querySelector('.topic-chip.available[data-id="' + id + '"]');
+            const selectedChip = document.querySelector('#selected-topics-area div[data-id="' + id + '"]');
+            return {
+                id: id,
+                name: chip ? chip.dataset.name : (selectedChip ? selectedChip.textContent.replace('×', '').trim() : 'Topic'),
+                permanent: chip ? chip.dataset.permanent === 'true' : false,
+            };
+        });
+
+        let description = '';
+        if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.editor) {
+            description = CKEDITOR.instances.editor.getData();
+        } else {
+            const editorEl = document.getElementById('editor');
+            if (editorEl) description = editorEl.value;
+        }
+
+        const fileInput = document.getElementById('mainImageInput');
+        const previewEl = document.getElementById('mainImagePreview');
+        const hasUploadedFile = !!(fileInput && fileInput.files && fileInput.files.length > 0)
+            || !!(previewEl && !previewEl.classList.contains('hidden') && previewEl.src
+                && (previewEl.src.startsWith('data:') || previewEl.src.startsWith('blob:')));
+        const hiddenImage = document.getElementById('existingImagePath');
+
+        return {
+            subtitle: document.getElementById('post_subtitle')?.value || '',
+            title: document.getElementById('post_title')?.value || '',
+            sub_title_points: Array.from(form.querySelectorAll('input[name="sub_title_points[]"]')).map(function (el) { return el.value; }),
+            category_ids: Array.from(form.querySelectorAll('input[name="category_ids[]"]:checked')).map(function (el) { return el.value; }),
+            existing_image: hasUploadedFile ? '' : (hiddenImage?.value || ''),
+            existing_image_preview: hasUploadedFile ? '' : (hiddenImage?.dataset.previewUrl || ''),
+            has_uploaded_image: hasUploadedFile,
+            image_caption: form.querySelector('[name="image_caption"]')?.value || '',
+            description: description,
+            reporter_id: form.querySelector('[name="reporter_id"]')?.value || '',
+            hero_layer: document.getElementById('hero_layer_value')?.value || '',
+            is_special_news: !!form.querySelector('[name="is_special_news"]')?.checked,
+            status: form.querySelector('[name="status"]')?.value || 'published',
+            seo_keywords: document.getElementById('seo_keywords')?.value || '',
+            is_seo_manual: isSeoManuallyEdited,
+            topics: topicEntries,
+            saved_at: Date.now(),
+        };
+    }
+
+    async function savePostCreateDraft() {
+        if (postCreateSaveInFlight) {
+            return postCreateSaveInFlight;
+        }
+
+        postCreateSaveInFlight = (async function () {
+            try {
+                const draft = collectPostCreateDraft();
+                if (!draft) return;
+
+                const imagePayload = await getCurrentUploadedImagePayload();
+                if (imagePayload) {
+                    draft.has_uploaded_image = true;
+                    draft.existing_image = '';
+                    draft.existing_image_preview = '';
+                    await idbPutImage({
+                        dataUrl: imagePayload.dataUrl,
+                        fileName: imagePayload.fileName,
+                        saved_at: Date.now(),
+                    });
+                } else if (draft.existing_image) {
+                    draft.has_uploaded_image = false;
+                    await idbClearImage();
+                } else {
+                    const idbImage = await idbGetImage().catch(function () { return null; });
+                    draft.has_uploaded_image = !!idbImage;
+                }
+
+            const empty = !draft.title
+                && !draft.subtitle
+                && !draft.description
+                    && draft.sub_title_points.every(function (p) { return !p; })
+                    && !draft.image_caption
+                    && !draft.existing_image
+                    && !draft.has_uploaded_image
+                    && draft.category_ids.length === 0
+                    && !draft.reporter_id
+                    && draft.topics.length === 0;
+
+                if (empty) {
+                    localStorage.removeItem(POST_CREATE_DRAFT.storageKey);
+                    await idbClearImage();
+                    return;
+                }
+
+                localStorage.setItem(POST_CREATE_DRAFT.storageKey, JSON.stringify(draft));
+            } catch (e) {
+                console.warn('Post draft save failed', e);
+            } finally {
+                postCreateSaveInFlight = null;
+            }
+        })();
+
+        return postCreateSaveInFlight;
+    }
+
+    function schedulePostCreateDraftSave() {
+        clearTimeout(postCreateSaveTimer);
+        postCreateSaveTimer = setTimeout(function () {
+            savePostCreateDraft();
+        }, 350);
+    }
+
+    function clearPostCreateDraft() {
+        localStorage.removeItem(POST_CREATE_DRAFT.storageKey);
+        idbClearImage();
+    }
+
+    function showSubTitlePointsSection() {
+        const wrapper = document.getElementById('sub-title-points-wrapper');
+        if (wrapper) wrapper.classList.remove('hidden');
+    }
+
+    function createSubTitlePointRow() {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 sub-title-point-row';
+        row.innerHTML = ''
+            + '<input type="text" name="sub_title_points[]" class="flex-1 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">'
+            + '<button type="button" class="remove-sub-title-point inline-flex items-center justify-center w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 text-sm" title="Remove point">&times;</button>';
+        return row;
+    }
+
+    function restoreSubTitlePoints(points) {
+        const wrapper = document.getElementById('sub-title-points-wrapper');
+        if (!wrapper) return;
+        const values = Array.isArray(points)
+            ? points.map(function (value) { return String(value || '').trim(); }).filter(Boolean)
+            : [];
+        if (!values.length) return;
+        wrapper.innerHTML = '';
+        showSubTitlePointsSection();
+        values.forEach(function (value) {
+            const row = createSubTitlePointRow();
+            const input = row.querySelector('input');
+            if (input) input.value = value;
+            wrapper.appendChild(row);
+        });
+    }
+
+    async function restorePostCreateDraft() {
+        if (POST_CREATE_DRAFT.skipRestore) return;
+        let draft = null;
+        try {
+            draft = JSON.parse(localStorage.getItem(POST_CREATE_DRAFT.storageKey) || 'null');
+        } catch (e) {
+            draft = null;
+        }
+
+        const hasIdbImage = await idbGetImage().catch(function () { return null; });
+        if (!draft && !hasIdbImage) return;
+        if (!draft) {
+            draft = { has_uploaded_image: true };
+        }
+
+        const form = document.getElementById('post-create-form');
+        if (!form) return;
+
         const titleInput = document.getElementById('post_title');
         const seoTextarea = document.getElementById('seo_keywords');
-        let isSeoManuallyEdited = false;
+        const subtitleInput = document.getElementById('post_subtitle');
+        if (subtitleInput && typeof draft.subtitle === 'string') {
+            subtitleInput.value = draft.subtitle;
+            if (draft.subtitle.trim() !== '') {
+                showPostSubtitleInput();
+            }
+        }
+        if (titleInput && draft.title) titleInput.value = draft.title;
+        if (seoTextarea && typeof draft.seo_keywords === 'string') seoTextarea.value = draft.seo_keywords;
+        isSeoManuallyEdited = !!draft.is_seo_manual;
+
+        restoreSubTitlePoints(draft.sub_title_points);
+
+        form.querySelectorAll('input[name="category_ids[]"]').forEach(function (el) {
+            el.checked = Array.isArray(draft.category_ids) && draft.category_ids.includes(el.value);
+        });
+
+        const captionEl = form.querySelector('[name="image_caption"]');
+        if (captionEl && typeof draft.image_caption === 'string') captionEl.value = draft.image_caption;
+
+        const reporterEl = form.querySelector('[name="reporter_id"]');
+        if (reporterEl && draft.reporter_id) reporterEl.value = draft.reporter_id;
+
+        const heroHidden = document.getElementById('hero_layer_value');
+        if (heroHidden) heroHidden.value = draft.hero_layer || '';
+        document.querySelectorAll('.hero-layer-checkbox').forEach(function (cb) {
+            cb.checked = String(draft.hero_layer || '') === cb.getAttribute('data-value');
+        });
+
+        const specialEl = form.querySelector('[name="is_special_news"]');
+        if (specialEl) specialEl.checked = !!draft.is_special_news;
+
+        const statusEl = form.querySelector('[name="status"]');
+        if (statusEl && draft.status) statusEl.value = draft.status;
+
+        await restorePostCreateDraftImage(draft);
+
+        if (Array.isArray(draft.topics) && postCreateTopicAdd) {
+            draft.topics.forEach(function (topic) {
+                postCreateTopicAdd(topic.id, topic.name, !!topic.permanent);
+            });
+        }
+
+        if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.editor && draft.description) {
+            CKEDITOR.instances.editor.setData(draft.description);
+        } else {
+            const editorEl = document.getElementById('editor');
+            if (editorEl && draft.description) editorEl.value = draft.description;
+        }
+    }
+
+    function showPostSubtitleInput() {
+        const wrap = document.getElementById('post-subtitle-input-wrap');
+        const toggle = document.getElementById('toggle-post-subtitle');
+        const input = document.getElementById('post_subtitle');
+        if (wrap) wrap.classList.remove('hidden');
+        if (toggle) toggle.classList.add('hidden');
+        if (input) input.focus();
+    }
+
+    function initPostSubtitleToggle() {
+        const toggle = document.getElementById('toggle-post-subtitle');
+        if (!toggle) return;
+        toggle.addEventListener('click', showPostSubtitleInput);
+    }
+
+    function initPostCreateDraftAutosave() {
+        const form = document.getElementById('post-create-form');
+        if (!form) return;
+
+        form.addEventListener('input', schedulePostCreateDraftSave);
+        form.addEventListener('change', schedulePostCreateDraftSave);
+
+        form.addEventListener('submit', function (event) {
+            if (!event.defaultPrevented) {
+                clearPostCreateDraft();
+            }
+        });
+
+        form.querySelector('a[href*="pick-image"]')?.addEventListener('click', function () {
+            savePostCreateDraft();
+        });
+
+        document.addEventListener('post-featured-image-updated', function (event) {
+            clearExistingImagePath();
+            const detail = event.detail || {};
+            if (!detail.dataUrl) {
+                savePostCreateDraft();
+                return;
+            }
+
+            const fileName = detail.fileName || 'featured-image.jpg';
+            idbPutImage({
+                dataUrl: detail.dataUrl,
+                fileName: fileName,
+                saved_at: Date.now(),
+            }).then(function () {
+                return savePostCreateDraft();
+            }).then(function () {
+                return compressDataUrlForDraft(detail.dataUrl).then(function (compressed) {
+                    return idbPutImage({
+                        dataUrl: compressed,
+                        fileName: fileName,
+                        saved_at: Date.now(),
+                    });
+                });
+            }).catch(function () {
+                savePostCreateDraft();
+            });
+        });
+
+        window.addEventListener('pagehide', savePostCreateDraft);
+        window.addEventListener('beforeunload', savePostCreateDraft);
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'hidden') savePostCreateDraft();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (POST_CREATE_DRAFT.serverExistingImage) {
+            applyExistingImagePreview(POST_CREATE_DRAFT.serverExistingImage, POST_CREATE_DRAFT.serverExistingImageUrl);
+        } else {
+            const existingImagePath = document.getElementById('existingImagePath');
+            if (existingImagePath && existingImagePath.dataset.previewUrl) {
+                applyExistingImagePreview(existingImagePath.value, existingImagePath.dataset.previewUrl);
+            }
+        }
+
+        const titleInput = document.getElementById('post_title');
+        const seoTextarea = document.getElementById('seo_keywords');
 
         // Auto-fill SEO Keywords from Title as long as user hasn't edited SEO box
         titleInput.addEventListener('input', function() {
@@ -347,16 +894,20 @@
         // Detect manual edits to SEO Keywords
         seoTextarea.addEventListener('input', function() {
             isSeoManuallyEdited = true;
-            // If user clears the box, reset sync capability
             if (this.value === '') {
                 isSeoManuallyEdited = false;
                 seoTextarea.value = titleInput.value;
             }
         });
 
+        initPostSubtitleToggle();
         initSubTitlePoints();
         initTopicsSelection();
         initMainImagePreview();
+        initPostCreateDraftAutosave();
+        restorePostCreateDraft().then(function () {
+            setTimeout(savePostCreateDraft, 400);
+        });
     });
 
     function initTopicsSelection() {
@@ -407,8 +958,8 @@
         }
 
         function addTopic(id, name, isPermanent) {
-            if (selectedIds.has(id)) return;
-            selectedIds.add(id);
+            if (selectedIds.has(String(id))) return;
+            selectedIds.add(String(id));
 
             // Hide placeholder
             if (placeholder) placeholder.classList.add('hidden');
@@ -434,10 +985,11 @@
             // Mark in selector
             const selectorChip = document.querySelector(`.topic-chip.available[data-id="${id}"]`);
             if (selectorChip) selectorChip.classList.add('opacity-40', 'pointer-events-none');
+            schedulePostCreateDraftSave();
         }
 
         function removeTopic(id) {
-            selectedIds.delete(id);
+            selectedIds.delete(String(id));
             
             // Remove chip
             const chip = area.querySelector(`div[data-id="${id}"]`);
@@ -455,6 +1007,7 @@
             // Unmark in selector
             const selectorChip = document.querySelector(`.topic-chip.available[data-id="${id}"]`);
             if (selectorChip) selectorChip.classList.remove('opacity-40', 'pointer-events-none');
+            schedulePostCreateDraftSave();
         }
 
         // Handle clicks on available chips
@@ -639,6 +1192,8 @@
             observer.observe(sentinel);
         }
 
+        postCreateTopicAdd = addTopic;
+
         // Pre-fill old selections (if validation fails and returns)
         @if(is_array(old('topic_ids')))
             @foreach(old('topic_ids') as $oldId)
@@ -673,40 +1228,25 @@
     }
 
     function initMainImagePreview() {
-        const input = document.getElementById('mainImageInput');
-        if (!input) return;
-        input.addEventListener('change', function () {
-            previewMainImage(this);
-        });
-    }
-
-    function previewMainImage(input) {
-        const box = input.closest('[data-main-image-upload]');
-        const preview = box ? box.querySelector('#mainImagePreview') : document.getElementById('mainImagePreview');
-        const placeholder = box ? box.querySelector('#mainImagePlaceholder') : document.getElementById('mainImagePlaceholder');
-        const file = input.files && input.files[0];
-
-        if (!file || !preview) return;
-
-        if (!file.type.startsWith('image/')) {
-            input.value = '';
-            return;
+        if (window.AdminPostImageCrop) {
+            window.AdminPostImageCrop.init('#mainImageInput');
         }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            preview.src = e.target.result;
-            preview.classList.remove('hidden');
-            if (placeholder) placeholder.classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
     }
-
-    window.previewMainImage = previewMainImage;
 
     function initCKEditor() {
         if (typeof CKEDITOR !== 'undefined' && document.getElementById('editor')) {
-            CKEDITOR.replace('editor', adminCkeditorConfig({ height: 400 }));
+            const editor = CKEDITOR.replace('editor', adminCkeditorConfig({ height: 400 }));
+            editor.on('instanceReady', function () {
+                editor.on('change', schedulePostCreateDraftSave);
+                if (!POST_CREATE_DRAFT.skipRestore) {
+                    try {
+                        const draft = JSON.parse(localStorage.getItem(POST_CREATE_DRAFT.storageKey) || 'null');
+                        if (draft && draft.description && !editor.getData()) {
+                            editor.setData(draft.description);
+                        }
+                    } catch (e) {}
+                }
+            });
         }
     }
 
@@ -722,38 +1262,27 @@
         if (!wrapper || !addBtn) return;
 
         addBtn.addEventListener('click', function () {
-            const row = document.createElement('div');
-            row.className = 'flex items-center gap-2 sub-title-point-row';
-            row.innerHTML = `
-                <input
-                    type="text"
-                    name="sub_title_points[]"
-                    placeholder="Sub title point"
-                    class="flex-1 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm"
-                >
-                <button
-                    type="button"
-                    class="remove-sub-title-point inline-flex items-center justify-center w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 text-sm"
-                    title="Remove point"
-                >&times;</button>
-            `;
+            showSubTitlePointsSection();
+            const row = createSubTitlePointRow();
             wrapper.appendChild(row);
+            const input = row.querySelector('input');
+            if (input) input.focus();
+            schedulePostCreateDraftSave();
         });
 
         wrapper.addEventListener('click', function (event) {
             const target = event.target;
-            if (target.classList.contains('remove-sub-title-point')) {
-                const row = target.closest('.sub-title-point-row');
-                if (!row) return;
-                const rows = wrapper.querySelectorAll('.sub-title-point-row');
-                if (rows.length > 1) {
-                    row.remove();
-                } else {
-                    const input = row.querySelector('input[name="sub_title_points[]"]');
-                    if (input) input.value = '';
-                }
+            if (!target.classList.contains('remove-sub-title-point')) return;
+            const row = target.closest('.sub-title-point-row');
+            if (!row) return;
+            row.remove();
+            if (!wrapper.querySelector('.sub-title-point-row')) {
+                wrapper.classList.add('hidden');
             }
+            schedulePostCreateDraftSave();
         });
+
+        wrapper.addEventListener('input', schedulePostCreateDraftSave);
     }
 </script>
 @endpush

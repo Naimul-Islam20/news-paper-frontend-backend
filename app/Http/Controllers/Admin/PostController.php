@@ -9,6 +9,10 @@ use App\Models\Reporter;
 use App\Models\Topic;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class PostController extends Controller
@@ -80,7 +84,9 @@ class PostController extends Controller
         $reporters = $this->reportersForCurrentUser();
         $topics = Topic::orderBy('can_delete', 'asc')->orderBy('name', 'asc')->get();
 
-        return view('admin.posts.create', compact('categories', 'reporters', 'topics'));
+        $pickedImage = session()->pull('post_picked_image');
+
+        return view('admin.posts.create', compact('categories', 'reporters', 'topics', 'pickedImage'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -91,11 +97,13 @@ class PostController extends Controller
 
         $request->validate([
             'title'              => 'required|string|max:255',
+            'subtitle'           => 'nullable|string|max:150',
             'sub_title_points'   => 'nullable|array',
             'sub_title_points.*' => 'nullable|string|max:255',
-            'category_ids'      => 'required|array',
+            'category_ids'      => 'required|array|min:1',
             'category_ids.*'    => 'exists:categories,id',
-            'image'              => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'existing_image'     => 'nullable|string|max:255',
             'image_caption'      => 'nullable|string',
             'description'        => 'required|string',
             'reporter_id'        => 'required|exists:reporters,id',
@@ -104,40 +112,25 @@ class PostController extends Controller
             'hero_layer'         => 'nullable|in:1,2,3,4',
         ], [
             'title.required'       => 'শিরোনাম অবশ্যই দিতে হবে।',
-            'category_ids.required' => 'ক্যাটাগরি নির্বাচন করুন।',
+            'category_ids.required' => 'ক্যাটাগরি বা সাব-ক্যাটাগরি নির্বাচন করুন।',
+            'category_ids.min'      => 'ক্যাটাগরি বা সাব-ক্যাটাগরি নির্বাচন করুন।',
             'image.required'       => 'ছবি আপলোড করুন।',
             'description.required' => 'বিবরণ লিখুন।',
             'reporter_id.required' => 'রিপোর্টার নির্বাচন করুন।',
         ]);
 
-        $data = $request->only([
-            'title', 'description', 'image_caption',
-            'seo_keywords', 'status', 'hero_layer'
-        ]);
+        $data = $this->buildPostFormData($request);
 
-        // Sub title points -> JSON string in sub_title column
-        $points = collect($request->input('sub_title_points', []))
-            ->map(function ($value) {
-                return is_string($value) ? trim($value) : '';
-            })
-            ->filter(function ($value) {
-                return $value !== '';
-            })
-            ->values()
-            ->all();
+        if (! $request->hasFile('image') && ! $request->filled('existing_image')) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['image' => 'ছবি আপলোড করুন বা মিডিয়া থেকে বেছে নিন।']);
+        }
 
-        $data['sub_title'] = !empty($points)
-            ? json_encode($points, JSON_UNESCAPED_UNICODE)
-            : null;
-        $data['reporter_id'] = $this->resolveReporterId($request->reporter_id);
-        $data['is_special_news'] = $request->boolean('is_special_news');
-
-        // Slug: from SEO keywords (auto = title) or title. Title Bangla হলে slug ও Bangla থাকবে (slugifyUnicode).
-        $slugSource = $request->seo_keywords ?: $request->title;
-        $data['slug'] = $this->makePostSlug($slugSource);
-
-        if ($request->hasFile('image')) {
-            $data['image'] = store_public_upload($request->file('image'), 'posts');
+        try {
+            $this->applyImageToPostData($request, $data);
+        } catch (ValidationException $e) {
+            return redirect()->back()->withInput()->withErrors($e->errors());
         }
 
         $post = Post::create($data);
@@ -167,7 +160,9 @@ class PostController extends Controller
         $reporters = $this->reportersForCurrentUser();
         $topics = Topic::orderBy('can_delete', 'asc')->orderBy('name', 'asc')->get();
 
-        return view('admin.posts.edit', compact('post', 'categories', 'reporters', 'topics'));
+        $pickedImage = session()->pull('post_picked_image');
+
+        return view('admin.posts.edit', compact('post', 'categories', 'reporters', 'topics', 'pickedImage'));
     }
 
     public function update(Request $request, $id)
@@ -176,11 +171,13 @@ class PostController extends Controller
 
         $request->validate([
             'title'              => 'required|string|max:255',
+            'subtitle'           => 'nullable|string|max:150',
             'sub_title_points'   => 'nullable|array',
             'sub_title_points.*' => 'nullable|string|max:255',
-            'category_ids'      => 'required|array',
+            'category_ids'      => 'required|array|min:1',
             'category_ids.*'    => 'exists:categories,id',
             'image'              => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
+            'existing_image'     => 'nullable|string|max:255',
             'image_caption'      => 'nullable|string',
             'description'        => 'required|string',
             'reporter_id'        => 'required|exists:reporters,id',
@@ -189,40 +186,20 @@ class PostController extends Controller
             'hero_layer'         => 'nullable|in:1,2,3,4',
         ], [
             'title.required'       => 'শিরোনাম অবশ্যই দিতে হবে।',
-            'category_ids.required' => 'ক্যাটাগরি নির্বাচন করুন।',
+            'category_ids.required' => 'ক্যাটাগরি বা সাব-ক্যাটাগরি নির্বাচন করুন।',
+            'category_ids.min'      => 'ক্যাটাগরি বা সাব-ক্যাটাগরি নির্বাচন করুন।',
             'description.required' => 'বিবরণ লিখুন।',
             'reporter_id.required' => 'রিপোর্টার নির্বাচন করুন।',
         ]);
 
-        $data = $request->only([
-            'title', 'description', 'image_caption',
-            'seo_keywords', 'status', 'hero_layer'
-        ]);
+        $data = $this->buildPostFormData($request, $post);
 
-        // Sub title points -> JSON string in sub_title column
-        $points = collect($request->input('sub_title_points', []))
-            ->map(function ($value) {
-                return is_string($value) ? trim($value) : '';
-            })
-            ->filter(function ($value) {
-                return $value !== '';
-            })
-            ->values()
-            ->all();
-
-        $data['sub_title'] = !empty($points)
-            ? json_encode($points, JSON_UNESCAPED_UNICODE)
-            : null;
-        $data['reporter_id'] = $this->resolveReporterId($request->reporter_id);
-        $data['is_special_news'] = $request->boolean('is_special_news');
-
-        // Slug: from SEO keywords (auto = title) or title. Title Bangla হলে slug ও Bangla থাকবে (slugifyUnicode).
-        $slugSource = $request->seo_keywords ?: $request->title;
-        $data['slug'] = $this->makePostSlug($slugSource, $post->id);
-
-        if ($request->hasFile('image')) {
-            delete_uploaded_media($post->image);
-            $data['image'] = store_public_upload($request->file('image'), 'posts');
+        if ($request->hasFile('image') || $request->filled('existing_image')) {
+            try {
+                $this->applyImageToPostData($request, $data, $post);
+            } catch (ValidationException $e) {
+                return redirect()->back()->withInput()->withErrors($e->errors());
+            }
         }
 
         $post->update($data);
@@ -295,10 +272,83 @@ class PostController extends Controller
         return function_exists('mb_strtolower') ? mb_strtolower($value, 'UTF-8') : strtolower($value);
     }
 
+    public function pickImage(Request $request): View
+    {
+        $validated = $request->validate([
+            'context' => 'required|in:create,edit',
+            'post_id' => 'required_if:context,edit|nullable|integer|exists:posts,id',
+            'search'  => 'nullable|string|max:100',
+        ]);
+
+        $search = trim((string) ($validated['search'] ?? ''));
+        $perPage = 60;
+        $page = max(1, (int) $request->get('page', 1));
+
+        $validImages = $this->queryDistinctPostImages($search)
+            ->get()
+            ->filter(fn ($row) => $this->postImageFileExists($row->image))
+            ->values();
+
+        $lastPage = max(1, (int) ceil($validImages->count() / $perPage));
+
+        if ($page > $lastPage && $validImages->isNotEmpty()) {
+            return redirect()->route('admin.posts.pick-image', array_filter([
+                'context' => $validated['context'],
+                'post_id' => $validated['post_id'] ?? null,
+                'search'  => $search !== '' ? $search : null,
+                'page'    => $lastPage,
+            ]));
+        }
+
+        $images = new LengthAwarePaginator(
+            $validImages->forPage($page, $perPage)->values(),
+            $validImages->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url()]
+        );
+        $images->appends($request->except('page'));
+
+        return view('admin.posts.pick-image', [
+            'images'  => $images,
+            'context' => $validated['context'],
+            'postId'  => $validated['post_id'] ?? null,
+            'search'  => $search,
+        ]);
+    }
+
+    public function applyPickedImage(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'existing_image' => 'required|string|max:255',
+            'context'        => 'required|in:create,edit',
+            'post_id'        => 'required_if:context,edit|nullable|integer|exists:posts,id',
+        ]);
+
+        $path = $this->resolveExistingPostImage($validated['existing_image']);
+
+        if ($path === null) {
+            return redirect()
+                ->route('admin.posts.pick-image', array_filter([
+                    'context' => $validated['context'],
+                    'post_id' => $validated['post_id'] ?? null,
+                ]))
+                ->withErrors(['existing_image' => 'নির্বাচিত ছবি সঠিক নয় বা ফাইল পাওয়া যায়নি।']);
+        }
+
+        session(['post_picked_image' => $path]);
+
+        if ($validated['context'] === 'edit') {
+            return redirect()->route('admin.posts.edit', $validated['post_id']);
+        }
+
+        return redirect()->route('admin.posts.create');
+    }
+
     public function destroy($id)
     {
         $post = Post::findOrFail($id);
-        delete_uploaded_media($post->image);
+        $this->deletePostImageIfUnused($post->image, $post->id);
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully!');
     }
@@ -317,7 +367,7 @@ class PostController extends Controller
         $deleted = 0;
 
         foreach (Post::whereIn('id', $ids)->get() as $post) {
-            delete_uploaded_media($post->image);
+            $this->deletePostImageIfUnused($post->image, $post->id);
             $post->delete();
             $deleted++;
         }
@@ -329,6 +379,129 @@ class PostController extends Controller
         return redirect()
             ->route('admin.posts.index', $request->only(['search', 'category_id', 'status']))
             ->with('success', $message);
+    }
+
+    protected function buildPostFormData(Request $request, ?Post $post = null): array
+    {
+        $data = $request->only([
+            'title', 'subtitle', 'description', 'image_caption',
+            'seo_keywords', 'status', 'hero_layer',
+        ]);
+
+        $data['subtitle'] = trim((string) ($data['subtitle'] ?? '')) ?: null;
+
+        $points = collect($request->input('sub_title_points', []))
+            ->map(fn ($value) => is_string($value) ? trim($value) : '')
+            ->filter(fn ($value) => $value !== '')
+            ->values()
+            ->all();
+
+        $data['sub_title'] = ! empty($points)
+            ? json_encode($points, JSON_UNESCAPED_UNICODE)
+            : null;
+        $data['reporter_id'] = $this->resolveReporterId($request->reporter_id);
+        $data['is_special_news'] = $request->boolean('is_special_news');
+
+        $slugSource = $request->seo_keywords ?: $request->title;
+        $data['slug'] = $this->makePostSlug($slugSource, $post?->id);
+
+        return $data;
+    }
+
+    protected function queryDistinctPostImages(string $search = '')
+    {
+        $query = DB::table('posts')
+            ->whereNotNull('image')
+            ->where('image', '!=', '');
+
+        if ($search !== '') {
+            $query->where('title', 'like', '%' . $search . '%');
+        }
+
+        return $query
+            ->select('image', DB::raw('MAX(created_at) as last_used'), DB::raw('MAX(title) as sample_title'))
+            ->groupBy('image')
+            ->orderByDesc('last_used');
+    }
+
+    protected function applyImageToPostData(Request $request, array &$data, ?Post $post = null): void
+    {
+        if ($request->hasFile('image')) {
+            if ($post?->image) {
+                $this->deletePostImageIfUnused($post->image, $post->id);
+            }
+
+            $data['image'] = store_public_upload($request->file('image'), 'posts');
+
+            return;
+        }
+
+        if ($request->filled('existing_image')) {
+            $path = $this->resolveExistingPostImage($request->input('existing_image'));
+
+            if ($path === null) {
+                throw ValidationException::withMessages([
+                    'image' => 'মিডিয়া থেকে নির্বাচিত ছবি সঠিক নয়।',
+                ]);
+            }
+
+            if ($post?->image && $post->image !== $path) {
+                $this->deletePostImageIfUnused($post->image, $post->id);
+            }
+
+            $data['image'] = $path;
+        }
+    }
+
+    protected function resolveExistingPostImage(?string $path): ?string
+    {
+        $path = trim((string) $path);
+
+        if ($path === '' || str_contains($path, '..')) {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return null;
+        }
+
+        $path = ltrim($path, '/');
+
+        if (! preg_match('#^posts/[A-Za-z0-9._-]+$#', $path)) {
+            return null;
+        }
+
+        if (! Post::where('image', $path)->exists()) {
+            return null;
+        }
+
+        return $this->postImageFileExists($path) ? $path : null;
+    }
+
+    protected function postImageFileExists(string $path): bool
+    {
+        $path = ltrim($path, '/');
+
+        return is_file(public_path($path)) || Storage::disk('public')->exists($path);
+    }
+
+    protected function deletePostImageIfUnused(?string $path, ?int $ignorePostId = null): void
+    {
+        if (! $path) {
+            return;
+        }
+
+        $query = Post::where('image', $path);
+
+        if ($ignorePostId) {
+            $query->where('id', '!=', $ignorePostId);
+        }
+
+        if ($query->exists()) {
+            return;
+        }
+
+        delete_uploaded_media($path);
     }
 
     /** Reporter লগইন থাকলে শুধু ওই রিপোর্টার; Sub Editor হলে শুধু নিজের reporter desk; নাহলে সব active reporter */

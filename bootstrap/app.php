@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -34,8 +34,8 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             $message = 'আপলোড ব্যর্থ: ফাইল বা ফর্ম ডেটা সার্ভারের সীমা (post_max_size) ছাড়িয়ে গেছে। '
-                .'২৪MB+ ভিডিওর জন্য হোস্টিং/cPanel এ upload_max_filesize ও post_max_size কমপক্ষে 64M সেট করুন। '
-                .'(Nginx হলে client_max_body_size 64M)';
+                . '২৪MB+ ভিডিওর জন্য হোস্টিং/cPanel এ upload_max_filesize ও post_max_size কমপক্ষে 64M সেট করুন। '
+                . '(Nginx হলে client_max_body_size 64M)';
 
             return redirect()->back()
                 ->withInput($request->except(['image', 'image_mobile', 'video', 'video_mobile', '_token']))

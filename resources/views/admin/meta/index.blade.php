@@ -173,6 +173,24 @@
                     </div>
                 </div>
 
+                {{-- Google AdSense --}}
+                <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-6">
+                    <div class="pb-4 border-b border-slate-200 dark:border-slate-800">
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                            Google AdSense
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">সাইট জুড়ে Google Ad চালাতে Publisher Client ID দিন। প্রতিটি অ্যাড স্লটে আলাদা Slot ID দেওয়া যাবে।</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-normal text-slate-900 dark:text-white mb-2 ml-0.5">AdSense Client ID</label>
+                        <input type="text" name="google_adsense_client" value="{{ old('google_adsense_client', $meta->google_adsense_client ?? '') }}" placeholder="ca-pub-1234567890123456" class="w-full max-w-lg px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-mono text-sm text-slate-900 dark:text-white">
+                        @error('google_adsense_client')
+                        <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
                 {{-- 5. Editor & Publisher Information --}}
                 <div class="p-4 sm:p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 space-y-8">
                     <div class="pb-4 border-b border-slate-200 dark:border-slate-800">

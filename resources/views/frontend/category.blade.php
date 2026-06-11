@@ -1,18 +1,7 @@
 <x-layout>
     <x-slot:title>{{ $category->name }} - {{ site_name() }}</x-slot>
 
-        @php $adCategoryBelowMenu = ad_slot('category_below_menu'); @endphp
-        @if($adCategoryBelowMenu && ad_has_media($adCategoryBelowMenu))
-        <div class="py-2 md:py-3 flex justify-center bg-transparent px-0 md:px-4">
-            <div class="container flex justify-center overflow-hidden">
-                <a href="{{ advertisement_click_url($adCategoryBelowMenu) }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
-                    <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[100px] overflow-hidden shrink-0">
-                        <x-ad-picture :ad="$adCategoryBelowMenu" class="w-full h-full object-cover object-center shadow-sm" />
-                    </div>
-                </a>
-            </div>
-        </div>
-        @endif
+        <x-ad-slot-display slug="category_below_menu" variant="banner" />
 
         <div class="py-4 md:py-10 min-h-screen">
             <div class="container">
@@ -189,25 +178,13 @@
                     @php
                     $adCategoryRight1 = ad_slot('category_right_1');
                     $adCategoryRight2 = ad_slot('category_right_2');
-                    $hasCategorySidebarAds = ($adCategoryRight1 && ad_has_media($adCategoryRight1))
-                        || ($adCategoryRight2 && ad_has_media($adCategoryRight2));
+                    $hasCategorySidebarAds = ad_should_display($adCategoryRight1)
+                        || ad_should_display($adCategoryRight2);
                     @endphp
                     @if($hasCategorySidebarAds)
                     <div class="flex flex-col gap-4 w-full min-w-0 md:justify-self-end">
-                        @if($adCategoryRight1 && ad_has_media($adCategoryRight1))
-                        <div class="shrink-0 w-full">
-                            <a href="{{ advertisement_click_url($adCategoryRight1) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-[300px] mx-auto">
-                                <x-ad-picture :ad="$adCategoryRight1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
-                            </a>
-                        </div>
-                        @endif
-                        @if($adCategoryRight2 && ad_has_media($adCategoryRight2))
-                        <div class="shrink-0 w-full">
-                            <a href="{{ advertisement_click_url($adCategoryRight2) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-[300px] mx-auto">
-                                <x-ad-picture :ad="$adCategoryRight2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
-                            </a>
-                        </div>
-                        @endif
+                        <x-ad-slot-display :ad="$adCategoryRight1" variant="sidebar" sidebar-class="max-w-[300px] mx-auto" />
+                        <x-ad-slot-display :ad="$adCategoryRight2" variant="sidebar" sidebar-class="max-w-[300px] mx-auto" />
                     </div>
                     @endif
                 </section>

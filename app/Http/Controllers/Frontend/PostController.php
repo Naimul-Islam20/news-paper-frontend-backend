@@ -53,6 +53,23 @@ class PostController extends Controller
     }
 
     /**
+     * Post featured image — full page viewer (/{slug}/photo).
+     */
+    public function showPhoto(string $slug): View
+    {
+        $post = Post::query()
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->first();
+
+        if (! $post || ! $post->image) {
+            abort(404);
+        }
+
+        return view('frontend.post-photo', compact('post'));
+    }
+
+    /**
      * Post detail page by slug (/{slug}).
      */
     public function show(string $slug): View

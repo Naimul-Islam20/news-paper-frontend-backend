@@ -3,27 +3,11 @@
         {{ site_browser_title() }}
         </x-slot>
 
-        @php $adBelowMenu = ad_slot('below_menu'); @endphp
-        @if($adBelowMenu && ad_has_media($adBelowMenu))
-        <div class="py-2 md:py-3 flex justify-center bg-transparent px-0 md:px-4">
-            <div class="container flex justify-center overflow-hidden">
-                <a href="{{ advertisement_click_url($adBelowMenu) }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
-                    <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[100px] overflow-hidden shrink-0">
-                        <x-ad-picture :ad="$adBelowMenu" class="w-full h-full object-cover object-center shadow-sm" />
-                    </div>
-                </a>
-            </div>
-        </div>
-        @endif
+        <x-ad-slot-display slug="below_menu" variant="banner" />
 
         <div class="container">
             <!-- Hero Section -->
             <section class="flex flex-col lg:grid lg:grid-cols-[2.7fr_6.3fr_3fr] gap-6 lg:gap-3 mb-4 border-b border-custom pb-4">
-                @php
-                $adHeroRight1 = ad_slot('hero_right_1');
-                $adHeroRight2 = ad_slot('hero_right_2');
-                $adHeroRight3 = ad_slot('hero_right_3');
-                @endphp
                 <!-- Left Column: Top Stories (Order 2 on mobile, Order 1 on Desktop) -->
                 <div class="lg:border-r border-custom lg:pr-3 text-left order-2 lg:order-1">
                     @forelse($hero_layer_4_posts as $index => $post)
@@ -34,11 +18,11 @@
                             @if($post->image)
                             <img
                                 src="{{ storage_image_url($post->image) }}"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                class="w-full h-full object-cover"
                                 onload="this.parentElement.classList.remove('img-placeholder')">
                             @endif
                         </div>
-                        <h4 class="text-xl lg:text-2xl font-semibold  serif leading-snug group-hover:text-primary transition-colors mt-1 text-left text-title">
+                        <h4 class="text-xl font-semibold serif leading-snug group-hover:text-primary transition-colors mt-1 text-left text-title">
                             {{ $post->title }}
                         </h4>
                         @php
@@ -68,7 +52,7 @@
                             <img
                                 src="{{ storage_image_url($lead->image) }}"
                                 alt="{{ $lead->title }}"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                class="w-full h-full object-cover"
                                 onload="this.parentElement.classList.remove('img-placeholder')">
                             @endif
                         </div>
@@ -98,7 +82,7 @@
                                 @if($post->image)
                                 <img
                                     src="{{ storage_image_url($post->image) }}"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    class="w-full h-full object-cover"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                                 @endif
                             </div>
@@ -118,7 +102,7 @@
                             @if($post->image)
                             <img
                                 src="{{ storage_image_url($post->image) }}"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                class="w-full h-full object-cover"
                                 onload="this.parentElement.classList.remove('img-placeholder')">
                             @endif
                         </div>
@@ -138,18 +122,12 @@
 
                 </div>
 
-                <!-- Right: উপরে অ্যাড, মাঝে মিনি, ডেস্কটপে নিচে hero_right_3 / hero_right_2 (কলাম প্রস্থ ব্যবহার) -->
-                <div class="md:border-l border-custom px-0 md:pl-3 md:px-0 text-left order-3 lg:order-3 flex flex-col h-full min-h-0 w-full min-w-0">
-                    @if($adHeroRight1 && ad_has_media($adHeroRight1))
-                    <div class="shrink-0 mb-4 w-full">
-                        <a href="{{ advertisement_click_url($adHeroRight1) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full">
-                            <x-ad-picture :ad="$adHeroRight1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
-                        </a>
-                    </div>
-                    @endif
+                <!-- Right: উপরে অ্যাড → মিনি নিউজ → নিচে hero_right_3 / hero_right_2 -->
+                <div class="md:border-l border-custom px-0 md:pl-3 md:px-0 text-left order-3 lg:order-3 flex flex-col w-full min-w-0">
+                    <x-ad-slot-display slug="hero_right_1" variant="sidebar" />
 
-                    <!-- Opinion / Mini Section (মাঝখানে) -->
-                    <div class="flex-1 flex flex-col justify-center min-h-0 py-2">
+                    <!-- Opinion / Mini Section (উপরের অ্যাডের ঠিক নিচে) -->
+                    <div class="shrink-0 w-full mt-4">
                         <div class="space-y-4 w-full">
                             @forelse($mini_posts as $post)
                             <div class="group cursor-pointer{{ !$loop->first ? ' pt-4 border-t border-custom' : '' }}">
@@ -236,37 +214,13 @@
                         </div>
                     </div>
 
-                    @if($adHeroRight3 && ad_has_media($adHeroRight3))
-                    <div class="hidden md:block shrink-0 mt-4 w-full">
-                        <a href="{{ advertisement_click_url($adHeroRight3) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full">
-                            <x-ad-picture :ad="$adHeroRight3" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
-                        </a>
-                    </div>
-                    @endif
-
-                    @if($adHeroRight2 && ad_has_media($adHeroRight2))
-                    <div class="hidden md:block shrink-0 mt-4 w-full">
-                        <a href="{{ advertisement_click_url($adHeroRight2) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full">
-                            <x-ad-picture :ad="$adHeroRight2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
-                        </a>
-                    </div>
-                    @endif
+                    <x-ad-slot-display slug="hero_right_3" variant="sidebar" wrapper-class="shrink-0 mt-4 w-full" />
+                    <x-ad-slot-display slug="hero_right_2" variant="sidebar" wrapper-class="shrink-0 mt-4 w-full" />
 
                 </div>
 
             </section>
-            @php $adHeroBelow = ad_slot('hero_below'); @endphp
-            @if($adHeroBelow && ad_has_media($adHeroBelow))
-            <div class="py-2 md:py-3 flex justify-center bg-transparent px-0 md:px-4">
-                <div class="container flex justify-center overflow-hidden">
-                    <a href="{{ advertisement_click_url($adHeroBelow) }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
-                        <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[100px] overflow-hidden shrink-0">
-                            <x-ad-picture :ad="$adHeroBelow" class="w-full h-full object-cover object-center shadow-sm" />
-                        </div>
-                    </a>
-                </div>
-            </div>
-            @endif
+            <x-ad-slot-display slug="hero_below" variant="banner" />
             <!-- Section: Politics (রাজনীতি) -->
             @php
             $politicsSection = $layoutSections['section-politics'] ?? null;
@@ -301,7 +255,7 @@
                                 <img
                                     src="{{ storage_image_url($post->image) }}"
                                     alt="{{ $post->title }}"
-                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    class="w-full h-full object-cover"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                                 @endif
                             </div>
@@ -322,14 +276,6 @@
                     <!-- fallback: আগের static ৪টা item চাইলে এখানে কপি করো -->
                     @endforelse
                 </div>
-
-                @if($adHeroRight2 && ad_has_media($adHeroRight2))
-                <div class="md:hidden mt-8 flex justify-center px-0 w-full">
-                    <a href="{{ advertisement_click_url($adHeroRight2) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-full shadow-sm">
-                        <x-ad-picture :ad="$adHeroRight2" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
-                    </a>
-                </div>
-                @endif
 
                 @php $adHomeVideo = ad_slot('home_video'); @endphp
                 @if($adHomeVideo && filled($adHomeVideo->video_youtube_id))
@@ -482,7 +428,7 @@
                                     <img
                                         src="{{ storage_image_url($mainNational->image) }}"
                                         alt="{{ $mainNational->title }}"
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        class="w-full h-full object-cover"
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                 </div>
@@ -503,7 +449,7 @@
                             </a>
                             @else
                             <div class="group cursor-pointer">
-                                <div class="img-placeholder overflow-hidden aspect-[16/10] mb-2 relative shadow-sm"><img src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                <div class="img-placeholder overflow-hidden aspect-[16/10] mb-2 relative shadow-sm"><img src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                 </div>
                                 <h3 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mb-1.5">
                                     মেট্রোরেলের নতুন রুট উদ্বোধন: বদলে যাচ্ছে রাজধানীর যাতায়াত দৃশ্যপট
@@ -526,7 +472,7 @@
                                     <img
                                         src="{{ storage_image_url($post->image) }}"
                                         alt="{{ $post->title }}"
-                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                        class="w-full h-full object-cover"
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                 </div>
@@ -561,7 +507,7 @@
                                     </div>
                                     <div class="img-placeholder w-20 h-14 overflow-hidden shrink-0 shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                 </a>
@@ -580,7 +526,7 @@
                                     </div>
                                     <div class="img-placeholder w-20 h-14 overflow-hidden shrink-0 shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                 </a>
@@ -589,14 +535,6 @@
                         </div>
                     </div>
                 </section>
-
-                @if($adHeroRight3 && ad_has_media($adHeroRight3))
-                <div class="md:hidden mt-10 flex justify-center px-0 w-full">
-                    <a href="{{ advertisement_click_url($adHeroRight3) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-full shadow-sm">
-                        <x-ad-picture :ad="$adHeroRight3" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
-                    </a>
-                </div>
-                @endif
 
                 <!-- Section: Capital (রাজধানী) -->
                 @php
@@ -635,7 +573,7 @@
                                     <img
                                         src="{{ storage_image_url($post->image) }}"
                                         alt="{{ $post->title }}"
-                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                        class="w-full h-full object-cover"
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                 </div>
@@ -704,7 +642,7 @@
                                 <a href="{{ news_url($sportsMain) }}" class="block">
                                     <div class="img-placeholder overflow-hidden aspect-video mb-2 relative shadow-sm">
                                         @if($sportsMain->image)
-                                        <img src="{{ storage_image_url($sportsMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($sportsMain->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h3 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mb-1">
@@ -729,7 +667,7 @@
                                     <div class="flex gap-2 lg:gap-4">
                                         <div class="img-placeholder w-36 h-24 lg:w-32 lg:h-20 shrink-0 overflow-hidden shadow-sm">
                                             @if($sportsSecondary->image)
-                                            <img src="{{ storage_image_url($sportsSecondary->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                            <img src="{{ storage_image_url($sportsSecondary->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
                                         <h4 class="text-lg font-normal serif leading-tight group-hover:text-primary transition-colors text-left text-title mt-0.5">
@@ -759,7 +697,7 @@
                                     <div class="flex gap-2 lg:gap-4">
                                         <div class="img-placeholder w-36 h-24 lg:w-32 lg:h-20 shrink-0 overflow-hidden shadow-sm">
                                             @if($post->image)
-                                            <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                            <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
                                         <h4 class="text-lg font-bold serif leading-tight group-hover:text-primary transition-colors text-left text-title mt-0.5">
@@ -786,7 +724,7 @@
                                     <div class="flex gap-2 lg:gap-4">
                                         <div class="img-placeholder w-36 h-24 lg:w-32 lg:h-20 shrink-0 overflow-hidden shadow-sm">
                                             @if($post->image)
-                                            <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                            <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
                                         <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -851,7 +789,7 @@
                                     <a href="{{ news_url($countryMain) }}" class="group cursor-pointer">
                                         <div class="img-placeholder overflow-hidden aspect-video mb-4 relative shadow-sm">
                                             @if($countryMain->image)
-                                            <img src="{{ storage_image_url($countryMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                            <img src="{{ storage_image_url($countryMain->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
                                         <h3 class="text-3xl font-bold serif leading-tight group-hover:text-primary transition-colors text-left text-title mb-4">
@@ -874,7 +812,7 @@
                                         <div class="flex flex-row lg:block gap-2 lg:gap-0">
                                             <div class="img-placeholder w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 overflow-hidden relative shadow-sm mb-0 lg:mb-3">
                                                 @if($countryMid1->image)
-                                                <img src="{{ storage_image_url($countryMid1->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                                <img src="{{ storage_image_url($countryMid1->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                                 @endif
                                             </div>
                                             <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -890,7 +828,7 @@
                                         <div class="flex flex-row lg:block gap-2 lg:gap-0">
                                             <div class="img-placeholder w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 overflow-hidden relative shadow-sm mb-0 lg:mb-3">
                                                 @if($countryMid2->image)
-                                                <img src="{{ storage_image_url($countryMid2->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                                <img src="{{ storage_image_url($countryMid2->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                                 @endif
                                             </div>
                                             <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -911,7 +849,7 @@
                                         <div class="flex flex-row md:block gap-2 md:gap-0">
                                             <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-video shrink-0 overflow-hidden relative shadow-sm mb-0 md:mb-2">
                                                 @if($countryBot1->image)
-                                                <img src="{{ storage_image_url($countryBot1->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                                <img src="{{ storage_image_url($countryBot1->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                                 @endif
                                             </div>
                                             <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -928,7 +866,7 @@
                                         <div class="flex flex-row md:block gap-2 md:gap-0">
                                             <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-video shrink-0 overflow-hidden relative shadow-sm mb-0 md:mb-2">
                                                 @if($countryBot2->image)
-                                                <img src="{{ storage_image_url($countryBot2->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                                <img src="{{ storage_image_url($countryBot2->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                                 @endif
                                             </div>
                                             <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -945,7 +883,7 @@
                                         <div class="flex flex-row md:block gap-2 md:gap-0">
                                             <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-video shrink-0 overflow-hidden relative shadow-sm mb-0 md:mb-2">
                                                 @if($countryBot3->image)
-                                                <img src="{{ storage_image_url($countryBot3->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                                <img src="{{ storage_image_url($countryBot3->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                                 @endif
                                             </div>
                                             <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -1069,7 +1007,7 @@
                             <a href="{{ news_url($worldMain) }}" class="group cursor-pointer">
                                 <div class="img-placeholder overflow-hidden aspect-video mb-2 relative shadow-sm">
                                     @if($worldMain->image)
-                                    <img src="{{ storage_image_url($worldMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                    <img src="{{ storage_image_url($worldMain->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                 </div>
                                 <h3 class="text-2xl font-bold serif leading-tight group-hover:text-primary transition-colors text-left text-title mb-2">
@@ -1095,7 +1033,7 @@
                                 <div class="flex flex-row lg:block gap-2 lg:gap-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 overflow-hidden shadow-sm mb-0 lg:mb-3">
                                         @if($worldMid1->image)
-                                        <img src="{{ storage_image_url($worldMid1->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($worldMid1->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h4 class="text-lg font-bold serif leading-snug lg:leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5 lg:mt-0">
@@ -1118,7 +1056,7 @@
                                 <div class="flex flex-row lg:block gap-2 lg:gap-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 overflow-hidden shadow-sm mb-0 lg:mb-3">
                                         @if($worldMid2->image)
-                                        <img src="{{ storage_image_url($worldMid2->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($worldMid2->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h4 class="text-lg font-bold serif leading-snug lg:leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5 lg:mt-0">
@@ -1143,7 +1081,7 @@
                                     <div class="flex gap-2">
                                         <div class="img-placeholder w-36 h-24 shrink-0 overflow-hidden shadow-sm">
                                             @if($post->image)
-                                            <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                            <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
                                         <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -1205,7 +1143,7 @@
                                 <a href="{{ news_url($post) }}" class="flex gap-2 lg:gap-4">
                                     <div class="img-placeholder w-36 h-24 lg:w-40 lg:h-23 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -1226,7 +1164,7 @@
                             <a href="{{ news_url($entMid) }}" class="group cursor-pointer">
                                 <div class="img-placeholder overflow-hidden h-84 mb-3 relative shadow-sm">
                                     @if($entMid->image)
-                                    <img src="{{ storage_image_url($entMid->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                    <img src="{{ storage_image_url($entMid->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
                                 </div>
                                 <h3 class="text-2xl font-bold serif leading-tight group-hover:text-primary transition-colors text-left text-title mb-2">
@@ -1249,7 +1187,7 @@
                                 <a href="{{ news_url($post) }}" class="flex gap-2 lg:gap-4">
                                     <div class="img-placeholder w-36 h-24 lg:w-40 lg:h-23 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h4 class="text-lg font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -1311,7 +1249,7 @@
                                 <div class="flex flex-row lg:block gap-2 lg:gap-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 overflow-hidden relative shadow-sm mb-0 lg:mb-3">
                                         @if($lifeMain->image)
-                                        <img src="{{ storage_image_url($lifeMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($lifeMain->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -1328,7 +1266,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-3 pb-2 border-b border-custom last:border-0 last:pb-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-40 lg:h-23 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h5 class="text-lg font-normal serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -1352,7 +1290,7 @@
                                 <div class="flex flex-row lg:block gap-2 lg:gap-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 overflow-hidden relative shadow-sm mb-0 lg:mb-3">
                                         @if($techMain->image)
-                                        <img src="{{ storage_image_url($techMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($techMain->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -1369,7 +1307,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-3 pb-2 border-b border-custom last:border-0 last:pb-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-40 lg:h-23 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h5 class="text-lg font-normal serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -1393,7 +1331,7 @@
                                 <div class="flex flex-row lg:block gap-2 lg:gap-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 overflow-hidden relative shadow-sm mb-0 lg:mb-3">
                                         @if($diffMain->image)
-                                        <img src="{{ storage_image_url($diffMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($diffMain->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -1410,7 +1348,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-3 pb-2 border-b border-custom last:border-0 last:pb-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-40 lg:h-23 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h5 class="text-lg font-normal serif leading-snug group-hover:text-primary transition-colors text-left text-title">
@@ -1491,7 +1429,7 @@
                                     <div class="flex flex-row lg:block gap-2 lg:gap-0">
                                         <div class="img-placeholder w-36 h-24 lg:w-full lg:h-86 shrink-0 overflow-hidden relative shadow-sm mb-0 lg:mb-2">
                                             @if($genMain->image)
-                                            <img src="{{ storage_image_url($genMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                            <img src="{{ storage_image_url($genMain->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
                                         <h4 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors">{{ $genMain->title }}</h4>
@@ -1506,7 +1444,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-4 pb-3 border-b border-custom last:border-0 last:pb-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-32 lg:h-18 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
@@ -1522,7 +1460,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-4 pb-3 border-b border-custom last:border-0 last:pb-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-32 lg:h-18 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
@@ -1543,7 +1481,7 @@
                                     <div class="flex flex-row lg:block gap-2 lg:gap-0">
                                         <div class="img-placeholder w-36 h-24 lg:w-full lg:h-86 shrink-0 overflow-hidden relative shadow-sm mb-0 lg:mb-2">
                                             @if($campusMain->image)
-                                            <img src="{{ storage_image_url($campusMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                            <img src="{{ storage_image_url($campusMain->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
                                         <h4 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors">{{ $campusMain->title }}</h4>
@@ -1558,7 +1496,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-4 pb-3 border-b border-custom last:border-0 last:pb-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-32 lg:h-18 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
@@ -1574,7 +1512,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-4 pb-3 border-b border-custom last:border-0 last:pb-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-32 lg:h-18 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
@@ -1595,7 +1533,7 @@
                                     <div class="flex flex-row lg:block gap-2 lg:gap-0">
                                         <div class="img-placeholder w-36 h-24 lg:w-full lg:h-86 shrink-0 overflow-hidden relative shadow-sm mb-0 lg:mb-2">
                                             @if($jobMain->image)
-                                            <img src="{{ storage_image_url($jobMain->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                            <img src="{{ storage_image_url($jobMain->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                         </div>
                                         <h4 class="text-2xl font-bold serif leading-snug group-hover:text-primary transition-colors">{{ $jobMain->title }}</h4>
@@ -1610,7 +1548,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-4 pb-3 border-b border-custom last:border-0 last:pb-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-32 lg:h-18 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
@@ -1626,7 +1564,7 @@
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-4 pb-3 border-b border-custom last:border-0 last:pb-0">
                                     <div class="img-placeholder w-36 h-24 lg:w-32 lg:h-18 shrink-0 overflow-hidden relative shadow-sm">
                                         @if($post->image)
-                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
                                     <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
@@ -1753,7 +1691,7 @@
                                         <div class="{{ $sideThumb ? 'img-placeholder' : '' }} w-36 h-24 lg:w-full lg:h-auto lg:aspect-[4/3] shrink-0 relative overflow-hidden bg-black shadow-sm mb-0 lg:mb-2">
                                             @if($sideThumb)
                                             <img src="{{ $sideThumb }}" alt="{{ $video->title }}"
-                                                class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"
+                                                class="w-full h-full object-cover opacity-90"
                                                 onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
                                             <div class="absolute inset-0 flex items-center justify-center">
@@ -1814,7 +1752,7 @@
                                     @php $cover = $gallery->images->first(); @endphp
                                     <a href="{{ route('gallery.show', $gallery->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[240px] md:h-[180px]">
                                         @if($cover)
-                                        <img src="{{ storage_image_url($cover->image) }}" alt="{{ $gallery->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        <img src="{{ storage_image_url($cover->image) }}" alt="{{ $gallery->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
                                             <p class="text-white font-serif text-base font-normal leading-tight line-clamp-1">{{ $gallery->title }}</p>

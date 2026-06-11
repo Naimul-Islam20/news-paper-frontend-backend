@@ -28,6 +28,7 @@ class SiteMeta extends Model
         'address_1',
         'editor_name',
         'publisher_name',
+        'google_adsense_client',
     ];
 
     protected $casts = [

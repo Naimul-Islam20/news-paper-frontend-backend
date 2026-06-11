@@ -1,18 +1,7 @@
 <x-layout>
     <x-slot:title>{{ $category->name }} - {{ site_name() }}</x-slot>
 
-        @php $adCategoryBelowMenu = ad_slot('category_below_menu'); @endphp
-        @if($adCategoryBelowMenu && ad_has_media($adCategoryBelowMenu))
-        <div class="py-2 md:py-3 flex justify-center bg-transparent px-0 md:px-4">
-            <div class="container flex justify-center overflow-hidden">
-                <a href="{{ advertisement_click_url($adCategoryBelowMenu) }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
-                    <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[100px] overflow-hidden shrink-0">
-                        <x-ad-picture :ad="$adCategoryBelowMenu" class="w-full h-full object-cover object-center shadow-sm" />
-                    </div>
-                </a>
-            </div>
-        </div>
-        @endif
+        <x-ad-slot-display slug="category_below_menu" variant="banner" />
 
         <div class="py-4 md:py-10 min-h-screen">
             <div class="container">

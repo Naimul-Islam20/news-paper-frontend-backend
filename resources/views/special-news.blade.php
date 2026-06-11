@@ -93,7 +93,7 @@
                                         <img
                                             src="{{ storage_image_url($featured->image) }}"
                                             alt="{{ $featured->title }}"
-                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            class="w-full h-full object-cover"
                                             onload="this.parentElement.classList.remove('img-placeholder')">
                                     </div>
                                 </a>
@@ -107,7 +107,7 @@
                             @foreach($gridPosts as $index => $post)
                             <article class="flex flex-row-reverse md:flex-col gap-2 md:gap-3 pb-4 border-b border-gray-100 md:border-b-0 md:pb-0 {{ $index < 2 ? 'md:pr-3 md:border-r md:border-slate-200' : 'md:pl-3' }}">
                                 <a href="{{ news_url($post) }}" class="group overflow-hidden shrink-0">
-                                    <div class="img-placeholder w-36 h-24 md:w-full md:h-[100px]"><img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onload="this.parentElement.classList.remove('img-placeholder')"></div>
+                                    <div class="img-placeholder w-36 h-24 md:w-full md:h-[100px]"><img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')"></div>
                                 </a>
                                 <div class="flex flex-col gap-1 flex-1">
                                     <a href="{{ news_url($post) }}">
@@ -154,7 +154,7 @@
                                     <h4 class="text-base font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
                                 </div>
                                 <div class="overflow-hidden shrink-0 border border-gray-100 shadow-sm" style="width:96px; height:72px; min-width:96px; min-height:72px;">
-                                    <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover">
                                 </div>
                             </a>
                             @empty
@@ -172,7 +172,7 @@
                                     <h4 class="text-base font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title mt-0.5">{{ $post->title }}</h4>
                                 </div>
                                 <div class="overflow-hidden shrink-0 border border-gray-100 shadow-sm" style="width:96px; height:72px; min-width:96px; min-height:72px;">
-                                    <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    <img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover">
                                 </div>
                             </a>
                             @empty

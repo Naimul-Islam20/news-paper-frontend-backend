@@ -6,7 +6,7 @@
 @section('content')
 <div class="py-1 w-full mx-auto">
     <div class="max-w-6xl mx-auto">
-        <form action="{{ route('admin.posts.update', $post->id) }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <form id="post-edit-form" action="{{ route('admin.posts.update', $post->id) }}" method="POST" enctype="multipart/form-data" class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             @csrf
             @method('PUT')
             
@@ -15,40 +15,69 @@
                     
                     {{-- Left Column: Primary Content --}}
                     <div class="lg:col-span-8 space-y-6">
+                        {{-- Subtitle (above title on frontend) --}}
+                        @php $showSubtitleInput = filled(old('subtitle', $post->subtitle)); @endphp
+                        <div id="post-subtitle-field">
+                            <div class="mb-2 ml-0.5 flex items-center gap-2">
+                                <span class="text-sm font-normal text-slate-900">Subtitle</span>
+                                <button
+                                    type="button"
+                                    id="toggle-post-subtitle"
+                                    class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-dashed border-slate-300 text-sm font-medium text-slate-600 transition-all hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-600 dark:text-slate-300 {{ $showSubtitleInput ? 'hidden' : '' }}"
+                                    title="Subtitle যোগ করুন">+</button>
+                            </div>
+                            <div id="post-subtitle-input-wrap" class="{{ $showSubtitleInput ? '' : 'hidden' }}">
+                                <input
+                                    type="text"
+                                    name="subtitle"
+                                    id="post_subtitle"
+                                    value="{{ old('subtitle', $post->subtitle) }}"
+                                    maxlength="150"
+                                    class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-700 text-xs md:text-sm">
+                                @error('subtitle') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+                            </div>
+                        </div>
+
                         {{-- Title --}}
-                        <div>
+                        <div id="post-title-field">
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Title <span class="text-rose-500">*</span></label>
                             <input type="text" name="title" id="post_title" value="{{ old('title', $post->title) }}" required placeholder="Enter post title..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                             @error('title') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Sub Title Points --}}
-                        <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Sub Title Points</label>
-                            @php
-                                $oldPoints = old('sub_title_points');
-                                if (is_null($oldPoints)) {
-                                    $decoded = json_decode($post->sub_title ?? '', true);
-                                    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                        $oldPoints = $decoded;
-                                    } elseif(!empty($post->sub_title)) {
-                                        $oldPoints = [$post->sub_title];
-                                    } else {
-                                        $oldPoints = [''];
-                                    }
+                        @php
+                            $oldPoints = old('sub_title_points');
+                            if (is_null($oldPoints)) {
+                                $decoded = json_decode($post->sub_title ?? '', true);
+                                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                    $oldPoints = $decoded;
+                                } elseif (! empty($post->sub_title)) {
+                                    $oldPoints = [$post->sub_title];
+                                } else {
+                                    $oldPoints = [];
                                 }
-                                if (!is_array($oldPoints) || empty($oldPoints)) {
-                                    $oldPoints = [''];
-                                }
-                            @endphp
-                            <div id="sub-title-points-wrapper" class="space-y-2">
-                                @foreach($oldPoints as $idx => $value)
+                            }
+                            $oldPoints = is_array($oldPoints) ? $oldPoints : [];
+                            $showSubTitlePoints = collect($oldPoints)->contains(fn ($value) => trim((string) $value) !== '');
+                            $oldPoints = collect($oldPoints)->filter(fn ($value) => trim((string) $value) !== '')->values()->all();
+                        @endphp
+                        <div id="sub-title-points-field">
+                            <div class="mb-2 ml-0.5">
+                                <button
+                                    type="button"
+                                    id="add-sub-title-point"
+                                    class="inline-flex items-center rounded-md border border-dashed border-slate-300 px-2.5 py-1 text-xs font-normal text-slate-700 transition-all hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-600 dark:text-slate-300">
+                                    + Add point
+                                </button>
+                            </div>
+                            <div id="sub-title-points-wrapper" class="{{ $showSubTitlePoints ? 'space-y-2' : 'hidden space-y-2' }}">
+                                @foreach($oldPoints as $value)
                                     <div class="flex items-center gap-2 sub-title-point-row">
                                         <input
                                             type="text"
                                             name="sub_title_points[]"
                                             value="{{ $value }}"
-                                            placeholder="Sub title point {{ $idx + 1 }}"
                                             class="flex-1 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm"
                                         >
                                         <button
@@ -59,19 +88,12 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <button
-                                type="button"
-                                id="add-sub-title-point"
-                                class="mt-2 inline-flex items-center px-3 py-1.5 rounded-lg border border-dashed border-slate-300 text-xs font-normal text-slate-700 hover:border-indigo-400 hover:text-indigo-600 transition-all"
-                            >
-                                + Add point
-                            </button>
                             @error('sub_title_points') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                             @error('sub_title_points.*') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Category (multiple allowed) --}}
-                        <div>
+                        <div id="post-category-field">
                             <label class="block text-sm font-normal text-slate-900 dark:text-slate-200 mb-2 ml-0.5">Post Category <span class="text-rose-500">*</span></label>
                             <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 max-h-[300px] overflow-y-auto shadow-inner custom-scrollbar">
                                 <div class="columns-1 md:columns-2 gap-x-12">
@@ -101,24 +123,37 @@
 
                         {{-- Image & Caption --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Featured Image <span class="text-rose-500">*</span></label>
-                                <div class="relative h-32 rounded-lg border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-1.5 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-xs shadow-sm bg-white dark:bg-slate-900">
-                                    <input type="file" name="image" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewMainImage(this)">
-                                    @if($post->image)
-                                        <img id="mainImagePreview" src="{{ storage_image_url($post->image) }}" class="absolute inset-0 w-full h-full object-cover">
+                            <div id="post-image-field">
+                                <div class="mb-2 ml-0.5 flex items-center justify-between gap-2">
+                                    <label class="text-sm font-normal text-slate-900">Featured Image</label>
+                                    <a href="{{ route('admin.posts.pick-image', ['context' => 'edit', 'post_id' => $post->id]) }}" class="inline-flex items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 dark:border-slate-700 dark:text-indigo-400 dark:hover:bg-indigo-500/10">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        Media
+                                    </a>
+                                </div>
+                                @php
+                                    $existingImageValue = old('existing_image', $pickedImage ?? '');
+                                    $displayImage = $existingImageValue ?: $post->image;
+                                @endphp
+                                <input type="hidden" name="existing_image" id="existingImagePath" value="{{ $existingImageValue }}" @if($existingImageValue) data-preview-url="{{ storage_image_url($existingImageValue) }}" @endif>
+                                <div class="relative w-full h-32 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer overflow-hidden font-normal text-slate-600 text-xs shadow-sm bg-white dark:bg-slate-900" data-main-image-upload>
+                                    <input type="file" name="image" id="mainImageInput" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" class="absolute inset-0 z-20 opacity-0 cursor-pointer">
+                                    @if($displayImage)
+                                        <img id="mainImagePreview" src="{{ storage_image_url($displayImage) }}" class="absolute inset-0 w-full h-full object-contain bg-slate-100 dark:bg-slate-800">
                                         <div id="mainImagePlaceholder" class="hidden flex flex-col items-center justify-center gap-1.5">
                                             <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                             <span>Change Image</span>
                                         </div>
                                     @else
-                                        <img id="mainImagePreview" class="absolute inset-0 w-full h-full object-cover hidden">
+                                        <img id="mainImagePreview" class="absolute inset-0 w-full h-full object-contain bg-slate-100 dark:bg-slate-800 hidden">
                                         <div id="mainImagePlaceholder" class="flex flex-col items-center justify-center gap-1.5">
                                             <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                             <span>Choose Image</span>
                                         </div>
                                     @endif
                                 </div>
+                                <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">ছবির অনুপাত: <span class="font-medium text-slate-600 dark:text-slate-300">১৬:৯</span> (উদাহরণ: ১২০০×৬৭৫ px)</p>
+                                @error('image') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Image Caption</label>
@@ -129,11 +164,12 @@
                         </div>
 
                         {{-- Post Content --}}
-                        <div>
+                        <div id="post-description-field">
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Post Description <span class="text-rose-500">*</span></label>
                             <div class="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden bg-white shadow-sm">
                                 <textarea id="editor" name="description">{{ old('description', $post->description) }}</textarea>
                             </div>
+                            @error('description') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                     </div>
@@ -142,7 +178,7 @@
                     <div class="lg:col-span-4 space-y-6">
 
                         {{-- Reporter --}}
-                        <div>
+                        <div id="post-reporter-field">
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Reporter <span class="text-rose-500">*</span></label>
                             <div class="relative">
                                 <select name="reporter_id" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 cursor-pointer text-sm">
@@ -155,6 +191,7 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
+                            @error('reporter_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                         </div>
 
                         {{-- Hero Layer – 4 টা চেকবক্স, যেকোনো একটা সিলেক্ট করলে বাকি ৩টা সিলেক্ট করা যাবে না --}}
@@ -172,19 +209,14 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <p class="mt-2 text-[10px] text-slate-400 italic">* যেকোনো একটা সিলেক্ট করুন; একটা সিলেক্ট করলে বাকিগুলো অটো বন্ধ হয়ে যাবে।</p>
                         </div>
 
-                        {{-- বিশেষ সংবাদ – সিলেক্ট করলে এই পোস্ট বিশেষ সংবাদ পেজে দেখাবে, নতুন ডাটা প্রথমে --}}
                         <div>
                             <label class="block text-sm font-bold text-slate-900 mb-2 ml-0.5 uppercase tracking-wider">বিশেষ সংবাদ</label>
-                            <div class="flex items-center gap-2">
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="is_special_news" value="1" class="sr-only peer" {{ old('is_special_news', $post->is_special_news) ? 'checked' : '' }}>
-                                    <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
-                                </label>
-                                <span class="text-sm font-normal text-slate-900">সিলেক্ট করলে এই পোস্ট বিশেষ সংবাদ পেজে দেখাবে (নতুন প্রথমে)</span>
-                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_special_news" value="1" class="sr-only peer" {{ old('is_special_news', $post->is_special_news) ? 'checked' : '' }}>
+                                <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                            </label>
                         </div>
 
                         {{-- Status --}}
@@ -342,12 +374,39 @@
         </form>
     </div>
 </div>
+
+<x-admin.post-image-cropper />
+<x-admin.post-form-scroll-to-error form-id="post-edit-form" :require-image="false" />
 @endsection
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const subtitleToggle = document.getElementById('toggle-post-subtitle');
+        const subtitleWrap = document.getElementById('post-subtitle-input-wrap');
+        const subtitleInput = document.getElementById('post_subtitle');
+        if (subtitleToggle && subtitleWrap) {
+            subtitleToggle.addEventListener('click', function () {
+                subtitleWrap.classList.remove('hidden');
+                subtitleToggle.classList.add('hidden');
+                if (subtitleInput) subtitleInput.focus();
+            });
+        }
+
+        const existingImagePath = document.getElementById('existingImagePath');
+        if (existingImagePath && existingImagePath.dataset.previewUrl) {
+            const preview = document.getElementById('mainImagePreview');
+            const placeholder = document.getElementById('mainImagePlaceholder');
+            if (preview) {
+                preview.src = existingImagePath.dataset.previewUrl;
+                preview.classList.remove('hidden');
+            }
+            if (placeholder) {
+                placeholder.classList.add('hidden');
+            }
+        }
+
         const titleInput = document.getElementById('post_title');
         const seoTextarea = document.getElementById('seo_keywords');
         let isSeoManuallyEdited = {{ old('seo_keywords', $post->seo_keywords) ? 'true' : 'false' }};
@@ -370,6 +429,7 @@
 
         initSubTitlePoints();
         initTopicsSelection();
+        initMainImagePreview();
     });
 
     function initTopicsSelection() {
@@ -691,17 +751,9 @@
         initHeroLayerCheckboxes();
     }
 
-    function previewMainImage(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('mainImagePreview');
-                const placeholder = document.getElementById('mainImagePlaceholder');
-                preview.src = e.target.result;
-                preview.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-            };
-            reader.readAsDataURL(input.files[0]);
+    function initMainImagePreview() {
+        if (window.AdminPostImageCrop) {
+            window.AdminPostImageCrop.init('#mainImageInput');
         }
     }
 
@@ -722,37 +774,31 @@
         const addBtn = document.getElementById('add-sub-title-point');
         if (!wrapper || !addBtn) return;
 
-        addBtn.addEventListener('click', function () {
+        function createRow() {
             const row = document.createElement('div');
             row.className = 'flex items-center gap-2 sub-title-point-row';
-            row.innerHTML = `
-                <input
-                    type="text"
-                    name="sub_title_points[]"
-                    placeholder="Sub title point"
-                    class="flex-1 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm"
-                >
-                <button
-                    type="button"
-                    class="remove-sub-title-point inline-flex items-center justify-center w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 text-sm"
-                    title="Remove point"
-                >&times;</button>
-            `;
+            row.innerHTML = ''
+                + '<input type="text" name="sub_title_points[]" class="flex-1 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">'
+                + '<button type="button" class="remove-sub-title-point inline-flex items-center justify-center w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-rose-600 hover:border-rose-300 text-sm" title="Remove point">&times;</button>';
+            return row;
+        }
+
+        addBtn.addEventListener('click', function () {
+            wrapper.classList.remove('hidden');
+            const row = createRow();
             wrapper.appendChild(row);
+            const input = row.querySelector('input');
+            if (input) input.focus();
         });
 
         wrapper.addEventListener('click', function (event) {
             const target = event.target;
-            if (target.classList.contains('remove-sub-title-point')) {
-                const row = target.closest('.sub-title-point-row');
-                if (!row) return;
-                const rows = wrapper.querySelectorAll('.sub-title-point-row');
-                if (rows.length > 1) {
-                    row.remove();
-                } else {
-                    const input = row.querySelector('input[name="sub_title_points[]"]');
-                    if (input) input.value = '';
-                }
+            if (!target.classList.contains('remove-sub-title-point')) return;
+            const row = target.closest('.sub-title-point-row');
+            if (!row) return;
+            row.remove();
+            if (!wrapper.querySelector('.sub-title-point-row')) {
+                wrapper.classList.add('hidden');
             }
         });
     }

@@ -11,6 +11,11 @@
             {{ session('success') }}
         </div>
         @endif
+        @if($errors->any())
+        <div class="mb-4 px-4 py-2 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-sm">
+            {{ $errors->first() }}
+        </div>
+        @endif
         <div class="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-100 dark:border-slate-800 mb-6 sm:mb-8">
             <p class="text-sm text-slate-600 dark:text-slate-400 min-w-0">ফিক্সড অ্যাড স্লটগুলো এখানে তালিকাভুক্ত। নতুন অ্যাড যোগ করা যাবে না; শুধু প্রতিটি স্লটের ইমেজ/লিংক আপডেট করুন।</p>
         </div>
@@ -25,7 +30,8 @@
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">রেশিও / সাইজ</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">URL</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">সময়সূচি</th>
-                        <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider text-right w-28">Action</th>
+                        <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">সোর্স</th>
+                        <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider text-right w-40">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
@@ -81,7 +87,9 @@
                             $slotWindowPast = $s && $e && $e->isPast();
                             $hasQueue = $ad->hasActiveQueueItems();
                             @endphp
-                            @if($ad->is_auto && $s)
+                            @if(($ad->ad_source ?? 'local') === 'google')
+                            <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Google Ad · সক্রিয়</span>
+                            @elseif($ad->is_auto && $s)
                             <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">Auto · চলছে</span>
                             @elseif(!$s || (!$e && ! $ad->is_auto))
                             <span class="text-xs font-medium text-amber-700 dark:text-amber-400">মেয়াদ নেই — ফ্রন্টে দেখাবে না</span>
@@ -105,7 +113,22 @@
                             </div>
                             @endif
                         </td>
+                        <td class="py-3 px-4">
+                            @if(($ad->ad_source ?? 'local') === 'google')
+                            <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">Google</span>
+                            @else
+                            <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Local</span>
+                            @endif
+                        </td>
                         <td class="py-3 px-4 text-right">
+                            @if($ad->slug !== 'home_video')
+                            <form method="POST" action="{{ route('admin.advertisements.toggle-source', $ad->id) }}" class="inline-block mr-1">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors {{ ($ad->ad_source ?? 'local') === 'google' ? 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800' : 'border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20' }}" title="সোর্স টগল">
+                                    {{ ($ad->ad_source ?? 'local') === 'google' ? 'Local' : 'Google' }}
+                                </button>
+                            </form>
+                            @endif
                             <a href="{{ route('admin.advertisements.edit', $ad->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-colors" title="Edit">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
@@ -116,7 +139,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="py-8 px-4 text-center text-slate-500 dark:text-slate-400 text-sm">কোনো অ্যাড স্লট নেই। সিডার চালান: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">php artisan db:seed --class=AdvertisementSeeder</code></td>
+                        <td colspan="9" class="py-8 px-4 text-center text-slate-500 dark:text-slate-400 text-sm">কোনো অ্যাড স্লট নেই। সিডার চালান: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">php artisan db:seed --class=AdvertisementSeeder</code></td>
                     </tr>
                     @endforelse
                 </tbody>

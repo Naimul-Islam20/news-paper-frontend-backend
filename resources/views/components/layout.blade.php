@@ -18,10 +18,10 @@
 
     {{-- Open Graph & Twitter Card: শেয়ার প্রিভিউ — ইমেজ + টাইটেল + site domain --}}
     @php
-        $hasShareMeta = (isset($metaImage) && $metaImage !== '') || isset($ogTitle);
-        $shareTitle = $ogTitle ?? $title ?? site_name();
-        $sharePageUrl = isset($shareUrl) && trim((string) $shareUrl) !== '' ? trim((string) $shareUrl) : url()->current();
-        $shareSiteLabel = share_site_label($sharePageUrl);
+    $hasShareMeta = (isset($metaImage) && $metaImage !== '') || isset($ogTitle);
+    $shareTitle = $ogTitle ?? $title ?? site_name();
+    $sharePageUrl = isset($shareUrl) && trim((string) $shareUrl) !== '' ? trim((string) $shareUrl) : url()->current();
+    $shareSiteLabel = share_site_label($sharePageUrl);
     @endphp
     @if($hasShareMeta)
     <link rel="canonical" href="{{ $sharePageUrl }}">
@@ -71,21 +71,42 @@
     @endif
     @endif
 
+    @if(google_adsense_client())
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ google_adsense_client() }}" crossorigin="anonymous"></script>
+    @endif
+
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @php
-        $__primary = optional($siteMeta)->primary_color ?? null;
-        $__primaryOk = is_string($__primary) && preg_match('/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/', $__primary);
+    $__primary = optional($siteMeta)->primary_color ?? null;
+    $__primaryOk = is_string($__primary) && preg_match('/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/', $__primary);
     @endphp
     @if ($__primaryOk)
-    <style>:root { --color-primary: {{ $__primary }} !important; --site-name: "{{ site_name() }}"; }</style>
+    <style>
+        :root {
+            --color-primary: {
+                    {
+                    $__primary
+                }
+            }
+
+            !important;
+            --site-name: "{{ site_name() }}";
+        }
+    </style>
     @else
-    <style>:root { --site-name: "{{ site_name() }}"; }</style>
+    <style>
+        :root {
+            --site-name: "{{ site_name() }}";
+        }
+    </style>
     @endif
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="antialiased text-slate-900 overflow-x-hidden">
+
+    <div id="google_translate_element" class="hidden" aria-hidden="true"></div>
 
     <x-header />
 
@@ -183,6 +204,19 @@
             );
         }
     </script>
+
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'bn',
+                includedLanguages: 'bn,en',
+                autoDisplay: false,
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            }, 'google_translate_element');
+        }
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" defer></script>
+    @stack('scripts')
 </body>
 
 </html>

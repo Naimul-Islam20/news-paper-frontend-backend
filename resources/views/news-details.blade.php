@@ -149,7 +149,7 @@
                                 <div class="img-placeholder aspect-[16/9] overflow-hidden">
                                     <img src="https://loremflickr.com/600/400/law?lock=10"
                                         alt="Related News"
-                                        class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                                        class="w-full h-full object-cover"
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                 </div>
                                 <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-primary transition-colors">
@@ -162,7 +162,7 @@
                                 <div class="img-placeholder aspect-[16/9] overflow-hidden">
                                     <img src="https://loremflickr.com/600/400/office?lock=11"
                                         alt="Related News"
-                                        class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                                        class="w-full h-full object-cover"
                                         onload="this.parentElement.classList.remove('img-placeholder')">
                                 </div>
                                 <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-primary transition-colors">
@@ -187,7 +187,7 @@
                             <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
                                 <img src="https://loremflickr.com/600/400/law?lock=10"
                                     alt="Related News"
-                                    class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                                    class="w-full h-full object-cover"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
                             <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
@@ -199,7 +199,7 @@
                             <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
                                 <img src="https://loremflickr.com/600/400/office?lock=11"
                                     alt="Related News"
-                                    class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                                    class="w-full h-full object-cover"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
                             <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
@@ -212,7 +212,7 @@
                             <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
                                 <img src="https://loremflickr.com/600/400/law?lock=10"
                                     alt="Related News"
-                                    class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                                    class="w-full h-full object-cover"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
                             <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
@@ -225,7 +225,7 @@
                             <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
                                 <img src="https://loremflickr.com/600/400/office?lock=11"
                                     alt="Related News"
-                                    class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                                    class="w-full h-full object-cover"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
                             <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
@@ -238,7 +238,7 @@
                             <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
                                 <img src="https://loremflickr.com/600/400/city?lock=12"
                                     alt="Related News"
-                                    class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                                    class="w-full h-full object-cover"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
                             <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
@@ -251,7 +251,7 @@
                             <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
                                 <img src="https://loremflickr.com/600/400/money?lock=13"
                                     alt="Related News"
-                                    class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                                    class="w-full h-full object-cover"
                                     onload="this.parentElement.classList.remove('img-placeholder')">
                             </div>
                             <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">

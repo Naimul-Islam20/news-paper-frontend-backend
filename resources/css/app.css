@@ -20,6 +20,9 @@
 
     /* ডিফল্ট ব্র্যান্ড রঙ — অ্যাডমিন সাইট মেটা থেকে primary_color সেট করলে layout এ :root ওভাররাইড হয় */
     --color-primary: #2563eb;
+
+    /* রিপোর্টার, প্রকাশ তারিখ ইত্যাদি — text-byline */
+    --color-byline: #292929;
 }
 
 html,
@@ -35,6 +38,14 @@ body {
 .font-light,
 .font-normal {
     font-weight: 400;
+}
+
+/* Solaiman Lipi-তে ৫০০ ওজন নেই — Regular (400) + হালকা stroke = medium দেখায় */
+.font-medium {
+    font-weight: 400;
+    font-synthesis: none;
+    -webkit-text-stroke: 0.2px currentColor;
+    paint-order: stroke fill;
 }
 
 .font-semibold {
@@ -56,10 +67,13 @@ main section,
     font-family: "SolaimanLipi", ui-sans-serif, sans-serif;
 }
 
-/* হেডার মেনু — semibold (600), Solaiman Lipi সিনথেসাইজ */
-header nav ul a {
-    font-weight: 600;
-    font-synthesis: weight;
+/* হেডার মেনু — medium (রিপোর্টারের মতো) */
+header nav ul a,
+.header-drawer-menu a {
+    font-weight: 400;
+    font-synthesis: none;
+    -webkit-text-stroke: 0.2px currentColor;
+    paint-order: stroke fill;
 }
 
 /* হেডার তারিখ — বাংলা, স্বাভাবিক স্পেসিং */
@@ -133,6 +147,20 @@ header nav ul a {
     color: #212121;
 }
 
+/* নিউজ/পোস্ট টাইটেল — হোভারে primary রঙ হবে না */
+.group:hover :is(h1, h2, h3, h4).text-title,
+:is(h1, h2, h3, h4).text-title:hover {
+    color: #212121 !important;
+}
+
+@utility text-byline {
+    color: #292929;
+}
+
+@utility text-caption {
+    color: #787878;
+}
+
 @keyframes shimmer {
     0% {
         background-position: -1000px 0;
@@ -188,4 +216,33 @@ img {
 
 [x-cloak] {
     display: none !important;
+}
+
+/* Google Translate — কাস্টম ভাষা সুইচার; ডিফল্ট বার/গ্যাজেট লুকানো */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-banner-frame,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.goog-te-menu-value span,
+.goog-te-gadget {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+body {
+    top: 0 !important;
+    position: static !important;
+}
+
+#google_translate_element,
+.skiptranslate {
+    display: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+.goog-text-highlight {
+    background: none !important;
+    box-shadow: none !important;
 }

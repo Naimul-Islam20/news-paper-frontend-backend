@@ -10,22 +10,58 @@
             <div class="p-6">
                 <div class="mb-6 border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-xl font-semibold text-slate-800 dark:text-white">অ্যাড স্লট সম্পাদনা</h2>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ $advertisement->name }} <span class="text-slate-400">({{ $advertisement->slug }})</span></p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        @if($spec = $advertisement->mediaSpec())
-                        <p class="text-sm text-emerald-800 dark:text-emerald-300">
-                            Aspect ratio: {{ $spec['ratio'] }} | সাইজ: {{ $spec['size'] }}
+                        <h2 class="text-xl font-semibold text-slate-800 dark:text-white">{{ $advertisement->name }}</h2>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                            {{ $advertisement->slug }}
+                            @if($spec = $advertisement->mediaSpec())
+                            <span class="text-slate-400">· {{ $spec['ratio'] }} · {{ $spec['size'] }}</span>
+                            @endif
                         </p>
-                        @endif
-                        <button type="button" id="ad-form-clear" class="px-4 py-2 border border-amber-500 dark:border-amber-600 rounded-md text-sm font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition shrink-0">Clear (মুছুন)</button>
                     </div>
+                    <button type="button" id="ad-form-clear" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition shrink-0">Clear</button>
                 </div>
+
+                @if($errors->has('ad_source') || $errors->has('google_ad_slot'))
+                <div class="mb-4 px-4 py-2 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-sm">
+                    {{ $errors->first('ad_source') ?: $errors->first('google_ad_slot') }}
+                </div>
+                @endif
 
                 <form id="ad-edit-form" action="{{ route('admin.advertisements.update', $advertisement->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
+
+                    @php
+                    $isGoogleSource = old('ad_source', $advertisement->ad_source ?? 'local') === 'google';
+                    $isHomeVideoSlot = $advertisement->slug === 'home_video';
+                    @endphp
+
+                    @if(! $isHomeVideoSlot)
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">সোর্স</span>
+                        <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900">
+                            <label class="inline-flex items-center px-4 py-2 text-sm font-medium cursor-pointer {{ ! $isGoogleSource ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300' }}">
+                                <input type="radio" name="ad_source" value="local" class="sr-only ad-source-radio" {{ ! $isGoogleSource ? 'checked' : '' }}>
+                                Local
+                            </label>
+                            <label class="inline-flex items-center px-4 py-2 text-sm font-medium cursor-pointer border-l border-slate-200 dark:border-slate-700 {{ $isGoogleSource ? 'bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300' }}">
+                                <input type="radio" name="ad_source" value="google" class="sr-only ad-source-radio" {{ $isGoogleSource ? 'checked' : '' }}>
+                                Google
+                            </label>
+                        </div>
+                    </div>
+                    <div id="ad-google-fields" class="{{ $isGoogleSource ? '' : 'hidden' }}">
+                        <label for="google_ad_slot" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Google Slot ID <span class="text-rose-600">*</span></label>
+                        <input type="text" name="google_ad_slot" id="google_ad_slot" value="{{ old('google_ad_slot', $advertisement->google_ad_slot) }}" placeholder="1234567890" class="w-full max-w-sm px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm font-mono">
+                        @if(! google_adsense_client())
+                        <p class="mt-1 text-xs text-amber-700 dark:text-amber-300">Client ID নেই — <a href="{{ route('admin.meta.index') }}" class="underline">SEO & Meta</a></p>
+                        @endif
+                    </div>
+                    @else
+                    <input type="hidden" name="ad_source" value="local">
+                    @endif
+
+                    <div id="ad-local-fields" class="space-y-6 {{ $isGoogleSource && ! $isHomeVideoSlot ? 'hidden' : '' }}">
 
                     @php
                     $slotDurDaysRaw = 0;
@@ -41,8 +77,8 @@
                     @endphp
                     <div class="space-y-3">
                         <div class="flex flex-wrap items-center justify-between gap-3">
-                            <p class="text-xs font-medium text-slate-700 dark:text-slate-300">
-                                মেয়াদ (দিন + ঘণ্টা)
+                            <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                মেয়াদ
                                 <span id="slot-duration-required" class="text-rose-600 dark:text-rose-400 font-normal {{ $slotAuto ? 'hidden' : '' }}">*</span>
                             </p>
                             <label class="inline-flex items-center gap-2 cursor-pointer select-none">
@@ -81,19 +117,11 @@
                     </div>
 
                     @if($slotFormDisplay ?? null)
-                    <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50">
-                        <h3 class="text-sm font-semibold text-slate-800 dark:text-white mb-2">পরিসংখ্যান (চলমান স্লট)</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="rounded-md border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 px-4 py-3">
-                                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">ভিউ</p>
-                                <p class="text-2xl font-bold text-slate-800 dark:text-white tabular-nums">{{ number_format((int) ($advertisement->views_count ?? 0)) }}</p>
-                            </div>
-                            <div class="rounded-md border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 px-4 py-3">
-                                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">ক্লিক</p>
-                                <p class="text-2xl font-bold text-slate-800 dark:text-white tabular-nums">{{ number_format((int) ($advertisement->clicks_count ?? 0)) }}</p>
-                            </div>
-                        </div>
-                    </div>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        ভিউ: <span class="font-semibold text-slate-800 dark:text-white tabular-nums">{{ number_format((int) ($advertisement->views_count ?? 0)) }}</span>
+                        <span class="mx-2 text-slate-300">|</span>
+                        ক্লিক: <span class="font-semibold text-slate-800 dark:text-white tabular-nums">{{ number_format((int) ($advertisement->clicks_count ?? 0)) }}</span>
+                    </p>
                     @endif
 
                     @include('admin.advertisements.partials.media-fields', [
@@ -107,22 +135,20 @@
                     @enderror
                     @endforeach
 
+                    </div>
+
                     <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
                         <a href="{{ route('admin.advertisements.index') }}" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Cancel</a>
                         <button type="submit" class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">Save Changes</button>
                     </div>
                 </form>
 
-                <div id="queue-admin-root" class="mt-10 pt-8 border-t border-slate-200 dark:border-slate-800">
+                <div id="queue-admin-root" class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 {{ $isGoogleSource && ! $isHomeVideoSlot ? 'hidden' : '' }}">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                        <div>
-                            <h3 class="text-lg font-semibold text-slate-800 dark:text-white">অতিরিক্ত অ্যাড কিউ</h3>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-2">
-                            <button type="button" id="queue-open-create" class="px-4 py-2 bg-emerald-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition">
-                                আরেকটি অ্যাড যোগ করুন
-                            </button>
-                        </div>
+                        <h3 class="text-base font-semibold text-slate-800 dark:text-white">কিউ</h3>
+                        <button type="button" id="queue-open-create" class="px-3 py-1.5 bg-emerald-600 rounded-md text-sm font-medium text-white hover:bg-emerald-700 transition">
+                            + যোগ করুন
+                        </button>
                     </div>
 
                     @if(($queueItems ?? collect())->isNotEmpty())
@@ -133,7 +159,7 @@
                                     <th class="px-3 py-2 text-left font-medium text-slate-600 dark:text-slate-300">#</th>
                                     <th class="px-3 py-2 text-left font-medium text-slate-600 dark:text-slate-300">প্রিভিউ</th>
                                     <th class="px-3 py-2 text-left font-medium text-slate-600 dark:text-slate-300">শিরোনাম</th>
-                                    <th class="px-3 py-2 text-left font-medium text-slate-600 dark:text-slate-300 hidden md:table-cell">মেয়াদ / চালু</th>
+                                    <th class="px-3 py-2 text-left font-medium text-slate-600 dark:text-slate-300 hidden md:table-cell">মেয়াদ</th>
                                     <th class="px-3 py-2 text-right font-medium text-slate-600 dark:text-slate-300">ভিউ / ক্লিক</th>
                                     <th class="px-3 py-2 text-right font-medium text-slate-600 dark:text-slate-300">ক্রম</th>
                                     <th class="px-3 py-2 text-right font-medium text-slate-600 dark:text-slate-300">অ্যাকশন</th>
@@ -157,7 +183,7 @@
                                     <td class="px-3 py-2 text-slate-800 dark:text-slate-200 max-w-[12rem]">
                                         <span class="truncate block">{{ $item->title ?: '—' }}</span>
                                         @if(($liveQueueItem ?? null) && (int) $liveQueueItem->id === (int) $item->id)
-                                        <span class="inline-block mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded">ফ্রন্টে চলছে</span>
+                                        <span class="inline-block mt-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-300">● লাইভ</span>
                                         @endif
                                     </td>
                                     <td class="px-3 py-2 text-slate-500 dark:text-slate-400 text-xs hidden md:table-cell">
@@ -194,11 +220,8 @@
                     </div>
                     @endif
 
-                    <div class="mt-10 pt-8 border-t border-slate-200 dark:border-slate-800">
-                        <div class="mb-4">
-                            <h3 class="text-lg font-semibold text-slate-800 dark:text-white">পুরনো অ্যাড তালিকা</h3>
-                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">মেয়াদ শেষ হওয়া স্লট অ্যাড ও কিউ আইটেম — শুধু দেখার জন্য, এখান থেকে সম্পাদনা করা যাবে না।</p>
-                        </div>
+                    <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+                        <h3 class="text-base font-semibold text-slate-800 dark:text-white mb-4">পুরনো অ্যাড</h3>
 
                         @if(($expiredAds ?? collect())->isNotEmpty())
                         <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
@@ -246,9 +269,7 @@
                             </table>
                         </div>
                         @else
-                        <p class="text-sm text-slate-500 dark:text-slate-400 py-4 px-4 rounded-lg border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/20">
-                            এখনো কোনো পুরনো অ্যাড নেই। স্লট বা কিউর মেয়াদ শেষ হলে স্বয়ংক্রিয়ভাবে এখানে দেখা যাবে।
-                        </p>
+                        <p class="text-sm text-slate-400 py-2">কোনো পুরনো অ্যাড নেই।</p>
                         @endif
                     </div>
 
@@ -264,7 +285,7 @@
                     <x-slot name="header">
                         <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800 shrink-0">
                             <div>
-                                <h3 id="queue-dialog-title" class="text-base font-semibold text-slate-900 dark:text-white">নতুন কিউ আইটেম</h3>
+                                <h3 id="queue-dialog-title" class="text-base font-semibold text-slate-900 dark:text-white">কিউ আইটেম</h3>
                             </div>
                             <button type="button" onclick="closeModal('adQueueModal', 'adQueueModalContainer')" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all" aria-label="বন্ধ">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -279,13 +300,11 @@
                         <input type="hidden" name="_method" id="queue_item_spoof_method" value="PUT" disabled>
 
                         <div>
-                            <label for="q_title" class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">শিরোনাম <span class="text-slate-400 font-normal">(ঐচ্ছিক — তালিকায় চেনার জন্য)</span></label>
+                            <label for="q_title" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">শিরোনাম</label>
                             <input type="text" name="title" id="q_title" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white">
                         </div>
 
-                        <div class="p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/50 dark:bg-indigo-950/20 space-y-3">
-                            <p class="text-xs font-medium text-slate-700 dark:text-slate-300">মেয়াদ (দিন + ঘণ্টা)</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label for="q_duration_days" class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">দিন</label>
                                     <select name="duration_days" id="q_duration_days" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm focus:ring-1 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white">
@@ -303,7 +322,6 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
 
                         @include('admin.advertisements.partials.media-fields', [
                         'display' => null,
@@ -395,8 +413,6 @@ $i->id => [
             qForm.action = window.__queueStoreUrl;
             if (spoof) spoof.disabled = true;
             el('queue-dialog-title').textContent = 'নতুন কিউ আইটেম';
-            var sub = el('queue-dialog-subtitle');
-            if (sub) sub.textContent = 'অতিরিক্ত অ্যাড কিউতে নতুন আইটেম যোগ করুন।';
             openModal('adQueueModal', 'adQueueModalContainer');
         }
 
@@ -406,9 +422,7 @@ $i->id => [
             clearQueueForm();
             qForm.action = window.__queueItemUpdateUrls[id];
             if (spoof) spoof.disabled = false;
-            el('queue-dialog-title').textContent = 'কিউ আইটেম সম্পাদনা';
-            var subEd = el('queue-dialog-subtitle');
-            if (subEd) subEd.textContent = 'এই কিউ আইটেমের তথ্য আপডেট করুন।';
+            el('queue-dialog-title').textContent = 'কিউ সম্পাদনা';
             el('q_title').value = payload.title || '';
             el('q_link').value = payload.link || '';
             var dd = el('q_duration_days');
@@ -468,6 +482,38 @@ $i->id => [
                 submitQueueReorder();
             }
         });
+    })();
+
+    (function() {
+        var localFields = document.getElementById('ad-local-fields');
+        var googleFields = document.getElementById('ad-google-fields');
+        var queueRoot = document.getElementById('queue-admin-root');
+        var sourceRadios = document.querySelectorAll('.ad-source-radio');
+
+        function syncAdSourceUI() {
+            var selected = document.querySelector('.ad-source-radio:checked');
+            var isGoogle = selected && selected.value === 'google';
+            if (localFields) localFields.classList.toggle('hidden', isGoogle);
+            if (googleFields) googleFields.classList.toggle('hidden', !isGoogle);
+            if (queueRoot) queueRoot.classList.toggle('hidden', isGoogle);
+            sourceRadios.forEach(function(radio) {
+                var label = radio.closest('label');
+                if (!label) return;
+                var active = radio.checked;
+                var google = radio.value === 'google';
+                label.classList.remove('bg-indigo-600', 'text-white', 'bg-blue-600', 'text-slate-600', 'dark:text-slate-300');
+                if (active) {
+                    label.classList.add(google ? 'bg-blue-600' : 'bg-indigo-600', 'text-white');
+                } else {
+                    label.classList.add('text-slate-600', 'dark:text-slate-300');
+                }
+            });
+        }
+
+        sourceRadios.forEach(function(radio) {
+            radio.addEventListener('change', syncAdSourceUI);
+        });
+        syncAdSourceUI();
     })();
 
     (function() {

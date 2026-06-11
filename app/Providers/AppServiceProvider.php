@@ -38,8 +38,13 @@ class AppServiceProvider extends ServiceProvider
                         ? Category::whereIn('id', $col3Ids)->get()->sortBy(fn ($c) => array_search($c->id, $col3Ids))->values()
                         : collect();
 
-                    // Combined categories for the side menu drawer (Header -> Footer2 -> Footer3)
-                    $sideMenuCategories = $headerCategories->merge($footerCol2)->merge($footerCol3)->unique('id');
+                    // Side drawer: সব active parent category (header/footer সিলেক্ট ছাড়াও)
+                    $sideMenuCategories = Category::query()
+                        ->whereNull('parent_id')
+                        ->where('status', 'active')
+                        ->orderByRaw("FIELD(type, 'post', 'video', 'gallery', 'page')")
+                        ->orderBy('name')
+                        ->get();
 
                 } catch (\Throwable) {
                     $headerCategories = collect();

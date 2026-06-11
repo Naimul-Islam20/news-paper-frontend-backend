@@ -7,21 +7,10 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
         @if($postShareImage)
         <x-slot:metaImage>{{ $postShareImage }}</x-slot>
             @endif
-                <x-slot:ogTitle>{{ $post->title }}</x-slot>
+            <x-slot:ogTitle>{{ $post->title }}</x-slot>
                 <x-slot:shareUrl>{{ news_url($post) }}</x-slot>
 
-        @php $adDetailsBelowMenu = ad_slot('details_below_menu'); @endphp
-        @if($adDetailsBelowMenu && ad_has_media($adDetailsBelowMenu))
-        <div class="py-2 md:py-3 flex justify-center bg-transparent px-0 md:px-4 no-print">
-            <div class="container flex justify-center overflow-hidden">
-                <a href="{{ advertisement_click_url($adDetailsBelowMenu) }}" class="w-full flex justify-center max-w-[1000px] mx-auto" target="_blank" rel="noopener">
-                    <div class="img-placeholder w-full max-w-[1000px] h-[90px] md:h-[100px] overflow-hidden shrink-0">
-                        <x-ad-picture :ad="$adDetailsBelowMenu" class="w-full h-full object-cover object-center shadow-sm" />
-                    </div>
-                </a>
-            </div>
-        </div>
-        @endif
+                    <x-ad-slot-display slug="details_below_menu" variant="banner" wrapper-class="no-print" />
 
                     <div class="py-4 md:py-10 min-h-screen bg-white">
                         <div class="container">
@@ -199,53 +188,61 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
 
                                 <!-- প্রথম কলাম (৮ ভাগ) -->
                                 <div class="flex flex-col gap-6 w-full">
-                                    <!-- শিরোনাম: post title -->
-                                    <h1 class="text-2xl md:text-4xl font-bold serif text-title leading-tight">
-                                        {{ $post->title }}
-                                    </h1>
                                     @php
                                     $subTitlePoints = [];
-                                    if (!empty($post->sub_title)) {
+                                    if (! empty($post->sub_title)) {
                                     $decoded = json_decode($post->sub_title, true);
                                     if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                                     $subTitlePoints = collect($decoded)
-                                    ->filter(function ($value) {
-                                    return is_string($value) && trim($value) !== '';
-                                    })
+                                    ->filter(fn ($value) => is_string($value) && trim($value) !== '')
                                     ->values()
                                     ->all();
                                     } else {
-                                    $subTitlePoints = [ $post->sub_title ];
+                                    $subTitlePoints = [$post->sub_title];
                                     }
                                     }
                                     @endphp
-                                    @if(!empty($subTitlePoints))
-                                    <div class="mt-3 space-y-2">
-                                        @foreach($subTitlePoints as $point)
-                                        <div class="flex items-center gap-3">
-                                            <span class="flex-shrink-0 inline-flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-black" viewBox="0 0 24 24" fill="currentColor">
-                                                    <circle cx="12" cy="12" r="6" />
-                                                </svg>
-                                            </span>
-                                            <p class="text-lg md:text-xl font-bold leading-relaxed text-black whitespace-pre-line">{{ $point }}</p>
-                                        </div>
-                                        @endforeach
-                                    </div>
-                                    @endif
 
-                                    <div class="flex flex-col gap-1 pb-2 mb-2">
-                                        <span class="text-lg font-bold text-title leading-tight">
+                                    <header class="space-y-2">
+                                        @if(filled($post->subtitle))
+                                        <p class="text-sm font-medium leading-snug text-primary md:text-base">
+                                            {{ $post->subtitle }}
+                                        </p>
+                                        @endif
+
+                                        <h1 class="text-2xl md:text-4xl font-bold serif text-title leading-tight">
+                                            {{ $post->title }}
+                                        </h1>
+
+                                        @if(! empty($subTitlePoints))
+                                        <ul class="m-0 list-none space-y-1 p-0 pt-1">
+                                            @foreach($subTitlePoints as $point)
+                                            <li class="flex items-baseline gap-2.5">
+                                                <span class="inline-flex w-2 shrink-0 items-center justify-center leading-none" aria-hidden="true">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2 text-title" viewBox="0 0 24 24" fill="currentColor">
+                                                        <circle cx="12" cy="12" r="6" />
+                                                    </svg>
+                                                </span>
+                                                <p class="min-w-0 flex-1 text-base font-bold leading-relaxed text-title md:text-lg whitespace-pre-line">{{ $point }}</p>
+                                            </li>
+                                            @endforeach
+                                        </ul>
+                                        @endif
+                                    </header>
+
+                                    <div class="flex flex-col gap-4">
+                                    <div class="flex flex-col gap-0">
+                                        <span class="text-xl font-medium text-byline">
                                             {{ $post->reporter->desk ?? $post->reporter->name ?? 'ডিজিটাল ডেস্ক' }}
                                         </span>
-                                        <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-4">
-                                            <span class="text-sm md:text-base text-desc">
+                                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                            <span class="text-lg font-normal text-byline">
                                                 প্রকাশ : {{ published_at($post->created_at) }}
                                             </span>
 
                                             @php
-                                                $shareUrl = news_url($post);
-                                                $whatsappShareUrl = news_whatsapp_share_url($post);
+                                            $shareUrl = news_url($post);
+                                            $whatsappShareUrl = news_whatsapp_share_url($post);
                                             @endphp
                                             <!-- সোশ্যাল শেয়ার আইকনসমূহ -->
                                             <div class="flex items-center gap-3">
@@ -255,7 +252,9 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                                 <a href="#" role="button" data-share-url="{{ $shareUrl }}" onclick="shareOnMessenger(event)" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-[#0084ff] hover:text-white transition-all" title="Messenger" aria-label="Share on Messenger"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                                         <path d="M0 7.76C0 3.301 3.493 0 8 0s8 3.301 8 7.76-3.493 7.76-8 7.76c-.81 0-1.586-.107-2.316-.307a.639.639 0 0 0-.427.03l-1.588.702a.64.64 0 0 1-.898-.566l-.044-1.423a.639.639 0 0 0-.215-.456C.956 12.108 0 10.092 0 7.76zm5.546-1.459-2.35 3.728c-.225.358.214.761.551.506l2.525-1.916a.441.441 0 0 1 .51-.011l1.802 1.307c.51.37 1.158.27 1.55-.223l2.356-3.728c.226-.359-.214-.761-.551-.506l-2.525 1.917a.441.441 0 0 1-.51.011L6.595 5.893a.903.903 0 0 0-1.049.408z" />
                                                     </svg></a>
-                                                <a href="https://wa.me/?text={{ urlencode($whatsappShareUrl) }}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all" title="WhatsApp" aria-label="Share on WhatsApp"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.06 3.973L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg></a>
+                                                <a href="https://wa.me/?text={{ urlencode($whatsappShareUrl) }}" target="_blank" rel="noopener noreferrer" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-[#25D366] hover:text-white transition-all" title="WhatsApp" aria-label="Share on WhatsApp"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.06 3.973L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z" />
+                                                    </svg></a>
                                                 <span class="relative inline-flex shrink-0">
                                                     <span class="copy-btn-toast" style="position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);z-index:50;padding:6px 12px;border-radius:6px;background:#fff;color:#000;font-size:12px;font-weight:600;line-height:1.2;white-space:nowrap;box-shadow:0 2px 10px rgba(0,0,0,0.12);border:1px solid #e2e8f0;opacity:0;pointer-events:none;transition:opacity 0.2s ease">Copied</span>
                                                     <button type="button" onclick="copyPostShareLink(this)" data-copy-url="{{ $whatsappShareUrl }}" class="w-8 h-8 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition-all" title="লিংক কপি করুন" aria-label="লিংক কপি করুন">
@@ -280,33 +279,42 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                     </div>
 
                                     <!-- ফিচারড ইমেজ -->
+                                    @php
+                                    $postFeaturedImageUrl = storage_image_url($post->image) ?: 'https://loremflickr.com/1200/800/parliament,building?lock=1';
+                                    @endphp
                                     <div class="w-full">
-                                        <div class="img-placeholder w-full aspect-video overflow-hidden shadow-md">
-                                            <img src="{{ storage_image_url($post->image) ?: 'https://loremflickr.com/1200/800/parliament,building?lock=1' }}"
-                                                alt="{{ $post->title }}"
-                                                class="w-full h-full object-cover"
-                                                onload="this.parentElement.classList.remove('img-placeholder')">
-                                        </div>
+                                        <a
+                                            href="{{ news_photo_url($post) }}"
+                                            class="group block w-full cursor-zoom-in"
+                                            aria-label="পূর্ণ স্ক্রিনে ছবি দেখুন">
+                                            <div class="img-placeholder w-full aspect-video overflow-hidden shadow-md">
+                                                <img src="{{ $postFeaturedImageUrl }}"
+                                                    alt="{{ $post->title }}"
+                                                    class="w-full h-full object-cover transition-opacity group-hover:opacity-95"
+                                                    onload="this.parentElement.classList.remove('img-placeholder')">
+                                            </div>
+                                        </a>
                                         @if($post->image_caption)
-                                        <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                                        <p class="text-caption mt-2 text-lg font-bold leading-relaxed">
                                             {{ $post->image_caption }}
                                         </p>
                                         @endif
+                                    </div>
                                     </div>
 
                                     @php
                                     $adDetailsRight1 = ad_slot('details_right_1');
                                     $adDetailsRight2 = ad_slot('details_right_2');
-                                    $hasDetailsRightAds = ($adDetailsRight1 && ad_has_media($adDetailsRight1))
-                                    || ($adDetailsRight2 && ad_has_media($adDetailsRight2));
+                                    $hasDetailsRightAds = ad_should_display($adDetailsRight1)
+                                    || ad_should_display($adDetailsRight2);
 
                                     $descRaw = $post->description ?? '';
-                                    $mobileAd1 = ($adDetailsRight1 && ad_has_media($adDetailsRight1))
-                                        ? view('frontend.partials.detail-inline-ad', ['ad' => $adDetailsRight1])->render()
-                                        : '';
-                                    $mobileAd2 = ($adDetailsRight2 && ad_has_media($adDetailsRight2))
-                                        ? view('frontend.partials.detail-inline-ad', ['ad' => $adDetailsRight2])->render()
-                                        : '';
+                                    $mobileAd1 = ad_should_display($adDetailsRight1)
+                                    ? view('frontend.partials.detail-inline-ad', ['ad' => $adDetailsRight1])->render()
+                                    : '';
+                                    $mobileAd2 = ad_should_display($adDetailsRight2)
+                                    ? view('frontend.partials.detail-inline-ad', ['ad' => $adDetailsRight2])->render()
+                                    : '';
                                     $descriptionForBody = inject_post_detail_ads_between_paragraphs($descRaw, $mobileAd1, $mobileAd2);
                                     @endphp
 
@@ -335,20 +343,8 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
 
                                     @if($hasDetailsRightAds)
                                     <div class="flex flex-col gap-4 w-full min-w-0 ad-section">
-                                        @if($adDetailsRight1 && ad_has_media($adDetailsRight1))
-                                        <div class="shrink-0 w-full">
-                                            <a href="{{ advertisement_click_url($adDetailsRight1) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-none">
-                                                <x-ad-picture :ad="$adDetailsRight1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
-                                            </a>
-                                        </div>
-                                        @endif
-                                        @if($adDetailsRight2 && ad_has_media($adDetailsRight2))
-                                        <div class="shrink-0 w-full">
-                                            <a href="{{ advertisement_click_url($adDetailsRight2) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full max-w-none">
-                                                <x-ad-picture :ad="$adDetailsRight2" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100" />
-                                            </a>
-                                        </div>
-                                        @endif
+                                        <x-ad-slot-display :ad="$adDetailsRight1" variant="sidebar" />
+                                        <x-ad-slot-display :ad="$adDetailsRight2" variant="sidebar" />
                                     </div>
                                     @endif
 
@@ -367,7 +363,7 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                             <div class="img-placeholder aspect-[16/9] overflow-hidden">
                                                 <img src="{{ storage_image_url($rel->image) ?: 'https://loremflickr.com/600/400/law?lock='.$rel->id }}"
                                                     alt="{{ $rel->title }}"
-                                                    class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                                                    class="w-full h-full object-cover"
                                                     onload="this.parentElement.classList.remove('img-placeholder')">
                                             </div>
                                             <h4 class="text-base font-bold serif leading-snug text-title group-hover:text-primary transition-colors">
@@ -398,7 +394,7 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                         <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
                                             <img src="{{ storage_image_url($rel->image) ?: 'https://loremflickr.com/600/400/news?lock='.$rel->id }}"
                                                 alt="{{ $rel->title }}"
-                                                class="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                                                class="w-full h-full object-cover"
                                                 onload="this.parentElement.classList.remove('img-placeholder')">
                                         </div>
                                         <h4 class="text-base md:text-lg font-bold serif leading-snug text-title group-hover:text-primary transition-colors flex-1">
@@ -421,7 +417,7 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                             toast.style.opacity = '1';
 
                             clearTimeout(btn._copyToastTimer);
-                            btn._copyToastTimer = setTimeout(function () {
+                            btn._copyToastTimer = setTimeout(function() {
                                 toast.style.opacity = '0';
                             }, 2000);
                         }
@@ -430,17 +426,17 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                             const url = btn.getAttribute('data-copy-url');
                             if (!url) return;
 
-                            const done = function () {
+                            const done = function() {
                                 btn.classList.add('bg-primary', 'text-white');
                                 showCopyLinkToast(btn);
                                 clearTimeout(btn._copyBtnTimer);
-                                btn._copyBtnTimer = setTimeout(function () {
+                                btn._copyBtnTimer = setTimeout(function() {
                                     btn.classList.remove('bg-primary', 'text-white');
                                 }, 1500);
                             };
 
                             if (navigator.clipboard && navigator.clipboard.writeText) {
-                                navigator.clipboard.writeText(url).then(done).catch(function () {
+                                navigator.clipboard.writeText(url).then(done).catch(function() {
                                     fallbackCopy(url, done);
                                 });
                             } else {

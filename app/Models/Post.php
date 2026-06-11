@@ -8,6 +8,7 @@ class Post extends Model
 {
     protected $fillable = [
         'title',
+        'subtitle',
         'sub_title',
         'slug',
         'description',

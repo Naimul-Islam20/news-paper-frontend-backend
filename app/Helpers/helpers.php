@@ -279,6 +279,26 @@ if (! function_exists('advertisement_click_url')) {
     }
 }
 
+if (! function_exists('google_adsense_client')) {
+    /**
+     * Google AdSense publisher client ID (ca-pub-xxxxxxxx).
+     */
+    function google_adsense_client(): ?string
+    {
+        $client = trim((string) (optional(site_meta_record())->google_adsense_client ?? ''));
+
+        if ($client === '') {
+            return null;
+        }
+
+        if (! str_starts_with($client, 'ca-pub-')) {
+            $client = 'ca-pub-'.$client;
+        }
+
+        return $client;
+    }
+}
+
 if (! function_exists('ad_has_media')) {
     /**
      * অ্যাডে দেখানোর মতো মিডিয়া আছে কিনা (ইমেজ, GIF, ভিডিও ফাইল, YouTube)।
@@ -296,6 +316,24 @@ if (! function_exists('ad_has_media')) {
     }
 }
 
+if (! function_exists('ad_should_display')) {
+    /**
+     * ফ্রন্টে অ্যাড দেখানো উচিত কিনা — Local মিডিয়া বা Google Ad।
+     */
+    function ad_should_display(?\App\Models\Advertisement $ad): bool
+    {
+        if (! $ad) {
+            return false;
+        }
+
+        if ($ad->usesGoogleAd()) {
+            return $ad->canShowGoogleAd();
+        }
+
+        return ad_has_media($ad);
+    }
+}
+
 if (! function_exists('ad_slot')) {
     /**
      * Get ad slot by frontend slug for display.
@@ -304,7 +342,9 @@ if (! function_exists('ad_slot')) {
     function ad_slot(string $slug): ?\App\Models\Advertisement
     {
         $ad = \App\Models\Advertisement::getBySlug($slug);
-        advertisement_bump_view_once($ad);
+        if ($ad && ! $ad->usesGoogleAd()) {
+            advertisement_bump_view_once($ad);
+        }
 
         return $ad;
     }
@@ -509,6 +549,20 @@ if (! function_exists('news_url')) {
         }
 
         return route('news.show', [$post->slug]);
+    }
+}
+
+if (! function_exists('news_photo_url')) {
+    /**
+     * Full-page featured image URL (/{slug}/photo).
+     */
+    function news_photo_url($post): string
+    {
+        if (! $post || ! $post->slug || ! $post->image) {
+            return news_url($post);
+        }
+
+        return route('news.photo', [$post->slug]);
     }
 }
 

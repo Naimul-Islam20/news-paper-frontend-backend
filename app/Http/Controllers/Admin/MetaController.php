@@ -46,6 +46,7 @@ class MetaController extends Controller
             'address_1' => ['nullable', 'string'],
             'editor_name' => ['nullable', 'string', 'max:255'],
             'publisher_name' => ['nullable', 'string', 'max:255'],
+            'google_adsense_client' => ['nullable', 'string', 'max:64'],
         ]);
 
         $meta = SiteMeta::first();
@@ -81,6 +82,19 @@ class MetaController extends Controller
                 ->withInput();
         } else {
             $validated['primary_color'] = strtolower($pc);
+        }
+
+        $adsenseClient = isset($validated['google_adsense_client'])
+            ? trim((string) $validated['google_adsense_client'])
+            : '';
+        if ($adsenseClient === '') {
+            $validated['google_adsense_client'] = null;
+        } elseif (! preg_match('/^(ca-pub-)?\d+$/', $adsenseClient)) {
+            return redirect()->back()
+                ->withErrors(['google_adsense_client' => 'Google AdSense Client ID সঠিক ফরম্যাটে দিন (যেমন ca-pub-1234567890123456)।'])
+                ->withInput();
+        } elseif (! str_starts_with($adsenseClient, 'ca-pub-')) {
+            $validated['google_adsense_client'] = 'ca-pub-'.$adsenseClient;
         }
 
         if ($meta) {
