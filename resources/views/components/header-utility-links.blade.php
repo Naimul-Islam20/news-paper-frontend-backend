@@ -1,0 +1,67 @@
+@props(['variant' => 'inline'])
+
+@php
+    $menuLinkClass = 'font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all';
+    $isMenuVariant = $variant === 'menu';
+@endphp
+
+@if($isMenuVariant)
+<ul class="flex justify-start items-center gap-3 text-base whitespace-nowrap py-0.5 {{ $attributes->get('class') }}">
+    <li>
+        <a href="{{ route('bangla-converter') }}"
+            class="{{ $menuLinkClass }} {{ request()->routeIs('bangla-converter') ? 'text-primary border-primary' : '' }}"
+            title="Unicode to Bijoy - Bangla text Converter">
+            <span class="i18n-bn">বাংলা কনভার্টার</span>
+            <span class="i18n-en">Bangla Converter</span>
+        </a>
+    </li>
+    <li>
+        <a href="{{ route('archive') }}"
+            class="{{ $menuLinkClass }} {{ request()->routeIs('archive') ? 'text-primary border-primary' : '' }}">
+            <span class="i18n-bn">আর্কাইভ</span>
+            <span class="i18n-en">Archive</span>
+        </a>
+    </li>
+    <li>
+        <x-language-switcher :class="$menuLinkClass" />
+    </li>
+</ul>
+@elseif($variant === 'drawer')
+<ul class="space-y-2 {{ $attributes->get('class') }}">
+    <li class="border-b border-gray-400 pb-1">
+        <a href="{{ route('bangla-converter') }}"
+            class="block text-xl font-medium hover:text-primary transition-colors {{ request()->routeIs('bangla-converter') ? 'text-primary' : '' }}"
+            title="Unicode to Bijoy - Bangla text Converter">
+            <span class="i18n-bn">বাংলা কনভার্টার</span>
+            <span class="i18n-en">Bangla Converter</span>
+        </a>
+    </li>
+    <li class="border-b border-gray-400 pb-1">
+        <a href="{{ route('archive') }}"
+            class="block text-xl font-medium hover:text-primary transition-colors {{ request()->routeIs('archive') ? 'text-primary' : '' }}">
+            <span class="i18n-bn">আর্কাইভ</span>
+            <span class="i18n-en">Archive</span>
+        </a>
+    </li>
+    <li class="border-b border-gray-400 pb-1">
+        <x-language-switcher class="block text-xl font-medium hover:text-primary transition-colors text-left w-full" />
+    </li>
+</ul>
+@else
+<div class="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs md:text-sm font-medium text-slate-800 {{ $attributes->get('class') }}">
+    <a href="{{ route('bangla-converter') }}"
+        class="hover:text-primary transition-colors whitespace-nowrap {{ request()->routeIs('bangla-converter') ? 'text-primary' : '' }}"
+        title="Unicode to Bijoy - Bangla text Converter">
+        <span class="i18n-bn">বাংলা কনভার্টার</span>
+        <span class="i18n-en">Bangla Converter</span>
+    </a>
+    <span aria-hidden="true">|</span>
+    <a href="{{ route('archive') }}"
+        class="hover:text-primary transition-colors whitespace-nowrap {{ request()->routeIs('archive') ? 'text-primary' : '' }}">
+        <span class="i18n-bn">আর্কাইভ</span>
+        <span class="i18n-en">Archive</span>
+    </a>
+    <span aria-hidden="true">|</span>
+    <x-language-switcher />
+</div>
+@endif
