@@ -30,7 +30,7 @@
 <ul class="space-y-2 {{ $attributes->get('class') }}">
     <li class="border-b border-gray-400 pb-1">
         <a href="{{ route('bangla-converter') }}"
-            class="block text-xl font-medium hover:text-primary transition-colors {{ request()->routeIs('bangla-converter') ? 'text-primary' : '' }}"
+            class="block text-2xl font-medium hover:text-primary transition-colors {{ request()->routeIs('bangla-converter') ? 'text-primary' : '' }}"
             title="Unicode to Bijoy - Bangla text Converter">
             <span class="i18n-bn">বাংলা কনভার্টার</span>
             <span class="i18n-en">Bangla Converter</span>
@@ -38,13 +38,13 @@
     </li>
     <li class="border-b border-gray-400 pb-1">
         <a href="{{ route('archive') }}"
-            class="block text-xl font-medium hover:text-primary transition-colors {{ request()->routeIs('archive') ? 'text-primary' : '' }}">
+            class="block text-2xl font-medium hover:text-primary transition-colors {{ request()->routeIs('archive') ? 'text-primary' : '' }}">
             <span class="i18n-bn">আর্কাইভ</span>
             <span class="i18n-en">Archive</span>
         </a>
     </li>
     <li class="border-b border-gray-400 pb-1">
-        <x-language-switcher class="block text-xl font-medium hover:text-primary transition-colors text-left w-full" />
+        <x-language-switcher class="block text-2xl font-medium hover:text-primary transition-colors text-left w-full" />
     </li>
 </ul>
 @else

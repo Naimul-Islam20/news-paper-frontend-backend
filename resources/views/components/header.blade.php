@@ -37,7 +37,7 @@
                         </div>
 
                         <ul class="header-drawer-menu space-y-2">
-                            <li class="border-b border-gray-400 pb-2"><a href="{{ front_home_url() }}" class="block text-lg font-medium hover:text-primary transition-colors flex items-center gap-2">
+                            <li class="border-b border-gray-400 pb-2"><a href="{{ front_home_url() }}" class="block text-xl font-medium hover:text-primary transition-colors flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                         <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -45,12 +45,12 @@
                                     হোম
                                 </a></li>
                             {{-- সর্বশেষ সর্বদা বাম পাশের প্রথম মেনু (স্থান পরিবর্তন হবে না) --}}
-                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('latest') }}" class="block text-xl font-medium hover:text-primary transition-colors">সর্বশেষ</a></li>
-                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('special-news') }}" class="block text-xl font-medium hover:text-primary transition-colors">বিশেষ সংবাদ</a></li>
+                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('latest') }}" class="block text-2xl font-medium hover:text-primary transition-colors">সর্বশেষ</a></li>
+                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('special-news') }}" class="block text-2xl font-medium hover:text-primary transition-colors">বিশেষ সংবাদ</a></li>
                             @if(isset($sideMenuCategories) && $sideMenuCategories->isNotEmpty())
                             @foreach($sideMenuCategories as $cat)
                             <li class="border-b border-gray-400 pb-1">
-                                <a href="{{ route('category.show', $cat->slug) }}" class="block text-xl font-medium hover:text-primary transition-colors">
+                                <a href="{{ route('category.show', $cat->slug) }}" class="block text-2xl font-medium hover:text-primary transition-colors">
                                     {{ $cat->name }}
                                 </a>
                             </li>
@@ -99,7 +99,7 @@
 
             <x-ad-slot-display slug="header" variant="header" />
 
-            <div class="container pt-1 pb-0 text-center overflow-visible">
+            <div class="container pt-1 md:pt-1 pb-0 text-center overflow-visible">
                 <div class="flex items-center justify-between mb-0 md:mb-1">
                     <div class="flex-1 text-left">
                         <div class="hidden md:flex items-center gap-2 md:gap-3">
@@ -142,9 +142,9 @@
                     <div class="flex-1 flex justify-center items-center px-2">
                         <a href="{{ front_home_url() }}">
                             @if(!empty(optional($siteMeta)->site_logo))
-                            <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="{{ optional($siteMeta)->site_name ?? 'Logo' }}" class="h-8 md:h-18 w-auto object-contain" onerror="this.src='{{ asset('logo.svg') }}'; this.onerror=null;">
+                            <img src="{{ storage_image_url($siteMeta->site_logo) }}" alt="{{ optional($siteMeta)->site_name ?? 'Logo' }}" class="h-11 md:h-18 w-auto object-contain" onerror="this.src='{{ asset('logo.svg') }}'; this.onerror=null;">
                             @else
-                            <img src="{{ asset('logo.svg') }}" alt="{{ site_name() }}" class="h-8 md:h-18 w-auto object-contain">
+                            <img src="{{ asset('logo.svg') }}" alt="{{ site_name() }}" class="h-11 md:h-18 w-auto object-contain">
                             @endif
                         </a>
                     </div>
@@ -300,11 +300,11 @@
 
         <nav
             class="z-50 bg-white md:border-b border-slate-200 transition-all duration-300"
-            :class="isSticky ? 'py-1 md:fixed md:top-0 md:left-0 md:w-full md:py-1.5 max-md:shadow-[0_10px_32px_-6px_rgba(15,23,42,0.16),0_-10px_32px_-6px_rgba(15,23,42,0.16)] md:shadow-none' : 'relative pt-2.5 pb-0.5 md:pt-3 md:pb-0.5 max-md:shadow-[0_6px_22px_-4px_rgba(15,23,42,0.12),0_-6px_22px_-4px_rgba(15,23,42,0.12)] md:shadow-none'">
+            :class="isSticky ? 'py-1 md:fixed md:top-0 md:left-0 md:w-full md:py-1.5 max-md:shadow-[0_10px_32px_-6px_rgba(15,23,42,0.16),0_-10px_32px_-6px_rgba(15,23,42,0.16)] md:shadow-none' : 'relative py-1.5 md:pt-3 md:pb-0.5 max-md:shadow-[0_6px_22px_-4px_rgba(15,23,42,0.12),0_-6px_22px_-4px_rgba(15,23,42,0.12)] md:shadow-none'">
             <div class="container">
                 <div
                     class="flex items-center transition-all duration-300 border-t-0 md:border-t-2"
-                    :class="isSticky ? 'md:border-transparent pt-0.5 md:pt-0' : 'md:border-black py-1 md:py-1'">
+                    :class="isSticky ? 'md:border-transparent pt-0.5 md:pt-0' : 'md:border-black py-0.5 md:py-1'">
                     <!-- Smooth Sliding Sidebar Trigger & Logo Short (Desktop Only) -->
                     <div
                         class="hidden md:flex items-center gap-2 overflow-hidden transition-all duration-500 ease-in-out"
@@ -327,7 +327,7 @@
                     </div>
 
                     <div class="flex-1 overflow-x-auto overflow-y-hidden no-scrollbar py-0 flex items-center justify-between">
-                        <ul class="flex justify-start items-center gap-3 md:gap-6 text-base md:text-xl whitespace-nowrap py-0.5 md:py-0.5">
+                        <ul class="flex justify-start items-center gap-4 md:gap-6 text-xl md:text-xl whitespace-nowrap py-0.5 md:py-0.5">
                             {{-- সর্বশেষ সর্বদা হেডার মেনুর বাম পাশের প্রথম আইটেম (স্থান অপরিবর্তিত) --}}
                             <li><a href="{{ route('latest') }}" class="font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('latest') ? 'text-primary border-primary' : '' }}">সর্বশেষ</a></li>
                             <li><a href="{{ route('special-news') }}" class="font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('special-news') ? 'text-primary border-primary' : '' }}">বিশেষ সংবাদ</a></li>
