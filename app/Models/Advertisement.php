@@ -12,6 +12,7 @@ class Advertisement extends Model
         'slug',
         'ad_source',
         'google_ad_slot',
+        'google_ad_auto',
         'name',
         'image',
         'image_mobile',
@@ -33,6 +34,7 @@ class Advertisement extends Model
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
             'is_auto' => 'boolean',
+            'google_ad_auto' => 'boolean',
         ];
     }
 
@@ -390,21 +392,50 @@ class Advertisement extends Model
         $this->setAttribute('clicks_count', (int) ($item->clicks_count ?? 0));
     }
 
-    public function usesGoogleAd(): bool
+    public function googleAdAutoEnabled(): bool
     {
-        return $this->ad_source === 'google';
+        return (bool) ($this->google_ad_auto ?? true);
     }
 
     public function canShowGoogleAd(): bool
     {
-        return $this->usesGoogleAd()
-            && filled($this->google_ad_slot)
+        return filled($this->google_ad_slot)
             && filled(google_adsense_client());
+    }
+
+    public function hasRunningLocalAd(): bool
+    {
+        if (! $this->isActiveForDisplay()) {
+            return false;
+        }
+
+        return ad_has_media($this);
+    }
+
+    /** ফ্রন্টে Google Ad দেখাবে কিনা (local না থাকলে auto fallback) */
+    public function displayUsesGoogleAd(): bool
+    {
+        if (! $this->canShowGoogleAd() || ! $this->googleAdAutoEnabled()) {
+            return false;
+        }
+
+        return ! $this->hasRunningLocalAd();
+    }
+
+    public function displayUsesLocalAd(): bool
+    {
+        return $this->hasRunningLocalAd();
+    }
+
+    /** @deprecated displayUsesGoogleAd() ব্যবহার করুন */
+    public function usesGoogleAd(): bool
+    {
+        return $this->displayUsesGoogleAd();
     }
 
     /**
      * Get ad slot by slug (for frontend and views).
-     * Google mode: শিডিউল ছাড়াই; Local mode: শিডিউলের মধ্যে থাকলে।
+     * Local চললে local; না থাকলে google_ad_auto + Slot ID থাকলে Google।
      */
     public static function getBySlug(string $slug): ?self
     {
@@ -417,17 +448,15 @@ class Advertisement extends Model
             return null;
         }
 
-        if ($ad->usesGoogleAd()) {
-            return $ad->canShowGoogleAd() ? $ad : null;
+        if ($ad->isActiveForDisplay()) {
+            $ad->applyQueueItemDisplayOverride();
         }
 
-        if (! $ad->isActiveForDisplay()) {
-            return null;
+        if ($ad->displayUsesLocalAd() || $ad->displayUsesGoogleAd()) {
+            return $ad;
         }
 
-        $ad->applyQueueItemDisplayOverride();
-
-        return $ad;
+        return null;
     }
 
     public function hasDisplayableMedia(): bool

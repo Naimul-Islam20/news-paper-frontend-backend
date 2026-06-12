@@ -21,9 +21,19 @@
                     <button type="button" id="ad-form-clear" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition shrink-0">Clear</button>
                 </div>
 
-                @if($errors->has('ad_source') || $errors->has('google_ad_slot'))
+                @if(session('success'))
+                <div class="mb-4 px-4 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-sm">
+                    {{ session('success') }}
+                </div>
+                @endif
+
+                @if($errors->any())
                 <div class="mb-4 px-4 py-2 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-sm">
-                    {{ $errors->first('ad_source') ?: $errors->first('google_ad_slot') }}
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
                 </div>
                 @endif
 
@@ -32,36 +42,41 @@
                     @method('PUT')
 
                     @php
-                    $isGoogleSource = old('ad_source', $advertisement->ad_source ?? 'local') === 'google';
+                    $googleAdAuto = old('google_ad_auto', ($advertisement->google_ad_auto ?? true) ? '1' : '0') === '1';
                     $isHomeVideoSlot = $advertisement->slug === 'home_video';
                     @endphp
 
                     @if(! $isHomeVideoSlot)
-                    <div class="flex flex-wrap items-center justify-between gap-3">
-                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">সোর্স</span>
-                        <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900">
-                            <label class="inline-flex items-center px-4 py-2 text-sm font-medium cursor-pointer {{ ! $isGoogleSource ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300' }}">
-                                <input type="radio" name="ad_source" value="local" class="sr-only ad-source-radio" {{ ! $isGoogleSource ? 'checked' : '' }}>
-                                Local
-                            </label>
-                            <label class="inline-flex items-center px-4 py-2 text-sm font-medium cursor-pointer border-l border-slate-200 dark:border-slate-700 {{ $isGoogleSource ? 'bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300' }}">
-                                <input type="radio" name="ad_source" value="google" class="sr-only ad-source-radio" {{ $isGoogleSource ? 'checked' : '' }}>
-                                Google
-                            </label>
+                    <div class="p-4 rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/40 dark:bg-blue-950/20 space-y-3">
+                        <div class="flex flex-wrap items-end gap-4">
+                            <div class="flex-1 min-w-[12rem]">
+                                <label for="google_ad_slot" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Google Slot ID</label>
+                                <input type="text" name="google_ad_slot" id="google_ad_slot" value="{{ old('google_ad_slot', $advertisement->google_ad_slot) }}" placeholder="2436228703" class="w-full max-w-sm px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm font-mono">
+                                @error('google_ad_slot')
+                                <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div class="shrink-0 pb-1">
+                                <input type="hidden" name="google_ad_auto" value="0">
+                                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                    <input type="checkbox" name="google_ad_auto" id="google_ad_auto" value="1" class="sr-only" {{ $googleAdAuto ? 'checked' : '' }}>
+                                    <span id="google_ad_auto_track" aria-hidden="true" class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors duration-200 {{ $googleAdAuto ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600' }}">
+                                        <span id="google_ad_auto_knob" class="block h-5 w-5 shrink-0 rounded-full bg-white border border-slate-200 shadow-sm transition-transform duration-200 ease-in-out dark:border-slate-400" style="transform: translateX({{ $googleAdAuto ? '20px' : '0px' }});"></span>
+                                    </span>
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Auto</span>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    <div id="ad-google-fields" class="{{ $isGoogleSource ? '' : 'hidden' }}">
-                        <label for="google_ad_slot" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Google Slot ID <span class="text-rose-600">*</span></label>
-                        <input type="text" name="google_ad_slot" id="google_ad_slot" value="{{ old('google_ad_slot', $advertisement->google_ad_slot) }}" placeholder="1234567890" class="w-full max-w-sm px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm font-mono">
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Auto ON: Local ad না থাকলে Google Ad চলবে। Local ad থাকলে Local-ই priority পাবে।</p>
                         @if(! google_adsense_client())
-                        <p class="mt-1 text-xs text-amber-700 dark:text-amber-300">Client ID নেই — <a href="{{ route('admin.meta.index') }}" class="underline">SEO & Meta</a></p>
+                        <p class="text-xs text-amber-700 dark:text-amber-300">Client ID নেই — <a href="{{ route('admin.meta.index') }}" class="underline">SEO & Meta</a> থেকে যোগ করুন।</p>
                         @endif
                     </div>
                     @else
-                    <input type="hidden" name="ad_source" value="local">
+                    <input type="hidden" name="google_ad_auto" value="0">
                     @endif
 
-                    <div id="ad-local-fields" class="space-y-6 {{ $isGoogleSource && ! $isHomeVideoSlot ? 'hidden' : '' }}">
+                    <div id="ad-local-fields" class="space-y-6">
 
                     @php
                     $slotDurDaysRaw = 0;
@@ -143,7 +158,7 @@
                     </div>
                 </form>
 
-                <div id="queue-admin-root" class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 {{ $isGoogleSource && ! $isHomeVideoSlot ? 'hidden' : '' }}">
+                <div id="queue-admin-root" class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                         <h3 class="text-base font-semibold text-slate-800 dark:text-white">কিউ</h3>
                         <button type="button" id="queue-open-create" class="px-3 py-1.5 bg-emerald-600 rounded-md text-sm font-medium text-white hover:bg-emerald-700 transition">
@@ -485,35 +500,25 @@ $i->id => [
     })();
 
     (function() {
-        var localFields = document.getElementById('ad-local-fields');
-        var googleFields = document.getElementById('ad-google-fields');
-        var queueRoot = document.getElementById('queue-admin-root');
-        var sourceRadios = document.querySelectorAll('.ad-source-radio');
+        var googleAutoCheckbox = document.getElementById('google_ad_auto');
+        var googleAutoTrack = document.getElementById('google_ad_auto_track');
+        var googleAutoKnob = document.getElementById('google_ad_auto_knob');
+        if (!googleAutoCheckbox) return;
 
-        function syncAdSourceUI() {
-            var selected = document.querySelector('.ad-source-radio:checked');
-            var isGoogle = selected && selected.value === 'google';
-            if (localFields) localFields.classList.toggle('hidden', isGoogle);
-            if (googleFields) googleFields.classList.toggle('hidden', !isGoogle);
-            if (queueRoot) queueRoot.classList.toggle('hidden', isGoogle);
-            sourceRadios.forEach(function(radio) {
-                var label = radio.closest('label');
-                if (!label) return;
-                var active = radio.checked;
-                var google = radio.value === 'google';
-                label.classList.remove('bg-indigo-600', 'text-white', 'bg-blue-600', 'text-slate-600', 'dark:text-slate-300');
-                if (active) {
-                    label.classList.add(google ? 'bg-blue-600' : 'bg-indigo-600', 'text-white');
-                } else {
-                    label.classList.add('text-slate-600', 'dark:text-slate-300');
-                }
-            });
+        function syncGoogleAdAutoUI() {
+            var on = googleAutoCheckbox.checked;
+            if (googleAutoTrack) {
+                googleAutoTrack.classList.toggle('bg-blue-500', on);
+                googleAutoTrack.classList.toggle('bg-slate-300', !on);
+                googleAutoTrack.classList.toggle('dark:bg-slate-600', !on);
+            }
+            if (googleAutoKnob) {
+                googleAutoKnob.style.transform = on ? 'translateX(20px)' : 'translateX(0px)';
+            }
         }
 
-        sourceRadios.forEach(function(radio) {
-            radio.addEventListener('change', syncAdSourceUI);
-        });
-        syncAdSourceUI();
+        googleAutoCheckbox.addEventListener('change', syncGoogleAdAutoUI);
+        syncGoogleAdAutoUI();
     })();
 
     (function() {

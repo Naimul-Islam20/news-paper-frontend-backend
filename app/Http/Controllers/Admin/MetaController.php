@@ -80,18 +80,13 @@ class MetaController extends Controller
             $validated['primary_color'] = strtolower($pc);
         }
 
-        $adsenseClient = isset($validated['google_adsense_client'])
-            ? trim((string) $validated['google_adsense_client'])
-            : '';
-        if ($adsenseClient === '') {
-            $validated['google_adsense_client'] = null;
-        } elseif (! preg_match('/^(ca-pub-)?\d+$/', $adsenseClient)) {
+        $normalizedClient = normalize_google_adsense_client($validated['google_adsense_client'] ?? null);
+        if (($validated['google_adsense_client'] ?? '') !== '' && $validated['google_adsense_client'] !== null && $normalizedClient === null) {
             return redirect()->back()
-                ->withErrors(['google_adsense_client' => 'Google AdSense Client ID সঠিক ফরম্যাটে দিন (যেমন ca-pub-1234567890123456)।'])
+                ->withErrors(['google_adsense_client' => 'Google AdSense Client ID সঠিক ফরম্যাটে দিন (যেমন pub-2602475216171666 বা ca-pub-2602475216171666)।'])
                 ->withInput();
-        } elseif (! str_starts_with($adsenseClient, 'ca-pub-')) {
-            $validated['google_adsense_client'] = 'ca-pub-'.$adsenseClient;
         }
+        $validated['google_adsense_client'] = $normalizedClient;
 
         if ($meta) {
             $meta->update($validated);

@@ -253,3 +253,12 @@ body {
     background: none !important;
     box-shadow: none !important;
 }
+
+/* Bijoy converter — শুধু .bijoy-text; সাইটের বাকি font (SolaimanLipi) অপরিবর্তিত */
+.bijoy-text {
+    font-family: "SutonnyMJ", "SutonnyMJ Regular", monospace;
+    font-weight: 400;
+    font-synthesis: none;
+    letter-spacing: normal;
+    line-height: 1.6;
+}

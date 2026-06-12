@@ -14,7 +14,7 @@ $ad = $ad ?? ($slug ? ad_slot($slug) : null);
 @endphp
 
 @if($ad && ad_should_display($ad))
-    @if($ad->usesGoogleAd())
+    @if($ad->displayUsesGoogleAd())
         @if($variant === 'header')
         <div class="hidden w-full py-1 md:flex md:py-2 justify-center bg-white px-2 {{ $wrapperClass }}">
             <div class="container flex justify-center overflow-hidden">

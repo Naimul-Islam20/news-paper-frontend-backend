@@ -5,7 +5,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "fonts:sync": "mkdir -p public/fonts && curl -fsSL 'https://okkhor52.com/webfont/solaimanlipi.woff2' -o public/fonts/SolaimanLipi.woff2 && curl -fsSL 'https://fonts.maateen.me/solaiman-lipi/solaimanlipi-normal-v1.0.ttf' -o public/fonts/SolaimanLipi.ttf && curl -fsSL 'https://fonts.maateen.me/solaiman-lipi/solaimanlipi-bold-v1.0.woff2' -o public/fonts/SolaimanLipi-Bold.woff2 && curl -fsSL 'https://fonts.maateen.me/solaiman-lipi/solaimanlipi-bold-v1.0.ttf' -o public/fonts/SolaimanLipi-Bold.ttf",
+        "fonts:sync": "mkdir -p public/fonts && curl -fsSL 'https://okkhor52.com/webfont/solaimanlipi.woff2' -o public/fonts/SolaimanLipi.woff2 && curl -fsSL 'https://fonts.maateen.me/solaiman-lipi/solaimanlipi-normal-v1.0.ttf' -o public/fonts/SolaimanLipi.ttf && curl -fsSL 'https://fonts.maateen.me/solaiman-lipi/solaimanlipi-bold-v1.0.woff2' -o public/fonts/SolaimanLipi-Bold.woff2 && curl -fsSL 'https://fonts.maateen.me/solaiman-lipi/solaimanlipi-bold-v1.0.ttf' -o public/fonts/SolaimanLipi-Bold.ttf && curl -fsSL 'https://github.com/tazihad/bangla-fonts/raw/main/SutonnyMJ.ttf' -o public/fonts/SutonnyMJ.ttf",
         "postinstall": "npm run fonts:sync"
     },
     "devDependencies": {

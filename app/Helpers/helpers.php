@@ -331,23 +331,37 @@ if (! function_exists('advertisement_click_url')) {
     }
 }
 
+if (! function_exists('normalize_google_adsense_client')) {
+    /**
+     * AdSense Publisher ID — pub- / ca-pub- / শুধু সংখ্যা → ca-pub-XXXXXXXX
+     */
+    function normalize_google_adsense_client(?string $raw): ?string
+    {
+        $raw = trim((string) ($raw ?? ''));
+
+        if ($raw === '') {
+            return null;
+        }
+
+        if (preg_match('/^(?:ca-pub-|pub-)(\d+)$/i', $raw, $m)) {
+            return 'ca-pub-'.$m[1];
+        }
+
+        if (preg_match('/^\d+$/', $raw)) {
+            return 'ca-pub-'.$raw;
+        }
+
+        return null;
+    }
+}
+
 if (! function_exists('google_adsense_client')) {
     /**
      * Google AdSense publisher client ID (ca-pub-xxxxxxxx).
      */
     function google_adsense_client(): ?string
     {
-        $client = trim((string) (optional(site_meta_record())->google_adsense_client ?? ''));
-
-        if ($client === '') {
-            return null;
-        }
-
-        if (! str_starts_with($client, 'ca-pub-')) {
-            $client = 'ca-pub-' . $client;
-        }
-
-        return $client;
+        return normalize_google_adsense_client(optional(site_meta_record())->google_adsense_client ?? null);
     }
 }
 
@@ -370,7 +384,7 @@ if (! function_exists('ad_has_media')) {
 
 if (! function_exists('ad_should_display')) {
     /**
-     * ফ্রন্টে অ্যাড দেখানো উচিত কিনা — Local মিডিয়া বা Google Ad।
+     * ফ্রন্টে অ্যাড দেখানো উচিত কিনা — Local মিডিয়া বা Google Ad (auto fallback)।
      */
     function ad_should_display(?\App\Models\Advertisement $ad): bool
     {
@@ -378,11 +392,7 @@ if (! function_exists('ad_should_display')) {
             return false;
         }
 
-        if ($ad->usesGoogleAd()) {
-            return $ad->canShowGoogleAd();
-        }
-
-        return ad_has_media($ad);
+        return $ad->displayUsesLocalAd() || $ad->displayUsesGoogleAd();
     }
 }
 
@@ -394,7 +404,7 @@ if (! function_exists('ad_slot')) {
     function ad_slot(string $slug): ?\App\Models\Advertisement
     {
         $ad = \App\Models\Advertisement::getBySlug($slug);
-        if ($ad && ! $ad->usesGoogleAd()) {
+        if ($ad && $ad->displayUsesLocalAd()) {
             advertisement_bump_view_once($ad);
         }
 

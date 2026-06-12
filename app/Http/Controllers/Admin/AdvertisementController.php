@@ -69,29 +69,27 @@ class AdvertisementController extends Controller
 
         if ($advertisement->slug === 'home_video') {
             return redirect()->back()
-                ->withErrors(['ad_source' => 'হোম ভিডিও স্লটে Google Ad ব্যবহার করা যায় না।']);
+                ->withErrors(['google_ad_auto' => 'হোম ভিডিও স্লটে Google Ad ব্যবহার করা যায় না।']);
         }
 
-        $newSource = $advertisement->ad_source === 'google' ? 'local' : 'google';
+        $newAuto = ! $advertisement->googleAdAutoEnabled();
 
-        if ($newSource === 'google') {
-            if (! filled(google_adsense_client())) {
-                return redirect()->back()
-                    ->withErrors(['ad_source' => 'আগে SEO & Meta সেটিংসে Google AdSense Client ID (ca-pub-...) সেট করুন।']);
-            }
-
-            if (! filled($advertisement->google_ad_slot)) {
-                return redirect()
-                    ->route('admin.advertisements.edit', $advertisement->id)
-                    ->withErrors(['google_ad_slot' => 'Google Ad Slot ID দিন, তারপর Google Ad চালু করুন।']);
-            }
+        if ($newAuto && ! filled($advertisement->google_ad_slot)) {
+            return redirect()
+                ->route('admin.advertisements.edit', $advertisement->id)
+                ->withErrors(['google_ad_slot' => 'Auto চালু করতে Google Slot ID দিন।']);
         }
 
-        $advertisement->update(['ad_source' => $newSource]);
+        if ($newAuto && ! filled(google_adsense_client())) {
+            return redirect()->back()
+                ->withErrors(['google_ad_auto' => 'আগে SEO & Meta সেটিংসে Google AdSense Client ID সেট করুন।']);
+        }
 
-        $message = $newSource === 'google'
-            ? 'এই স্লটে এখন শুধু Google Ad চলবে।'
-            : 'এই স্লটে এখন Local Ad চলবে।';
+        $advertisement->update(['google_ad_auto' => $newAuto]);
+
+        $message = $newAuto
+            ? 'Local ad না থাকলে এখন Google Ad auto চলবে।'
+            : 'Google Ad auto বন্ধ — শুধু Local ad চলবে।';
 
         return redirect()->back()->with('success', $message);
     }
@@ -100,49 +98,39 @@ class AdvertisementController extends Controller
     {
         $advertisement = Advertisement::findOrFail($id);
 
-        $adSource = $request->input('ad_source', 'local') === 'google' ? 'google' : 'local';
+        $isHomeVideo = $advertisement->slug === 'home_video';
+        $slotId = $isHomeVideo
+            ? ''
+            : preg_replace('/\D+/', '', trim((string) $request->input('google_ad_slot', '')));
+        $googleAdAuto = ! $isHomeVideo && $request->boolean('google_ad_auto');
 
-        if ($adSource === 'google') {
-            if ($advertisement->slug === 'home_video') {
-                return redirect()->back()
-                    ->withErrors(['ad_source' => 'হোম ভিডিও স্লটে Google Ad ব্যবহার করা যায় না।'])
-                    ->withInput();
-            }
-
-            $request->validate([
-                'ad_source' => 'required|in:local,google',
-                'google_ad_slot' => 'required|string|max:32|regex:/^\d+$/',
-            ]);
-
-            if (! filled(google_adsense_client())) {
-                return redirect()->back()
-                    ->withErrors(['google_ad_slot' => 'আগে SEO & Meta সেটিংসে Google AdSense Client ID সেট করুন।'])
-                    ->withInput();
-            }
-
-            $advertisement->update([
-                'ad_source' => 'google',
-                'google_ad_slot' => trim((string) $request->input('google_ad_slot')),
-            ]);
-
-            return redirect()
-                ->route('admin.advertisements.index')
-                ->with('success', 'Google Ad সেটিংস সংরক্ষণ করা হয়েছে।');
+        if ($googleAdAuto && $slotId === '') {
+            return redirect()->back()
+                ->withErrors(['google_ad_slot' => 'Auto চালু থাকলে Google Slot ID দিন।'])
+                ->withInput();
         }
 
+        $request->merge(['google_ad_slot' => $slotId]);
+
         $request->validate(array_merge($this->mediaValidationRules(), [
-            'ad_source' => 'required|in:local,google',
+            'google_ad_auto' => 'nullable|boolean',
+            'google_ad_slot' => 'nullable|string|max:32|regex:/^\d*$/',
             'slot_auto' => 'nullable|in:0,1',
             'slot_duration_days' => 'nullable|integer|min:0|max:365',
             'slot_duration_hours' => 'nullable|integer|min:0|max:23',
         ]));
 
+        $requireMedia = ! ($googleAdAuto && $slotId !== '');
+
         $data = [
             'link' => $request->input('link'),
             'caption' => $request->input('caption'),
+            'ad_source' => 'local',
+            'google_ad_slot' => $slotId !== '' ? $slotId : null,
+            'google_ad_auto' => $googleAdAuto,
         ];
 
-        if ($mediaError = $this->applyMediaFromRequest($request, $data, $advertisement, requireMedia: true)) {
+        if ($mediaError = $this->applyMediaFromRequest($request, $data, $advertisement, requireMedia: $requireMedia)) {
             return $mediaError;
         }
 
@@ -174,7 +162,7 @@ class AdvertisementController extends Controller
         $advertisement->update($data);
 
         return redirect()
-            ->route('admin.advertisements.index')
+            ->route('admin.advertisements.edit', $advertisement->id)
             ->with('success', 'অ্যাড স্লট আপডেট করা হয়েছে।');
     }
 

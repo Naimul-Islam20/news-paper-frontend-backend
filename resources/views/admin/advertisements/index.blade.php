@@ -87,8 +87,24 @@
                             $slotWindowPast = $s && $e && $e->isPast();
                             $hasQueue = $ad->hasActiveQueueItems();
                             @endphp
-                            @if(($ad->ad_source ?? 'local') === 'google')
-                            <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Google Ad · সক্রিয়</span>
+                            @if($ad->hasRunningLocalAd())
+                            @if($ad->is_auto && $s)
+                            <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">Auto · চলছে</span>
+                            @elseif(!$s || (!$e && ! $ad->is_auto))
+                            <span class="text-xs font-medium text-amber-700 dark:text-amber-400">মেয়াদ নেই — ফ্রন্টে দেখাবে না</span>
+                            @elseif($active && $slotWindowPast && $hasQueue)
+                            <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400">স্লট মেয়াদ শেষ · কিউ চলছে</span>
+                            @elseif($active)
+                            <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">চলছে</span>
+                            @elseif($e && $e->isPast() && ! $hasQueue)
+                            <span class="text-xs font-medium text-slate-500 dark:text-slate-400">মেয়াদ শেষ</span>
+                            @elseif($s && $s->isFuture())
+                            <span class="text-xs font-medium text-amber-600 dark:text-amber-400">আসন্ন</span>
+                            @else
+                            <span class="text-xs text-slate-400">—</span>
+                            @endif
+                            @elseif(($ad->google_ad_auto ?? true) && filled($ad->google_ad_slot))
+                            <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Google Auto · fallback</span>
                             @elseif($ad->is_auto && $s)
                             <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">Auto · চলছে</span>
                             @elseif(!$s || (!$e && ! $ad->is_auto))
@@ -114,8 +130,13 @@
                             @endif
                         </td>
                         <td class="py-3 px-4">
-                            @if(($ad->ad_source ?? 'local') === 'google')
-                            <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">Google</span>
+                            @if($ad->hasRunningLocalAd())
+                            <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">Local</span>
+                            @if(($ad->google_ad_auto ?? true) && filled($ad->google_ad_slot))
+                            <span class="block text-[10px] text-blue-600 dark:text-blue-400 mt-0.5">+ Google fallback</span>
+                            @endif
+                            @elseif(($ad->google_ad_auto ?? true) && filled($ad->google_ad_slot))
+                            <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">Google Auto</span>
                             @else
                             <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Local</span>
                             @endif
@@ -124,8 +145,8 @@
                             @if($ad->slug !== 'home_video')
                             <form method="POST" action="{{ route('admin.advertisements.toggle-source', $ad->id) }}" class="inline-block mr-1">
                                 @csrf
-                                <button type="submit" class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors {{ ($ad->ad_source ?? 'local') === 'google' ? 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800' : 'border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20' }}" title="সোর্স টগল">
-                                    {{ ($ad->ad_source ?? 'local') === 'google' ? 'Local' : 'Google' }}
+                                <button type="submit" class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors {{ ($ad->google_ad_auto ?? true) ? 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800' : 'border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20' }}" title="Google Auto টগল">
+                                    Auto {{ ($ad->google_ad_auto ?? true) ? 'Off' : 'On' }}
                                 </button>
                             </form>
                             @endif

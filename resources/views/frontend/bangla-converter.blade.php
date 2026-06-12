@@ -1,6 +1,17 @@
 <x-layout>
     <x-slot:title>Unicode to Bijoy - Bangla text Converter - {{ site_name() }}</x-slot>
 
+    {{-- Bijoy font — শুধু এই পেজে; সাইটের global font পরিবর্তন হয় না --}}
+    <style>
+        @font-face {
+            font-family: "SutonnyMJ";
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url("{{ asset('fonts/SutonnyMJ.ttf') }}") format("truetype");
+        }
+    </style>
+
     <div class="py-4 md:py-10 min-h-screen notranslate">
         <div class="container max-w-4xl">
 
@@ -96,6 +107,10 @@
                         placeholder="আপনার বিজয় লেখা এখানে পেস্ট করুন..."
                         data-placeholder-en="Paste your Bijoy text here..."
                         class="w-full px-4 py-3 text-base md:text-lg leading-relaxed border-0 focus:ring-0 outline-none resize-y min-h-[180px] bijoy-text notranslate"></textarea>
+                    <p class="px-4 pb-3 text-xs text-slate-500">
+                        <span class="i18n-bn">বিজয় লেখা SutonnyMJ font-এ দেখানো হয় — Word/InDesign-এ paste করতে হলে সেখানেও Bijoy font লাগবে।</span>
+                        <span class="i18n-en">Bijoy text is shown in SutonnyMJ — paste into Word/InDesign with a Bijoy font installed.</span>
+                    </p>
                 </div>
 
             </div>
