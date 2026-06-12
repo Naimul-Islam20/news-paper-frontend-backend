@@ -23,6 +23,8 @@
 
     /* রিপোর্টার, প্রকাশ তারিখ ইত্যাদি — text-byline */
     --color-byline: #292929;
+    /* ফিচারড ইমেজ ক্যাপশন */
+    --color-caption: #787878;
 }
 
 html,
@@ -158,7 +160,12 @@ header nav ul a,
 }
 
 @utility text-caption {
-    color: #787878;
+    color: var(--color-caption);
+}
+
+/* লাইভে পুরনো Tailwind বিল্ড থাকলেও ক্যাপশন রঙ ঠিক থাকে */
+.post-image-caption {
+    color: var(--color-caption, #787878);
 }
 
 @keyframes shimmer {

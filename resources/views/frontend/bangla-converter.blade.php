@@ -41,29 +41,33 @@
                         class="w-full px-4 py-3 text-base md:text-lg leading-relaxed border-0 focus:ring-0 outline-none resize-y min-h-[180px] font-normal"></textarea>
                 </div>
 
-                <div class="flex flex-wrap items-center justify-center gap-2 md:gap-3">
+                <div class="flex flex-wrap items-center justify-center gap-2 md:gap-3 notranslate">
                     <button
                         type="button"
                         onclick="banglaUnicodeToBijoy()"
-                        class="px-4 py-2 text-sm font-semibold bg-primary text-white hover:opacity-90 transition-opacity rounded-sm">
+                        class="px-4 py-2 text-sm font-semibold text-white rounded-sm"
+                        style="background-color:#2563eb">
                         Unicode to Bijoy
                     </button>
                     <button
                         type="button"
                         onclick="banglaBijoyToUnicode()"
-                        class="px-4 py-2 text-sm font-semibold bg-slate-800 text-white hover:bg-slate-700 transition-colors rounded-sm">
+                        class="px-4 py-2 text-sm font-semibold text-white rounded-sm"
+                        style="background-color:#1e293b">
                         Bijoy to Unicode
                     </button>
                     <button
                         type="button"
                         onclick="banglaFixBroken()"
-                        class="px-4 py-2 text-sm font-semibold border border-amber-500 text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors rounded-sm">
+                        class="px-4 py-2 text-sm font-semibold rounded-sm"
+                        style="border:1px solid #f59e0b;color:#b45309;background-color:#fffbeb">
                         Fix Bijoy Broken
                     </button>
                     <button
                         type="button"
                         onclick="banglaClearAll()"
-                        class="px-4 py-2 text-sm font-semibold border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 transition-colors rounded-sm">
+                        class="px-4 py-2 text-sm font-semibold rounded-sm"
+                        style="border:1px solid #cbd5e1;color:#334155;background-color:#fff">
                         Clear text
                     </button>
                 </div>
@@ -87,10 +91,5 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script src="{{ asset('js/bangla-converter/base.js') }}"></script>
-        <script src="{{ asset('js/bangla-converter/bijoy.js') }}"></script>
-        <script src="{{ asset('js/bangla-converter/unicode.js') }}"></script>
-        <script src="{{ asset('js/bangla-converter/page.js') }}"></script>
-    @endpush
+    <script src="{{ asset('js/bangla-converter/all.js') }}?v=1"></script>
 </x-layout>

@@ -295,7 +295,7 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                             </div>
                                         </a>
                                         @if($post->image_caption)
-                                        <p class="text-caption mt-2 text-lg font-bold leading-relaxed">
+                                        <p class="post-image-caption mt-2 text-lg font-bold leading-relaxed" style="color:#787878">
                                             {{ $post->image_caption }}
                                         </p>
                                         @endif
