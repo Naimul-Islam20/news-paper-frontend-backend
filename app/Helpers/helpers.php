@@ -14,7 +14,7 @@ if (! function_exists('front_home_url')) {
     {
         if (! app()->runningInConsole()) {
             try {
-                return rtrim((string) url('/'), '/').'/';
+                return rtrim((string) url('/'), '/') . '/';
             } catch (\Throwable) {
                 // fall through
             }
@@ -22,14 +22,14 @@ if (! function_exists('front_home_url')) {
 
         $configured = rtrim((string) config('app.url', ''), '/');
         if ($configured !== '') {
-            return $configured.'/';
+            return $configured . '/';
         }
 
         if (! app()->runningInConsole()) {
             try {
                 $root = request()->root();
                 if (is_string($root) && $root !== '') {
-                    return rtrim($root, '/').'/';
+                    return rtrim($root, '/') . '/';
                 }
             } catch (\Throwable) {
                 // fall through
@@ -37,7 +37,7 @@ if (! function_exists('front_home_url')) {
         }
 
         try {
-            return rtrim((string) url('/'), '/').'/';
+            return rtrim((string) url('/'), '/') . '/';
         } catch (\Throwable) {
             return '/';
         }
@@ -74,14 +74,14 @@ if (! function_exists('storage_image_url')) {
         }
 
         if (Storage::disk('public')->exists($path)) {
-            return asset('storage/'.$path);
+            return asset('storage/' . $path);
         }
 
         if ($isManagedUploadPath) {
             return asset($path);
         }
 
-        return asset('storage/'.$path);
+        return asset('storage/' . $path);
     }
 }
 
@@ -99,7 +99,7 @@ if (! function_exists('store_public_upload')) {
         $filename = $file->hashName();
         $file->move($targetDir, $filename);
 
-        return $directory.'/'.$filename;
+        return $directory . '/' . $filename;
     }
 }
 
@@ -161,6 +161,58 @@ if (! function_exists('published_at')) {
         $bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
 
         return str_replace(range(0, 9), $bnDigits, $formatted);
+    }
+}
+
+if (! function_exists('bangla_diff_for_humans')) {
+    function bangla_diff_for_humans($date): string
+    {
+        if (! $date) {
+            return '';
+        }
+
+        \Carbon\Carbon::setLocale('bn');
+        $bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+
+        return str_replace(range(0, 9), $bnDigits, $date->diffForHumans());
+    }
+}
+
+if (! function_exists('post_list_meta_parts')) {
+    /**
+     * তালিকায় meta line-এর অংশগুলো: [ক্যাটাগরি, রিপোর্টার/ডেস্ক, সময়]।
+     *
+     * @return array<int, string>
+     */
+    function post_list_meta_parts($post): array
+    {
+        $parts = [];
+
+        $categoryName = trim((string) optional($post->categories->first())->name);
+        if ($categoryName !== '') {
+            $parts[] = $categoryName;
+        }
+
+        $reporterLabel = trim((string) (optional($post->reporter)->desk ?: optional($post->reporter)->name ?: ''));
+        if ($reporterLabel !== '') {
+            $parts[] = $reporterLabel;
+        }
+
+        if ($post->created_at) {
+            $parts[] = bangla_diff_for_humans($post->created_at);
+        }
+
+        return $parts;
+    }
+}
+
+if (! function_exists('post_list_meta_line')) {
+    /**
+     * তালিকায়: ক্যাটাগরি | রিপোর্টার/ডেস্ক | সময় (বাংলায়)।
+     */
+    function post_list_meta_line($post): string
+    {
+        return implode(' | ', post_list_meta_parts($post));
     }
 }
 
@@ -227,7 +279,7 @@ if (! function_exists('advertisement_bump_view_once')) {
             return;
         }
         $queueId = ad_queue_display_get($ad);
-        $key = $queueId !== null ? 'q:'.$queueId : 'a:'.$ad->id;
+        $key = $queueId !== null ? 'q:' . $queueId : 'a:' . $ad->id;
         $keys = $req->attributes->get('advertisement_view_bumped_keys', []);
         if (! is_array($keys)) {
             $keys = [];
@@ -269,7 +321,7 @@ if (! function_exists('advertisement_click_url')) {
         }
         $queueId = ad_queue_display_get($ad);
         if ($queueId !== null) {
-            $sig = hash_hmac('sha256', 'queue:'.(string) $queueId, (string) config('app.key'));
+            $sig = hash_hmac('sha256', 'queue:' . (string) $queueId, (string) config('app.key'));
 
             return route('advertisement.queue-click', ['queueItem' => $queueId, 's' => $sig], false);
         }
@@ -292,7 +344,7 @@ if (! function_exists('google_adsense_client')) {
         }
 
         if (! str_starts_with($client, 'ca-pub-')) {
-            $client = 'ca-pub-'.$client;
+            $client = 'ca-pub-' . $client;
         }
 
         return $client;
@@ -386,23 +438,23 @@ if (! function_exists('inject_post_detail_ads_between_paragraphs')) {
 
         if ($adBlock1 !== '') {
             $pos = $endAfter($tagMatches[0]);
-            $at[$pos] = ($at[$pos] ?? '').$adBlock1;
+            $at[$pos] = ($at[$pos] ?? '') . $adBlock1;
         }
 
         if ($adBlock2 !== '') {
             if ($n === 2) {
                 $pos = $endAfter($tagMatches[0]);
-                $at[$pos] = ($at[$pos] ?? '').$adBlock2;
+                $at[$pos] = ($at[$pos] ?? '') . $adBlock2;
             } else {
                 $idx = $n - 2;
                 $pos = $endAfter($tagMatches[$idx]);
-                $at[$pos] = ($at[$pos] ?? '').$adBlock2;
+                $at[$pos] = ($at[$pos] ?? '') . $adBlock2;
             }
         }
 
         krsort($at, SORT_NUMERIC);
         foreach ($at as $offset => $fragment) {
-            $html = substr($html, 0, $offset).$fragment.substr($html, $offset);
+            $html = substr($html, 0, $offset) . $fragment . substr($html, $offset);
         }
 
         return $html;
@@ -577,5 +629,169 @@ if (! function_exists('news_whatsapp_share_url')) {
         }
 
         return url('/' . $post->id);
+    }
+}
+
+if (! function_exists('person_name_first_word')) {
+    function person_name_first_word(?string $name): ?string
+    {
+        $name = trim((string) $name);
+        if ($name === '') {
+            return null;
+        }
+
+        $parts = preg_split('/\s+/u', $name, 2);
+
+        return $parts[0] ?: null;
+    }
+}
+
+if (! function_exists('reporter_person_name')) {
+    /**
+     * রিপোর্টার ধরন/ডেস্ক নয় — রিপোর্টার রেকর্ডের ব্যক্তির নাম (name ফিল্ড)।
+     */
+    function reporter_person_name($reporter): ?string
+    {
+        if (! $reporter) {
+            return null;
+        }
+
+        $name = trim((string) ($reporter->name ?? ''));
+        if ($name !== '') {
+            return $name;
+        }
+
+        if ($reporter->relationLoaded('subEditor') || $reporter->sub_editor_id) {
+            $name = trim((string) optional($reporter->subEditor)->name);
+            if ($name !== '') {
+                return $name;
+            }
+        }
+
+        return null;
+    }
+}
+
+if (! function_exists('latin_initial_to_bangla')) {
+    function latin_initial_to_bangla(string $letter): string
+    {
+        return match (mb_strtoupper($letter, 'UTF-8')) {
+            'A' => 'এ',
+            'B' => 'বি',
+            'C' => 'সি',
+            'D' => 'ডি',
+            'E' => 'ই',
+            'F' => 'এফ',
+            'G' => 'জি',
+            'H' => 'এইচ',
+            'I' => 'আই',
+            'J' => 'জে',
+            'K' => 'কে',
+            'L' => 'এল',
+            'M' => 'এম',
+            'N' => 'এন',
+            'O' => 'ও',
+            'P' => 'পি',
+            'Q' => 'কью',
+            'R' => 'আর',
+            'S' => 'এস',
+            'T' => 'টি',
+            'U' => 'ইউ',
+            'V' => 'ভি',
+            'W' => 'ডব্লিউ',
+            'X' => 'এক্স',
+            'Y' => 'ওয়াই',
+            'Z' => 'জিড',
+            default => $letter,
+        };
+    }
+}
+
+if (! function_exists('person_name_first_letter')) {
+    function person_name_first_letter(?string $name): ?string
+    {
+        $name = trim((string) $name);
+        if ($name === '') {
+            return null;
+        }
+
+        $first = mb_substr($name, 0, 1, 'UTF-8');
+
+        if (preg_match('/^[A-Za-z]$/', $first)) {
+            return latin_initial_to_bangla($first);
+        }
+
+        return $first;
+    }
+}
+
+if (! function_exists('site_domain')) {
+    /** সাইট ডোমেইন — news24bd.tv (www ছাড়া)। */
+    function site_domain(): string
+    {
+        $host = share_site_label();
+        if ($host === '') {
+            return '';
+        }
+
+        return preg_replace('/^www\./i', '', $host) ?? $host;
+    }
+}
+
+if (! function_exists('post_credit_line')) {
+    /**
+     * news24bd.tv/আই,এম — সাইট ডোমেইন + পোস্টকারী ও রিপোর্টারের প্রথম অক্ষর।
+     */
+    function post_credit_line($post): string
+    {
+        $letters = [];
+
+        $creatorLetter = person_name_first_letter(optional($post->creator)->name);
+        if (is_string($creatorLetter) && $creatorLetter !== '') {
+            $letters[] = $creatorLetter;
+        }
+
+        $reporterLetter = person_name_first_letter(reporter_person_name($post->reporter));
+        if (is_string($reporterLetter) && $reporterLetter !== '' && ! in_array($reporterLetter, $letters, true)) {
+            $letters[] = $reporterLetter;
+        }
+
+        if ($letters === []) {
+            return '';
+        }
+
+        $initials = implode(',', $letters);
+        $domain = site_domain();
+
+        return $domain !== '' ? $domain . '/' . $initials : $initials;
+    }
+}
+
+if (! function_exists('site_editor_publisher_lines')) {
+    /**
+     * সম্পাদক/প্রকাশক ফুটার লাইন — একটা ফিল্ড থাকলে একসাথে, দুটো থাকলে আলাদা।
+     *
+     * @return array<int, array{label: string, name: string}>
+     */
+    function site_editor_publisher_lines($siteMeta = null): array
+    {
+        $editorName = trim((string) optional($siteMeta)->editor_name);
+        $publisherName = trim((string) optional($siteMeta)->publisher_name);
+
+        if ($editorName !== '' && $publisherName !== '') {
+            return [
+                ['label' => 'সম্পাদক', 'name' => $editorName],
+                ['label' => 'প্রকাশক', 'name' => $publisherName],
+            ];
+        }
+
+        $singleName = $editorName !== '' ? $editorName : $publisherName;
+        if ($singleName === '') {
+            return [];
+        }
+
+        return [
+            ['label' => 'সম্পাদক ও প্রকাশক', 'name' => $singleName],
+        ];
     }
 }

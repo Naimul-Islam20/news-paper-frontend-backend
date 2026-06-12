@@ -75,13 +75,13 @@ class PostController extends Controller
     public function show(string $slug): View
     {
         // Try finding a Post first (slug), then numeric ID (WhatsApp share links)
-        $post = Post::with(['reporter', 'categories.parent.subCategories', 'topics'])
+        $post = Post::with(['reporter.subEditor', 'creator', 'categories.parent.subCategories', 'topics'])
             ->where('slug', $slug)
             ->where('status', 'published')
             ->first();
 
         if (! $post && ctype_digit($slug)) {
-            $post = Post::with(['reporter', 'categories.parent.subCategories', 'topics'])
+            $post = Post::with(['reporter.subEditor', 'creator', 'categories.parent.subCategories', 'topics'])
                 ->where('id', (int) $slug)
                 ->where('status', 'published')
                 ->first();

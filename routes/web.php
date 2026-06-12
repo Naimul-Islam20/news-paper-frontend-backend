@@ -42,6 +42,9 @@ Route::get('/topic/{slug}', [FrontendSearchController::class, 'index'])->name('t
 // সর্বশেষ – সব নতুন পোস্ট, ক্যাটাগরি পেজের মতো UI
 Route::get('/latest', [FrontendCategoryController::class, 'latest'])->name('latest');
 
+// আর্কাইভ – সর্বশেষ পেজের মতো UI
+Route::get('/archive', [FrontendCategoryController::class, 'archive'])->name('archive');
+
 // Category listing routes
 Route::get('/category/{slug}', [FrontendCategoryController::class, 'show'])->name('category.show');
 Route::get('/category/{parentSlug}/{childSlug}', [FrontendCategoryController::class, 'showChild'])
@@ -232,10 +235,10 @@ Route::get('/news/{slug}', [FrontendPostController::class, 'redirectLegacyNews']
 
 // Post featured image — full page viewer
 Route::get('/{slug}/photo', [FrontendPostController::class, 'showPhoto'])
-    ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|subscribe$|special-news$|videos$|terms$|privacy-policy$|bangla-converter$|heartbeat$|national$|api$|lang$).+')
+    ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|archive$|subscribe$|special-news$|videos$|terms$|privacy-policy$|bangla-converter$|heartbeat$|national$|api$|lang$).+')
     ->name('news.photo');
 
 // News detail route (fully simplified)
 Route::get('/{slug}', [FrontendPostController::class, 'show'])
-    ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|subscribe$|special-news$|videos$|terms$|privacy-policy$|bangla-converter$|heartbeat$|national$|api$|lang$).+')
+    ->where('slug', '^(?!admin$|category$|page$|gallery$|video$|login$|search$|latest$|archive$|subscribe$|special-news$|videos$|terms$|privacy-policy$|bangla-converter$|heartbeat$|national$|api$|lang$).+')
     ->name('news.show');

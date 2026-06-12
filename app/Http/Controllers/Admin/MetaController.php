@@ -39,8 +39,6 @@ class MetaController extends Controller
             'twitter_link' => ['nullable', 'string', 'max:500'],
             'instagram_link' => ['nullable', 'string', 'max:500'],
             'youtube_link' => ['nullable', 'string', 'max:500'],
-            'extra_social_links' => ['nullable', 'array'],
-            'extra_social_links.*' => ['nullable', 'string', 'max:500'],
             'map_link' => ['nullable', 'string', 'max:500'],
             'map_desc' => ['nullable', 'string', 'max:255'],
             'address_1' => ['nullable', 'string'],
@@ -69,9 +67,7 @@ class MetaController extends Controller
             unset($validated['site_icon']);
         }
 
-        if (isset($validated['extra_social_links'])) {
-            $validated['extra_social_links'] = array_values(array_filter($validated['extra_social_links']));
-        }
+        $validated['extra_social_links'] = [];
 
         $pc = isset($validated['primary_color']) ? trim((string) $validated['primary_color']) : '';
         if ($pc === '') {

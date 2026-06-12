@@ -6,6 +6,7 @@
 @section('content')
 <div class="py-1 w-full mx-auto">
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4">
+        <p class="mb-4 text-sm text-slate-600 dark:text-slate-400">প্রতিটি রিপোর্টার অবশ্যই <strong>Users</strong> থেকে তৈরি করা একজন ইউজারের সাথে লিংক থাকবে। ইউজার না থাকলে রিপোর্টার থাকবে না — আগে Users থেকে Sub Editor যোগ করুন, তারপর এখানে ডেস্ক/ধরন যোগ করুন।</p>
         <div class="flex flex-wrap items-center gap-3 sm:gap-4 justify-between pb-6 border-b border-slate-100 dark:border-slate-800 mb-6 sm:mb-8">
             <form method="GET" action="{{ route('admin.reporters.index') }}" class="relative w-full min-w-0 max-w-full sm:max-w-sm flex items-center">
                 <input
@@ -30,7 +31,7 @@
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider w-20">Photo</th>
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">Name</th>
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">ডেস্ক/ধরন</th>
-                        <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">User</th>
+                        <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">লিংকড ইউজার</th>
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">Email</th>
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">Phone</th>
                         <th class="py-1 px-2 text-[11px] font-normal text-black dark:text-white uppercase tracking-wider">Created By</th>
@@ -62,7 +63,7 @@
                             <span class="text-xs text-black dark:text-white">{{ $reporter->desk ?? '—' }}</span>
                         </td>
                         <td class="py-1 px-2">
-                            <span class="text-xs text-black dark:text-white">{{ $reporter->subEditor->name ?? '—' }}</span>
+                            <span class="text-xs text-black dark:text-white">{{ $reporter->subEditor->name }}</span>
                         </td>
                         <td class="py-1 px-2">
                             <span class="text-xs text-black dark:text-white">{{ $reporter->email }}</span>

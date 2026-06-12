@@ -6,7 +6,7 @@ return [
         'hero_layer_1' => 1,
         'hero_layer_2' => 2,
         'hero_layer_3' => 2,
-        'hero_layer_4' => 6,
+        'hero_layer_4' => 7,
 
         // Mini section on the right side of hero
         'mini_section' => 3,

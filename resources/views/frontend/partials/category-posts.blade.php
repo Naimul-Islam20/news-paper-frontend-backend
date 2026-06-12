@@ -1,3 +1,6 @@
+@php
+    $isLatestListing = ($listingSlug ?? '') === 'latest';
+@endphp
 @foreach($posts as $post)
 <article class="flex flex-col md:flex-row gap-2 md:gap-4 last:pb-0 category-post-item">
     <a
@@ -12,15 +15,18 @@
     </a>
     <div class="flex flex-col justify-start gap-2 pt-1 flex-1">
         <a href="{{ route('news.show', [$post->slug]) }}">
-            <h3 class="text-xl md:text-xl font-bold serif text-title leading-snug hover:text-primary transition-colors">
+            <h3 class="{{ $isLatestListing ? 'text-lg md:text-xl' : 'text-xl md:text-xl' }} font-bold serif text-title leading-snug hover:text-primary transition-colors">
                 {{ $post->title }}
             </h3>
         </a>
         @if($post->description)
-            <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-1">
+            <p class="{{ $isLatestListing ? 'text-base md:text-base line-clamp-2' : 'hidden md:block text-sm md:text-base line-clamp-1' }} font-normal text-desc leading-relaxed md:line-clamp-1">
                 {!! html_entity_decode(Str::limit(strip_tags($post->description), 100)) !!}
             </p>
         @endif
+        @if($isLatestListing)
+        <x-post-list-meta :post="$post" />
+        @else
         <div class="flex items-center gap-1.5 mt-auto text-gray-500">
             <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10" />
@@ -30,6 +36,7 @@
                 {{ $post->created_at->diffForHumans() }}
             </span>
         </div>
+        @endif
     </div>
 </article>
 @endforeach

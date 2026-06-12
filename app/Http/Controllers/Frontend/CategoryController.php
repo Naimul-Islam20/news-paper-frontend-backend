@@ -8,6 +8,7 @@ use App\Models\Gallery;
 use App\Models\Page;
 use App\Models\Post;
 use App\Models\Video;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
@@ -18,20 +19,67 @@ class CategoryController extends Controller
      */
     public function latest(): View|JsonResponse
     {
+        return $this->listingPage('সর্বশেষ', 'latest');
+    }
+
+    /**
+     * আর্কাইভ পেজ – তারিখ বাছাই করলে সেই দিন + তার আগের খবর; পরের দিনের খবর বাদ।
+     */
+    public function archive(): View|JsonResponse
+    {
         $baseQuery = Post::with(['reporter', 'categories.parent'])
             ->where('status', 'published')
-            ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
-            ->latest();
+            ->whereHas('categories', fn ($q) => $q->where('type', 'post'));
+
+        $selectedDate = $this->parseArchiveDate(request()->input('date'));
+
+        if ($selectedDate) {
+            $baseQuery->where('created_at', '<=', $selectedDate->copy()->endOfDay());
+        }
+
+        $baseQuery->latest();
+
+        $calendarMonth = $this->parseArchiveMonth(request()->input('month'), $selectedDate);
+        $datesWithPosts = $this->archiveDatesWithPosts($calendarMonth);
+        $archiveYears = $this->archiveAvailableYears();
 
         $category = (object) [
-            'name'   => 'সর্বশেষ',
+            'name'   => 'আর্কাইভ',
             'parent' => null,
             'id'     => 0,
         ];
 
         $subCategorySource = (object) [
             'subCategories' => collect(),
-            'slug'          => 'latest',
+            'slug'          => 'archive',
+        ];
+
+        return $this->categoryPostsWithLoadMore(
+            $baseQuery,
+            10,
+            20,
+            compact('category', 'subCategorySource', 'selectedDate', 'calendarMonth', 'datesWithPosts', 'archiveYears'),
+            'frontend.archive',
+            'frontend.partials.archive-posts'
+        );
+    }
+
+    private function listingPage(string $title, string $slug): View|JsonResponse
+    {
+        $baseQuery = Post::with(['reporter', 'categories.parent'])
+            ->where('status', 'published')
+            ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
+            ->latest();
+
+        $category = (object) [
+            'name'   => $title,
+            'parent' => null,
+            'id'     => 0,
+        ];
+
+        $subCategorySource = (object) [
+            'subCategories' => collect(),
+            'slug'          => $slug,
         ];
 
         return $this->categoryPostsWithLoadMore($baseQuery, 10, 20, compact('category', 'subCategorySource'), 'frontend.category');
@@ -80,9 +128,9 @@ class CategoryController extends Controller
     /**
      * প্রথমে ১০টি খবর, আরও ক্লিক করলে ২০টি করে লোড। AJAX এ more_page প্যারামিটার ব্যবহার।
      */
-    private function categoryPostsWithLoadMore($baseQuery, int $initialCount, int $moreCount, array $viewData, string $viewName): View|JsonResponse
+    private function categoryPostsWithLoadMore($baseQuery, int $initialCount, int $moreCount, array $viewData, string $viewName, string $partialView = 'frontend.partials.category-posts'): View|JsonResponse
     {
-        return $this->categoryLoadMore($baseQuery, $initialCount, $moreCount, $viewData, $viewName, 'frontend.partials.category-posts', 'posts');
+        return $this->categoryLoadMore($baseQuery, $initialCount, $moreCount, $viewData, $viewName, $partialView, 'posts');
     }
 
     /**
@@ -97,10 +145,10 @@ class CategoryController extends Controller
             $offset = $initialCount + ($morePage - 1) * $moreCount;
             $items = (clone $baseQuery)->skip($offset)->take($moreCount)->get();
             $hasMore = $total > $initialCount + $morePage * $moreCount;
-            $nextUrl = $hasMore ? request()->url() . '?more_page=' . ($morePage + 1) : null;
+            $nextUrl = $hasMore ? $this->loadMoreUrl($morePage + 1) : null;
 
             return response()->json([
-                'html'          => view($partialView, [$variableName => $items])->render(),
+                'html'          => view($partialView, $this->postsPartialData($viewData, $variableName, $items))->render(),
                 'next_page_url' => $nextUrl,
                 'has_more'      => $hasMore,
             ]);
@@ -108,7 +156,7 @@ class CategoryController extends Controller
 
         $items = (clone $baseQuery)->take($initialCount)->get();
         $hasMore = $total > $initialCount;
-        $nextPageUrl = $hasMore ? request()->url() . '?more_page=1' : null;
+        $nextPageUrl = $hasMore ? $this->loadMoreUrl(1) : null;
 
         $viewData[$variableName] = $items;
         $viewData['hasMore'] = $hasMore;
@@ -148,5 +196,89 @@ class CategoryController extends Controller
 
         // Reuse the same layout as other single pages (similar to privacy-policy)
         return view('frontend.page', compact('page'));
+    }
+
+    private function loadMoreUrl(int $morePage): string
+    {
+        return request()->fullUrlWithQuery(['more_page' => $morePage]);
+    }
+
+    private function postsPartialData(array $viewData, string $variableName, $items): array
+    {
+        $data = [$variableName => $items];
+
+        if (isset($viewData['subCategorySource']->slug)) {
+            $data['listingSlug'] = $viewData['subCategorySource']->slug;
+        }
+
+        return $data;
+    }
+
+    private function parseArchiveDate(?string $date): ?Carbon
+    {
+        if (! $date) {
+            return null;
+        }
+
+        try {
+            $parsed = Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($parsed->isFuture()) {
+            return null;
+        }
+
+        return $parsed;
+    }
+
+    private function parseArchiveMonth(?string $month, ?Carbon $selectedDate): Carbon
+    {
+        if ($month) {
+            try {
+                return Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+            } catch (\Throwable) {
+                // fall through
+            }
+        }
+
+        if ($selectedDate) {
+            return $selectedDate->copy()->startOfMonth();
+        }
+
+        return now()->startOfMonth();
+    }
+
+    /** @return array<int, string> */
+    private function archiveDatesWithPosts(Carbon $month): array
+    {
+        $start = $month->copy()->startOfMonth()->startOfDay();
+        $end = $month->copy()->endOfMonth()->endOfDay();
+
+        return Post::query()
+            ->where('status', 'published')
+            ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
+            ->whereBetween('created_at', [$start, $end])
+            ->selectRaw('DATE(created_at) as archive_day')
+            ->groupBy('archive_day')
+            ->pluck('archive_day')
+            ->map(fn ($day) => Carbon::parse($day)->format('Y-m-d'))
+            ->all();
+    }
+
+    /** @return array<int, int> */
+    private function archiveAvailableYears(): array
+    {
+        $oldest = Post::query()
+            ->where('status', 'published')
+            ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
+            ->oldest('created_at')
+            ->value('created_at');
+
+        $startYear = $oldest ? (int) Carbon::parse($oldest)->year : (int) now()->year;
+        $endYear = (int) now()->year;
+
+        return range($endYear, $startYear);
     }
 }

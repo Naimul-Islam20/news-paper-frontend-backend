@@ -138,13 +138,21 @@
                         </a>
                     </div>
                     <div class="flex-1 text-right flex justify-end items-center gap-2">
-                        <div class="md:hidden relative z-[120] flex items-center gap-2">
+                        <div class="md:hidden relative z-[120] flex items-center gap-2 text-xs font-medium text-slate-800">
                             <a href="{{ route('bangla-converter') }}"
-                                class="flex items-center px-2 py-1 text-slate-700 hover:text-primary transition-colors border border-slate-200 rounded-sm text-xs font-medium bg-white notranslate whitespace-nowrap {{ request()->routeIs('bangla-converter') ? 'text-primary border-primary' : '' }}"
+                                class="hover:text-primary transition-colors whitespace-nowrap {{ request()->routeIs('bangla-converter') ? 'text-primary' : '' }}"
                                 title="Unicode to Bijoy - Bangla text Converter">
-                                বাংলা কনভার্টার
+                                <span class="i18n-bn">বাংলা কনভার্টার</span>
+                                <span class="i18n-en">Bangla Converter</span>
                             </a>
-                            <x-language-switcher open-up />
+                            <span aria-hidden="true">|</span>
+                            <a href="{{ route('archive') }}"
+                                class="hover:text-primary transition-colors whitespace-nowrap {{ request()->routeIs('archive') ? 'text-primary' : '' }}">
+                                <span class="i18n-bn">আর্কাইভ</span>
+                                <span class="i18n-en">Archive</span>
+                            </a>
+                            <span aria-hidden="true">|</span>
+                            <x-language-switcher />
                         </div>
                         <!-- Mobile Search Trigger (Far Right) -->
                         <button @click="showSearch = true" class="md:hidden p-2 hover:bg-slate-100 transition-colors shrink-0 z-10">
@@ -258,12 +266,22 @@
                             <span class="leading-normal tracking-normal">{{ $d }}, {{ $dn }} {{ $m }} {{ $yn }}, {{ $bangla_date }} বঙ্গাব্দ</span>
                     </div>
                     <div class="flex items-center gap-3 relative z-[120]">
-                        <a href="{{ route('bangla-converter') }}"
-                            class="flex items-center px-2 py-1 text-slate-700 hover:text-primary transition-colors border border-slate-200 rounded-sm text-sm font-medium bg-white notranslate whitespace-nowrap {{ request()->routeIs('bangla-converter') ? 'text-primary border-primary' : '' }}"
-                            title="Unicode to Bijoy - Bangla text Converter">
-                            বাংলা কনভার্টার
-                        </a>
-                        <x-language-switcher open-up />
+                        <div class="flex items-center gap-2 text-sm md:text-base font-medium text-slate-800">
+                            <a href="{{ route('bangla-converter') }}"
+                                class="hover:text-primary transition-colors whitespace-nowrap {{ request()->routeIs('bangla-converter') ? 'text-primary' : '' }}"
+                                title="Unicode to Bijoy - Bangla text Converter">
+                                <span class="i18n-bn">বাংলা কনভার্টার</span>
+                                <span class="i18n-en">Bangla Converter</span>
+                            </a>
+                            <span aria-hidden="true">|</span>
+                            <a href="{{ route('archive') }}"
+                                class="hover:text-primary transition-colors whitespace-nowrap {{ request()->routeIs('archive') ? 'text-primary' : '' }}">
+                                <span class="i18n-bn">আর্কাইভ</span>
+                                <span class="i18n-en">Archive</span>
+                            </a>
+                            <span aria-hidden="true">|</span>
+                            <x-language-switcher />
+                        </div>
                         @if(!empty(optional($siteMeta)->facebook_link))
                         <a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-primary transition-colors" title="Facebook" aria-label="Facebook">
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

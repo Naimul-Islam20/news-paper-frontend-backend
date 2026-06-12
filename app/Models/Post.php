@@ -15,6 +15,7 @@ class Post extends Model
         'image',
         'image_caption',
         'reporter_id',
+        'created_by',
         'seo_keywords',
         'status',
         'main_section_layer',
@@ -32,6 +33,11 @@ class Post extends Model
     public function reporter()
     {
         return $this->belongsTo(Reporter::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function categories()

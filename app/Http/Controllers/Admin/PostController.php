@@ -10,6 +10,7 @@ use App\Models\Topic;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -120,6 +121,7 @@ class PostController extends Controller
         ]);
 
         $data = $this->buildPostFormData($request);
+        $data['created_by'] = Auth::id();
 
         if (! $request->hasFile('image') && ! $request->filled('existing_image')) {
             return redirect()->back()
@@ -510,25 +512,38 @@ class PostController extends Controller
     protected function reportersForCurrentUser()
     {
         $user = auth()->user();
-        if (!$user) {
-            return Reporter::where('status', 'active')->orderBy('name')->get();
+        if (! $user) {
+            return Reporter::query()
+                ->linkedToUser()
+                ->where('status', 'active')
+                ->orderBy('desk')
+                ->get();
         }
 
         // Reporter role হলে: শুধু নিজের reporter row
         if ($user->role === 'reporter' && $user->reporter_id) {
-            return Reporter::where('id', $user->reporter_id)->get();
+            return Reporter::query()
+                ->linkedToUser()
+                ->where('id', $user->reporter_id)
+                ->get();
         }
 
         // Sub Editor হলে: শুধুমাত্র তার sub_editor_id মেলা reporter desk গুলো
         if ($user->role === 'sub editor') {
-            return Reporter::where('status', 'active')
+            return Reporter::query()
+                ->linkedToUser()
+                ->where('status', 'active')
                 ->where('sub_editor_id', $user->id)
-                ->orderBy('name')
+                ->orderBy('desk')
                 ->get();
         }
 
-        // Admin / Senior editor ইত্যাদি: সব active reporter
-        return Reporter::where('status', 'active')->orderBy('name')->get();
+        // Admin / Senior editor ইত্যাদি: লিংকড ইউজারসহ active reporter
+        return Reporter::query()
+            ->linkedToUser()
+            ->where('status', 'active')
+            ->orderBy('desk')
+            ->get();
     }
 
     /** Reporter/Sub Editor role থাকলে শুধু নিজের desk-এর id সেট হয়; অন্যথায় request থেকে */

@@ -12,7 +12,10 @@ class ReporterController extends Controller
 {
     public function index(Request $request)
     {
-        $baseQuery = Reporter::with(['creator', 'subEditor'])->latest();
+        $baseQuery = Reporter::query()
+            ->linkedToUser()
+            ->with(['creator', 'subEditor'])
+            ->latest();
 
         $query = clone $baseQuery;
 
@@ -100,26 +103,25 @@ class ReporterController extends Controller
         $reporter = Reporter::findOrFail($id);
 
         $request->validate([
-            'sub_editor_id' => 'nullable|exists:users,id',
+            'sub_editor_id' => 'required|exists:users,id',
             'desk' => 'required|string|max:255',
             'status' => 'required|in:active,inactive',
         ], [
+            'sub_editor_id.required' => 'ইউজার নির্বাচন করুন। প্রতিটি রিপোর্টার ধরনের সাথে একটি ইউজার লিংক থাকতে হবে।',
+            'sub_editor_id.exists' => 'অবৈধ ইউজার।',
             'desk.required' => 'রিপোর্টার ধরন/ডেস্ক অবশ্যই লিখতে হবে। পোস্টে রিপোর্টার এই ডেস্ক অনুযায়ী দেখাবে।',
         ]);
 
-        $data = [
-            'desk' => $request->input('desk'),
-            'sub_editor_id' => $request->input('sub_editor_id') ?: null,
-            'status' => $request->input('status'),
-        ];
-        if ($request->filled('sub_editor_id')) {
-            $subEditor = User::findOrFail($request->sub_editor_id);
-            $data['name'] = $subEditor->name;
-            $data['email'] = $subEditor->email;
-            $data['phone'] = $subEditor->phone ?? null;
-        }
+        $subEditor = User::findOrFail($request->sub_editor_id);
 
-        $reporter->update($data);
+        $reporter->update([
+            'desk' => $request->input('desk'),
+            'sub_editor_id' => $subEditor->id,
+            'name' => $subEditor->name,
+            'email' => $subEditor->email,
+            'phone' => $subEditor->phone ?? null,
+            'status' => $request->input('status'),
+        ]);
 
         return redirect()->route('admin.reporters.index')->with('success', 'Reporter updated successfully.');
     }

@@ -11,33 +11,44 @@ class ReporterSeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('role', 'admin')->first() ?? User::first();
+        $subEditors = User::where('role', 'sub editor')
+            ->where('name', '!=', 'Sub Editor')
+            ->orderBy('id')
+            ->get();
 
-        $names = [
-            'মোহাম্মদ রফিক',
-            'সাবিনা ইয়াসমিন',
-            'আরিফুল ইসলাম',
-            'তানজিলা হক',
-            'রাবেয়া সুলতানা',
-            'ইমরান হোসেন',
-            'তাহসিন আহমেদ',
-            'নুসরাত জাহান',
-            'মেহেদী হাসান',
-            'রিদওয়ান করিম',
+        if ($subEditors->isEmpty()) {
+            return;
+        }
+
+        $desks = [
+            'ডিজিটাল ডেস্ক',
+            'রাজনীতি ডেস্ক',
+            'অর্থনীতি ডেস্ক',
+            'খেলাধুলা ডেস্ক',
+            'আন্তর্জাতিক ডেস্ক',
+            'সংস্কৃতি ডেস্ক',
+            'শিক্ষা ডেস্ক',
+            'স্বাস্থ্য ডেস্ক',
+            'প্রযুক্তি ডেস্ক',
+            'সম্পাদকীয়',
         ];
 
-        foreach ($names as $index => $name) {
+        foreach ($desks as $index => $desk) {
+            $subEditor = $subEditors[$index % $subEditors->count()];
+
             Reporter::updateOrCreate(
-                ['email' => "reporter".($index + 1)."@example.com"],
+                ['desk' => $desk],
                 [
-                    'name' => $name,
-                    'phone' => '+88018' . random_int(10000000, 99999999),
+                    'name' => $subEditor->name,
+                    'email' => $subEditor->email,
+                    'phone' => $subEditor->phone,
                     'address' => 'ঢাকা, বাংলাদেশ',
                     'image' => null,
                     'status' => 'active',
+                    'sub_editor_id' => $subEditor->id,
                     'created_by' => $admin?->id,
                 ],
             );
         }
     }
 }
-

@@ -33,7 +33,7 @@
 
                 {{-- ইউজার – নাম ইমেইল ফোন এখান থেকে --}}
                 <div>
-                    <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">User <span class="text-rose-500">*</span></label>
+                    <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">লিংকড ইউজার <span class="text-rose-500">*</span></label>
                     <div class="relative">
                         <select name="sub_editor_id" required class="w-full px-4 py-2.5 rounded-xl border @error('sub_editor_id') border-rose-500 @else border-slate-200 dark:border-slate-800 @enderror bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-black cursor-pointer">
                             @forelse($subEditors as $se)
@@ -46,7 +46,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </div>
-                    <p class="mt-1 text-xs text-slate-500">নাম, ইমেইল, ফোন সিলেক্ট করা ইউজার থেকে অটো নেওয়া হবে।</p>
+                    <p class="mt-1 text-xs text-slate-500">রিপোর্টার = পোস্টের ডেস্ক/ধরন + একজন লিংকড ইউজার (তার নাম পোস্টে Reporter হিসেবে যায়)।</p>
                     @error('sub_editor_id')
                         <p class="mt-1 text-xs text-rose-500 font-normal ml-0.5">{{ $message }}</p>
                     @enderror

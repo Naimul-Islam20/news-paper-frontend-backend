@@ -126,13 +126,6 @@
                             <input type="text" name="youtube_link" value="{{ old('youtube_link', $meta->youtube_link ?? '') }}" placeholder="https://youtube.com/..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                     </div>
-                    
-                    <div class="mt-4">
-                        <button type="button" onclick="addSocialLink()" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-all">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                            Add More Link
-                        </button>
-                    </div>
                 </div>
 
                 {{-- 3. Google Map --}}
@@ -210,6 +203,7 @@
                             <input type="text" name="publisher_name" value="{{ old('publisher_name', $meta->publisher_name ?? '') }}" placeholder="প্রকাশকের নাম লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                     </div>
+                    <p class="text-xs text-slate-500 mt-2">একটা ফিল্ড পূরণ করলে ফুটারে দেখাবে: <span class="font-medium">সম্পাদক ও প্রকাশক: নাম</span>। দুটো আলাদা পূরণ করলে সম্পাদক ও প্রকাশক আলাদা লাইনে দেখাবে।</p>
                 </div>
 
                 {{-- Unified Save Button --}}
@@ -232,23 +226,6 @@
         if (typeof CKEDITOR !== 'undefined' && document.getElementById('editor')) {
             CKEDITOR.replace('editor', adminCkeditorConfig({ height: 200 }));
         }
-    }
-
-    function addSocialLink() {
-        const container = document.getElementById('social-links-container');
-        const count = container.children.length + 1;
-        const div = document.createElement('div');
-        div.className = "group relative";
-        div.innerHTML = `
-            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Additional Link ${count - 4}</label>
-            <div class="flex gap-2">
-                <input type="text" name="extra_social_links[]" placeholder="https://..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
-                <button type="button" onclick="this.closest('.group').remove()" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
-            </div>
-        `;
-        container.appendChild(div);
     }
 
     if (document.readyState === 'complete') {

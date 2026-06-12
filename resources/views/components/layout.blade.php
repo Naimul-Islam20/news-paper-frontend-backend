@@ -1,9 +1,113 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="bn" class="scroll-smooth">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        (function () {
+            var STORAGE_KEY = 'site_lang';
+
+            function readPref() {
+                try {
+                    return localStorage.getItem(STORAGE_KEY);
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function writePref(code) {
+                try {
+                    localStorage.setItem(STORAGE_KEY, code);
+                } catch (e) {}
+            }
+
+            function cookieValue(name) {
+                var match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]+)'));
+                return match ? decodeURIComponent(match[1]) : '';
+            }
+
+            function isEnglishGoogTrans(value) {
+                return value !== '' && /\/en(?:$|\/)/.test(value);
+            }
+
+            function clearGoogTrans() {
+                var host = location.hostname;
+                var domains = [''];
+                if (host) {
+                    domains.push(host);
+                    var parts = host.split('.');
+                    if (parts.length > 2) {
+                        domains.push('.' + parts.slice(-2).join('.'));
+                    }
+                }
+
+                domains.forEach(function (domain) {
+                    var cookie = 'googtrans=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                    if (domain) {
+                        cookie += ';domain=' + domain;
+                    }
+                    document.cookie = cookie;
+                });
+            }
+
+            function setGoogTransEnglish() {
+                document.cookie = 'googtrans=/bn/en;path=/;SameSite=Lax';
+            }
+
+            window.__siteLangHelpers = {
+                storageKey: STORAGE_KEY,
+                clearGoogTrans: clearGoogTrans,
+                setGoogTransEnglish: setGoogTransEnglish,
+                writePref: writePref,
+            };
+
+            var pref = readPref();
+            var googVal = cookieValue('googtrans');
+            var wantsEnglish = pref === 'en';
+
+            if (pref === 'bn' || pref === null) {
+                clearGoogTrans();
+                if (pref === null) {
+                    writePref('bn');
+                }
+                wantsEnglish = false;
+            } else if (!wantsEnglish && isEnglishGoogTrans(googVal)) {
+                clearGoogTrans();
+            } else if (wantsEnglish) {
+                setGoogTransEnglish();
+                document.documentElement.classList.add('lang-pending-en');
+            }
+
+            if (wantsEnglish) {
+                document.documentElement.classList.add('site-lang-en');
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.querySelectorAll('[data-placeholder-en]').forEach(function (el) {
+                        el.placeholder = el.getAttribute('data-placeholder-en');
+                    });
+                });
+            }
+
+            window.__siteLangEn = wantsEnglish;
+        })();
+    </script>
+    <style>
+        html.lang-pending-en body {
+            visibility: hidden !important;
+        }
+
+        html .i18n-en {
+            display: none !important;
+        }
+
+        html.site-lang-en .i18n-bn {
+            display: none !important;
+        }
+
+        html.site-lang-en .i18n-en {
+            display: inline !important;
+        }
+    </style>
     <x-font-preload />
     <title>{{ $title ?? site_browser_title() }}</title>
     @if(!empty(optional($siteMeta)->site_keywords))
@@ -108,6 +212,59 @@
 
     <div id="google_translate_element" class="hidden" aria-hidden="true"></div>
 
+    <script>
+        (function () {
+            if (!window.__siteLangEn) {
+                return;
+            }
+
+            function revealEnglishPage() {
+                document.documentElement.classList.remove('lang-pending-en');
+            }
+
+            function watchForTranslation() {
+                var html = document.documentElement;
+
+                if (html.classList.contains('translated-ltr')) {
+                    revealEnglishPage();
+                    return;
+                }
+
+                var observer = new MutationObserver(function () {
+                    if (html.classList.contains('translated-ltr')) {
+                        observer.disconnect();
+                        revealEnglishPage();
+                    }
+                });
+
+                observer.observe(html, {
+                    attributes: true,
+                    attributeFilter: ['class'],
+                });
+
+                setTimeout(function () {
+                    observer.disconnect();
+                    revealEnglishPage();
+                }, 6000);
+            }
+
+            window.googleTranslateElementInit = function () {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'bn',
+                    includedLanguages: 'bn,en',
+                    autoDisplay: false,
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                }, 'google_translate_element');
+
+                watchForTranslation();
+            };
+
+            var script = document.createElement('script');
+            script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            document.head.appendChild(script);
+        })();
+    </script>
+
     <x-header />
 
     <main id="main-content" class="pb-12 md:pt-3">
@@ -206,16 +363,11 @@
     </script>
 
     <script>
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'bn',
-                includedLanguages: 'bn,en',
-                autoDisplay: false,
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            }, 'google_translate_element');
+        if (!window.__siteLangEn) {
+            document.documentElement.classList.remove('translated-ltr', 'lang-pending-en');
+            document.documentElement.lang = 'bn';
         }
     </script>
-    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" defer></script>
     @stack('scripts')
 </body>
 

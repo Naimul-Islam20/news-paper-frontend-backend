@@ -36,76 +36,73 @@
             <!-- Column 1: Info and Copyright (Span 3) -->
             <div class="col-span-2 md:col-span-3 space-y-6 md:border-r border-slate-200 md:pr-4">
                 <div class="text-base font-md space-y-1">
-                    @if(!empty(optional($siteMeta)->editor_name))
-                    <p>সম্পাদক: {{ $siteMeta->editor_name }}</p>
-                    @endif
-                    @if(!empty(optional($siteMeta)->publisher_name))
-                    <p>প্রকাশক: {{ $siteMeta->publisher_name }}</p>
-                    @endif
+                    @foreach(site_editor_publisher_lines($siteMeta) as $line)
+                    <p>{{ $line['label'] }}: {{ $line['name'] }}</p>
+                    @endforeach
                 </div>
                 @if(!empty(optional($siteMeta)->address_1))
                 <div class="text-sm text-gray-900 leading-relaxed font-md prose prose-sm max-w-none">
                     {!! $siteMeta->address_1 !!}
                 </div>
                 @endif
-                <p class="text-xs font-md text-gray-900 uppercase tracking-widest pt-4">
+                <p class="text-xs font-md text-gray-900 uppercase tracking-widest !mt-3 pt-1">
                     © প্রকাশক কর্তৃক সর্বস্বত্ব সংরক্ষিত
                 </p>
             </div>
 
-            <!-- Column 2: Category Links (Span 4) -->
-            <div class="col-span-2 md:col-span-4 md:border-r border-slate-200 md:pr-4">
+            <!-- Column 2: Category Links (Span 5 — Column 3 থেকে কমানো জায়গা) -->
+            <div class="col-span-2 md:col-span-5 md:border-r border-slate-200 md:pr-4">
                 @if(isset($footerCol2) && $footerCol2->isNotEmpty())
-                <div class="grid grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-2 text-base font-semibold">
+                <div class="grid w-full grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-base md:text-xl">
                     @foreach($footerCol2 as $cat)
-                    <a href="{{ route('category.show', $cat->slug) }}" class="hover:text-primary transition-colors">{{ $cat->name }}</a>
+                    <a href="{{ route('category.show', $cat->slug) }}" class="block w-full font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all">{{ $cat->name }}</a>
                     @endforeach
                 </div>
                 @else
-                <div class="grid grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-2 text-base font-semibold">
-                    <a href="{{ route('gallery.index') }}" class="hover:text-primary transition-colors">ছবি</a>
-                    <a href="{{ route('videos.index') }}" class="hover:text-primary transition-colors">ভিডিও</a>
+                <div class="grid w-full grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-base md:text-xl">
+                    <a href="{{ route('gallery.index') }}" class="block w-full font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all">ছবি</a>
+                    <a href="{{ route('videos.index') }}" class="block w-full font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all">ভিডিও</a>
                 </div>
                 @endif
             </div>
 
-            <!-- Column 3: Custom Links / Footer Column 3 (Span 3) -->
-            <div class="md:col-span-3 md:border-r border-slate-200 md:pr-4">
+            <!-- Column 3: Custom Links (Span 2 — same as Column 4) -->
+            <div class="md:col-span-2 md:border-r border-slate-200 md:pr-4">
                 @if(isset($footerCol3) && $footerCol3->isNotEmpty())
-                <ul class="space-y-4 text-base font-semibold">
+                <ul class="space-y-1 text-base md:text-xl">
                     @foreach($footerCol3 as $cat)
-                    <li><a href="{{ route('category.show', $cat->slug) }}" class="hover:text-primary transition-colors">{{ $cat->name }}</a></li>
+                    <li><a href="{{ route('category.show', $cat->slug) }}" class="font-medium hover:text-primary transition-all">{{ $cat->name }}</a></li>
                     @endforeach
                 </ul>
                 @else
-                <ul class="space-y-4 text-base font-semibold">
-                    <li><a href="#" class="hover:text-primary transition-colors">বিজ্ঞাপন</a></li>
-                    <li><a href="#" class="hover:text-primary transition-colors">যোগাযোগ</a></li>
-                    <li><a href="{{ route('privacy-policy') }}" class="hover:text-primary transition-colors">গোপনীয়তা নীতি</a></li>
-                    <li><a href="{{ route('terms') }}" class="hover:text-primary transition-colors">শর্তাবলী</a></li>
+                <ul class="space-y-1 text-base md:text-xl">
+                    <li><a href="#" class="font-medium hover:text-primary transition-all">বিজ্ঞাপন</a></li>
+                    <li><a href="#" class="font-medium hover:text-primary transition-all">যোগাযোগ</a></li>
+                    <li><a href="{{ route('privacy-policy') }}" class="font-medium hover:text-primary transition-all">গোপনীয়তা নীতি</a></li>
+                    <li><a href="{{ route('terms') }}" class="font-medium hover:text-primary transition-all">শর্তাবলী</a></li>
                 </ul>
                 @endif
             </div>
 
             <!-- Column 4: Social Links – backend (site meta) থেকে ডাইনামিক -->
             <div class="md:col-span-2">
-                <ul class="space-y-4 text-base font-semibold">
+                <ul class="list-none p-0 m-0 text-base md:text-xl">
                     @if(!empty(optional($siteMeta)->facebook_link))
-                    <li><a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Facebook</a></li>
+                    <li class="border-b border-dotted border-custom pb-1 mb-1 last:border-b-0 last:mb-0 last:pb-0"><a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener" class="block w-full font-medium hover:text-primary transition-all">Facebook</a></li>
                     @endif
                     @if(!empty(optional($siteMeta)->twitter_link))
-                    <li><a href="{{ $siteMeta->twitter_link }}" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Twitter</a></li>
+                    <li class="border-b border-dotted border-custom pb-1 mb-1 last:border-b-0 last:mb-0 last:pb-0"><a href="{{ $siteMeta->twitter_link }}" target="_blank" rel="noopener" class="block w-full font-medium hover:text-primary transition-all">Twitter</a></li>
                     @endif
                     @if(!empty(optional($siteMeta)->instagram_link))
-                    <li><a href="{{ $siteMeta->instagram_link }}" target="_blank" rel="noopener" class="hover:text-primary transition-colors">Instagram</a></li>
+                    <li class="border-b border-dotted border-custom pb-1 mb-1 last:border-b-0 last:mb-0 last:pb-0"><a href="{{ $siteMeta->instagram_link }}" target="_blank" rel="noopener" class="block w-full font-medium hover:text-primary transition-all">Instagram</a></li>
                     @endif
                     @if(!empty(optional($siteMeta)->youtube_link))
-                    <li><a href="{{ $siteMeta->youtube_link }}" target="_blank" rel="noopener" class="hover:text-primary transition-colors">YouTube</a></li>
+                    <li class="border-b border-dotted border-custom pb-1 mb-1 last:border-b-0 last:mb-0 last:pb-0"><a href="{{ $siteMeta->youtube_link }}" target="_blank" rel="noopener" class="block w-full font-medium hover:text-primary transition-all">YouTube</a></li>
                     @endif
                     @if(!empty(optional($siteMeta)->extra_social_links) && is_array($siteMeta->extra_social_links))
                     @foreach($siteMeta->extra_social_links as $extraLink)
                     @if(!empty($extraLink))
-                    <li><a href="{{ $extraLink }}" target="_blank" rel="noopener" class="hover:text-primary transition-colors">লিংক</a></li>
+                    <li class="border-b border-dotted border-custom pb-1 mb-1 last:border-b-0 last:mb-0 last:pb-0"><a href="{{ $extraLink }}" target="_blank" rel="noopener" class="block w-full font-medium hover:text-primary transition-all">লিংক</a></li>
                     @endif
                     @endforeach
                     @endif

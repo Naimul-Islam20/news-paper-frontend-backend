@@ -323,6 +323,12 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                         {!! $descriptionForBody !!}
                                     </div>
 
+                                    @if(($postCreditLine = post_credit_line($post)) !== '')
+                                    <div class="mt-6 px-0 lg:px-[125px] no-print">
+                                        <p class="text-lg md:text-xl font-medium text-byline">{{ $postCreditLine }}</p>
+                                    </div>
+                                    @endif
+
                                     <!-- অনুসন্ধান বিষয় (Dynamic Topics) -->
                                     @if($post->topics->isNotEmpty())
                                     <div class="mt-8 pt-6 border-t border-slate-100 px-0 lg:px-[125px] no-print">
