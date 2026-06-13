@@ -436,18 +436,18 @@ class Advertisement extends Model
             && filled(google_adsense_client());
     }
 
-    /** ফ্রন্টে Google Ad দেখাবে কিনা (local না থাকলে auto fallback) */
+    /** ফ্রন্টে Google Ad — Auto ON + Slot ID + Client ID থাকলে slot-এ Google */
     public function displayUsesGoogleAd(): bool
     {
-        if (! $this->canShowGoogleAd() || ! $this->googleAdAutoEnabled()) {
-            return false;
-        }
-
-        return ! $this->hasRunningLocalAd();
+        return $this->googleAdAutoEnabled() && $this->canShowGoogleAd();
     }
 
     public function displayUsesLocalAd(): bool
     {
+        if ($this->googleAdAutoEnabled() && $this->canShowGoogleAd()) {
+            return false;
+        }
+
         return $this->hasRunningLocalAd();
     }
 
@@ -459,7 +459,7 @@ class Advertisement extends Model
 
     /**
      * Get ad slot by slug (for frontend and views).
-     * Local চললে local; না থাকলে google_ad_auto + Slot ID থাকলে Google।
+     * Google Auto ON + Slot ID → Google; নাহলে Local।
      */
     public static function getBySlug(string $slug): ?self
     {
