@@ -46,7 +46,7 @@
         @endif
 
         @php
-        $googleAdAuto = old('google_ad_auto', ($advertisement->google_ad_auto ?? true) ? '1' : '0') === '1';
+        $googleAdAuto = old('google_ad_auto', ($advertisement->google_ad_auto ?? false) ? '1' : '0') === '1';
         $isHomeVideoSlot = $advertisement->slug === 'home_video';
         $hasGoogleFallback = $advertisement->googleAdAutoEnabled() && filled($advertisement->google_ad_slot);
         $localMediaRequired = ! $hasGoogleFallback;
@@ -62,7 +62,7 @@
         <div class="bg-white dark:bg-slate-900 shadow-sm rounded-lg border-2 border-blue-200 dark:border-blue-900/60 overflow-hidden">
             <div class="px-6 py-4 bg-blue-50 dark:bg-blue-950/40 border-b border-blue-100 dark:border-blue-900/50">
                 <h3 class="text-base font-semibold text-blue-900 dark:text-blue-100">Google Ad</h3>
-                <p class="mt-0.5 text-sm text-blue-800/70 dark:text-blue-200/70">Auto ON + Slot ID থাকলে slot-এ Google ad চলবে (Local এর উপরে priority)</p>
+                <p class="mt-0.5 text-sm text-blue-800/70 dark:text-blue-200/70">Local ad না থাকলে slot-এ Google fallback (Auto ON + Slot ID)</p>
             </div>
             <div class="p-6">
                 @if($googleErrors->isNotEmpty())

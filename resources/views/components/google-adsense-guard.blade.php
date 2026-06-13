@@ -18,7 +18,7 @@
             });
         }
 
-        function initRemainingSlots() {
+        function initSlotAds() {
             document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-slot]:not([data-adsbygoogle-status])').forEach(function () {
                 try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
             });
@@ -26,19 +26,17 @@
 
         function boot() {
             blockOverlaysOnly();
-            initRemainingSlots();
+            initSlotAds();
         }
 
-        var adsScript = document.getElementById('adsense-js');
-        if (adsScript) {
-            adsScript.addEventListener('load', boot);
-        }
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', boot);
         } else {
             boot();
         }
         window.addEventListener('load', boot);
+        setTimeout(boot, 1500);
+        setTimeout(boot, 4000);
 
         if (typeof MutationObserver !== 'undefined') {
             new MutationObserver(blockOverlaysOnly).observe(document.documentElement, { childList: true, subtree: true });

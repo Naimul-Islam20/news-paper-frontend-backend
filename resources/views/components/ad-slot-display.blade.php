@@ -20,43 +20,44 @@ $stripOuterClass = $variant === 'header'
 @endphp
 
 @if($ad && ad_should_display($ad))
+    @php
+        $useGoogle = $ad->displayUsesGoogleAd();
+        $useLocal = $ad->displayUsesLocalAd();
+    @endphp
+
     @if($isStrip)
-        <div class="{{ $stripOuterClass }} {{ $wrapperClass }}" @if($ad->displayUsesGoogleAd()) data-ad-slot-root @endif>
+        <div class="{{ $stripOuterClass }} {{ $wrapperClass }}" @if($useGoogle) data-ad-slot-root @endif>
             <div class="container">
-                @if($ad->displayUsesGoogleAd())
+                @if($useGoogle)
                 <div class="ad-slot-google ad-slot-google--{{ $stripFormat }} w-full flex items-center justify-center bg-slate-50">
                     <x-google-ad-unit :ad="$ad" :format="$stripFormat" />
                 </div>
-                @else
+                @elseif($useLocal)
                 <a href="{{ advertisement_click_url($ad) }}" class="ad-slot-frame {{ $stripFrameClass }} w-full flex items-center justify-center bg-slate-50 img-placeholder" target="_blank" rel="noopener">
                     <x-ad-picture :ad="$ad" class="{{ $pictureClass }}" />
                 </a>
                 @endif
             </div>
         </div>
-    @elseif($ad->displayUsesGoogleAd())
-        @if($variant === 'sidebar')
+    @elseif($useGoogle && $variant === 'sidebar')
         <div class="{{ $wrapperClass ?: 'shrink-0 w-full' }}" data-ad-slot-root>
             <div class="block relative bg-gray-50 w-full {{ $sidebarClass }}">
                 <x-google-ad-unit :ad="$ad" format="sidebar" class="mx-auto" />
             </div>
         </div>
-        @elseif($variant === 'inline')
+    @elseif($useGoogle && $variant === 'inline')
         <div class="not-prose lg:hidden ad-section my-6 w-full max-w-[min(100%,320px)] mx-auto {{ $wrapperClass }}" data-ad-slot-root>
             <div class="block relative bg-gray-50 w-full">
                 <x-google-ad-unit :ad="$ad" format="inline" class="mx-auto" />
             </div>
         </div>
-        @endif
-    @else
-        @if($variant === 'sidebar')
+    @elseif($useLocal && $variant === 'sidebar')
         <div class="{{ $wrapperClass ?: 'shrink-0 w-full' }}">
             <a href="{{ advertisement_click_url($ad) }}" target="_blank" rel="noopener" class="block img-placeholder group cursor-pointer relative overflow-hidden bg-gray-50 aspect-[4/3] w-full {{ $sidebarClass }}">
                 <x-ad-picture :ad="$ad" class="{{ $sidebarPictureClass }}" />
             </a>
         </div>
-        @elseif($variant === 'inline')
+    @elseif($useLocal && $variant === 'inline')
         @include('frontend.partials.detail-inline-ad', ['ad' => $ad])
-        @endif
     @endif
 @endif

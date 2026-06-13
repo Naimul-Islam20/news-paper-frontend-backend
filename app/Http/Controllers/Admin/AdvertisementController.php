@@ -129,7 +129,7 @@ class AdvertisementController extends Controller
 
         $advertisement->update([
             'google_ad_slot' => $slotId !== '' ? $slotId : null,
-            'google_ad_auto' => $googleAdAuto,
+            'google_ad_auto' => $slotId !== '' ? $googleAdAuto : false,
         ]);
 
         return redirect()

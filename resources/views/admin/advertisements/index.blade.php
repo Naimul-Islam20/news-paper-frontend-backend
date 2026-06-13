@@ -94,7 +94,7 @@
                             @else
                             <span class="text-xs text-slate-400">—</span>
                             @endif
-                            @elseif(($ad->google_ad_auto ?? true) && filled($ad->google_ad_slot))
+                            @elseif(($ad->google_ad_auto ?? false) && filled($ad->google_ad_slot))
                             <span class="text-xs font-medium text-blue-600 dark:text-blue-400">Google Auto · fallback</span>
                             @elseif($ad->is_auto && $s)
                             <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">Auto · চলছে</span>
@@ -123,10 +123,10 @@
                         <td class="py-3 px-4">
                             @if($ad->hasRunningLocalAd())
                             <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">Local</span>
-                            @if(($ad->google_ad_auto ?? true) && filled($ad->google_ad_slot))
+                            @if(($ad->google_ad_auto ?? false) && filled($ad->google_ad_slot))
                             <span class="block text-[10px] text-blue-600 dark:text-blue-400 mt-0.5">+ Google fallback</span>
                             @endif
-                            @elseif(($ad->google_ad_auto ?? true) && filled($ad->google_ad_slot))
+                            @elseif(($ad->google_ad_auto ?? false) && filled($ad->google_ad_slot))
                             <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">Google Auto</span>
                             @else
                             <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Local</span>

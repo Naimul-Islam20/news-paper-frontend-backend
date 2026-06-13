@@ -427,7 +427,7 @@ class Advertisement extends Model
 
     public function googleAdAutoEnabled(): bool
     {
-        return (bool) ($this->google_ad_auto ?? true);
+        return (bool) ($this->google_ad_auto ?? false);
     }
 
     public function canShowGoogleAd(): bool
@@ -436,18 +436,18 @@ class Advertisement extends Model
             && filled(google_adsense_client());
     }
 
-    /** ফ্রন্টে Google Ad — Auto ON + Slot ID + Client ID থাকলে slot-এ Google */
+    /** Local চললে Local; না থাকলে Google fallback (Auto ON + Slot ID) */
     public function displayUsesGoogleAd(): bool
     {
-        return $this->googleAdAutoEnabled() && $this->canShowGoogleAd();
+        if (! $this->googleAdAutoEnabled() || ! $this->canShowGoogleAd()) {
+            return false;
+        }
+
+        return ! $this->hasRunningLocalAd();
     }
 
     public function displayUsesLocalAd(): bool
     {
-        if ($this->googleAdAutoEnabled() && $this->canShowGoogleAd()) {
-            return false;
-        }
-
         return $this->hasRunningLocalAd();
     }
 
@@ -459,7 +459,7 @@ class Advertisement extends Model
 
     /**
      * Get ad slot by slug (for frontend and views).
-     * Google Auto ON + Slot ID → Google; নাহলে Local।
+     * Local চললে local; না থাকলে google_ad_auto + Slot ID থাকলে Google।
      */
     public static function getBySlug(string $slug): ?self
     {
@@ -476,7 +476,12 @@ class Advertisement extends Model
             $ad->applyQueueItemDisplayOverride();
         }
 
-        if ($ad->displayUsesLocalAd() || $ad->displayUsesGoogleAd()) {
+        // Google-only slot: local inactive হলেও Google দেখানোর জন্য ad return
+        if ($ad->displayUsesGoogleAd()) {
+            return $ad;
+        }
+
+        if ($ad->displayUsesLocalAd()) {
             return $ad;
         }
 
