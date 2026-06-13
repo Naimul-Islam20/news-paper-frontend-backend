@@ -178,25 +178,12 @@
     @if(google_adsense_client())
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ google_adsense_client() }}" crossorigin="anonymous"></script>
     <style>
-        /* AdSense auto ads (anchor/vignette/side-rail) বন্ধ — শুধু .google-ad-unit স্লটে ad */
-        ins.adsbygoogle {
-            display: none !important;
-            visibility: hidden !important;
-            max-height: 0 !important;
-            overflow: hidden !important;
-            pointer-events: none !important;
-        }
-
-        .google-ad-unit ins.adsbygoogle {
-            display: inline-block !important;
-            visibility: visible !important;
-            max-height: none !important;
-            overflow: hidden !important;
-            pointer-events: auto !important;
-        }
-
-        body > ins.adsbygoogle,
-        body > div > ins.adsbygoogle {
+        /* Critical: auto/anchor ad আগে থেকেই লুকানো — slot ad (data-ad-slot) ছাড়া */
+        ins.adsbygoogle:not([data-ad-slot]),
+        ins.adsbygoogle[data-anchor-status],
+        ins.adsbygoogle[data-vignette-loaded],
+        ins.adsbygoogle[data-anchor-shown],
+        .adsbygoogle-noablate {
             display: none !important;
             visibility: hidden !important;
             height: 0 !important;
@@ -206,9 +193,15 @@
         }
 
         body > iframe[id^="aswift_"],
-        body > div[id^="google_ads_iframe_"] {
+        body > div[id^="aswift_"],
+        body > div[id^="google_ads_iframe_"],
+        body > ins.adsbygoogle,
+        body > .adsbygoogle-noablate {
             display: none !important;
             visibility: hidden !important;
+            height: 0 !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
             pointer-events: none !important;
         }
     </style>
@@ -397,40 +390,86 @@
     </script>
     @if(google_adsense_client())
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.google-ad-unit ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(function (el) {
-                try {
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                } catch (e) {}
-            });
-
-            function hideUnfilledAds() {
-                document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-status="unfilled"]').forEach(function (el) {
-                    var wrap = el.closest('.google-ad-unit');
-                    if (wrap) {
-                        wrap.style.display = 'none';
-                    }
-                });
+        (function () {
+            function isSlotAd(el) {
+                return el && el.matches('ins.adsbygoogle[data-ad-slot]') && el.closest('.google-ad-unit');
             }
 
-            function suppressAutoPlacedAds() {
+            function hideNode(node) {
+                if (!node || node.nodeType !== 1) return;
+                node.style.setProperty('display', 'none', 'important');
+                node.style.setProperty('visibility', 'hidden', 'important');
+                node.style.setProperty('height', '0', 'important');
+                node.style.setProperty('max-height', '0', 'important');
+                node.style.setProperty('overflow', 'hidden', 'important');
+                node.style.setProperty('pointer-events', 'none', 'important');
+            }
+
+            function suppressAutoAds() {
                 document.querySelectorAll('ins.adsbygoogle').forEach(function (el) {
+                    if (isSlotAd(el)) return;
+                    hideNode(el);
+                });
+
+                document.querySelectorAll('body > iframe[id^="aswift_"], body > div[id^="aswift_"], body > div[id^="google_ads_iframe_"], body > ins.adsbygoogle, body > .adsbygoogle-noablate').forEach(hideNode);
+
+                document.querySelectorAll('.adsbygoogle-noablate, ins.adsbygoogle[data-anchor-shown]').forEach(function (el) {
                     if (!el.closest('.google-ad-unit')) {
-                        el.style.setProperty('display', 'none', 'important');
-                        el.style.setProperty('visibility', 'hidden', 'important');
-                        el.style.setProperty('height', '0', 'important');
-                        el.style.setProperty('max-height', '0', 'important');
-                        el.style.setProperty('pointer-events', 'none', 'important');
+                        hideNode(el);
+                    }
+                });
+
+                document.querySelectorAll('[id^="google_ads_iframe_"]').forEach(function (el) {
+                    if (!el.closest('.google-ad-unit')) {
+                        hideNode(el);
                     }
                 });
             }
 
-            suppressAutoPlacedAds();
-            setTimeout(hideUnfilledAds, 2500);
-            setTimeout(hideUnfilledAds, 6000);
-            setTimeout(suppressAutoPlacedAds, 1000);
-            setTimeout(suppressAutoPlacedAds, 4000);
-        });
+            function initSlotAds() {
+                document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-slot]:not([data-adsbygoogle-status])').forEach(function (el) {
+                    try {
+                        (window.adsbygoogle = window.adsbygoogle || []).push({});
+                    } catch (e) {}
+                });
+            }
+
+            function collapseUnfilled() {
+                document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-status="unfilled"]').forEach(function (el) {
+                    var root = el.closest('[data-ad-slot-root]') || el.closest('.google-ad-unit');
+                    if (root) {
+                        root.style.display = 'none';
+                    }
+                });
+            }
+
+            function tick() {
+                initSlotAds();
+                suppressAutoAds();
+                collapseUnfilled();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', tick);
+            } else {
+                tick();
+            }
+
+            var passes = 0;
+            var retry = setInterval(function () {
+                tick();
+                if (++passes >= 24) {
+                    clearInterval(retry);
+                }
+            }, 500);
+
+            if (typeof MutationObserver !== 'undefined') {
+                new MutationObserver(function () {
+                    suppressAutoAds();
+                    collapseUnfilled();
+                }).observe(document.documentElement, { childList: true, subtree: true });
+            }
+        })();
     </script>
     @endif
     @stack('scripts')

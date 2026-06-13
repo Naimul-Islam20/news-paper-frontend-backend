@@ -13,18 +13,18 @@ return [
     'media_specs' => [
         'header' => [
             'ratio' => '≈11:1',
-            'size' => '1000×90 px',
-            'note' => 'হেডার ব্যানার — উচ্চতা ফিক্সড, প্রস্থ সর্বোচ্চ ১০০০px',
+            'size' => '1300×90 px',
+            'note' => 'হেডার ব্যানার — site width, উচ্চতা ৯০px',
         ],
         'below_menu' => [
-            'ratio' => '≈10:1',
-            'size' => '1000×100 px',
-            'note' => 'মেনুর নিচে — পূর্ণ প্রস্থ ব্যানার',
+            'ratio' => '≈13:1',
+            'size' => '1300×100 px',
+            'note' => 'মেনুর নিচে — site width, উচ্চতা ১০০px',
         ],
         'category_below_menu' => [
-            'ratio' => '≈10:1',
-            'size' => '1000×100 px',
-            'note' => 'ক্যাটাগরি পেজ — মেনুর নিচে ব্যানার',
+            'ratio' => '≈13:1',
+            'size' => '1300×100 px',
+            'note' => 'ক্যাটাগরি পেজ — site width, উচ্চতা ১০০px',
         ],
         'hero_right_1' => [
             'ratio' => '4:3',
@@ -42,9 +42,9 @@ return [
             'note' => 'হোম — ডান কলাম (নিচে)',
         ],
         'hero_below' => [
-            'ratio' => '≈10:1',
-            'size' => '1000×100 px',
-            'note' => 'হোম — হিরো সেকশনের নিচে ব্যানার',
+            'ratio' => '≈13:1',
+            'size' => '1300×100 px',
+            'note' => 'হোম — হিরো সেকশনের নিচে — site width, উচ্চতা ১০০px',
         ],
         'home_video' => [
             'ratio' => '16:9',
@@ -52,9 +52,9 @@ return [
             'note' => 'YouTube ভিডিও — aspect-video (১৬:৯)',
         ],
         'details_below_menu' => [
-            'ratio' => '≈10:1',
-            'size' => '1000×100 px',
-            'note' => 'নিউজ ডিটেইল — মেনুর নিচে ব্যানার',
+            'ratio' => '≈13:1',
+            'size' => '1300×100 px',
+            'note' => 'নিউজ ডিটেইল — মেনুর নিচে — site width, উচ্চতা ১০০px',
         ],
         'details_right_1' => [
             'ratio' => '4:3',

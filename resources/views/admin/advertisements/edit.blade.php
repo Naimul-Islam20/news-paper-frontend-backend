@@ -21,12 +21,15 @@
                 @endif
             </p>
             @php
-            $frontSource = $advertisement->displayUsesLocalAd()
-                ? 'Local'
-                : ($advertisement->displayUsesGoogleAd() ? 'Google' : 'খালি');
-            $frontSourceClass = match ($frontSource) {
-                'Local' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-                'Google' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+            $frontSource = $advertisement->hasPausedLocalAd()
+                ? 'Local (বন্ধ)'
+                : ($advertisement->displayUsesLocalAd()
+                    ? 'Local'
+                    : ($advertisement->displayUsesGoogleAd() ? 'Google' : 'খালি'));
+            $frontSourceClass = match (true) {
+                $advertisement->hasPausedLocalAd() => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+                $frontSource === 'Local' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+                $frontSource === 'Google' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
                 default => 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
             };
             @endphp
@@ -49,6 +52,9 @@
         $localMediaRequired = ! $hasGoogleFallback;
         $googleErrors = collect($errors->getMessages())->only(['google_ad_slot', 'google_ad_auto'])->flatten();
         $localErrors = collect($errors->getMessages())->except(['google_ad_slot', 'google_ad_auto', 'order'])->flatten();
+        $localAdRunning = $advertisement->hasRunningLocalAd();
+        $localAdPaused = $advertisement->hasPausedLocalAd();
+        $localAdHasData = $advertisement->hasDisplayableMedia() || filled($advertisement->link) || $localAdPaused;
         @endphp
 
         {{-- ① Google Ad — আলাদা ফর্ম, আলাদা কার্ড --}}
@@ -126,6 +132,66 @@
                 </div>
                 @endif
 
+                @if($localAdRunning)
+                <div class="mb-5 flex flex-wrap items-center justify-between gap-3 p-4 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50/80 dark:bg-amber-950/20">
+                    <div class="min-w-0">
+                        <p class="text-sm font-medium text-amber-900 dark:text-amber-100">Local ad চলছে</p>
+                        <p class="mt-0.5 text-xs text-amber-800/80 dark:text-amber-200/70">বন্ধ করলে মিডিয়া ও টাইমার সংরক্ষিত থাকবে — Google fallback চালু হতে পারে।</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 shrink-0">
+                        <form action="{{ route('admin.advertisements.local-ad.pause', $advertisement->id) }}" method="POST" onsubmit="return confirm('Local ad বন্ধ করবেন? ডেটা ও বাকি মেয়াদ সংরক্ষিত থাকবে।');">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition">
+                                বন্ধ করুন
+                            </button>
+                        </form>
+                        <form action="{{ route('admin.advertisements.local-ad.delete', $advertisement->id) }}" method="POST" onsubmit="return confirm('Local ad সম্পূর্ণ মুছে ফেলবেন? এটা ফিরিয়ে আনা যাবে না।');">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md transition">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @elseif($localAdPaused)
+                <div class="mb-5 flex flex-wrap items-center justify-between gap-3 p-4 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50">
+                    <div class="min-w-0">
+                        <p class="text-sm font-medium text-slate-800 dark:text-slate-200">Local ad বন্ধ আছে</p>
+                        <p class="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
+                            মিডিয়া ও মেয়াদ সংরক্ষিত।
+                            @if($advertisement->local_ad_paused_remaining_seconds)
+                            বাকি: {{ intdiv((int) $advertisement->local_ad_paused_remaining_seconds, 86400) }} দিন {{ intdiv((int) $advertisement->local_ad_paused_remaining_seconds % 86400, 3600) }} ঘণ্টা
+                            @elseif($advertisement->is_auto)
+                            সীমাহীন মেয়াদ
+                            @endif
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 shrink-0">
+                        <form action="{{ route('admin.advertisements.local-ad.resume', $advertisement->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md transition">
+                                চালু করুন
+                            </button>
+                        </form>
+                        <form action="{{ route('admin.advertisements.local-ad.delete', $advertisement->id) }}" method="POST" onsubmit="return confirm('Local ad সম্পূর্ণ মুছে ফেলবেন?');">
+                            @csrf
+                            <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md transition">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @elseif($localAdHasData)
+                <div class="mb-5 flex flex-wrap items-center justify-end gap-2 p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">
+                    <form action="{{ route('admin.advertisements.local-ad.delete', $advertisement->id) }}" method="POST" onsubmit="return confirm('Local ad সম্পূর্ণ মুছে ফেলবেন?');">
+                        @csrf
+                        <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium rounded-md transition">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+                @endif
+
                 <form id="ad-local-form" action="{{ route('admin.advertisements.update', $advertisement->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
@@ -134,7 +200,11 @@
                     @php
                     $slotDurDaysRaw = 0;
                     $slotDurHoursRaw = 0;
-                    if ($advertisement->starts_at && $advertisement->ends_at) {
+                    if ($advertisement->isLocalAdPaused() && $advertisement->local_ad_paused_remaining_seconds) {
+                        $totalH = max(1, (int) ceil((int) $advertisement->local_ad_paused_remaining_seconds / 3600));
+                        $slotDurDaysRaw = intdiv($totalH, 24);
+                        $slotDurHoursRaw = $totalH % 24;
+                    } elseif ($advertisement->starts_at && $advertisement->ends_at) {
                     $totalH = max(1, (int) round($advertisement->starts_at->floatDiffInHours($advertisement->ends_at)));
                     $slotDurDaysRaw = intdiv($totalH, 24);
                     $slotDurHoursRaw = $totalH % 24;
@@ -208,7 +278,6 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-                        <button type="button" id="ad-form-clear" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Clear</button>
                         <button type="submit" class="px-5 py-2 bg-emerald-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition">Local Save</button>
                     </div>
                 </form>
@@ -611,37 +680,5 @@ $i->id => [
         checkbox.addEventListener('change', syncSlotAutoUI);
         syncSlotAutoUI();
     })();
-
-    var adClearBtn = document.getElementById('ad-form-clear');
-    if (adClearBtn) adClearBtn.addEventListener('click', function() {
-        var form = document.getElementById('ad-local-form');
-        if (!form) return;
-        form.querySelectorAll('input[type="text"], input[type="url"]').forEach(function(inp) {
-            if (inp.name && inp.name !== '_token' && inp.name !== '_method') inp.value = '';
-        });
-        var sd = form.querySelector('#slot_duration_days');
-        var sh = form.querySelector('#slot_duration_hours');
-        if (sd) sd.value = '1';
-        if (sh) sh.value = '0';
-        var slotAuto = form.querySelector('#slot_auto');
-        if (slotAuto) {
-            slotAuto.checked = false;
-            slotAuto.dispatchEvent(new Event('change'));
-        }
-        form.querySelectorAll('input[type="file"]').forEach(function(inp) {
-            inp.value = '';
-        });
-        var dtw = document.getElementById('ad-desktop-thumb-wrap');
-        var mtw = document.getElementById('ad-mobile-thumb-wrap');
-        if (dtw) dtw.classList.add('hidden');
-        if (mtw) mtw.classList.add('hidden');
-        var removeImage = form.querySelector('input[name="remove_image"]');
-        if (removeImage) removeImage.checked = true;
-        var removeImageMob = form.querySelector('input[name="remove_image_mobile"]');
-        if (removeImageMob) removeImageMob.checked = true;
-        form.querySelectorAll('input[type="checkbox"]').forEach(function(inp) {
-            if (['remove_image', 'remove_image_mobile'].indexOf(inp.name) === -1) inp.checked = false;
-        });
-    });
 </script>
 @endsection

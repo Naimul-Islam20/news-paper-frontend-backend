@@ -1,6 +1,6 @@
 @if(!empty($ad) && ad_should_display($ad))
     @if($ad->displayUsesGoogleAd())
-    <div class="not-prose lg:hidden ad-section my-6 w-full max-w-[min(100%,320px)] mx-auto">
+    <div class="not-prose lg:hidden ad-section my-6 w-full max-w-[min(100%,320px)] mx-auto" data-ad-slot-root>
         <div class="block relative overflow-hidden bg-gray-50 aspect-[4/3] w-full">
             <x-google-ad-unit :ad="$ad" format="inline" class="w-full max-w-[300px] mx-auto" />
         </div>

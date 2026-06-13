@@ -50,7 +50,9 @@ class AdvertisementController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        $slotFormDisplay = $advertisement->isWithinSlotScheduleWindow() ? $advertisement : null;
+        $slotFormDisplay = ($advertisement->isWithinSlotScheduleWindow() || $advertisement->hasPausedLocalAd())
+            ? $advertisement
+            : null;
 
         $liveQueueItem = $advertisement->findQueueItemForFrontDisplayMerge();
 
@@ -182,12 +184,122 @@ class AdvertisementController extends Controller
         }
 
         $data['ad_source'] = 'local';
+        $data['local_ad_paused'] = false;
+        $data['local_ad_paused_remaining_seconds'] = null;
 
         $advertisement->update($data);
 
         return redirect()
             ->route('admin.advertisements.edit', $advertisement->id)
             ->with('success', 'Local অ্যাড সংরক্ষণ করা হয়েছে।');
+    }
+
+    public function pauseLocalAd(int $id): RedirectResponse
+    {
+        $advertisement = Advertisement::findOrFail($id);
+
+        if ($advertisement->isLocalAdPaused()) {
+            return redirect()
+                ->route('admin.advertisements.edit', $advertisement->id)
+                ->with('success', 'Local ad ইতিমধ্যে বন্ধ আছে।');
+        }
+
+        if (! $advertisement->hasRunningLocalAd()) {
+            return redirect()
+                ->route('admin.advertisements.edit', $advertisement->id)
+                ->withErrors(['media_type' => 'চালু Local ad নেই — বন্ধ করার মতো কিছু নেই।']);
+        }
+
+        $remaining = null;
+        if (! $advertisement->is_auto && $advertisement->ends_at && $advertisement->ends_at->gt(now())) {
+            $remaining = max(1, (int) now()->diffInSeconds($advertisement->ends_at));
+        }
+
+        $advertisement->update([
+            'local_ad_paused' => true,
+            'local_ad_paused_remaining_seconds' => $remaining,
+        ]);
+
+        $message = 'Local ad বন্ধ করা হয়েছে — মিডিয়া ও মেয়াদ সংরক্ষিত আছে।';
+        if ($advertisement->googleAdAutoEnabled() && filled($advertisement->google_ad_slot)) {
+            $message .= ' Google fallback এখন চালু হবে।';
+        }
+
+        return redirect()
+            ->route('admin.advertisements.edit', $advertisement->id)
+            ->with('success', $message);
+    }
+
+    public function resumeLocalAd(int $id): RedirectResponse
+    {
+        $advertisement = Advertisement::findOrFail($id);
+
+        if (! $advertisement->hasPausedLocalAd()) {
+            return redirect()
+                ->route('admin.advertisements.edit', $advertisement->id)
+                ->withErrors(['media_type' => 'বন্ধ Local ad নেই — চালু করার মতো কিছু নেই।']);
+        }
+
+        $data = [
+            'local_ad_paused' => false,
+            'local_ad_paused_remaining_seconds' => null,
+        ];
+
+        $remaining = (int) ($advertisement->local_ad_paused_remaining_seconds ?? 0);
+        if (! $advertisement->is_auto && $remaining > 0) {
+            $data['starts_at'] = now();
+            $data['ends_at'] = now()->copy()->addSeconds($remaining);
+        }
+
+        $advertisement->update($data);
+
+        return redirect()
+            ->route('admin.advertisements.edit', $advertisement->id)
+            ->with('success', 'Local ad আবার চালু হয়েছে — বাকি মেয়াদ থেকে টাইমার চলবে।');
+    }
+
+    public function deleteLocalAd(int $id): RedirectResponse
+    {
+        $advertisement = Advertisement::findOrFail($id);
+
+        if (! $advertisement->hasDisplayableMedia() && ! $advertisement->isLocalAdPaused() && ! filled($advertisement->link)) {
+            return redirect()
+                ->route('admin.advertisements.edit', $advertisement->id)
+                ->with('success', 'মুছার মতো Local ad ডেটা নেই।');
+        }
+
+        $hasQueue = $advertisement->hasActiveQueueItems();
+        $hasGoogleFallback = $advertisement->googleAdAutoEnabled() && filled($advertisement->google_ad_slot);
+
+        $this->deleteAllMediaPaths($advertisement);
+
+        $now = now();
+        $advertisement->update([
+            'image' => null,
+            'image_mobile' => null,
+            'video' => null,
+            'video_mobile' => null,
+            'video_youtube_id' => null,
+            'link' => null,
+            'caption' => null,
+            'is_auto' => false,
+            'local_ad_paused' => false,
+            'local_ad_paused_remaining_seconds' => null,
+            'starts_at' => $now,
+            'ends_at' => $now,
+        ]);
+
+        $message = 'Local ad সম্পূর্ণ মুছে ফেলা হয়েছে।';
+
+        if ($hasQueue) {
+            $message .= ' কিউতে ad থাকলে সেটা এখনও চলতে পারে।';
+        } elseif ($hasGoogleFallback) {
+            $message .= ' Google fallback চালু হবে।';
+        }
+
+        return redirect()
+            ->route('admin.advertisements.edit', $advertisement->id)
+            ->with('success', $message);
     }
 
     public function storeQueueItem(Request $request, int $id): RedirectResponse

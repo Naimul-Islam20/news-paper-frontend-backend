@@ -180,6 +180,9 @@ Route::prefix('admin')
                 Route::get('/advertisements/{id}/edit', [App\Http\Controllers\Admin\AdvertisementController::class, 'edit'])->name('advertisements.edit');
                 Route::put('/advertisements/{id}', [App\Http\Controllers\Admin\AdvertisementController::class, 'update'])->name('advertisements.update');
                 Route::put('/advertisements/{id}/google-settings', [App\Http\Controllers\Admin\AdvertisementController::class, 'updateGoogleSettings'])->name('advertisements.google-settings.update');
+                Route::post('/advertisements/{id}/pause-local', [App\Http\Controllers\Admin\AdvertisementController::class, 'pauseLocalAd'])->name('advertisements.local-ad.pause');
+                Route::post('/advertisements/{id}/resume-local', [App\Http\Controllers\Admin\AdvertisementController::class, 'resumeLocalAd'])->name('advertisements.local-ad.resume');
+                Route::post('/advertisements/{id}/delete-local', [App\Http\Controllers\Admin\AdvertisementController::class, 'deleteLocalAd'])->name('advertisements.local-ad.delete');
                 Route::post('/advertisements/{id}/toggle-ad-source', [App\Http\Controllers\Admin\AdvertisementController::class, 'toggleAdSource'])->name('advertisements.toggle-source');
                 Route::post('/advertisements/{id}/queue-items', [App\Http\Controllers\Admin\AdvertisementController::class, 'storeQueueItem'])->name('advertisements.queue-items.store');
                 Route::put('/advertisements/{id}/queue-items/{itemId}', [App\Http\Controllers\Admin\AdvertisementController::class, 'updateQueueItem'])->name('advertisements.queue-items.update');

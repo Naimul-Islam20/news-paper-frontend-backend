@@ -13,6 +13,8 @@ class Advertisement extends Model
         'ad_source',
         'google_ad_slot',
         'google_ad_auto',
+        'local_ad_paused',
+        'local_ad_paused_remaining_seconds',
         'name',
         'image',
         'image_mobile',
@@ -35,6 +37,8 @@ class Advertisement extends Model
             'ends_at' => 'datetime',
             'is_auto' => 'boolean',
             'google_ad_auto' => 'boolean',
+            'local_ad_paused' => 'boolean',
+            'local_ad_paused_remaining_seconds' => 'integer',
         ];
     }
 
@@ -125,6 +129,10 @@ class Advertisement extends Model
      */
     public function archiveExpiredSlotIfNeeded(): bool
     {
+        if ($this->isLocalAdPaused()) {
+            return false;
+        }
+
         if ($this->is_auto || $this->isWithinSlotScheduleWindow()) {
             return false;
         }
@@ -238,9 +246,34 @@ class Advertisement extends Model
             'starts_at' => null,
             'ends_at' => null,
             'is_auto' => false,
+            'local_ad_paused' => false,
+            'local_ad_paused_remaining_seconds' => null,
             'views_count' => 0,
             'clicks_count' => 0,
         ]);
+    }
+
+    public function isLocalAdPaused(): bool
+    {
+        return (bool) ($this->local_ad_paused ?? false);
+    }
+
+    public function hasPausedLocalAd(): bool
+    {
+        return $this->isLocalAdPaused() && $this->hasDisplayableMedia();
+    }
+
+    public function hasRunningLocalAd(): bool
+    {
+        if ($this->isLocalAdPaused()) {
+            return false;
+        }
+
+        if (! $this->isActiveForDisplay()) {
+            return false;
+        }
+
+        return ad_has_media($this);
     }
 
     public function queueItems(): HasMany
@@ -401,15 +434,6 @@ class Advertisement extends Model
     {
         return filled($this->google_ad_slot)
             && filled(google_adsense_client());
-    }
-
-    public function hasRunningLocalAd(): bool
-    {
-        if (! $this->isActiveForDisplay()) {
-            return false;
-        }
-
-        return ad_has_media($this);
     }
 
     /** ফ্রন্টে Google Ad দেখাবে কিনা (local না থাকলে auto fallback) */
