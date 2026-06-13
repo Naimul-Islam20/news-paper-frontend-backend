@@ -436,18 +436,18 @@ class Advertisement extends Model
             && filled(google_adsense_client());
     }
 
-    /** Local চললে Local; না থাকলে Google fallback (Auto ON + Slot ID) */
+    /** Auto ON + Slot ID + Client ID = slot-এ Google (Local front-এ বন্ধ) */
     public function displayUsesGoogleAd(): bool
     {
-        if (! $this->googleAdAutoEnabled() || ! $this->canShowGoogleAd()) {
-            return false;
-        }
-
-        return ! $this->hasRunningLocalAd();
+        return $this->googleAdAutoEnabled() && $this->canShowGoogleAd();
     }
 
     public function displayUsesLocalAd(): bool
     {
+        if ($this->displayUsesGoogleAd()) {
+            return false;
+        }
+
         return $this->hasRunningLocalAd();
     }
 
