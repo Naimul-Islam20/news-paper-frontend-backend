@@ -8,9 +8,9 @@ $client = google_adsense_client();
 $slot = $ad?->google_ad_slot ?? null;
 
 $styles = match ($format) {
-    'sidebar', 'inline' => 'display:block;width:100%;max-width:300px;height:250px;margin:0 auto;',
-    'header' => 'display:block;width:100%;max-width:1000px;height:90px;margin:0 auto;',
-    default => 'display:block;width:100%;max-width:1000px;height:90px;margin:0 auto;',
+    'sidebar', 'inline' => 'display:inline-block;width:300px;max-width:100%;height:250px;',
+    'header' => 'display:inline-block;width:100%;max-width:1000px;height:90px;',
+    default => 'display:inline-block;width:100%;max-width:1000px;height:90px;',
 };
 @endphp
 
@@ -19,6 +19,7 @@ $styles = match ($format) {
     <ins class="adsbygoogle"
         style="{{ $styles }}"
         data-ad-client="{{ $client }}"
-        data-ad-slot="{{ $slot }}"></ins>
+        data-ad-slot="{{ $slot }}"
+        data-full-width-responsive="false"></ins>
 </div>
 @endif

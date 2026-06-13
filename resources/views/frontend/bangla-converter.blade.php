@@ -2,6 +2,7 @@
     <x-slot:title>Unicode to Bijoy - Bangla text Converter - {{ site_name() }}</x-slot>
 
     {{-- Bijoy font — শুধু এই পেজে; সাইটের global font পরিবর্তন হয় না --}}
+    <link rel="preload" href="{{ asset('fonts/SutonnyMJ.ttf') }}" as="font" type="font/ttf" crossorigin>
     <style>
         @font-face {
             font-family: "SutonnyMJ";
@@ -9,6 +10,14 @@
             font-weight: 400;
             font-display: swap;
             src: url("{{ asset('fonts/SutonnyMJ.ttf') }}") format("truetype");
+        }
+
+        #bijoy-input.bijoy-text {
+            font-family: "SutonnyMJ", "SutonnyMJ Regular", monospace !important;
+            font-weight: 400 !important;
+            font-synthesis: none !important;
+            letter-spacing: normal;
+            line-height: 1.6;
         }
     </style>
 
@@ -97,5 +106,5 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/bangla-converter/all.js') }}?v=2"></script>
+    <script src="{{ asset('js/bangla-converter/all.js') }}?v=3" charset="utf-8"></script>
 </x-layout>

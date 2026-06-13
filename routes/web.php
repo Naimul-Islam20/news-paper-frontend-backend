@@ -179,6 +179,7 @@ Route::prefix('admin')
                 Route::get('/advertisements', [App\Http\Controllers\Admin\AdvertisementController::class, 'index'])->name('advertisements.index');
                 Route::get('/advertisements/{id}/edit', [App\Http\Controllers\Admin\AdvertisementController::class, 'edit'])->name('advertisements.edit');
                 Route::put('/advertisements/{id}', [App\Http\Controllers\Admin\AdvertisementController::class, 'update'])->name('advertisements.update');
+                Route::put('/advertisements/{id}/google-settings', [App\Http\Controllers\Admin\AdvertisementController::class, 'updateGoogleSettings'])->name('advertisements.google-settings.update');
                 Route::post('/advertisements/{id}/toggle-ad-source', [App\Http\Controllers\Admin\AdvertisementController::class, 'toggleAdSource'])->name('advertisements.toggle-source');
                 Route::post('/advertisements/{id}/queue-items', [App\Http\Controllers\Admin\AdvertisementController::class, 'storeQueueItem'])->name('advertisements.queue-items.store');
                 Route::put('/advertisements/{id}/queue-items/{itemId}', [App\Http\Controllers\Admin\AdvertisementController::class, 'updateQueueItem'])->name('advertisements.queue-items.update');

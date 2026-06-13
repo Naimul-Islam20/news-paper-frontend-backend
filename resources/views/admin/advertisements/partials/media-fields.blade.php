@@ -3,6 +3,8 @@ $display = $display ?? null;
 $mediaType = old('media_type', $display?->resolvedMediaType() ?? 'image');
 $idPrefix = $idPrefix ?? '';
 $mediaSpec = $mediaSpec ?? null;
+$linkRequired = $linkRequired ?? true;
+$mediaRequired = $mediaRequired ?? true;
 @endphp
 
 <div class="space-y-4">
@@ -17,8 +19,8 @@ $mediaSpec = $mediaSpec ?? null;
     </div>
 
     <div>
-        <label for="{{ $idPrefix }}link" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">লিংক URL <span class="text-rose-600">*</span></label>
-        <input type="url" name="link" id="{{ $idPrefix }}link" value="{{ old('link', $display?->link ?? '') }}" placeholder="https://example.com/..." required class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm">
+        <label for="{{ $idPrefix }}link" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">লিংক URL @if($linkRequired)<span class="text-rose-600">*</span>@else<span class="text-slate-400 font-normal">(ঐচ্ছিক)</span>@endif</label>
+        <input type="url" name="link" id="{{ $idPrefix }}link" value="{{ old('link', $display?->link ?? '') }}" placeholder="https://example.com/..." @if($linkRequired) required @endif class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm">
     </div>
 
     <div id="{{ $idPrefix }}media-image" class="ad-media-panel space-y-4 {{ $mediaType !== 'image' ? 'hidden' : '' }}">
@@ -27,7 +29,7 @@ $mediaSpec = $mediaSpec ?? null;
             <input type="text" name="caption" id="{{ $idPrefix }}caption" value="{{ old('caption', $display?->caption ?? '') }}" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm">
         </div>
         <div>
-            <label for="{{ $idPrefix }}image" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ডেস্কটপ ইমেজ <span class="text-rose-600">*</span></label>
+            <label for="{{ $idPrefix }}image" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ডেস্কটপ ইমেজ @if($mediaRequired)<span class="text-rose-600">*</span>@endif</label>
             @if($display?->image)
             <div class="mb-2 flex items-center gap-3">
                 <img src="{{ storage_image_url($display->image) }}" alt="" class="h-16 w-24 object-contain rounded border border-slate-200 dark:border-slate-700 bg-white">
@@ -56,7 +58,7 @@ $mediaSpec = $mediaSpec ?? null;
 
     <div id="{{ $idPrefix }}media-video" class="ad-media-panel space-y-4 {{ $mediaType !== 'video' ? 'hidden' : '' }}">
         <div>
-            <label for="{{ $idPrefix }}video" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ডেস্কটপ ভিডিও <span class="text-rose-600">*</span></label>
+            <label for="{{ $idPrefix }}video" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">ডেস্কটপ ভিডিও @if($mediaRequired)<span class="text-rose-600">*</span>@endif</label>
             @if($display?->video)
             <div class="mb-2">
                 <video src="{{ storage_image_url($display->video) }}" class="max-h-32 rounded border border-slate-200" controls muted playsinline></video>
@@ -85,7 +87,7 @@ $mediaSpec = $mediaSpec ?? null;
 
     <div id="{{ $idPrefix }}media-youtube" class="ad-media-panel space-y-4 {{ $mediaType !== 'youtube' ? 'hidden' : '' }}">
         <div>
-            <label for="{{ $idPrefix }}video_youtube_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">YouTube URL <span class="text-rose-600">*</span></label>
+            <label for="{{ $idPrefix }}video_youtube_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">YouTube URL @if($mediaRequired)<span class="text-rose-600">*</span>@endif</label>
             <input type="text" name="video_youtube_id" id="{{ $idPrefix }}video_youtube_id" value="{{ old('video_youtube_id', $display?->video_youtube_id ?? '') }}" placeholder="https://youtube.com/watch?v=..." class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm">
         </div>
     </div>

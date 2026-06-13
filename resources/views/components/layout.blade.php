@@ -177,6 +177,41 @@
 
     @if(google_adsense_client())
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ google_adsense_client() }}" crossorigin="anonymous"></script>
+    <style>
+        /* AdSense auto ads (anchor/vignette/side-rail) বন্ধ — শুধু .google-ad-unit স্লটে ad */
+        ins.adsbygoogle {
+            display: none !important;
+            visibility: hidden !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
+            pointer-events: none !important;
+        }
+
+        .google-ad-unit ins.adsbygoogle {
+            display: inline-block !important;
+            visibility: visible !important;
+            max-height: none !important;
+            overflow: hidden !important;
+            pointer-events: auto !important;
+        }
+
+        body > ins.adsbygoogle,
+        body > div > ins.adsbygoogle {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
+            pointer-events: none !important;
+        }
+
+        body > iframe[id^="aswift_"],
+        body > div[id^="google_ads_iframe_"] {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+    </style>
     @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @php
@@ -363,14 +398,14 @@
     @if(google_adsense_client())
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(function (el) {
+            document.querySelectorAll('.google-ad-unit ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(function (el) {
                 try {
                     (adsbygoogle = window.adsbygoogle || []).push({});
                 } catch (e) {}
             });
 
             function hideUnfilledAds() {
-                document.querySelectorAll('ins.adsbygoogle[data-ad-status="unfilled"]').forEach(function (el) {
+                document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-status="unfilled"]').forEach(function (el) {
                     var wrap = el.closest('.google-ad-unit');
                     if (wrap) {
                         wrap.style.display = 'none';
@@ -378,8 +413,23 @@
                 });
             }
 
+            function suppressAutoPlacedAds() {
+                document.querySelectorAll('ins.adsbygoogle').forEach(function (el) {
+                    if (!el.closest('.google-ad-unit')) {
+                        el.style.setProperty('display', 'none', 'important');
+                        el.style.setProperty('visibility', 'hidden', 'important');
+                        el.style.setProperty('height', '0', 'important');
+                        el.style.setProperty('max-height', '0', 'important');
+                        el.style.setProperty('pointer-events', 'none', 'important');
+                    }
+                });
+            }
+
+            suppressAutoPlacedAds();
             setTimeout(hideUnfilledAds, 2500);
             setTimeout(hideUnfilledAds, 6000);
+            setTimeout(suppressAutoPlacedAds, 1000);
+            setTimeout(suppressAutoPlacedAds, 4000);
         });
     </script>
     @endif

@@ -263,30 +263,53 @@ body {
     line-height: 1.6;
 }
 
-/* Google AdSense — স্লটের ভিতরে contain; পুরো screen জুড়ে ছড়াবে না */
+/* Google AdSense — শুধু স্লটের ভিতরে; auto-placed ad পুরো পেজে ছড়াবে না */
 .google-ad-unit {
     position: relative;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
-    contain: layout style;
+    contain: layout style paint;
+    isolation: isolate;
 }
 
 .google-ad-unit--banner,
 .google-ad-unit--header {
     max-width: 1000px;
+    min-height: 90px;
 }
 
 .google-ad-unit--sidebar,
 .google-ad-unit--inline {
     max-width: 300px;
+    min-height: 250px;
 }
 
-.google-ad-unit .adsbygoogle {
+.google-ad-unit ins.adsbygoogle {
     overflow: hidden !important;
+    max-width: 100% !important;
 }
 
 .google-ad-unit iframe {
     max-width: 100% !important;
+}
+
+/* Auto-injected AdSense (slot ছাড়া) — লুকানো; .google-ad-unit এর ভিতরে দেখাবে */
+ins.adsbygoogle {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+}
+
+.google-ad-unit ins.adsbygoogle {
+    display: inline-block !important;
+    visibility: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    pointer-events: auto !important;
 }

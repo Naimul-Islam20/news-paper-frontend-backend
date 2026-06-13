@@ -27,7 +27,6 @@
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider w-24">Banner</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">Name</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">Location (slug)</th>
-                        <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">রেশিও / সাইজ</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">URL</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">সময়সূচি</th>
                         <th class="py-3 px-4 text-[11px] font-bold text-black dark:text-slate-300 uppercase tracking-wider">সোর্স</th>
@@ -63,14 +62,6 @@
                         </td>
                         <td class="py-3 px-4">
                             <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] font-mono">{{ $ad->slug }}</span>
-                        </td>
-                        <td class="py-3 px-4">
-                            @if($spec = $ad->mediaSpec())
-                            <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400">{{ $spec['ratio'] }}</span>
-                            <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{{ $spec['size'] }}</span>
-                            @else
-                            <span class="text-xs text-slate-400">—</span>
-                            @endif
                         </td>
                         <td class="py-3 px-4">
                             @if($preview?->link)
@@ -142,14 +133,6 @@
                             @endif
                         </td>
                         <td class="py-3 px-4 text-right">
-                            @if($ad->slug !== 'home_video')
-                            <form method="POST" action="{{ route('admin.advertisements.toggle-source', $ad->id) }}" class="inline-block mr-1">
-                                @csrf
-                                <button type="submit" class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors {{ ($ad->google_ad_auto ?? true) ? 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800' : 'border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20' }}" title="Google Auto টগল">
-                                    Auto {{ ($ad->google_ad_auto ?? true) ? 'Off' : 'On' }}
-                                </button>
-                            </form>
-                            @endif
                             <a href="{{ route('admin.advertisements.edit', $ad->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-colors" title="Edit">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
@@ -160,7 +143,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="py-8 px-4 text-center text-slate-500 dark:text-slate-400 text-sm">কোনো অ্যাড স্লট নেই। সিডার চালান: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">php artisan db:seed --class=AdvertisementSeeder</code></td>
+                        <td colspan="8" class="py-8 px-4 text-center text-slate-500 dark:text-slate-400 text-sm">কোনো অ্যাড স্লট নেই। সিডার চালান: <code class="bg-slate-100 dark:bg-slate-800 px-1 rounded">php artisan db:seed --class=AdvertisementSeeder</code></td>
                     </tr>
                     @endforelse
                 </tbody>

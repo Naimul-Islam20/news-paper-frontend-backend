@@ -1,4 +1,6 @@
 # Apache + mod_php হলে বড় ভিডিও আপলোড (PHP-FPM এ .user.ini ব্যবহার হয়)
+AddDefaultCharset UTF-8
+
 <IfModule mod_php.c>
     php_value upload_max_filesize 64M
     php_value post_max_size 64M

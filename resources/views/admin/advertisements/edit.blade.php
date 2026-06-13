@@ -5,79 +5,132 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-slate-900 overflow-hidden shadow-sm rounded-lg border border-slate-200 dark:border-slate-800">
-            <div class="p-6">
-                <div class="mb-6 border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <h2 class="text-xl font-semibold text-slate-800 dark:text-white">{{ $advertisement->name }}</h2>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                            {{ $advertisement->slug }}
-                            @if($spec = $advertisement->mediaSpec())
-                            <span class="text-slate-400">· {{ $spec['ratio'] }} · {{ $spec['size'] }}</span>
-                            @endif
-                        </p>
-                    </div>
-                    <button type="button" id="ad-form-clear" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition shrink-0">Clear</button>
-                </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-                @if(session('success'))
-                <div class="mb-4 px-4 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-sm">
-                    {{ session('success') }}
-                </div>
+        {{-- Header --}}
+        <div class="bg-white dark:bg-slate-900 shadow-sm rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+            <a href="{{ route('admin.advertisements.index') }}" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-indigo-600 transition mb-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                সব স্লট
+            </a>
+            <h2 class="text-xl font-semibold text-slate-800 dark:text-white">{{ $advertisement->name }}</h2>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{{ $advertisement->slug }}</span>
+                @if($spec = $advertisement->mediaSpec())
+                <span class="text-slate-400">· {{ $spec['ratio'] }} · {{ $spec['size'] }}</span>
                 @endif
+            </p>
+            @php
+            $frontSource = $advertisement->displayUsesLocalAd()
+                ? 'Local'
+                : ($advertisement->displayUsesGoogleAd() ? 'Google' : 'খালি');
+            $frontSourceClass = match ($frontSource) {
+                'Local' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+                'Google' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+                default => 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+            };
+            @endphp
+            <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                ফ্রন্টে এখন:
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full font-medium {{ $frontSourceClass }}">{{ $frontSource }}</span>
+            </p>
+        </div>
 
-                @if($errors->any())
+        @if(session('success'))
+        <div class="px-4 py-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-sm">
+            {{ session('success') }}
+        </div>
+        @endif
+
+        @php
+        $googleAdAuto = old('google_ad_auto', ($advertisement->google_ad_auto ?? true) ? '1' : '0') === '1';
+        $isHomeVideoSlot = $advertisement->slug === 'home_video';
+        $hasGoogleFallback = $advertisement->googleAdAutoEnabled() && filled($advertisement->google_ad_slot);
+        $localMediaRequired = ! $hasGoogleFallback;
+        $googleErrors = collect($errors->getMessages())->only(['google_ad_slot', 'google_ad_auto'])->flatten();
+        $localErrors = collect($errors->getMessages())->except(['google_ad_slot', 'google_ad_auto', 'order'])->flatten();
+        @endphp
+
+        {{-- ① Google Ad — আলাদা ফর্ম, আলাদা কার্ড --}}
+        @if(! $isHomeVideoSlot)
+        <div class="bg-white dark:bg-slate-900 shadow-sm rounded-lg border-2 border-blue-200 dark:border-blue-900/60 overflow-hidden">
+            <div class="px-6 py-4 bg-blue-50 dark:bg-blue-950/40 border-b border-blue-100 dark:border-blue-900/50">
+                <h3 class="text-base font-semibold text-blue-900 dark:text-blue-100">Google Ad</h3>
+                <p class="mt-0.5 text-sm text-blue-800/70 dark:text-blue-200/70">Fallback — Local ad না থাকলে Google দেখাবে</p>
+            </div>
+            <div class="p-6">
+                @if($googleErrors->isNotEmpty())
                 <div class="mb-4 px-4 py-2 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-sm">
                     <ul class="list-disc list-inside space-y-1">
-                        @foreach($errors->all() as $err)
+                        @foreach($googleErrors as $err)
                         <li>{{ $err }}</li>
                         @endforeach
                     </ul>
                 </div>
                 @endif
 
-                <form id="ad-edit-form" action="{{ route('admin.advertisements.update', $advertisement->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <form id="ad-google-form" action="{{ route('admin.advertisements.google-settings.update', $advertisement->id) }}" method="POST" class="space-y-4">
                     @csrf
                     @method('PUT')
 
-                    @php
-                    $googleAdAuto = old('google_ad_auto', ($advertisement->google_ad_auto ?? true) ? '1' : '0') === '1';
-                    $isHomeVideoSlot = $advertisement->slug === 'home_video';
-                    @endphp
-
-                    @if(! $isHomeVideoSlot)
-                    <div class="p-4 rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/40 dark:bg-blue-950/20 space-y-3">
-                        <div class="flex flex-wrap items-end gap-4">
-                            <div class="flex-1 min-w-[12rem]">
-                                <label for="google_ad_slot" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Google Slot ID</label>
-                                <input type="text" name="google_ad_slot" id="google_ad_slot" value="{{ old('google_ad_slot', $advertisement->google_ad_slot) }}" placeholder="2436228703" class="w-full max-w-sm px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm font-mono">
-                                @error('google_ad_slot')
-                                <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div class="shrink-0 pb-1">
-                                <input type="hidden" name="google_ad_auto" value="0">
-                                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-                                    <input type="checkbox" name="google_ad_auto" id="google_ad_auto" value="1" class="sr-only" {{ $googleAdAuto ? 'checked' : '' }}>
-                                    <span id="google_ad_auto_track" aria-hidden="true" class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors duration-200 {{ $googleAdAuto ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600' }}">
-                                        <span id="google_ad_auto_knob" class="block h-5 w-5 shrink-0 rounded-full bg-white border border-slate-200 shadow-sm transition-transform duration-200 ease-in-out dark:border-slate-400" style="transform: translateX({{ $googleAdAuto ? '20px' : '0px' }});"></span>
-                                    </span>
-                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Auto</span>
-                                </label>
-                            </div>
+                    <div class="flex flex-wrap items-end gap-4">
+                        <div class="flex-1 min-w-[14rem] max-w-md">
+                            <label for="google_ad_slot" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Google Slot ID</label>
+                            <input type="text" name="google_ad_slot" id="google_ad_slot" value="{{ old('google_ad_slot', $advertisement->google_ad_slot) }}" placeholder="2436228703" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-md shadow-sm dark:bg-slate-800 dark:text-white text-sm font-mono">
+                            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">AdSense → Ads → By ad unit → Slot ID</p>
                         </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Auto ON: Local ad না থাকলে Google Ad চলবে। Local ad থাকলে Local-ই priority পাবে।</p>
-                        @if(! google_adsense_client())
-                        <p class="text-xs text-amber-700 dark:text-amber-300">Client ID নেই — <a href="{{ route('admin.meta.index') }}" class="underline">SEO & Meta</a> থেকে যোগ করুন।</p>
-                        @endif
+                        <div class="shrink-0 pb-1">
+                            <input type="hidden" name="google_ad_auto" value="0">
+                            <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" name="google_ad_auto" id="google_ad_auto" value="1" class="sr-only" {{ $googleAdAuto ? 'checked' : '' }}>
+                                <span id="google_ad_auto_track" aria-hidden="true" class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors duration-200 {{ $googleAdAuto ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600' }}">
+                                    <span id="google_ad_auto_knob" class="block h-5 w-5 shrink-0 rounded-full bg-white border border-slate-200 shadow-sm transition-transform duration-200 ease-in-out dark:border-slate-400" style="transform: translateX({{ $googleAdAuto ? '20px' : '0px' }});"></span>
+                                </span>
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Auto ON</span>
+                            </label>
+                        </div>
                     </div>
-                    @else
-                    <input type="hidden" name="google_ad_auto" value="0">
+
+                    @if(! google_adsense_client())
+                    <p class="text-xs text-amber-700 dark:text-amber-300">Client ID নেই — <a href="{{ route('admin.meta.index') }}" class="underline font-medium">SEO & Meta</a> থেকে Google AdSense Client ID যোগ করুন।</p>
                     @endif
 
-                    <div id="ad-local-fields" class="space-y-6">
+                    <div class="flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <button type="submit" class="px-5 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 transition">
+                            Google Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @endif
 
+        {{-- ② Local Ad — আলাদা ফর্ম, আলাদা কার্ড --}}
+        <div class="bg-white dark:bg-slate-900 shadow-sm rounded-lg border-2 border-emerald-200 dark:border-emerald-900/50 overflow-hidden">
+            <div class="px-6 py-4 bg-emerald-50 dark:bg-emerald-950/30 border-b border-emerald-100 dark:border-emerald-900/40">
+                <h3 class="text-base font-semibold text-emerald-900 dark:text-emerald-100">Local Ad</h3>
+                <p class="mt-0.5 text-sm text-emerald-800/70 dark:text-emerald-200/70">Priority — Local থাকলে সবসময় Local-ই দেখাবে
+                    @if($hasGoogleFallback)
+                    <span class="text-blue-600 dark:text-blue-400">· Google fallback সক্রিয়</span>
+                    @endif
+                </p>
+            </div>
+            <div class="p-6">
+                @if($localErrors->isNotEmpty())
+                <div class="mb-4 px-4 py-2 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-sm">
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach($localErrors as $err)
+                        <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+
+                <form id="ad-local-form" action="{{ route('admin.advertisements.update', $advertisement->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    @csrf
+                    @method('PUT')
+
+                    <div id="ad-local-fields" class="space-y-6">
                     @php
                     $slotDurDaysRaw = 0;
                     $slotDurHoursRaw = 0;
@@ -102,7 +155,7 @@
                                 <span id="slot_auto_track" aria-hidden="true" class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 transition-colors duration-200 {{ $slotAuto ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600' }}">
                                     <span id="slot_auto_knob" class="block h-5 w-5 shrink-0 rounded-full bg-white border border-slate-200 shadow-sm transition-transform duration-200 ease-in-out dark:border-slate-400" style="transform: translateX({{ $slotAuto ? '20px' : '0px' }});"></span>
                                 </span>
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Auto</span>
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">সীমাহীন</span>
                             </label>
                         </div>
                         <div id="slot-duration-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-4 {{ $slotAuto ? 'opacity-50 pointer-events-none' : '' }}">
@@ -143,6 +196,8 @@
                     'display' => $slotFormDisplay,
                     'idPrefix' => '',
                     'mediaSpec' => $advertisement->mediaSpec(),
+                    'linkRequired' => $localMediaRequired,
+                    'mediaRequired' => $localMediaRequired,
                     ])
                     @foreach(['image', 'image_mobile', 'video', 'video_mobile', 'video_youtube_id', 'media_type', 'link', 'caption'] as $mediaField)
                     @error($mediaField)
@@ -152,19 +207,26 @@
 
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
-                        <a href="{{ route('admin.advertisements.index') }}" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Cancel</a>
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">Save Changes</button>
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+                        <button type="button" id="ad-form-clear" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-md text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Clear</button>
+                        <button type="submit" class="px-5 py-2 bg-emerald-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition">Local Save</button>
                     </div>
                 </form>
+            </div>
+        </div>
 
-                <div id="queue-admin-root" class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
-                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                        <h3 class="text-base font-semibold text-slate-800 dark:text-white">কিউ</h3>
-                        <button type="button" id="queue-open-create" class="px-3 py-1.5 bg-emerald-600 rounded-md text-sm font-medium text-white hover:bg-emerald-700 transition">
-                            + যোগ করুন
-                        </button>
-                    </div>
+        {{-- ③ Queue — আলাদা কার্ড --}}
+        <div id="queue-admin-root" class="bg-white dark:bg-slate-900 shadow-sm rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                <h3 class="text-base font-semibold text-slate-800 dark:text-white">কিউ (Rotation)</h3>
+                <p class="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Local ad মেয়াদ শেষ হলে কিউ থেকে পরের ad চলবে</p>
+            </div>
+            <div class="p-6">
+                <div class="flex flex-wrap items-center justify-end gap-3 mb-4">
+                    <button type="button" id="queue-open-create" class="px-3 py-1.5 bg-indigo-600 rounded-md text-sm font-medium text-white hover:bg-indigo-700 transition">
+                        + কিউতে যোগ করুন
+                    </button>
+                </div>
 
                     @if(($queueItems ?? collect())->isNotEmpty())
                     <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
@@ -292,11 +354,12 @@
                         @csrf
                         <div id="queue-reorder-order-inputs"></div>
                     </form>
-                </div>
+            </div>
+        </div>
 
-                <x-admin.modal-scripts />
+        <x-admin.modal-scripts />
 
-                <x-admin.fixed-modal modal-id="adQueueModal" container-id="adQueueModalContainer" max-width="max-w-2xl">
+        <x-admin.fixed-modal modal-id="adQueueModal" container-id="adQueueModalContainer" max-width="max-w-2xl">
                     <x-slot name="header">
                         <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800 shrink-0">
                             <div>
@@ -350,8 +413,7 @@
                         </div>
                     </form>
                 </x-admin.fixed-modal>
-            </div>
-        </div>
+
     </div>
 </div>
 @php
@@ -552,7 +614,7 @@ $i->id => [
 
     var adClearBtn = document.getElementById('ad-form-clear');
     if (adClearBtn) adClearBtn.addEventListener('click', function() {
-        var form = document.getElementById('ad-edit-form');
+        var form = document.getElementById('ad-local-form');
         if (!form) return;
         form.querySelectorAll('input[type="text"], input[type="url"]').forEach(function(inp) {
             if (inp.name && inp.name !== '_token' && inp.name !== '_method') inp.value = '';

@@ -94,40 +94,64 @@ class AdvertisementController extends Controller
         return redirect()->back()->with('success', $message);
     }
 
-    public function update(Request $request, int $id): RedirectResponse
+    public function updateGoogleSettings(Request $request, int $id): RedirectResponse
     {
         $advertisement = Advertisement::findOrFail($id);
 
-        $isHomeVideo = $advertisement->slug === 'home_video';
-        $slotId = $isHomeVideo
-            ? ''
-            : preg_replace('/\D+/', '', trim((string) $request->input('google_ad_slot', '')));
-        $googleAdAuto = ! $isHomeVideo && $request->boolean('google_ad_auto');
+        if ($advertisement->slug === 'home_video') {
+            return redirect()->back()
+                ->withErrors(['google_ad_auto' => 'হোম ভিডিও স্লটে Google Ad ব্যবহার করা যায় না।']);
+        }
+
+        $slotId = preg_replace('/\D+/', '', trim((string) $request->input('google_ad_slot', '')));
+        $googleAdAuto = $request->boolean('google_ad_auto');
 
         if ($googleAdAuto && $slotId === '') {
             return redirect()->back()
-                ->withErrors(['google_ad_slot' => 'Auto চালু থাকলে Google Slot ID দিন।'])
+                ->withErrors(['google_ad_slot' => 'Auto চালু করতে Google Slot ID দিন।'])
+                ->withInput();
+        }
+
+        if ($googleAdAuto && ! filled(google_adsense_client())) {
+            return redirect()->back()
+                ->withErrors(['google_ad_auto' => 'আগে SEO & Meta সেটিংসে Google AdSense Client ID সেট করুন।'])
                 ->withInput();
         }
 
         $request->merge(['google_ad_slot' => $slotId]);
 
-        $request->validate(array_merge($this->mediaValidationRules(), [
+        $request->validate([
             'google_ad_auto' => 'nullable|boolean',
             'google_ad_slot' => 'nullable|string|max:32|regex:/^\d*$/',
+        ]);
+
+        $advertisement->update([
+            'google_ad_slot' => $slotId !== '' ? $slotId : null,
+            'google_ad_auto' => $googleAdAuto,
+        ]);
+
+        return redirect()
+            ->route('admin.advertisements.edit', $advertisement->id)
+            ->with('success', 'Google Ad সেটিংস সংরক্ষণ করা হয়েছে।');
+    }
+
+    public function update(Request $request, int $id): RedirectResponse
+    {
+        $advertisement = Advertisement::findOrFail($id);
+
+        $hasGoogleFallback = $advertisement->googleAdAutoEnabled() && filled($advertisement->google_ad_slot);
+        $requireMedia = ! $hasGoogleFallback;
+
+        $request->validate(array_merge($this->mediaValidationRules($requireMedia), [
             'slot_auto' => 'nullable|in:0,1',
             'slot_duration_days' => 'nullable|integer|min:0|max:365',
             'slot_duration_hours' => 'nullable|integer|min:0|max:23',
         ]));
 
-        $requireMedia = ! ($googleAdAuto && $slotId !== '');
-
         $data = [
             'link' => $request->input('link'),
             'caption' => $request->input('caption'),
             'ad_source' => 'local',
-            'google_ad_slot' => $slotId !== '' ? $slotId : null,
-            'google_ad_auto' => $googleAdAuto,
         ];
 
         if ($mediaError = $this->applyMediaFromRequest($request, $data, $advertisement, requireMedia: $requireMedia)) {
@@ -163,7 +187,7 @@ class AdvertisementController extends Controller
 
         return redirect()
             ->route('admin.advertisements.edit', $advertisement->id)
-            ->with('success', 'অ্যাড স্লট আপডেট করা হয়েছে।');
+            ->with('success', 'Local অ্যাড সংরক্ষণ করা হয়েছে।');
     }
 
     public function storeQueueItem(Request $request, int $id): RedirectResponse
@@ -305,15 +329,15 @@ class AdvertisementController extends Controller
     /**
      * @return array<string, string>
      */
-    protected function mediaValidationRules(): array
+    protected function mediaValidationRules(bool $requireMedia = true): array
     {
         return [
-            'media_type' => 'required|in:image,video,youtube',
+            'media_type' => ($requireMedia ? 'required' : 'nullable').'|in:image,video,youtube',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'image_mobile' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'video' => 'nullable|file|mimes:mp4,webm,mov,ogv,quicktime|max:51200',
             'video_mobile' => 'nullable|file|mimes:mp4,webm,mov,ogv,quicktime|max:51200',
-            'link' => 'required|url|max:500',
+            'link' => ($requireMedia ? 'required' : 'nullable').'|url|max:500',
             'caption' => 'nullable|string|max:500',
             'video_youtube_id' => 'nullable|string|max:500',
         ];
