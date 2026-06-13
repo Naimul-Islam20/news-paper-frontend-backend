@@ -263,15 +263,13 @@ body {
     line-height: 1.6;
 }
 
-/* Google AdSense — শুধু স্লটের ভিতরে; auto-placed ad পুরো পেজে ছড়াবে না */
+/* Google AdSense — slot ad container */
 .google-ad-unit {
     position: relative;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-    overflow: hidden;
-    contain: layout style paint;
-    isolation: isolate;
+    overflow: visible;
 }
 
 .google-ad-unit--banner,
@@ -361,8 +359,12 @@ body {
     min-height: 250px;
 }
 
+.ad-slot-frame .google-ad-unit ins.adsbygoogle {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
 .google-ad-unit ins.adsbygoogle {
-    overflow: hidden !important;
     max-width: 100% !important;
 }
 
@@ -370,21 +372,11 @@ body {
     max-width: 100% !important;
 }
 
-/* Slot ad — visible; AdSense iframe সাইজ নিজে ঠিক করবে */
-.google-ad-unit ins.adsbygoogle[data-ad-slot] {
-    display: block !important;
-    visibility: visible !important;
-    overflow: hidden !important;
-    pointer-events: auto !important;
-}
-
-/* Auto / anchor / vignette — data-ad-slot ছাড়া inject হওয়া ad লুকানো */
+/* Auto / anchor ad — শুধু slot id ছাড়া বা overlay format */
 ins.adsbygoogle:not([data-ad-slot]),
 ins.adsbygoogle[data-anchor-status],
 ins.adsbygoogle[data-vignette-loaded],
-ins.adsbygoogle[data-anchor-shown],
-ins.adsbygoogle[data-ad-format="auto"],
-.adsbygoogle-noablate {
+ins.adsbygoogle[data-anchor-shown] {
     display: none !important;
     visibility: hidden !important;
     height: 0 !important;
@@ -393,10 +385,7 @@ ins.adsbygoogle[data-ad-format="auto"],
     pointer-events: none !important;
 }
 
-body > iframe[id^="aswift_"],
-body > div[id^="aswift_"],
-body > div[id^="google_ads_iframe_"],
-body > ins.adsbygoogle,
+body > ins.adsbygoogle:not([data-ad-slot]),
 body > .adsbygoogle-noablate {
     display: none !important;
     visibility: hidden !important;
@@ -406,8 +395,7 @@ body > .adsbygoogle-noablate {
     pointer-events: none !important;
 }
 
-.google-ad-unit ins.adsbygoogle[data-ad-slot],
-.google-ad-unit iframe {
+.google-ad-unit ins.adsbygoogle[data-ad-slot] {
     display: block !important;
     visibility: visible !important;
     pointer-events: auto !important;

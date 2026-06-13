@@ -178,24 +178,11 @@
     @if(google_adsense_client())
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ google_adsense_client() }}" crossorigin="anonymous"></script>
     <style>
-        /* Critical: auto/anchor ad আগে থেকেই লুকানো — slot ad (data-ad-slot) ছাড়া */
         ins.adsbygoogle:not([data-ad-slot]),
         ins.adsbygoogle[data-anchor-status],
         ins.adsbygoogle[data-vignette-loaded],
         ins.adsbygoogle[data-anchor-shown],
-        .adsbygoogle-noablate {
-            display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            max-height: 0 !important;
-            overflow: hidden !important;
-            pointer-events: none !important;
-        }
-
-        body > iframe[id^="aswift_"],
-        body > div[id^="aswift_"],
-        body > div[id^="google_ads_iframe_"],
-        body > ins.adsbygoogle,
+        body > ins.adsbygoogle:not([data-ad-slot]),
         body > .adsbygoogle-noablate {
             display: none !important;
             visibility: hidden !important;
@@ -395,34 +382,20 @@
                 return el && el.matches('ins.adsbygoogle[data-ad-slot]') && el.closest('.google-ad-unit');
             }
 
-            function hideNode(node) {
-                if (!node || node.nodeType !== 1) return;
-                node.style.setProperty('display', 'none', 'important');
-                node.style.setProperty('visibility', 'hidden', 'important');
-                node.style.setProperty('height', '0', 'important');
-                node.style.setProperty('max-height', '0', 'important');
-                node.style.setProperty('overflow', 'hidden', 'important');
-                node.style.setProperty('pointer-events', 'none', 'important');
+            function hideAutoAd(el) {
+                if (!el || el.nodeType !== 1 || isSlotAd(el)) return;
+                if (el.matches('ins.adsbygoogle[data-anchor-status], ins.adsbygoogle[data-vignette-loaded], ins.adsbygoogle[data-anchor-shown], ins.adsbygoogle:not([data-ad-slot])')) {
+                    el.style.setProperty('display', 'none', 'important');
+                    el.style.setProperty('visibility', 'hidden', 'important');
+                    el.style.setProperty('height', '0', 'important');
+                    el.style.setProperty('pointer-events', 'none', 'important');
+                }
             }
 
             function suppressAutoAds() {
-                document.querySelectorAll('ins.adsbygoogle').forEach(function (el) {
-                    if (isSlotAd(el)) return;
-                    hideNode(el);
-                });
-
-                document.querySelectorAll('body > iframe[id^="aswift_"], body > div[id^="aswift_"], body > div[id^="google_ads_iframe_"], body > ins.adsbygoogle, body > .adsbygoogle-noablate').forEach(hideNode);
-
-                document.querySelectorAll('.adsbygoogle-noablate, ins.adsbygoogle[data-anchor-shown]').forEach(function (el) {
-                    if (!el.closest('.google-ad-unit')) {
-                        hideNode(el);
-                    }
-                });
-
-                document.querySelectorAll('[id^="google_ads_iframe_"]').forEach(function (el) {
-                    if (!el.closest('.google-ad-unit')) {
-                        hideNode(el);
-                    }
+                document.querySelectorAll('ins.adsbygoogle').forEach(hideAutoAd);
+                document.querySelectorAll('body > .adsbygoogle-noablate').forEach(function (el) {
+                    el.style.setProperty('display', 'none', 'important');
                 });
             }
 
@@ -436,37 +409,40 @@
 
             function collapseUnfilled() {
                 document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-status="unfilled"]').forEach(function (el) {
-                    var root = el.closest('[data-ad-slot-root]') || el.closest('.google-ad-unit');
+                    var root = el.closest('[data-ad-slot-root]');
                     if (root) {
                         root.style.display = 'none';
                     }
                 });
             }
 
-            function tick() {
+            function boot() {
                 initSlotAds();
                 suppressAutoAds();
-                collapseUnfilled();
             }
 
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', tick);
-            } else {
-                tick();
+            function whenAdsReady(fn) {
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', fn);
+                    return;
+                }
+                fn();
             }
+
+            whenAdsReady(boot);
 
             var passes = 0;
             var retry = setInterval(function () {
-                tick();
-                if (++passes >= 24) {
+                initSlotAds();
+                if (++passes >= 30) {
                     clearInterval(retry);
+                    setTimeout(collapseUnfilled, 2000);
                 }
             }, 500);
 
             if (typeof MutationObserver !== 'undefined') {
                 new MutationObserver(function () {
                     suppressAutoAds();
-                    collapseUnfilled();
                 }).observe(document.documentElement, { childList: true, subtree: true });
             }
         })();
