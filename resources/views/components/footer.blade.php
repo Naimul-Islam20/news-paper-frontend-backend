@@ -1,7 +1,7 @@
-<footer class="bg-white border-t border-black/10 text-black pt-16 pb-10 md:pb-14">
+<footer class="bg-white text-black pt-2 md:pt-3 pb-10 md:pb-12">
     <div class="container overflow-visible px-4 md:px-0">
         <!-- Logo + Email Subscribe Row -->
-        <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-4 pb-4 border-b border-gray-300">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-2 pb-2 border-b border-gray-300">
             <!-- Logo (Left) -->
             <a href="{{ front_home_url() }}" class="shrink-0 text-left">
                 @if(!empty(optional($siteMeta)->site_logo))
@@ -32,26 +32,26 @@
         </div>
 
         <!-- 12-Column Grid for precise control -->
-        <div class="grid grid-cols-2 md:grid-cols-12 gap-8 pt-4">
+        <div class="grid grid-cols-2 md:grid-cols-12 gap-8 pt-2 items-stretch">
             <!-- Column 1: Info and Copyright (Span 3) -->
-            <div class="col-span-2 md:col-span-3 space-y-6 md:pr-4 relative md:after:content-[''] md:after:absolute md:after:top-1/2 md:after:-translate-y-1/2 md:after:right-0 md:after:w-px md:after:h-[330px] md:after:bg-slate-300">
-                <div class="text-base font-md space-y-1">
+            <div class="col-span-2 md:col-span-3 space-y-6 md:pr-4 py-3 md:py-4 md:border-r md:border-slate-300">
+                <div class="text-base md:text-lg font-md space-y-1">
                     @foreach(site_editor_publisher_lines($siteMeta) as $line)
                     <p>{{ $line['label'] }}: {{ $line['name'] }}</p>
                     @endforeach
                 </div>
                 @if(!empty(optional($siteMeta)->address_1))
-                <div class="text-sm text-gray-900 leading-relaxed font-md prose prose-sm max-w-none">
+                <div class="text-sm md:text-base text-gray-900 leading-relaxed font-md prose prose-sm md:prose-base max-w-none">
                     {!! $siteMeta->address_1 !!}
                 </div>
                 @endif
-                <p class="text-xs font-md text-gray-900 uppercase tracking-widest !mt-3 pt-1">
+                <p class="text-xs md:text-sm font-md text-gray-900 uppercase tracking-widest !mt-3 pt-1">
                     © প্রকাশক কর্তৃক সর্বস্বত্ব সংরক্ষিত
                 </p>
             </div>
 
             <!-- Column 2: Category Links (Span 5 — Column 3 থেকে কমানো জায়গা) -->
-            <div class="col-span-2 md:col-span-5 md:pr-4 relative md:after:content-[''] md:after:absolute md:after:top-1/2 md:after:-translate-y-1/2 md:after:right-0 md:after:w-px md:after:h-[330px] md:after:bg-slate-300">
+            <div class="col-span-2 md:col-span-5 md:px-4 py-3 md:py-4 md:border-r md:border-slate-300">
                 @if(isset($footerCol2) && $footerCol2->isNotEmpty())
                 <div class="grid w-full grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-base md:text-xl">
                     @foreach($footerCol2 as $cat)
@@ -67,7 +67,7 @@
             </div>
 
             <!-- Column 3: Custom Links (Span 2 — same as Column 4) -->
-            <div class="md:col-span-2 md:pr-4 relative md:after:content-[''] md:after:absolute md:after:top-1/2 md:after:-translate-y-1/2 md:after:right-0 md:after:w-px md:after:h-[330px] md:after:bg-slate-300">
+            <div class="md:col-span-2 md:px-4 py-3 md:py-4 md:border-r md:border-slate-300">
                 @if(isset($footerCol3) && $footerCol3->isNotEmpty())
                 <ul class="space-y-1 text-base md:text-xl">
                     @foreach($footerCol3 as $cat)
@@ -85,7 +85,7 @@
             </div>
 
             <!-- Column 4: Social Links – backend (site meta) থেকে ডাইনামিক -->
-            <div class="md:col-span-2">
+            <div class="md:col-span-2 md:pl-4 py-3 md:py-4">
                 <ul class="list-none p-0 m-0 text-base md:text-xl">
                     @if(!empty(optional($siteMeta)->facebook_link))
                     <li class="border-b border-dotted border-custom pb-1 mb-1 last:border-b-0 last:mb-0 last:pb-0"><a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener" class="block w-full font-medium hover:text-primary transition-all">Facebook</a></li>

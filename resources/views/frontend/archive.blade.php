@@ -7,7 +7,7 @@
             <div class="container">
                 @php \Carbon\Carbon::setLocale('bn'); @endphp
 
-                <div class="mb-4 md:mb-10 text-left">
+                <div class="mb-3 md:mb-6 text-left">
                     <h1 class="text-2xl md:text-3xl font-semibold serif text-title mb-3">{{ $category->name }}</h1>
 
                     @if(!empty($selectedDate))
@@ -21,7 +21,7 @@
                     </p>
                     @endif
 
-                    <div class="flex items-center gap-1 text-sm font-bold text-slate-500 mb-4 md:mb-6">
+                    <div class="flex items-center gap-1 text-sm font-bold text-slate-500 mb-3 md:mb-4">
                         <a href="/" class="text-slate-500 hover:text-primary transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -34,12 +34,12 @@
                         <span class="text-black font-bold">{{ $category->name }}</span>
                     </div>
 
-                    <div class="w-full border-b border-slate-100 relative mb-4 md:mb-8">
+                    <div class="w-full border-b border-slate-300 relative mb-3 md:mb-5">
                         <div class="absolute -bottom-[1px] left-0 w-40 h-[2px] bg-primary"></div>
                     </div>
                 </div>
 
-                <div class="mb-4 md:hidden">
+                <div class="mb-3 md:hidden">
                     <x-archive-calendar
                         :calendar-month="$calendarMonth"
                         :selected-date="$selectedDate"
@@ -50,7 +50,7 @@
                 <style>
                     .archive-grid {
                         display: grid;
-                        gap: 1rem;
+                        gap: 0.75rem;
                         grid-template-columns: 1fr;
                     }
 
@@ -63,7 +63,7 @@
                 </style>
 
                 <section class="archive-grid">
-                    <div class="bg-white p-0 md:py-4 md:pr-4 flex flex-col gap-3 md:gap-5">
+                    <div class="bg-white p-0 md:pt-2 md:pb-4 md:pr-4 flex flex-col gap-3 md:gap-5">
                         <div id="category-posts-list" class="flex flex-col gap-3 md:gap-5">
                             @forelse($posts as $post)
                             <article class="flex flex-col md:flex-row gap-2 md:gap-4 last:pb-0 category-post-item">

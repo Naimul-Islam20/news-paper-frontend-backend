@@ -385,7 +385,9 @@
                                     }
                                 });
                             });
-                        }, { threshold: 0.4 });
+                        }, {
+                            threshold: 0.4
+                        });
                         observer.observe(container);
                     })();
                 </script>
@@ -1631,11 +1633,11 @@
                 $side3 = $videoList->get(3);
                 $side4 = $videoList->get(4);
                 @endphp
-                <section class="py-8 border-t border-custom mt-4">
-                    <div class="">
+                <section class="relative left-1/2 -ml-[50vw] w-screen bg-primary/10 border-t border-b border-custom mt-4">
+                    <div class="container pt-8 pb-6">
                         <div class="flex items-center gap-3 mb-6">
                             <h2 class="text-2xl font-bold serif text-gray-900">@if($videoCategory)<a href="{{ category_url($videoCategory) }}" class="hover:text-primary transition-colors">{{ $videoTitle ?: 'ভিডিও' }}</a>@else{{ $videoTitle ?: 'ভিডিও' }}@endif</h2>
-                            <div class="h-1 flex-grow bg-primary"></div>
+                            <span class="w-4 h-4 bg-primary shrink-0"></span>
                         </div>
 
                         @if($videoList->isNotEmpty())
@@ -1724,11 +1726,11 @@
                 $gallerySmall2 = $galleryList->get(2);
                 $galleryRight = $galleryList->get(3);
                 @endphp
-                <section class="py-8 border-t border-custom mt-4">
+                <section class="pt-8 pb-6 border-b border-custom">
                     <div class="">
                         <div class="flex items-center gap-3 mb-6">
                             <h2 class="text-2xl font-bold serif text-gray-900">@if($galleryCategory)<a href="{{ category_url($galleryCategory) }}" class="hover:text-primary transition-colors">{{ $galleryTitle ?: 'ছবি' }}</a>@else{{ $galleryTitle ?: 'ছবি' }}@endif</h2>
-                            <div class="h-1 flex-grow bg-primary"></div>
+                            <span class="w-4 h-4 bg-primary shrink-0"></span>
                         </div>
 
                         @if($galleryList->isNotEmpty())
