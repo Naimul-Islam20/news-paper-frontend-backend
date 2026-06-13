@@ -175,6 +175,9 @@
     @endif
     @endif
 
+    @if(google_adsense_client())
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ google_adsense_client() }}" crossorigin="anonymous"></script>
+    @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @php
     $__primary = optional($siteMeta)->primary_color ?? null;

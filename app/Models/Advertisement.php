@@ -273,7 +273,7 @@ class Advertisement extends Model
             return false;
         }
 
-        return ad_has_media($this);
+        return $this->hasDisplayableMedia() || filled($this->link);
     }
 
     public function queueItems(): HasMany
@@ -436,19 +436,61 @@ class Advertisement extends Model
             && filled(google_adsense_client());
     }
 
-    /** Auto ON + Slot ID + Client ID = slot-এ Google (Local front-এ বন্ধ) */
+    /** Local priority — Google শুধু local না চললে fallback */
     public function displayUsesGoogleAd(): bool
     {
+        if ($this->hasRunningLocalAd()) {
+            return false;
+        }
+
         return $this->googleAdAutoEnabled() && $this->canShowGoogleAd();
     }
 
     public function displayUsesLocalAd(): bool
     {
-        if ($this->displayUsesGoogleAd()) {
-            return false;
+        return $this->hasRunningLocalAd();
+    }
+
+    /** ফ্রন্ট/অ্যাডমিন প্রিভিউ: কিউ মার্জ + মেয়াদ reconcile */
+    public function prepareForFrontDisplay(bool $forAdminPreview = false): self
+    {
+        $this->applyQueueItemDisplayOverride($forAdminPreview);
+
+        return $this;
+    }
+
+    /** @return array{mode: string, reasons: list<string>} */
+    public function frontAdDebug(): array
+    {
+        $this->prepareForFrontDisplay(forAdminPreview: true);
+
+        $reasons = [];
+
+        if (! $this->googleAdAutoEnabled()) {
+            $reasons[] = 'Google Auto OFF';
+        }
+        if (! filled($this->google_ad_slot)) {
+            $reasons[] = 'Slot ID নেই';
+        }
+        if (! filled(google_adsense_client())) {
+            $reasons[] = 'SEO & Meta-তে Client ID নেই';
+        }
+        if ($this->hasRunningLocalAd()) {
+            $reasons[] = 'Local ad চলছে (Google block)';
         }
 
-        return $this->hasRunningLocalAd();
+        if ($this->displayUsesGoogleAd()) {
+            return ['mode' => 'Google', 'reasons' => $reasons];
+        }
+        if ($this->displayUsesLocalAd()) {
+            if ($this->googleAdAutoEnabled() && filled($this->google_ad_slot) && filled(google_adsense_client())) {
+                $reasons[] = 'Google ready — Local বন্ধ/Delete করলে Google দেখাবে';
+            }
+
+            return ['mode' => 'Local', 'reasons' => $reasons];
+        }
+
+        return ['mode' => 'খালি', 'reasons' => $reasons ?: ['কোনো ad active নেই']];
     }
 
     /** @deprecated displayUsesGoogleAd() ব্যবহার করুন */
@@ -472,16 +514,13 @@ class Advertisement extends Model
             return null;
         }
 
-        if ($ad->isActiveForDisplay()) {
-            $ad->applyQueueItemDisplayOverride();
-        }
+        $ad->prepareForFrontDisplay();
 
-        // Google-only slot: local inactive হলেও Google দেখানোর জন্য ad return
-        if ($ad->displayUsesGoogleAd()) {
+        if ($ad->displayUsesLocalAd()) {
             return $ad;
         }
 
-        if ($ad->displayUsesLocalAd()) {
+        if ($ad->displayUsesGoogleAd()) {
             return $ad;
         }
 
@@ -493,7 +532,8 @@ class Advertisement extends Model
         return filled($this->video_youtube_id)
             || filled($this->video)
             || filled($this->video_mobile)
-            || filled($this->image);
+            || filled($this->image)
+            || filled($this->image_mobile);
     }
 
     public function resolvedMediaType(): string

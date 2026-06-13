@@ -21,11 +21,12 @@
                 @endif
             </p>
             @php
+            $frontPreview = $advertisement->fresh();
+            $frontPreview->load(['queueItems' => fn ($q) => $q->whereNull('expired_at')->orderBy('sort_order')->orderBy('id')]);
+            $frontAdDebug = $frontPreview->frontAdDebug();
             $frontSource = $advertisement->hasPausedLocalAd()
                 ? 'Local (বন্ধ)'
-                : ($advertisement->displayUsesLocalAd()
-                    ? 'Local'
-                    : ($advertisement->displayUsesGoogleAd() ? 'Google' : 'খালি'));
+                : $frontAdDebug['mode'];
             $frontSourceClass = match (true) {
                 $advertisement->hasPausedLocalAd() => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
                 $frontSource === 'Local' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
@@ -62,9 +63,27 @@
         <div class="bg-white dark:bg-slate-900 shadow-sm rounded-lg border-2 border-blue-200 dark:border-blue-900/60 overflow-hidden">
             <div class="px-6 py-4 bg-blue-50 dark:bg-blue-950/40 border-b border-blue-100 dark:border-blue-900/50">
                 <h3 class="text-base font-semibold text-blue-900 dark:text-blue-100">Google Ad</h3>
-                <p class="mt-0.5 text-sm text-blue-800/70 dark:text-blue-200/70">Auto ON + Slot ID = slot-এ Google ad (Local front-এ দেখাবে না)। Auto OFF = শুধু Local।</p>
+                <p class="mt-0.5 text-sm text-blue-800/70 dark:text-blue-200/70">Local না থাকলে Google fallback (Auto ON + Slot ID + Client ID)</p>
             </div>
             <div class="p-6">
+                <div class="mb-4 rounded-lg border px-4 py-3 text-sm {{ $frontAdDebug['mode'] === 'Google' ? 'border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-100' : ($frontAdDebug['mode'] === 'Local' ? 'border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40' : 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/40') }}">
+                    <p class="font-semibold">Frontend এ এখন দেখাবে: {{ $frontAdDebug['mode'] }}</p>
+                    @if($frontAdDebug['mode'] === 'Google')
+                    <p class="mt-1 text-xs opacity-80">Client: {{ google_adsense_client() }} · Slot: {{ $advertisement->google_ad_slot }}</p>
+                    @elseif($frontAdDebug['mode'] === 'Local' && count($frontAdDebug['reasons']))
+                    <ul class="mt-1 list-disc list-inside text-xs space-y-0.5">
+                        @foreach($frontAdDebug['reasons'] as $reason)
+                        <li>{{ $reason }}</li>
+                        @endforeach
+                    </ul>
+                    @elseif($frontAdDebug['mode'] === 'খালি')
+                    <ul class="mt-1 list-disc list-inside text-xs space-y-0.5">
+                        @foreach($frontAdDebug['reasons'] as $reason)
+                        <li>{{ $reason }}</li>
+                        @endforeach
+                    </ul>
+                    @endif
+                </div>
                 @if($googleErrors->isNotEmpty())
                 <div class="mb-4 px-4 py-2 rounded-lg bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-sm">
                     <ul class="list-disc list-inside space-y-1">

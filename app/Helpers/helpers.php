@@ -343,12 +343,12 @@ if (! function_exists('normalize_google_adsense_client')) {
             return null;
         }
 
-        if (preg_match('/^(?:ca-pub-|pub-)(\d+)$/i', $raw, $m)) {
+        if (preg_match('/^(?:ca-pub-|pub-)(\d+)$/i', preg_replace('/\s+/', '', $raw), $m)) {
             return 'ca-pub-'.$m[1];
         }
 
-        if (preg_match('/^\d+$/', $raw)) {
-            return 'ca-pub-'.$raw;
+        if (preg_match('/^\d+$/', preg_replace('/\s+/', '', $raw))) {
+            return 'ca-pub-'.preg_replace('/\s+/', '', $raw);
         }
 
         return null;
@@ -378,7 +378,8 @@ if (! function_exists('ad_has_media')) {
         return filled($ad->video_youtube_id)
             || filled($ad->video)
             || filled($ad->video_mobile)
-            || filled($ad->image);
+            || filled($ad->image)
+            || filled($ad->image_mobile);
     }
 }
 
@@ -527,26 +528,17 @@ if (! function_exists('share_meta_description')) {
 if (! function_exists('site_meta_record')) {
     function site_meta_record(): ?\App\Models\SiteMeta
     {
-        static $meta = null;
-        static $resolved = false;
-
-        if ($resolved) {
-            return $meta;
-        }
-
-        $resolved = true;
-
         if (! app()->runningInConsole()) {
             try {
                 $shared = view()->shared('siteMeta');
                 if ($shared instanceof \App\Models\SiteMeta) {
-                    return $meta = $shared;
+                    return $shared;
                 }
             } catch (\Throwable) {
             }
         }
 
-        return $meta = \App\Models\SiteMeta::first();
+        return \App\Models\SiteMeta::first();
     }
 }
 
