@@ -24,8 +24,8 @@ $stripOuterClass = $variant === 'header'
         <div class="{{ $stripOuterClass }} {{ $wrapperClass }}" @if($ad->displayUsesGoogleAd()) data-ad-slot-root @endif>
             <div class="container">
                 @if($ad->displayUsesGoogleAd())
-                <div class="ad-slot-frame {{ $stripFrameClass }} w-full flex items-center justify-center bg-slate-50">
-                    <x-google-ad-unit :ad="$ad" :format="$stripFormat" class="w-full max-w-full flex items-center justify-center" />
+                <div class="ad-slot-google ad-slot-google--{{ $stripFormat }} w-full flex items-center justify-center bg-slate-50">
+                    <x-google-ad-unit :ad="$ad" :format="$stripFormat" />
                 </div>
                 @else
                 <a href="{{ advertisement_click_url($ad) }}" class="ad-slot-frame {{ $stripFrameClass }} w-full flex items-center justify-center bg-slate-50 img-placeholder" target="_blank" rel="noopener">
@@ -37,14 +37,14 @@ $stripOuterClass = $variant === 'header'
     @elseif($ad->displayUsesGoogleAd())
         @if($variant === 'sidebar')
         <div class="{{ $wrapperClass ?: 'shrink-0 w-full' }}" data-ad-slot-root>
-            <div class="block relative overflow-hidden bg-gray-50 w-full min-h-[250px] {{ $sidebarClass }}">
-                <x-google-ad-unit :ad="$ad" format="sidebar" class="w-full max-w-[300px] mx-auto" />
+            <div class="block relative bg-gray-50 w-full {{ $sidebarClass }}">
+                <x-google-ad-unit :ad="$ad" format="sidebar" class="mx-auto" />
             </div>
         </div>
         @elseif($variant === 'inline')
         <div class="not-prose lg:hidden ad-section my-6 w-full max-w-[min(100%,320px)] mx-auto {{ $wrapperClass }}" data-ad-slot-root>
-            <div class="block relative overflow-hidden bg-gray-50 aspect-[4/3] w-full">
-                <x-google-ad-unit :ad="$ad" format="inline" class="w-full max-w-[300px] mx-auto" />
+            <div class="block relative bg-gray-50 w-full">
+                <x-google-ad-unit :ad="$ad" format="inline" class="mx-auto" />
             </div>
         </div>
         @endif

@@ -177,21 +177,6 @@
 
     @if(google_adsense_client())
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ google_adsense_client() }}" crossorigin="anonymous"></script>
-    <style>
-        ins.adsbygoogle:not([data-ad-slot]),
-        ins.adsbygoogle[data-anchor-status],
-        ins.adsbygoogle[data-vignette-loaded],
-        ins.adsbygoogle[data-anchor-shown],
-        body > ins.adsbygoogle:not([data-ad-slot]),
-        body > .adsbygoogle-noablate {
-            display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            max-height: 0 !important;
-            overflow: hidden !important;
-            pointer-events: none !important;
-        }
-    </style>
     @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @php
@@ -376,77 +361,7 @@
         }
     </script>
     @if(google_adsense_client())
-    <script>
-        (function () {
-            function isSlotAd(el) {
-                return el && el.matches('ins.adsbygoogle[data-ad-slot]') && el.closest('.google-ad-unit');
-            }
-
-            function hideAutoAd(el) {
-                if (!el || el.nodeType !== 1 || isSlotAd(el)) return;
-                if (el.matches('ins.adsbygoogle[data-anchor-status], ins.adsbygoogle[data-vignette-loaded], ins.adsbygoogle[data-anchor-shown], ins.adsbygoogle:not([data-ad-slot])')) {
-                    el.style.setProperty('display', 'none', 'important');
-                    el.style.setProperty('visibility', 'hidden', 'important');
-                    el.style.setProperty('height', '0', 'important');
-                    el.style.setProperty('pointer-events', 'none', 'important');
-                }
-            }
-
-            function suppressAutoAds() {
-                document.querySelectorAll('ins.adsbygoogle').forEach(hideAutoAd);
-                document.querySelectorAll('body > .adsbygoogle-noablate').forEach(function (el) {
-                    el.style.setProperty('display', 'none', 'important');
-                });
-            }
-
-            function initSlotAds() {
-                document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-slot]:not([data-adsbygoogle-status])').forEach(function (el) {
-                    try {
-                        (window.adsbygoogle = window.adsbygoogle || []).push({});
-                    } catch (e) {}
-                });
-            }
-
-            function collapseUnfilled() {
-                document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-status="unfilled"]').forEach(function (el) {
-                    var root = el.closest('[data-ad-slot-root]');
-                    if (root) {
-                        root.style.display = 'none';
-                    }
-                });
-            }
-
-            function boot() {
-                initSlotAds();
-                suppressAutoAds();
-            }
-
-            function whenAdsReady(fn) {
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', fn);
-                    return;
-                }
-                fn();
-            }
-
-            whenAdsReady(boot);
-
-            var passes = 0;
-            var retry = setInterval(function () {
-                initSlotAds();
-                if (++passes >= 30) {
-                    clearInterval(retry);
-                    setTimeout(collapseUnfilled, 2000);
-                }
-            }, 500);
-
-            if (typeof MutationObserver !== 'undefined') {
-                new MutationObserver(function () {
-                    suppressAutoAds();
-                }).observe(document.documentElement, { childList: true, subtree: true });
-            }
-        })();
-    </script>
+    <x-google-adsense-guard />
     @endif
     @stack('scripts')
 </body>

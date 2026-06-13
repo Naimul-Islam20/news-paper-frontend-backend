@@ -62,7 +62,7 @@
         <div class="bg-white dark:bg-slate-900 shadow-sm rounded-lg border-2 border-blue-200 dark:border-blue-900/60 overflow-hidden">
             <div class="px-6 py-4 bg-blue-50 dark:bg-blue-950/40 border-b border-blue-100 dark:border-blue-900/50">
                 <h3 class="text-base font-semibold text-blue-900 dark:text-blue-100">Google Ad</h3>
-                <p class="mt-0.5 text-sm text-blue-800/70 dark:text-blue-200/70">Fallback — Local ad না থাকলে Google দেখাবে</p>
+                <p class="mt-0.5 text-sm text-blue-800/70 dark:text-blue-200/70">Local ad বন্ধ/না থাকলে slot-এ Google ad চলবে — Local চললে Google দেখাবে না</p>
             </div>
             <div class="p-6">
                 @if($googleErrors->isNotEmpty())
