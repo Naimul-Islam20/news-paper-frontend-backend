@@ -178,8 +178,6 @@
     @if(google_adsense_client())
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ google_adsense_client() }}" crossorigin="anonymous"></script>
     @endif
-
-    <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @php
     $__primary = optional($siteMeta)->primary_color ?? null;
@@ -188,13 +186,7 @@
     @if ($__primaryOk)
     <style>
         :root {
-            --color-primary: {
-                    {
-                    $__primary
-                }
-            }
-
-            !important;
+            --color-primary: {{ $__primary }} !important;
             --site-name: "{{ site_name() }}";
         }
     </style>
@@ -368,6 +360,29 @@
             document.documentElement.lang = 'bn';
         }
     </script>
+    @if(google_adsense_client())
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])').forEach(function (el) {
+                try {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                } catch (e) {}
+            });
+
+            function hideUnfilledAds() {
+                document.querySelectorAll('ins.adsbygoogle[data-ad-status="unfilled"]').forEach(function (el) {
+                    var wrap = el.closest('.google-ad-unit');
+                    if (wrap) {
+                        wrap.style.display = 'none';
+                    }
+                });
+            }
+
+            setTimeout(hideUnfilledAds, 2500);
+            setTimeout(hideUnfilledAds, 6000);
+        });
+    </script>
+    @endif
     @stack('scripts')
 </body>
 

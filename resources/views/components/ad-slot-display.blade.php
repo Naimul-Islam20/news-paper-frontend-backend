@@ -19,27 +19,27 @@ $ad = $ad ?? ($slug ? ad_slot($slug) : null);
         <div class="hidden w-full py-1 md:flex md:py-2 justify-center bg-white px-2 {{ $wrapperClass }}">
             <div class="container flex justify-center overflow-hidden">
                 <div class="w-full flex justify-center max-w-[1000px]">
-                    <x-google-ad-unit :ad="$ad" min-height="70px" class="w-full max-w-[1000px]" />
+                    <x-google-ad-unit :ad="$ad" format="header" class="w-full max-w-[1000px]" />
                 </div>
             </div>
         </div>
         @elseif($variant === 'sidebar')
         <div class="{{ $wrapperClass ?: 'shrink-0 w-full' }}">
-            <div class="block relative overflow-hidden bg-gray-50 aspect-[4/3] w-full {{ $sidebarClass }}">
-                <x-google-ad-unit :ad="$ad" class="w-full h-full min-h-[200px]" />
+            <div class="block relative overflow-hidden bg-gray-50 w-full min-h-[250px] {{ $sidebarClass }}">
+                <x-google-ad-unit :ad="$ad" format="sidebar" class="w-full max-w-[300px] mx-auto" />
             </div>
         </div>
         @elseif($variant === 'inline')
         <div class="not-prose lg:hidden ad-section my-6 w-full max-w-[min(100%,320px)] mx-auto {{ $wrapperClass }}">
             <div class="block relative overflow-hidden bg-gray-50 aspect-[4/3] w-full">
-                <x-google-ad-unit :ad="$ad" class="w-full h-full min-h-[200px]" />
+                <x-google-ad-unit :ad="$ad" format="inline" class="w-full max-w-[300px] mx-auto" />
             </div>
         </div>
         @else
         <div class="py-2 md:py-3 flex justify-center bg-transparent px-0 md:px-4 {{ $wrapperClass }}">
             <div class="container flex justify-center overflow-hidden">
                 <div class="w-full flex justify-center max-w-[1000px] mx-auto">
-                    <x-google-ad-unit :ad="$ad" min-height="90px" class="w-full max-w-[1000px]" />
+                    <x-google-ad-unit :ad="$ad" format="banner" class="w-full max-w-[1000px]" />
                 </div>
             </div>
         </div>

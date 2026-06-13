@@ -13,7 +13,7 @@
                         x-show="showSidebar"
                         x-transition:opacity
                         @click="showSidebar = false"
-                        class="fixed inset-0 bg-black/50 z-[60] backdrop-blur-sm"
+                        class="fixed inset-0 bg-black/50 z-[200] backdrop-blur-sm"
                         x-cloak></div>
 
                     <!-- Drawer Content -->
@@ -25,7 +25,7 @@
                         x-transition:leave="transition ease-in duration-300 transform"
                         x-transition:leave-start="translate-x-0"
                         x-transition:leave-end="-translate-x-full"
-                        class="fixed inset-y-0 left-0 w-80 bg-white z-[80] shadow-2xl pt-2 px-6 pb-6 overflow-y-auto"
+                        class="fixed inset-y-0 left-0 w-80 bg-white z-[210] shadow-2xl pt-2 px-6 pb-6 overflow-y-auto"
                         x-cloak>
                         <div class="flex justify-end items-center mb-2 pb-2 border-b border-black/5">
                             <button @click="showSidebar = false" class="p-2 hover:bg-slate-100  transition-colors">
@@ -193,7 +193,7 @@
                 </form>
 
                 <!-- Top Utility Bar -->
-                <div class="flex justify-between items-center text-slate-800 text-sm md:text-base font-medium mb-0 hidden md:flex relative z-[120]">
+                <div class="flex justify-between items-center text-slate-800 text-sm md:text-base font-medium mb-0 hidden md:flex relative">
                     <div class="flex items-center gap-2 md:gap-2.5 header-date">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-5 md:h-5 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -260,7 +260,7 @@
                             @endphp
                             <span class="leading-normal tracking-normal">{{ $d }}, {{ $dn }} {{ $m }} {{ $yn }}, {{ $bangla_date }} বঙ্গাব্দ</span>
                     </div>
-                    <div class="flex items-center gap-3 relative z-[120]">
+                    <div class="flex items-center gap-3 relative">
                         <x-header-utility-links class="hidden md:flex" />
                         @if(!empty(optional($siteMeta)->facebook_link))
                         <a href="{{ $siteMeta->facebook_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-primary transition-colors" title="Facebook" aria-label="Facebook">

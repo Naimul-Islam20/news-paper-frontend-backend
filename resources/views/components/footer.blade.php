@@ -1,4 +1,4 @@
-<footer class="bg-white border-t border-black/10 text-black pt-16 pb-8">
+<footer class="bg-white border-t border-black/10 text-black pt-16 pb-10 md:pb-14">
     <div class="container overflow-visible px-4 md:px-0">
         <!-- Logo + Email Subscribe Row -->
         <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-4 pb-4 border-b border-gray-300">
@@ -34,7 +34,7 @@
         <!-- 12-Column Grid for precise control -->
         <div class="grid grid-cols-2 md:grid-cols-12 gap-8 pt-4">
             <!-- Column 1: Info and Copyright (Span 3) -->
-            <div class="col-span-2 md:col-span-3 space-y-6 md:border-r border-slate-200 md:pr-4">
+            <div class="col-span-2 md:col-span-3 space-y-6 md:pr-4 relative md:after:content-[''] md:after:absolute md:after:top-1/2 md:after:-translate-y-1/2 md:after:right-0 md:after:w-px md:after:h-[330px] md:after:bg-slate-300">
                 <div class="text-base font-md space-y-1">
                     @foreach(site_editor_publisher_lines($siteMeta) as $line)
                     <p>{{ $line['label'] }}: {{ $line['name'] }}</p>
@@ -51,23 +51,23 @@
             </div>
 
             <!-- Column 2: Category Links (Span 5 — Column 3 থেকে কমানো জায়গা) -->
-            <div class="col-span-2 md:col-span-5 md:border-r border-slate-200 md:pr-4">
+            <div class="col-span-2 md:col-span-5 md:pr-4 relative md:after:content-[''] md:after:absolute md:after:top-1/2 md:after:-translate-y-1/2 md:after:right-0 md:after:w-px md:after:h-[330px] md:after:bg-slate-300">
                 @if(isset($footerCol2) && $footerCol2->isNotEmpty())
                 <div class="grid w-full grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-base md:text-xl">
                     @foreach($footerCol2 as $cat)
-                    <a href="{{ route('category.show', $cat->slug) }}" class="block w-full font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all">{{ $cat->name }}</a>
+                    <a href="{{ route('category.show', $cat->slug) }}" class="block w-full font-medium hover:text-primary transition-all">{{ $cat->name }}</a>
                     @endforeach
                 </div>
                 @else
                 <div class="grid w-full grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-base md:text-xl">
-                    <a href="{{ route('gallery.index') }}" class="block w-full font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all">ছবি</a>
-                    <a href="{{ route('videos.index') }}" class="block w-full font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all">ভিডিও</a>
+                    <a href="{{ route('gallery.index') }}" class="block w-full font-medium hover:text-primary transition-all">ছবি</a>
+                    <a href="{{ route('videos.index') }}" class="block w-full font-medium hover:text-primary transition-all">ভিডিও</a>
                 </div>
                 @endif
             </div>
 
             <!-- Column 3: Custom Links (Span 2 — same as Column 4) -->
-            <div class="md:col-span-2 md:border-r border-slate-200 md:pr-4">
+            <div class="md:col-span-2 md:pr-4 relative md:after:content-[''] md:after:absolute md:after:top-1/2 md:after:-translate-y-1/2 md:after:right-0 md:after:w-px md:after:h-[330px] md:after:bg-slate-300">
                 @if(isset($footerCol3) && $footerCol3->isNotEmpty())
                 <ul class="space-y-1 text-base md:text-xl">
                     @foreach($footerCol3 as $cat)

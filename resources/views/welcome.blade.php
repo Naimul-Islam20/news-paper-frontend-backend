@@ -1736,7 +1736,7 @@
                             <div class="flex flex-col gap-4">
                                 @if($galleryMain)
                                 @php $galleryMainCover = $galleryMain->images->first(); @endphp
-                                <a href="{{ route('gallery.show', $galleryMain->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[180px] md:h-[330px]">
+                                <a href="{{ route('gallery.show', $galleryMain->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[200px] md:h-[355px]">
                                     @if($galleryMainCover)
                                     <img src="{{ storage_image_url($galleryMainCover->image) }}" alt="{{ $galleryMain->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif

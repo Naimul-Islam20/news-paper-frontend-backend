@@ -262,3 +262,31 @@ body {
     letter-spacing: normal;
     line-height: 1.6;
 }
+
+/* Google AdSense — স্লটের ভিতরে contain; পুরো screen জুড়ে ছড়াবে না */
+.google-ad-unit {
+    position: relative;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+    contain: layout style;
+}
+
+.google-ad-unit--banner,
+.google-ad-unit--header {
+    max-width: 1000px;
+}
+
+.google-ad-unit--sidebar,
+.google-ad-unit--inline {
+    max-width: 300px;
+}
+
+.google-ad-unit .adsbygoogle {
+    overflow: hidden !important;
+}
+
+.google-ad-unit iframe {
+    max-width: 100% !important;
+}
