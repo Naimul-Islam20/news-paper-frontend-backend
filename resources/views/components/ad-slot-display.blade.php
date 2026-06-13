@@ -60,4 +60,6 @@ $stripOuterClass = $variant === 'header'
             </div>
         </div>
     @endif
+@elseif($slug)
+<!-- ad-slot:{{ $slug }} status=empty (local+google both off) -->
 @endif

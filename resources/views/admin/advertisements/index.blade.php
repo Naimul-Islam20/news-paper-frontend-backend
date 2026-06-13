@@ -16,6 +16,17 @@
             {{ $errors->first() }}
         </div>
         @endif
+        @if($googleClientConfigured && $googleSlotCount === 0)
+        <div class="mb-4 px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-sm">
+            <strong>Google Client ID আছে</strong>, কিন্তু কোনো slot-এ <strong>Slot ID save হয়নি</strong>।
+            প্রতিটি slot Edit → Google section → Slot ID দিন → <strong>Google Save</strong> চাপুন।
+            Local ad নেই এমন slot-এ তখন Google fallback দেখাবে।
+        </div>
+        @elseif(! $googleClientConfigured)
+        <div class="mb-4 px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-sm">
+            <strong>SEO & Meta</strong>-তে Google AdSense Client ID (<code class="font-mono">pub-2602475216171666</code>) save করুন।
+        </div>
+        @endif
         <div class="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-100 dark:border-slate-800 mb-6 sm:mb-8">
             <p class="text-sm text-slate-600 dark:text-slate-400 min-w-0">ফিক্সড অ্যাড স্লটগুলো এখানে তালিকাভুক্ত। নতুন অ্যাড যোগ করা যাবে না; শুধু প্রতিটি স্লটের ইমেজ/লিংক আপডেট করুন।</p>
         </div>

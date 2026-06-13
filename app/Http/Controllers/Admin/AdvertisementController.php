@@ -17,8 +17,18 @@ class AdvertisementController extends Controller
         Advertisement::archiveAllExpiredSlots();
 
         $advertisements = Advertisement::orderBy('slug')->get();
+        $googleClientConfigured = filled(google_adsense_client());
+        $googleSlotCount = Advertisement::query()
+            ->where('google_ad_auto', true)
+            ->whereNotNull('google_ad_slot')
+            ->where('google_ad_slot', '!=', '')
+            ->count();
 
-        return view('admin.advertisements.index', compact('advertisements'));
+        return view('admin.advertisements.index', compact(
+            'advertisements',
+            'googleClientConfigured',
+            'googleSlotCount',
+        ));
     }
 
     public function edit(int $id): View
@@ -129,7 +139,8 @@ class AdvertisementController extends Controller
 
         $advertisement->update([
             'google_ad_slot' => $slotId !== '' ? $slotId : null,
-            'google_ad_auto' => $slotId !== '' ? $googleAdAuto : false,
+            // Slot ID save = Google fallback চালু (Auto checkbox ভুলে uncheck থাকলেও)
+            'google_ad_auto' => $slotId !== '' ? true : false,
         ]);
 
         return redirect()
