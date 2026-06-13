@@ -1,9 +1,14 @@
 import { BanglaLikhi } from 'bangla-likhi';
 
-function fixBrokenBijoy(text) {
+function fixBrokenBijoy(text, isUnicodeField) {
+    if (isUnicodeField && /[\u0980-\u09FF]/.test(text)) {
+        return text;
+    }
+
     let bijoy = '';
     for (let i = 0; i < text.length; i++) {
-        bijoy += String.fromCharCode(text.charCodeAt(i) & 0xff);
+        const code = text.charCodeAt(i);
+        bijoy += code <= 255 ? text[i] : String.fromCharCode(code & 0xff);
     }
     return BanglaLikhi.bijoyToUnicode(bijoy);
 }
@@ -31,11 +36,21 @@ function initBanglaConverter() {
     });
 
     document.getElementById('btn-fix-broken')?.addEventListener('click', () => {
-        const source = bijoyInput.value.trim() || unicodeInput.value.trim();
-        if (!source) {
+        const bijoyText = bijoyInput.value.trim();
+        const unicodeText = unicodeInput.value.trim();
+        if (!bijoyText && !unicodeText) {
             return;
         }
-        unicodeInput.value = fixBrokenBijoy(source);
+        if (bijoyText) {
+            unicodeInput.value = BanglaLikhi.bijoyToUnicode(bijoyText);
+            bijoyInput.value = BanglaLikhi.unicodeToBijoy(unicodeInput.value);
+            return;
+        }
+        if (/[\u0980-\u09FF]/.test(unicodeText)) {
+            bijoyInput.value = BanglaLikhi.unicodeToBijoy(unicodeText);
+            return;
+        }
+        unicodeInput.value = fixBrokenBijoy(unicodeText, true);
         bijoyInput.value = BanglaLikhi.unicodeToBijoy(unicodeInput.value);
     });
 

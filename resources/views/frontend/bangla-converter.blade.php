@@ -40,23 +40,13 @@
             </div>
 
             <div class="space-y-6">
-                <div class="bg-white border border-slate-200 rounded-sm shadow-sm overflow-hidden">
-                    <div class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200">
-                        <label for="unicode-input" class="text-sm font-semibold text-slate-800">
-                            <span class="i18n-bn">ইউনিকোডের লেখা পেস্ট করুন</span>
-                            <span class="i18n-en">Paste Unicode text</span>
-                        </label>
-                        <button type="button" onclick="banglaCopy('unicode')" class="text-xs text-primary hover:underline font-medium">
-                            <span class="i18n-bn">কপি</span>
-                            <span class="i18n-en">Copy</span>
-                        </button>
-                    </div>
+                <div class="rounded-sm">
                     <textarea
                         id="unicode-input"
-                        rows="8"
-                        placeholder="আপনার ইউনিকোড বাংলা লেখা এখানে পেস্ট করুন..."
-                        data-placeholder-en="Paste your Unicode Bangla text here..."
-                        class="w-full px-4 py-3 text-base md:text-lg leading-relaxed border-0 focus:ring-0 outline-none resize-y min-h-[180px] font-normal notranslate"></textarea>
+                        rows="9"
+                        placeholder="ইউনিকোডের লেখা পেস্ট করুন"
+                        data-placeholder-en="Paste Unicode text"
+                        class="w-full px-4 py-3 text-2xl md:text-3xl font-semibold serif text-title leading-tight bg-blue-50 border border-blue-400 rounded-sm focus:border-2 focus:border-blue-500 focus:ring-0 focus:outline-none outline-none resize-y min-h-[220px] h-[220px] overflow-y-auto notranslate placeholder:serif placeholder:font-semibold placeholder:text-slate-400 placeholder:text-2xl md:placeholder:text-3xl placeholder:leading-tight"></textarea>
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center gap-2 md:gap-3">
@@ -90,23 +80,13 @@
                     </button>
                 </div>
 
-                <div class="bg-white border border-slate-200 rounded-sm shadow-sm overflow-hidden">
-                    <div class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-200">
-                        <label for="bijoy-input" class="text-sm font-semibold text-slate-800">
-                            <span class="i18n-bn">বিজয় লেখা পেস্ট করুন</span>
-                            <span class="i18n-en">Paste Bijoy text</span>
-                        </label>
-                        <button type="button" onclick="banglaCopy('bijoy')" class="text-xs text-primary hover:underline font-medium">
-                            <span class="i18n-bn">কপি</span>
-                            <span class="i18n-en">Copy</span>
-                        </button>
-                    </div>
+                <div class="rounded-sm">
                     <textarea
                         id="bijoy-input"
-                        rows="8"
-                        placeholder="আপনার বিজয় লেখা এখানে পেস্ট করুন..."
-                        data-placeholder-en="Paste your Bijoy text here..."
-                        class="w-full px-4 py-3 text-base md:text-lg leading-relaxed border-0 focus:ring-0 outline-none resize-y min-h-[180px] bijoy-text notranslate"></textarea>
+                        rows="9"
+                        placeholder="বিজয়ের লেখা পেস্ট করুন"
+                        data-placeholder-en="Paste Bijoy text"
+                        class="w-full px-4 py-3 text-base md:text-lg leading-relaxed bg-blue-50 border border-blue-400 rounded-sm focus:border-2 focus:border-blue-500 focus:ring-0 focus:outline-none outline-none resize-y min-h-[220px] h-[220px] overflow-y-auto bijoy-text notranslate placeholder:text-lg md:placeholder:text-xl"></textarea>
                     <p class="px-4 pb-3 text-xs text-slate-500">
                         <span class="i18n-bn">বিজয় লেখা SutonnyMJ font-এ দেখানো হয় — Word/InDesign-এ paste করতে হলে সেখানেও Bijoy font লাগবে।</span>
                         <span class="i18n-en">Bijoy text is shown in SutonnyMJ — paste into Word/InDesign with a Bijoy font installed.</span>
@@ -117,5 +97,5 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/bangla-converter/all.js') }}?v=1"></script>
+    <script src="{{ asset('js/bangla-converter/all.js') }}?v=2"></script>
 </x-layout>

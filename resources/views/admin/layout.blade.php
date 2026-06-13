@@ -209,22 +209,23 @@
 
                 {{-- Smooth Dropdown Posts --}}
                 @if(auth()->user()->canFeature('posts.view') || auth()->user()->canFeature('posts.manage'))
+                @php $postsMenuOpen = request()->routeIs('admin.posts.*'); @endphp
                 <div class="relative">
                     <button
                         type="button"
                         onclick="toggleSubmenu('posts-menu')"
-                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all group">
+                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl transition-all {{ $postsMenuOpen ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }} group">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 {{ $postsMenuOpen ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path>
                             </svg>
                             <span class="font-medium">Posts</span>
                         </div>
-                        <svg id="posts-menu-arrow" class="w-3.5 h-3.5 transition-transform duration-300 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="posts-menu-arrow" class="w-3.5 h-3.5 transition-transform duration-300 text-slate-400 {{ $postsMenuOpen ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="posts-menu" class="grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
+                    <div id="posts-menu" class="{{ $postsMenuOpen ? 'grid grid-rows-[1fr]' : 'grid grid-rows-[0fr]' }} transition-all duration-300 ease-in-out">
                         <div class="overflow-hidden">
                             <div class="ml-4 pl-0 border-l border-slate-200 dark:border-slate-800 space-y-0 py-1">
                                 <a href="{{ route('admin.posts.create') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative">
@@ -249,23 +250,24 @@
 
                 {{-- Smooth Dropdown Category --}}
                 @if(auth()->user()->canFeature('categories.manage'))
+                @php $categoriesMenuOpen = request()->routeIs('admin.categories.*') || request()->routeIs('admin.sub-categories.*'); @endphp
                 <div class="relative">
                     <button
                         type="button"
                         onclick="toggleSubmenu('categories-menu')"
-                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all group">
+                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl transition-all {{ $categoriesMenuOpen ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }} group">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 {{ $categoriesMenuOpen ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.125 1.125 0 001.591 0l4.454-4.454a1.125 1.125 0 000-1.591L9.706 4.318A2.25 2.25 0 008.25 3h1.318z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6a1 1 0 100 2 1 1 0 000-2z"></path>
                             </svg>
                             <span class="font-medium">Categories</span>
                         </div>
-                        <svg id="categories-menu-arrow" class="w-3.5 h-3.5 transition-transform duration-300 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="categories-menu-arrow" class="w-3.5 h-3.5 transition-transform duration-300 text-slate-400 {{ $categoriesMenuOpen ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="categories-menu" class="grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
+                    <div id="categories-menu" class="{{ $categoriesMenuOpen ? 'grid grid-rows-[1fr]' : 'grid grid-rows-[0fr]' }} transition-all duration-300 ease-in-out">
                         <div class="overflow-hidden">
                             <div class="ml-4 pl-0 border-l border-slate-200 dark:border-slate-800 space-y-0 py-1">
                                 <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative">
@@ -301,22 +303,23 @@
 
 
                 @if(auth()->user()->canFeature('pages.manage'))
+                @php $pagesMenuOpen = request()->routeIs('admin.pages.*'); @endphp
                 <div class="mb-1">
                     <button
                         type="button"
                         onclick="toggleSubmenu('pages-menu')"
-                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all group">
+                        class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl transition-all {{ $pagesMenuOpen ? 'bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200' }} group">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 {{ $pagesMenuOpen ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25M9 16.5v.75m3-3v3M15 12v5.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path>
                             </svg>
                             <span class="font-medium">Pages</span>
                         </div>
-                        <svg id="pages-menu-arrow" class="w-3.5 h-3.5 transition-transform duration-300 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="pages-menu-arrow" class="w-3.5 h-3.5 transition-transform duration-300 text-slate-400 {{ $pagesMenuOpen ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
-                    <div id="pages-menu" class="grid grid-rows-[0fr] transition-all duration-300 ease-in-out">
+                    <div id="pages-menu" class="{{ $pagesMenuOpen ? 'grid grid-rows-[1fr]' : 'grid grid-rows-[0fr]' }} transition-all duration-300 ease-in-out">
                         <div class="overflow-hidden">
                             <div class="ml-4 pl-0 border-l border-slate-200 dark:border-slate-800 space-y-0 py-1">
                                 <a href="{{ route('admin.pages.create') }}" class="flex items-center gap-0 py-2 text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-all group/sub relative">
