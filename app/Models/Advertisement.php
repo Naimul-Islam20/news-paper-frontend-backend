@@ -573,6 +573,19 @@ class Advertisement extends Model
         return is_array($spec) ? $spec : null;
     }
 
+    /**
+     * @return array{width: int, height: int}|null
+     */
+    public function mediaSpecDimensions(): ?array
+    {
+        return ad_media_spec_dimensions($this->mediaSpec());
+    }
+
+    public function slotBoxStyle(string $layout = 'strip'): string
+    {
+        return ad_slot_box_style($this, $layout);
+    }
+
     public function mediaSpecLabel(): ?string
     {
         $spec = $this->mediaSpec();

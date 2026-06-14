@@ -6,6 +6,12 @@
 @php
 $client = google_adsense_client();
 $slot = google_adsense_slot_for($ad);
+
+$insFormat = match ($format) {
+    'header', 'banner' => ['data-ad-format' => 'horizontal', 'data-full-width-responsive' => 'false'],
+    'sidebar', 'inline' => ['data-ad-format' => 'rectangle', 'data-full-width-responsive' => 'false'],
+    default => [],
+};
 @endphp
 
 @if($ad && $client && filled($slot))
@@ -14,7 +20,8 @@ $slot = google_adsense_slot_for($ad);
         style="display:block"
         data-ad-client="{{ $client }}"
         data-ad-slot="{{ $slot }}"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
+        @foreach($insFormat as $attr => $value)
+        {{ $attr }}="{{ $value }}"
+        @endforeach></ins>
 </div>
 @endif

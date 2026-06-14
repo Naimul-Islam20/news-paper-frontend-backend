@@ -402,6 +402,57 @@ if (! function_exists('google_adsense_slot_for')) {
     }
 }
 
+if (! function_exists('ad_media_spec_dimensions')) {
+    /**
+     * config/advertisement_slots media_specs.size → ['width' => int, 'height' => int]
+     *
+     * @param  array{ratio?: string, size?: string, note?: string}|null  $spec
+     * @return array{width: int, height: int}|null
+     */
+    function ad_media_spec_dimensions(?array $spec): ?array
+    {
+        $size = is_array($spec) ? ($spec['size'] ?? null) : null;
+        if (! is_string($size) || $size === '') {
+            return null;
+        }
+
+        if (! preg_match('/(\d+)\s*[×x]\s*(\d+)/u', $size, $matches)) {
+            return null;
+        }
+
+        return [
+            'width' => (int) $matches[1],
+            'height' => (int) $matches[2],
+        ];
+    }
+}
+
+if (! function_exists('ad_slot_box_style')) {
+    /**
+     * Advertisement slot box — config size = min & max (local + Google একই)।
+     *
+     * @param  'strip'|'box'  $layout  strip = full-width banner; box = sidebar/inline
+     */
+    function ad_slot_box_style(?\App\Models\Advertisement $ad, string $layout = 'strip'): string
+    {
+        $dims = ad_media_spec_dimensions($ad?->mediaSpec());
+        if (! $dims) {
+            return $layout === 'strip'
+                ? 'width:100%;height:90px;min-height:90px;max-height:90px;'
+                : 'width:100%;aspect-ratio:4/3;';
+        }
+
+        $width = $dims['width'];
+        $height = $dims['height'];
+
+        if ($layout === 'strip') {
+            return "width:100%;max-width:{$width}px;height:{$height}px;min-height:{$height}px;max-height:{$height}px;margin-left:auto;margin-right:auto;";
+        }
+
+        return "width:100%;max-width:{$width}px;aspect-ratio:{$width}/{$height};max-height:{$height}px;margin-left:auto;margin-right:auto;";
+    }
+}
+
 if (! function_exists('ad_has_media')) {
     /**
      * অ্যাডে দেখানোর মতো মিডিয়া আছে কিনা (ইমেজ, GIF, ভিডিও ফাইল, YouTube)।
