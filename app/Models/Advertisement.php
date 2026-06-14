@@ -273,7 +273,7 @@ class Advertisement extends Model
             return false;
         }
 
-        return $this->hasDisplayableMedia() || filled($this->link);
+        return $this->hasDisplayableMedia();
     }
 
     public function queueItems(): HasMany
@@ -430,20 +430,29 @@ class Advertisement extends Model
         return (bool) ($this->google_ad_auto ?? false);
     }
 
+    public function resolvedGoogleAdSlot(): ?string
+    {
+        return google_adsense_slot_for($this);
+    }
+
     public function canShowGoogleAd(): bool
     {
-        return filled($this->google_ad_slot)
+        return filled($this->resolvedGoogleAdSlot())
             && filled(google_adsense_client());
     }
 
     /** Local priority — Google শুধু local না চললে fallback */
     public function displayUsesGoogleAd(): bool
     {
+        if ($this->slug === 'home_video') {
+            return false;
+        }
+
         if ($this->hasRunningLocalAd()) {
             return false;
         }
 
-        return $this->googleAdAutoEnabled() && $this->canShowGoogleAd();
+        return $this->canShowGoogleAd();
     }
 
     public function displayUsesLocalAd(): bool
@@ -470,7 +479,9 @@ class Advertisement extends Model
             $reasons[] = 'Google Auto OFF';
         }
         if (! filled($this->google_ad_slot)) {
-            $reasons[] = 'Slot ID নেই';
+            $reasons[] = filled(google_adsense_default_slot())
+                ? 'Slot ID নেই (Meta default: '.google_adsense_default_slot().')'
+                : 'Slot ID নেই';
         }
         if (! filled(google_adsense_client())) {
             $reasons[] = 'SEO & Meta-তে Client ID নেই';
@@ -483,11 +494,15 @@ class Advertisement extends Model
             return ['mode' => 'Google', 'reasons' => $reasons];
         }
         if ($this->displayUsesLocalAd()) {
-            if ($this->googleAdAutoEnabled() && filled($this->google_ad_slot) && filled(google_adsense_client())) {
+            if ($this->canShowGoogleAd()) {
                 $reasons[] = 'Google ready — Local বন্ধ/Delete করলে Google দেখাবে';
             }
 
             return ['mode' => 'Local', 'reasons' => $reasons];
+        }
+
+        if ($this->canShowGoogleAd() && ! $this->googleAdAutoEnabled() && filled(normalize_google_adsense_slot($this->google_ad_slot))) {
+            $reasons[] = 'Auto OFF (display still OK if Slot ID + Client ID আছে)';
         }
 
         return ['mode' => 'খালি', 'reasons' => $reasons ?: ['কোনো ad active নেই']];

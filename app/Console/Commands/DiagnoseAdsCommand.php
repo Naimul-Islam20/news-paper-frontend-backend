@@ -14,7 +14,9 @@ class DiagnoseAdsCommand extends Command
     public function handle(): int
     {
         $client = google_adsense_client();
+        $defaultSlot = google_adsense_default_slot();
         $this->info('Client ID: '.($client ?: '❌ নেই / ভুল format'));
+        $this->info('Default Slot: '.($defaultSlot ?: '— (Meta-তে set করুন)'));
         $this->newLine();
 
         $query = Advertisement::query()->orderBy('slug');
@@ -30,7 +32,7 @@ class DiagnoseAdsCommand extends Command
                 $d['mode'],
                 $ad->hasRunningLocalAd() ? 'হ্যাঁ' : 'না',
                 ($ad->google_ad_auto ?? false) ? 'ON' : 'OFF',
-                $ad->google_ad_slot ?: '—',
+                $ad->google_ad_slot ?: ($defaultSlot ?: '—'),
                 implode('; ', $d['reasons']),
             ];
         }

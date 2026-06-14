@@ -29,6 +29,7 @@ class SiteMeta extends Model
         'editor_name',
         'publisher_name',
         'google_adsense_client',
+        'google_adsense_default_slot',
     ];
 
     protected $casts = [

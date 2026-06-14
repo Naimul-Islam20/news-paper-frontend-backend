@@ -5,7 +5,7 @@
 
 @php
 $client = google_adsense_client();
-$slot = $ad?->google_ad_slot ?? null;
+$slot = google_adsense_slot_for($ad);
 @endphp
 
 @if($ad && $client && filled($slot))

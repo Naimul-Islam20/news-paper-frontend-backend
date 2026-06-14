@@ -16,11 +16,10 @@
             {{ $errors->first() }}
         </div>
         @endif
-        @if($googleClientConfigured && $googleSlotCount === 0)
+        @if($googleClientConfigured && $googleSlotCount === 0 && ! google_adsense_default_slot())
         <div class="mb-4 px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-sm">
-            <strong>Google Client ID আছে</strong>, কিন্তু কোনো slot-এ <strong>Slot ID save হয়নি</strong>।
-            প্রতিটি slot Edit → Google section → Slot ID দিন → <strong>Google Save</strong> চাপুন।
-            Local ad নেই এমন slot-এ তখন Google fallback দেখাবে।
+            <strong>Google Client ID আছে</strong>, কিন্তু কোনো slot-এ Slot ID save হয়নি এবং <strong>SEO & Meta-তে Default Slot ID</strong> ও নেই।
+            <strong>SEO & Meta</strong> → Default Google Slot ID দিন (সব slot-এ fallback), অথবা প্রতিটি slot Edit → Google section → Slot ID → <strong>Google Save</strong>।
         </div>
         @elseif(! $googleClientConfigured)
         <div class="mb-4 px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-sm">

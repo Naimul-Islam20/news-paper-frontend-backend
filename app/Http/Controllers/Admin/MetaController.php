@@ -45,6 +45,7 @@ class MetaController extends Controller
             'editor_name' => ['nullable', 'string', 'max:255'],
             'publisher_name' => ['nullable', 'string', 'max:255'],
             'google_adsense_client' => ['nullable', 'string', 'max:64'],
+            'google_adsense_default_slot' => ['nullable', 'string', 'max:32'],
         ]);
 
         $meta = SiteMeta::first();
@@ -88,10 +89,24 @@ class MetaController extends Controller
         }
         $validated['google_adsense_client'] = $normalizedClient;
 
+        $defaultSlot = normalize_google_adsense_slot($validated['google_adsense_default_slot'] ?? null);
+        if (($validated['google_adsense_default_slot'] ?? '') !== '' && $validated['google_adsense_default_slot'] !== null && $defaultSlot === null) {
+            return redirect()->back()
+                ->withErrors(['google_adsense_default_slot' => 'Default Slot ID শুধু সংখ্যা হতে হবে (যেমন 2436228703)।'])
+                ->withInput();
+        }
+        $validated['google_adsense_default_slot'] = $defaultSlot;
+
         if ($meta) {
             $meta->update($validated);
         } else {
             SiteMeta::create($validated);
+        }
+
+        if (filled($defaultSlot)) {
+            \App\Models\Advertisement::query()
+                ->where('slug', '!=', 'home_video')
+                ->update(['google_ad_auto' => true]);
         }
 
         return redirect()->route('admin.meta.index')->with('success', 'Settings updated successfully!');

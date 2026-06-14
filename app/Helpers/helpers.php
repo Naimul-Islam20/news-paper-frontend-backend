@@ -365,6 +365,43 @@ if (! function_exists('google_adsense_client')) {
     }
 }
 
+if (! function_exists('normalize_google_adsense_slot')) {
+    /**
+     * AdSense unit Slot ID — শুধু সংখ্যা রাখে।
+     */
+    function normalize_google_adsense_slot(?string $raw): ?string
+    {
+        $slot = preg_replace('/\D+/', '', trim((string) ($raw ?? '')));
+
+        return $slot !== '' ? $slot : null;
+    }
+}
+
+if (! function_exists('google_adsense_default_slot')) {
+    /**
+     * SEO & Meta-তে সেট করা ডিফল্ট Slot ID — সব ad slot-এ fallback।
+     */
+    function google_adsense_default_slot(): ?string
+    {
+        return normalize_google_adsense_slot(optional(site_meta_record())->google_adsense_default_slot ?? null);
+    }
+}
+
+if (! function_exists('google_adsense_slot_for')) {
+    /**
+     * প্রতি slot-এর Slot ID; খালি থাকলে site default।
+     */
+    function google_adsense_slot_for(?\App\Models\Advertisement $ad): ?string
+    {
+        $own = normalize_google_adsense_slot($ad?->google_ad_slot ?? null);
+        if ($own !== null) {
+            return $own;
+        }
+
+        return google_adsense_default_slot();
+    }
+}
+
 if (! function_exists('ad_has_media')) {
     /**
      * অ্যাডে দেখানোর মতো মিডিয়া আছে কিনা (ইমেজ, GIF, ভিডিও ফাইল, YouTube)।
