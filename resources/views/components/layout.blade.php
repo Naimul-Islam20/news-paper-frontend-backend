@@ -259,7 +259,7 @@
 
     <x-header />
 
-    <main id="main-content" class="pb-4 md:pb-6 md:pt-3">
+    <main id="main-content" class="pb-4 md:pb-6 pt-0">
         {{ $slot }}
     </main>
 

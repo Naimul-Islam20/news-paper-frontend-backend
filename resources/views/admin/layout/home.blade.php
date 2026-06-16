@@ -156,106 +156,142 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-            <!-- First Column -->
-            <div class="grid grid-rows-2 gap-4">
-                <div id="section-lifestyle" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
-                    <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 8</span>
-                    <span class="section-label">
-                        {{ optional(optional($sections->get('section-lifestyle'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
-                    </span>
-                    <button
-                        type="button"
-                        class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        data-section-id="section-lifestyle">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
-                        </svg>
-                    </button>
-                </div>
-
-                <div id="section-tech" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
-                    <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 9</span>
-                    <span class="section-label">
-                        {{ optional(optional($sections->get('section-tech'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
-                    </span>
-                    <button
-                        type="button"
-                        class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        data-section-id="section-tech">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
-                        </svg>
-                    </button>
-                </div>
+            <div id="section-lifestyle" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
+                <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 8</span>
+                <span class="section-label">
+                    {{ optional(optional($sections->get('section-lifestyle'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
+                </span>
+                <button
+                    type="button"
+                    class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    data-section-id="section-lifestyle">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
+                    </svg>
+                </button>
             </div>
 
-            <!-- Middle Column -->
-            <div class="grid grid-rows-2 gap-4">
-                <div id="section-different-eye" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
-                    <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 10</span>
-                    <span class="section-label">
-                        {{ optional(optional($sections->get('section-different-eye'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
-                    </span>
-                    <button
-                        type="button"
-                        class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        data-section-id="section-different-eye">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
-                        </svg>
-                    </button>
-                </div>
-
-                <div id="section-generation" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
-                    <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 11</span>
-                    <span class="section-label">
-                        {{ optional(optional($sections->get('section-generation'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
-                    </span>
-                    <button
-                        type="button"
-                        class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        data-section-id="section-generation">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
-                        </svg>
-                    </button>
-                </div>
+            <div id="section-tech" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
+                <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 9</span>
+                <span class="section-label">
+                    {{ optional(optional($sections->get('section-tech'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
+                </span>
+                <button
+                    type="button"
+                    class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    data-section-id="section-tech">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
+                    </svg>
+                </button>
             </div>
 
-            <!-- Last Column -->
-            <div class="grid grid-rows-2 gap-4">
-                <div id="section-campus" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
-                    <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 12</span>
-                    <span class="section-label">
-                        {{ optional(optional($sections->get('section-campus'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
-                    </span>
-                    <button
-                        type="button"
-                        class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        data-section-id="section-campus">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
-                        </svg>
-                    </button>
-                </div>
+            <div id="section-different-eye" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
+                <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 10</span>
+                <span class="section-label">
+                    {{ optional(optional($sections->get('section-different-eye'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
+                </span>
+                <button
+                    type="button"
+                    class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    data-section-id="section-different-eye">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
 
-                <div id="section-job" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
-                    <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 13</span>
-                    <span class="section-label">
-                        {{ optional(optional($sections->get('section-job'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
-                    </span>
-                    <button
-                        type="button"
-                        class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        data-section-id="section-job">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
-                        </svg>
-                    </button>
-                </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div id="section-generation" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
+                <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 11</span>
+                <span class="section-label">
+                    {{ optional(optional($sections->get('section-generation'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
+                </span>
+                <button
+                    type="button"
+                    class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    data-section-id="section-generation">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
+                    </svg>
+                </button>
             </div>
 
+            <div id="section-campus" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
+                <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 12</span>
+                <span class="section-label">
+                    {{ optional(optional($sections->get('section-campus'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
+                </span>
+                <button
+                    type="button"
+                    class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    data-section-id="section-campus">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
+                    </svg>
+                </button>
+            </div>
+
+            <div id="section-job" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
+                <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 13</span>
+                <span class="section-label">
+                    {{ optional(optional($sections->get('section-job'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
+                </span>
+                <button
+                    type="button"
+                    class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    data-section-id="section-job">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div id="section-triple-col-1" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
+                <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 14</span>
+                <span class="section-label">
+                    {{ optional(optional($sections->get('section-triple-col-1'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
+                </span>
+                <button
+                    type="button"
+                    class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    data-section-id="section-triple-col-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
+                    </svg>
+                </button>
+            </div>
+            <div id="section-triple-col-2" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
+                <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 15</span>
+                <span class="section-label">
+                    {{ optional(optional($sections->get('section-triple-col-2'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
+                </span>
+                <button
+                    type="button"
+                    class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    data-section-id="section-triple-col-2">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
+                    </svg>
+                </button>
+            </div>
+            <div id="section-triple-col-3" class="relative h-20 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center px-3 text-xs font-semibold text-slate-600 dark:text-slate-300" data-allowed-type="post">
+                <span class="absolute left-3 top-1 text-[10px] text-slate-400">Section 16</span>
+                <span class="section-label">
+                    {{ optional(optional($sections->get('section-triple-col-3'))->category)->name ?? 'ক্যাটাগরি যোগ করুন' }}
+                </span>
+                <button
+                    type="button"
+                    class="section-config-edit mt-1 inline-flex items-center justify-center w-7 h-7 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    data-section-id="section-triple-col-3">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 3.487l3.651 3.651M4.5 19.5l4.223-.469a2 2 0 001.15-.566l9.488-9.488a1.5 1.5 0 000-2.121L16.4 3.05a1.5 1.5 0 00-2.121 0L4.79 12.54a2 2 0 00-.566 1.15L3.75 17.914A1 1 0 004.5 19.5z" />
+                    </svg>
+                </button>
+            </div>
         </div>
         <div class="grid grid-cols-1 gap-3">
 

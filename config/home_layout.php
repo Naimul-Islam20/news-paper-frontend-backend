@@ -6,7 +6,7 @@ return [
         'hero_layer_1' => 1,
         'hero_layer_2' => 2,
         'hero_layer_3' => 2,
-        'hero_layer_4' => 7,
+        'hero_layer_4' => 6,
 
         // Mini section on the right side of hero
         'mini_section' => 3,
@@ -26,6 +26,9 @@ return [
         'section-generation' => 9,
         'section-campus'     => 9,
         'section-job'        => 9,
+        'section-triple-col-1' => 4,
+        'section-triple-col-2' => 4,
+        'section-triple-col-3' => 4,
         'section-video'      => 5, // 1 main + 2×2 side grid on welcome
         'section-gallery'    => 4,
     ],

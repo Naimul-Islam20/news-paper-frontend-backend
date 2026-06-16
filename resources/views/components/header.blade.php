@@ -1,6 +1,45 @@
 <div
-    x-data="{ showSidebar: false, showSearch: false, isSticky: false }"
-    @scroll.window="isSticky = (window.scrollY > 120)">
+    x-data="{
+        showSidebar: false,
+        showSearch: false,
+        isSticky: false,
+        hasHeaderAd: false,
+        headerAdHeight: 0,
+        syncHeaderAd() {
+            const ad = document.getElementById('header-ad-slot');
+            if (!ad || ad.classList.contains('ad-slot-pending')) {
+                this.hasHeaderAd = false;
+                this.headerAdHeight = 0;
+                ad?.classList.remove('header-ad-sticky');
+                return;
+            }
+            this.hasHeaderAd = true;
+            this.headerAdHeight = ad.offsetHeight;
+            if (this.isSticky) {
+                ad.classList.add('header-ad-sticky');
+            } else {
+                ad.classList.remove('header-ad-sticky');
+            }
+        },
+        updateSticky() {
+            this.isSticky = window.scrollY > 120;
+            this.syncHeaderAd();
+        }
+    }"
+    @scroll.window="updateSticky()"
+    x-init="
+        $data.syncHeaderAd();
+        window.addEventListener('header-ad-changed', () => $data.syncHeaderAd());
+        const adEl = document.getElementById('header-ad-slot');
+        if (adEl && typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(() => $data.syncHeaderAd()).observe(adEl);
+        }
+        if (adEl && typeof MutationObserver !== 'undefined') {
+            new MutationObserver(() => $data.syncHeaderAd()).observe(adEl, { attributes: true, attributeFilter: ['class'] });
+        }
+        window.addEventListener('load', () => $data.syncHeaderAd());
+        $data.updateSticky();
+    ">
     <!-- Mobile Fixed / Desktop Shared Wrapper -->
     <div id="site-header-shell" class="fixed top-0 left-0 w-full z-50 bg-white md:relative md:z-auto border-b border-slate-100 md:border-b-0 shadow-sm md:shadow-none">
         <!-- Main Header -->
@@ -295,12 +334,14 @@
             </div>
         </header>
 
-        <!-- Placeholder for Sticky Nav to prevent layout jump (Desktop Only) -->
+        <!-- Placeholder for sticky header ad + nav (desktop) -->
+        <div x-show="isSticky && hasHeaderAd" class="hidden md:block" :style="`height: ${headerAdHeight}px`" x-cloak></div>
         <div x-show="isSticky" class="hidden md:block md:h-[68px]" x-cloak></div>
 
         <nav
             class="z-50 bg-white md:border-b border-slate-200 transition-all duration-300"
-            :class="isSticky ? 'py-1 md:fixed md:top-0 md:left-0 md:w-full md:py-1.5 max-md:shadow-[0_10px_32px_-6px_rgba(15,23,42,0.16),0_-10px_32px_-6px_rgba(15,23,42,0.16)] md:shadow-none' : 'relative py-1.5 md:pt-3 md:pb-0.5 max-md:shadow-[0_6px_22px_-4px_rgba(15,23,42,0.12),0_-6px_22px_-4px_rgba(15,23,42,0.12)] md:shadow-none'">
+            :class="isSticky ? 'py-1 md:fixed md:left-0 md:w-full md:py-1.5 max-md:shadow-[0_10px_32px_-6px_rgba(15,23,42,0.16),0_-10px_32px_-6px_rgba(15,23,42,0.16)] md:shadow-none' : 'relative py-1.5 md:pt-3 md:pb-0.5 max-md:shadow-[0_6px_22px_-4px_rgba(15,23,42,0.12),0_-6px_22px_-4px_rgba(15,23,42,0.12)] md:shadow-none'"
+            :style="isSticky ? (hasHeaderAd ? { top: headerAdHeight + 'px' } : { top: '0px' }) : null">
             <div class="container">
                 <div
                     class="flex items-center transition-all duration-300 border-t-0 md:border-t-2"

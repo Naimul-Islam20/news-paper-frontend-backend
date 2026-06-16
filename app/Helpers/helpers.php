@@ -438,18 +438,18 @@ if (! function_exists('ad_slot_box_style')) {
         $dims = ad_media_spec_dimensions($ad?->mediaSpec());
         if (! $dims) {
             return $layout === 'strip'
-                ? 'width:100%;height:90px;min-height:90px;max-height:90px;'
-                : 'width:100%;aspect-ratio:4/3;';
+                ? 'width:100%;height:90px;min-height:90px;max-height:90px;--ad-max-width:100%;--ad-max-height:90px;'
+                : 'width:100%;aspect-ratio:4/3;max-height:240px;--ad-max-width:100%;--ad-max-height:240px;';
         }
 
         $width = $dims['width'];
         $height = $dims['height'];
 
         if ($layout === 'strip') {
-            return "width:100%;max-width:{$width}px;height:{$height}px;min-height:{$height}px;max-height:{$height}px;margin-left:auto;margin-right:auto;";
+            return "width:100%;max-width:{$width}px;height:{$height}px;min-height:{$height}px;max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;";
         }
 
-        return "width:100%;max-width:{$width}px;aspect-ratio:{$width}/{$height};max-height:{$height}px;margin-left:auto;margin-right:auto;";
+        return "width:100%;max-width:{$width}px;aspect-ratio:{$width}/{$height};max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;";
     }
 }
 

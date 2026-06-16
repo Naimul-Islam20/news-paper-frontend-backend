@@ -263,11 +263,60 @@ body {
     line-height: 1.6;
 }
 
+/* অ্যাড লোড না হলে জায়গা নেই — কিন্তু display:none নয় (ইমেজ লোড ব্লক হয়) */
+[data-ad-slot-root].ad-slot-pending {
+    height: 0 !important;
+    max-height: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    border: 0 !important;
+}
+
+/* হেডার অ্যাড + স্টিকি মেনু — স্ক্রলে গ্যাপ ছাড়া একসাথে */
+@media (min-width: 768px) {
+    #header-ad-slot.header-ad-sticky {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 60;
+        padding: 0 !important;
+        margin: 0;
+        background: #fff;
+    }
+}
+
 /* Google AdSense — config box-এর ভিতরে; clip শুধু frame-এ */
 .ad-slot-frame {
     width: 100%;
     overflow: hidden;
     position: relative;
+    background-color: #fff;
+}
+
+.ad-slot-frame picture {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.ad-slot-media {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+    margin-inline: auto;
 }
 
 .ad-slot-frame .google-ad-unit {
@@ -304,12 +353,50 @@ ins.adsbygoogle:not([data-ad-slot]) {
     pointer-events: none !important;
 }
 
-.ad-slot-media {
-    display: block;
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    object-position: center;
+/* মোবাইল — লোকাল অ্যাড: ইমেজ যতটুকু উচ্চতা, ততটুকু জায়গা; max সাইজের বেশি নয় */
+@media (max-width: 767px) {
+    [data-ad-slot-root] .ad-slot-frame.ad-slot-local {
+        height: auto !important;
+        min-height: 0 !important;
+        aspect-ratio: auto !important;
+        width: 100% !important;
+        max-width: min(100%, var(--ad-max-width, 100%)) !important;
+    }
+
+    [data-ad-slot-root] .ad-slot-frame.ad-slot-local picture,
+    [data-ad-slot-root] .ad-slot-frame.ad-slot-local .relative.aspect-video {
+        height: auto !important;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    [data-ad-slot-root] .ad-slot-frame.ad-slot-local img,
+    [data-ad-slot-root] .ad-slot-frame.ad-slot-local .ad-slot-media {
+        display: block;
+        width: 100% !important;
+        height: auto !important;
+        max-width: 100%;
+        max-height: var(--ad-max-height, 90px);
+        object-fit: contain;
+        object-position: center;
+        margin-inline: auto;
+    }
+
+    [data-ad-slot-root] .ad-slot-frame.ad-slot-local video {
+        display: block;
+        width: 100% !important;
+        height: auto !important;
+        max-width: 100%;
+        max-height: var(--ad-max-height, 90px);
+        object-fit: contain;
+        object-position: center;
+        margin-inline: auto;
+    }
+
+    [data-ad-slot-root] .ad-slot-frame.ad-slot-local iframe {
+        width: 100%;
+        max-height: var(--ad-max-height, 90px);
+        aspect-ratio: 16 / 9;
+        height: auto;
+    }
 }

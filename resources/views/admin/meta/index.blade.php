@@ -179,7 +179,7 @@
                         <label class="block text-sm font-normal text-slate-900 dark:text-white mb-2 ml-0.5">AdSense Client ID</label>
                         <input type="text" name="google_adsense_client" value="{{ old('google_adsense_client', $meta->google_adsense_client ?? '') }}" placeholder="pub-2602475216171666 বা ca-pub-2602475216171666" class="w-full max-w-lg px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-mono text-sm text-slate-900 dark:text-white">
                         <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">AdSense Account Information-এর Publisher ID (pub-... বা ca-pub-...)</p>
-                        <p class="mt-2 text-xs text-amber-700 dark:text-amber-300"><strong>গুরুত্বপূর্ণ:</strong> AdSense Dashboard → Ads → আপনার সাইট → Edit → <strong>Auto ads বন্ধ</strong> করুন। Auto ads চালু থাকলে Google পুরো স্ক্রিনের উপরে anchor/vignette ad দেখাবে — কোড দিয়ে পুরোপুরি বন্ধ করা যায় না, Dashboard থেকে off করতে হবে।</p>
+                        
                         @error('google_adsense_client')
                         <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                         @enderror

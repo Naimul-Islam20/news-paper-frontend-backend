@@ -71,7 +71,9 @@ class HomeController extends Controller
         }
 
         // Mini section (category-based, using HomeLayoutSection)
-        $miniSection = HomeLayoutSection::where('key', 'section-mini')->first();
+        $miniSection = HomeLayoutSection::with(['category.parent', 'category.subCategories'])
+            ->where('key', 'section-mini')
+            ->first();
         $miniPosts   = collect();
 
         if ($miniSection && $miniSection->category_id) {
@@ -102,6 +104,9 @@ class HomeController extends Controller
             'section-generation',
             'section-campus',
             'section-job',
+            'section-triple-col-1',
+            'section-triple-col-2',
+            'section-triple-col-3',
         ];
 
         $sectionKeys = array_merge($postSectionKeys, ['section-video', 'section-gallery']);
@@ -193,6 +198,7 @@ class HomeController extends Controller
             'hero_layer_2_posts' => $heroLayers['hero_layer_2'] ?? collect(),
             'hero_layer_3_posts' => $heroLayers['hero_layer_3'] ?? collect(),
             'hero_layer_4_posts' => $heroLayers['hero_layer_4'] ?? collect(),
+            'miniSection'        => $miniSection,
             'mini_posts'         => $miniPosts,
             'sectionPosts'       => $sectionPosts,
             'sectionVideos'       => $sectionVideos,

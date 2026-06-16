@@ -13,7 +13,7 @@
                     @forelse($hero_layer_4_posts as $index => $post)
                     <a
                         href="{{ news_url($post) }}"
-                        class="block group mb-3 lg:mb-2 cursor-pointer text-left lg:pt-0 lg:pb-1{{ $index > 0 ? ' border-t border-custom pt-5' : '' }}">
+                        class="block group max-lg:mb-3 cursor-pointer text-left lg:py-2{{ $index > 0 ? ' border-t border-custom max-lg:pt-5' : '' }}">
                         <div class="img-placeholder overflow-hidden aspect-video mb-3 lg:hidden">
                             @if($post->image)
                             <img
@@ -22,14 +22,14 @@
                                 onload="this.parentElement.classList.remove('img-placeholder')">
                             @endif
                         </div>
-                        <h4 class="text-xl font-semibold serif leading-snug group-hover:text-primary transition-colors mt-1 text-left text-title">
+                        <h4 class="text-xl font-semibold serif leading-snug group-hover:text-primary transition-colors max-lg:mt-1 text-left text-title">
                             {{ $post->title }}
                         </h4>
                         @php
-                        $excerpt = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($post->description)), 100);
+                        $excerpt = \Illuminate\Support\Str::limit(html_entity_decode(strip_tags($post->description)), 200);
                         @endphp
                         @if($excerpt)
-                        <p class="text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-2 mt-1 text-left">
+                        <p class="text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-3 max-lg:line-clamp-2 mt-1 text-left">
                             {!! $excerpt !!}
                         </p>
                         @endif
@@ -127,9 +127,10 @@
                     <x-ad-slot-display slug="hero_right_1" variant="sidebar" />
 
                     <!-- Opinion / Mini Section (উপরের অ্যাডের ঠিক নিচে) -->
+                    @if(optional($miniSection)->category_id)
                     <div class="shrink-0 w-full mt-4">
                         <div class="space-y-4 w-full">
-                            @forelse($mini_posts as $post)
+                            @foreach($mini_posts as $post)
                             <div class="group cursor-pointer{{ !$loop->first ? ' pt-4 border-t border-custom' : '' }}">
                                 <a
                                     href="{{ news_url($post) }}"
@@ -158,61 +159,10 @@
                                 </div>
                                 @endif
                             </div>
-                            @empty
-                            <!-- Fallback: original columnist cards when no mini posts -->
-                            <!-- Columnist 1 -->
-                            <div class="group cursor-pointer">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="img-placeholder w-15 h-15  overflow-hidden shrink-0"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&h=100&auto=format&fit=crop" alt="Author" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
-                                    </div>
-                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-primary transition-colors text-left">
-                                        পুলিশ ব্যবস্থার বর্তমান বাস্তবতা ও ভবিষ্যৎ পথরেখা
-                                    </h4>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-1">
-                                    <svg class="w-3.5 h-3.5 hidden md:block text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
-                                    <span class="text-[12px] hidden md:block text-desc font-bold text-left ml-0 leading-none">ড. মো. রুহুল আমিন সরকার</span>
-                                </div>
-                            </div>
-
-                            <!-- Columnist 2 -->
-                            <div class="group cursor-pointer pt-4 border-t border-custom">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="img-placeholder w-15 h-15  overflow-hidden shrink-0"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100&h=100&auto=format&fit=crop" alt="Author" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
-                                    </div>
-                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-primary transition-colors text-left">
-                                        উচ্চশিক্ষার মানোন্নয়ন ও আগামীর চ্যালেঞ্জ
-                                    </h4>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-1">
-                                    <svg class="w-3.5 h-3.5 hidden md:block text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
-                                    <span class="text-[12px] hidden md:block text-desc font-bold text-left ml-0 leading-none">অধ্যাপক ড. এম শাহিনুর রহমান</span>
-                                </div>
-                            </div>
-
-                            <!-- Columnist 3 -->
-                            <div class="group cursor-pointer pt-4 border-t border-custom">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="img-placeholder w-15 h-15  overflow-hidden shrink-0"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=100&h=100&auto=format&fit=crop" alt="Author" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
-                                    </div>
-                                    <h4 class="text-lg font-bold text-title leading-snug group-hover:text-primary transition-colors text-left">
-                                        নারীর ক্ষমতায়ন ও সামাজিক বিবর্তন
-                                    </h4>
-                                </div>
-                                <div class="flex items-center gap-1.5 pt-1">
-                                    <svg class="w-3.5 h-3.5 hidden md:block text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
-                                    <span class="text-[12px] hidden md:block text-desc font-bold text-left ml-0 leading-none">ড. নীলুফার পারভীন</span>
-                                </div>
-                            </div>
-                            @endforelse
+                            @endforeach
                         </div>
                     </div>
+                    @endif
 
                     <x-ad-slot-display slug="hero_right_3" variant="sidebar" wrapper-class="shrink-0 mt-4 w-full" />
                     <x-ad-slot-display slug="hero_right_2" variant="sidebar" wrapper-class="shrink-0 mt-4 w-full" />
@@ -228,6 +178,7 @@
             $politicsTitle = optional($politicsCategory)->name;
             $politicsPosts = $sectionPosts['section-politics'] ?? collect();
             @endphp
+            @if(optional($politicsSection)->category_id)
             <section class="mt-5 lg:mt-8">
                 <div class="flex items-center justify-between mb-5">
                     <h2 class="text-3xl font-semibold serif text-title relative inline-block">
@@ -276,6 +227,8 @@
                     <!-- fallback: আগের static ৪টা item চাইলে এখানে কপি করো -->
                     @endforelse
                 </div>
+            </section>
+            @endif
 
                 @php $adHomeVideo = ad_slot('home_video'); @endphp
                 @if($adHomeVideo && filled($adHomeVideo->video_youtube_id))
@@ -400,6 +353,7 @@
                 $nationalTitle = optional($nationalCategory)->name;
                 $nationalPosts = $sectionPosts['section-national'] ?? collect();
                 @endphp
+                @if(optional($nationalSection)->category_id)
                 <section class="mt-12">
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
@@ -537,6 +491,7 @@
                         </div>
                     </div>
                 </section>
+                @endif
 
                 <!-- Section: Capital (রাজধানী) -->
                 @php
@@ -545,6 +500,7 @@
                 $capitalTitle = optional($capitalCategory)->name;
                 $capitalPosts = $sectionPosts['section-capital'] ?? collect();
                 @endphp
+                @if(optional($capitalSection)->category_id)
                 <section class="mt-5 lg:mt-20 border-b border-custom pb-6">
                     <div class="flex items-center justify-between mb-5 md:pt-8 pt-5 border-t border-custom">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
@@ -594,6 +550,7 @@
                         @endforelse
                     </div>
                 </section>
+                @endif
 
                 @php
                 $sportsSectionBottom = $layoutSections['section-sports'] ?? null;
@@ -613,7 +570,7 @@
                 @endphp
 
                 <!-- Section: Sports (খেলা) -->
-
+                @if(optional($sportsSectionBottom)->category_id)
                 <section class="mt-12">
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
@@ -743,6 +700,7 @@
                     {{-- Sports সেকশনে এখনও কোনো পোস্ট নেই --}}
                     @endif
                 </section>
+                @endif
 
                 @php
                 $countrySection = $layoutSections['section-countrywide'] ?? null;
@@ -759,6 +717,7 @@
                 @endphp
 
                 <!-- Section: Countrywide (সারাদেশ) -->
+                @if(optional($countrySection)->category_id)
                 <section class="mt-10 border-t border-custom pt-8">
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
@@ -966,6 +925,7 @@
                     {{-- সারাদেশ সেকশনে এখনও কোনো পোস্ট নেই --}}
                     @endif
                 </section>
+                @endif
                 @php
                 $worldSection = $layoutSections['section-world'] ?? null;
                 $worldCategory = optional($worldSection)->category;
@@ -981,6 +941,7 @@
                 $worldRight4 = $worldPosts->get(6);
                 @endphp
                 <!-- Section: World News (বিশ্ব সংবাদ) -->
+                @if(optional($worldSection)->category_id)
                 <section class="mt-12 border-t border-custom pt-8">
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
@@ -1100,6 +1061,7 @@
                     {{-- বিশ্ব সংবাদ সেকশনে এখনও কোনো পোস্ট নেই --}}
                     @endif
                 </section>
+                @endif
                 @php
                 $entSection = $layoutSections['section-entertainment'] ?? null;
                 $entCategory = optional($entSection)->category;
@@ -1117,6 +1079,7 @@
                 $entRight4 = $entPosts->get(8);
                 @endphp
                 <!-- Section: Entertainment (বিনোদন) -->
+                @if(optional($entSection)->category_id)
                 <section class="mt-12 border-t border-custom pt-8">
                     <div class="flex items-center justify-between mb-8">
                         <h2 class="text-3xl font-semibold serif text-title relative inline-block">
@@ -1205,6 +1168,7 @@
                     {{-- বিনোদন সেকশনে এখনও কোনো পোস্ট নেই --}}
                     @endif
                 </section>
+                @endif
                 @php
                 $lifeSection = $layoutSections['section-lifestyle'] ?? null;
                 $lifeCategory = optional($lifeSection)->category;
@@ -1235,11 +1199,17 @@
                 $diffList1 = $diffPosts->get(1);
                 $diffList2 = $diffPosts->get(2);
                 $diffList3 = $diffPosts->get(3);
+
+                $hasLifestyleBlock = optional($lifeSection)->category_id
+                    || optional($techSection)->category_id
+                    || optional($diffSection)->category_id;
                 @endphp
                 <!-- Section: Lifestyle, Tech, Different Eyes (লাইফস্টাইল, টেক, ভিন্নচোখে) -->
+                @if($hasLifestyleBlock)
                 <section class="mt-12 border-t border-custom pt-8">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-y-10 lg:gap-0 lg:-mx-3">
                         <!-- Column 1: Lifestyle (লাইফস্টাইল) -->
+                        @if(optional($lifeSection)->category_id)
                         <div class="lg:px-3 lg:border-r border-custom">
                             <div class="mb-6">
                                 <h3 class="text-xl font-bold serif text-title border-b-2 pb-2 border-primary inline-block">@if($lifeCategory)<a href="{{ category_url($lifeCategory) }}" class="hover:text-primary transition-colors">{{ $lifeTitle ?: 'লাইফস্টাইল' }}</a>@else{{ $lifeTitle ?: 'লাইফস্টাইল' }}@endif</h3>
@@ -1262,7 +1232,7 @@
                             @endif
 
                             <!-- Lifestyle: List -->
-                            <div class="space-y-2 border-t border-custom pt-2 lg:border-t-0 lg:pt-0">
+                            <div class="space-y-2 border-t border-custom pt-2 lg:border-t-0 lg:pt-3">
                                 @foreach([$lifeList1, $lifeList2, $lifeList3] as $post)
                                 @if($post)
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-3 pb-2 border-b border-custom last:border-0 last:pb-0">
@@ -1271,7 +1241,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-primary transition-colors text-left text-title">
+                                    <h5 class="text-xl font-normal serif leading-snug group-hover:text-primary transition-colors text-left text-title">
                                         {{ $post->title }}
                                     </h5>
                                 </a>
@@ -1279,8 +1249,10 @@
                                 @endforeach
                             </div>
                         </div>
+                        @endif
 
                         <!-- Column 2: Tech (টেক) -->
+                        @if(optional($techSection)->category_id)
                         <div class="lg:px-3 lg:border-r border-custom">
                             <div class="mb-6">
                                 <h3 class="text-xl font-bold serif text-title border-b-2 pb-2 border-primary inline-block">@if($techCategory)<a href="{{ category_url($techCategory) }}" class="hover:text-primary transition-colors">{{ $techTitle ?: 'টেক' }}</a>@else{{ $techTitle ?: 'টেক' }}@endif</h3>
@@ -1303,7 +1275,7 @@
                             @endif
 
                             <!-- Tech: List -->
-                            <div class="space-y-2 border-t border-custom pt-2 lg:border-t-0 lg:pt-0">
+                            <div class="space-y-2 border-t border-custom pt-2 lg:border-t-0 lg:pt-3">
                                 @foreach([$techList1, $techList2, $techList3] as $post)
                                 @if($post)
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-3 pb-2 border-b border-custom last:border-0 last:pb-0">
@@ -1312,7 +1284,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-primary transition-colors text-left text-title">
+                                    <h5 class="text-xl font-medium serif leading-snug text-left text-title">
                                         {{ $post->title }}
                                     </h5>
                                 </a>
@@ -1320,8 +1292,10 @@
                                 @endforeach
                             </div>
                         </div>
+                        @endif
 
                         <!-- Column 3: Different Eyes (ভিন্নচোখে) -->
+                        @if(optional($diffSection)->category_id)
                         <div class="lg:px-3">
                             <div class="mb-6">
                                 <h3 class="text-xl font-bold serif text-title border-b-2 pb-2 border-primary inline-block">@if($diffCategory)<a href="{{ category_url($diffCategory) }}" class="hover:text-primary transition-colors">{{ $diffTitle ?: 'ভিন্নচোখে' }}</a>@else{{ $diffTitle ?: 'ভিন্নচোখে' }}@endif</h3>
@@ -1344,7 +1318,7 @@
                             @endif
 
                             <!-- Different Eyes: List -->
-                            <div class="space-y-2 border-t border-custom pt-2 lg:border-t-0 lg:pt-0">
+                            <div class="space-y-2 border-t border-custom pt-2 lg:border-t-0 lg:pt-3">
                                 @foreach([$diffList1, $diffList2, $diffList3] as $post)
                                 @if($post)
                                 <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-3 pb-2 border-b border-custom last:border-0 last:pb-0">
@@ -1353,7 +1327,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-lg font-normal serif leading-snug group-hover:text-primary transition-colors text-left text-title">
+                                    <h5 class="text-xl font-medium serif leading-snug text-left text-title">
                                         {{ $post->title }}
                                     </h5>
                                 </a>
@@ -1361,8 +1335,10 @@
                                 @endforeach
                             </div>
                         </div>
+                        @endif
                     </div>
                 </section>
+                @endif
                 <!-- Section: Tabbed Content (প্রজন্ম, ক্যাম্পাস, চাকরি) -->
                 @php
                 $genSection = $layoutSections['section-generation'] ?? null;
@@ -1412,17 +1388,32 @@
                 $jobCol3_2 = $jobPosts->get(6);
                 $jobCol3_3 = $jobPosts->get(7);
                 $jobCol3_4 = $jobPosts->get(8);
+
+                $hasTabbedBlock = optional($genSection)->category_id
+                    || optional($campusSection)->category_id
+                    || optional($jobSection)->category_id;
+                $firstTopicTab = optional($genSection)->category_id ? 'projonmo'
+                    : (optional($campusSection)->category_id ? 'campus'
+                    : (optional($jobSection)->category_id ? 'chakri' : null));
                 @endphp
+                @if($hasTabbedBlock)
                 <section class="mt-12 border-t border-custom pt-8">
                     <!-- Tabs Header (শুধু ট্যাব, ক্যাটাগরি পেজে নেয় না) -->
                     <div class="flex items-center gap-8 border-b border-custom mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                        <button type="button" onclick="switchTopicTab('projonmo')" id="tab-projonmo" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-primary text-primary transition-all duration-180">{{ $genTitle ?: 'প্রজন্ম' }}</button>
-                        <button type="button" onclick="switchTopicTab('campus')" id="tab-campus" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-primary transition-all duration-180">{{ $campusTitle ?: 'ক্যাম্পাস' }}</button>
-                        <button type="button" onclick="switchTopicTab('chakri')" id="tab-chakri" class="tab-topic text-xl font-bold serif pb-3 border-b-2 border-transparent text-gray-500 hover:text-primary transition-all duration-180">{{ $jobTitle ?: 'চাকরি' }}</button>
+                        @if(optional($genSection)->category_id)
+                        <button type="button" onclick="switchTopicTab('projonmo')" id="tab-projonmo" class="tab-topic text-xl font-bold serif pb-3 border-b-2 {{ $firstTopicTab === 'projonmo' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-primary' }} transition-all duration-180">{{ $genTitle ?: 'প্রজন্ম' }}</button>
+                        @endif
+                        @if(optional($campusSection)->category_id)
+                        <button type="button" onclick="switchTopicTab('campus')" id="tab-campus" class="tab-topic text-xl font-bold serif pb-3 border-b-2 {{ $firstTopicTab === 'campus' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-primary' }} transition-all duration-180">{{ $campusTitle ?: 'ক্যাম্পাস' }}</button>
+                        @endif
+                        @if(optional($jobSection)->category_id)
+                        <button type="button" onclick="switchTopicTab('chakri')" id="tab-chakri" class="tab-topic text-xl font-bold serif pb-3 border-b-2 {{ $firstTopicTab === 'chakri' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-primary' }} transition-all duration-180">{{ $jobTitle ?: 'চাকরি' }}</button>
+                        @endif
                     </div>
 
                     <!-- Tab Panels Container -->
-                    <div id="projonmo-panel" class="topic-panel">
+                    @if(optional($genSection)->category_id)
+                    <div id="projonmo-panel" class="topic-panel{{ $firstTopicTab !== 'projonmo' ? ' hidden' : '' }}">
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
                             <!-- Col 1: Big Vertical -->
                             <div class="group cursor-pointer lg:border-r border-custom lg:pr-3 pb-4 border-b border-custom lg:border-0 lg:pb-0">
@@ -1449,7 +1440,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-xl font-medium serif leading-snug text-title">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1465,16 +1456,18 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-xl font-medium serif leading-snug text-title">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <!-- Campus panel -->
-                    <div id="campus-panel" class="topic-panel hidden">
+                    @if(optional($campusSection)->category_id)
+                    <div id="campus-panel" class="topic-panel{{ $firstTopicTab !== 'campus' ? ' hidden' : '' }}">
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
                             <!-- Col 1: Big Vertical -->
                             <div class="group cursor-pointer lg:border-r border-custom lg:pr-3 pb-4 border-b border-custom lg:border-0 lg:pb-0">
@@ -1501,7 +1494,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-xl font-medium serif leading-snug text-title">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1517,16 +1510,18 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-xl font-medium serif leading-snug text-title">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <!-- Job panel -->
-                    <div id="chakri-panel" class="topic-panel hidden">
+                    @if(optional($jobSection)->category_id)
+                    <div id="chakri-panel" class="topic-panel{{ $firstTopicTab !== 'chakri' ? ' hidden' : '' }}">
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
                             <!-- Col 1: Big Vertical -->
                             <div class="group cursor-pointer lg:border-r border-custom lg:pr-3 pb-4 border-b border-custom lg:border-0 lg:pb-0">
@@ -1553,7 +1548,7 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-xl font-medium serif leading-snug text-title">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
@@ -1569,14 +1564,16 @@
                                         <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
                                     </div>
-                                    <h5 class="text-base font-normal serif leading-snug group-hover:text-primary transition-colors">{{ $post->title }}</h5>
+                                    <h5 class="text-xl font-medium serif leading-snug text-title">{{ $post->title }}</h5>
                                 </a>
                                 @endif
                                 @endforeach
                             </div>
                         </div>
                     </div>
+                    @endif
                 </section>
+                @endif
 
                 <script>
                     function switchTopicTab(topic) {
@@ -1621,6 +1618,81 @@
                         }
                     }
                 </script>
+                @php
+                $tripleColumnSections = [
+                ['key' => 'section-triple-col-1', 'fallback' => 'কলাম ১'],
+                ['key' => 'section-triple-col-2', 'fallback' => 'কলাম ২'],
+                ['key' => 'section-triple-col-3', 'fallback' => 'কলাম ৩'],
+                ];
+                $hasTripleColumnSections = collect($tripleColumnSections)->contains(function ($column) use ($layoutSections) {
+                return optional($layoutSections[$column['key']] ?? null)->category_id;
+                });
+                @endphp
+                <!-- Section: Triple Column (লাইফস্টাইল সেকশনের মতো — ভিডিওর ঠিক আগে) -->
+                @if($hasTripleColumnSections)
+                <section class="mt-12 border-t border-custom pt-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-y-10 lg:gap-0 lg:-mx-3">
+                        @foreach($tripleColumnSections as $columnIndex => $column)
+                        @php
+                        $columnSection = $layoutSections[$column['key']] ?? null;
+                        @endphp
+                        @if(optional($columnSection)->category_id)
+                        @php
+                        $columnCategory = optional($columnSection)->category;
+                        $columnTitle = optional($columnCategory)->name ?: $column['fallback'];
+                        $columnPosts = ($sectionPosts[$column['key']] ?? collect())->values();
+                        $columnMain = $columnPosts->get(0);
+                        $columnList = [$columnPosts->get(1), $columnPosts->get(2), $columnPosts->get(3)];
+                        $isLastColumn = $columnIndex === count($tripleColumnSections) - 1;
+                        @endphp
+                        <div class="lg:px-3{{ $isLastColumn ? '' : ' lg:border-r border-custom' }}">
+                            <div class="mb-6">
+                                <h3 class="text-xl font-bold serif text-title border-b-2 pb-2 border-primary inline-block">
+                                    @if($columnCategory)
+                                    <a href="{{ category_url($columnCategory) }}" class="hover:text-primary transition-colors">{{ $columnTitle }}</a>
+                                    @else
+                                    {{ $columnTitle }}
+                                    @endif
+                                </h3>
+                            </div>
+
+                            @if($columnMain)
+                            <a href="{{ news_url($columnMain) }}" class="group cursor-pointer mb-3 pb-4 border-b border-custom lg:border-0 lg:pb-0">
+                                <div class="flex flex-row lg:block gap-2 lg:gap-0">
+                                    <div class="img-placeholder w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 overflow-hidden relative shadow-sm mb-0 lg:mb-3">
+                                        @if($columnMain->image)
+                                        <img src="{{ storage_image_url($columnMain->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        @endif
+                                    </div>
+                                    <h4 class="text-xl font-bold serif leading-snug group-hover:text-primary transition-colors text-left text-title">
+                                        {{ $columnMain->title }}
+                                    </h4>
+                                </div>
+                            </a>
+                            @endif
+
+                            <div class="space-y-2 border-t border-custom pt-2 lg:border-t-0 lg:pt-3">
+                                @foreach($columnList as $post)
+                                @if($post)
+                                <a href="{{ news_url($post) }}" class="group cursor-pointer flex gap-2 lg:gap-3 pb-2 border-b border-custom last:border-0 last:pb-0">
+                                    <div class="img-placeholder w-36 h-24 lg:w-40 lg:h-23 shrink-0 overflow-hidden relative shadow-sm">
+                                        @if($post->image)
+                                        <img src="{{ storage_image_url($post->image) }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
+                                        @endif
+                                    </div>
+                                    <h5 class="text-xl {{ $columnIndex === 0 ? 'font-normal' : 'font-medium' }} serif leading-snug text-left text-title">
+                                        {{ $post->title }}
+                                    </h5>
+                                </a>
+                                @endif
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+                        @endforeach
+                    </div>
+                </section>
+                @endif
                 <!-- Section: Video (ভিডিও) -->
                 @php
                 $videoSection = $layoutSections['section-video'] ?? null;
@@ -1633,10 +1705,11 @@
                 $side3 = $videoList->get(3);
                 $side4 = $videoList->get(4);
                 @endphp
+                @if(optional($videoSection)->category_id)
                 <section class="relative left-1/2 -ml-[50vw] w-screen bg-primary/10 border-t border-b border-custom mt-4">
                     <div class="container pt-8 pb-6">
                         <div class="flex items-center gap-3 mb-6">
-                            <h2 class="text-2xl font-bold serif text-gray-900">@if($videoCategory)<a href="{{ category_url($videoCategory) }}" class="hover:text-primary transition-colors">{{ $videoTitle ?: 'ভিডিও' }}</a>@else{{ $videoTitle ?: 'ভিডিও' }}@endif</h2>
+                            <h2 class="text-2xl font-bold serif text-gray-900">@if($videoCategory)<a href="{{ category_url($videoCategory) }}">{{ $videoTitle ?: 'ভিডিও' }}</a>@else{{ $videoTitle ?: 'ভিডিও' }}@endif</h2>
                             <span class="w-4 h-4 bg-primary shrink-0"></span>
                         </div>
 
@@ -1658,19 +1731,16 @@
                                         <div class="{{ $mainThumb ? 'img-placeholder' : '' }} w-36 h-24 lg:w-full lg:h-auto lg:aspect-video shrink-0 relative overflow-hidden bg-black shadow-sm mb-0">
                                             @if($mainThumb)
                                             <img src="{{ $mainThumb }}" alt="{{ $mainVideo->title }}"
-                                                class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700"
+                                                class="w-full h-full object-cover opacity-90"
                                                 onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
-                                            <!-- Play Button Overlay -->
-                                            <div class="absolute inset-0 flex items-center justify-center">
-                                                <div class="w-10 h-10 lg:w-16 lg:h-16 bg-primary flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 lg:w-8 lg:h-8 fill-current" viewBox="0 0 24 24">
-                                                        <path d="M8 5v14l11-7z" />
-                                                    </svg>
-                                                </div>
+                                            <div class="absolute top-3 left-3 z-10 text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M8 5v14l11-7z" />
+                                                </svg>
                                             </div>
                                         </div>
-                                        <h3 class="text-xl lg:text-2xl font-bold serif leading-tight group-hover:text-primary transition-colors line-clamp-1 lg:line-clamp-1 lg:mt-3">{{ $mainVideo->title }}</h3>
+                                        <h3 class="text-xl lg:text-2xl font-bold serif leading-tight text-title line-clamp-1 lg:line-clamp-1 lg:mt-3">{{ $mainVideo->title }}</h3>
                                     </div>
                                 </a>
                                 @endif
@@ -1690,21 +1760,19 @@
                                     }
                                     @endphp
                                     <a href="{{ route('videos.show', $video->slug) }}" class="group cursor-pointer flex gap-2 lg:block pb-3 border-b border-custom last:border-0 lg:border-0 lg:pb-0">
-                                        <div class="{{ $sideThumb ? 'img-placeholder' : '' }} w-36 h-24 lg:w-full lg:h-auto lg:aspect-[4/3] shrink-0 relative overflow-hidden bg-black shadow-sm mb-0 lg:mb-2">
+                                        <div class="{{ $sideThumb ? 'img-placeholder' : '' }} w-36 h-24 lg:w-full lg:h-auto lg:aspect-[3/2] shrink-0 relative overflow-hidden bg-black shadow-sm mb-0 lg:mb-2">
                                             @if($sideThumb)
                                             <img src="{{ $sideThumb }}" alt="{{ $video->title }}"
                                                 class="w-full h-full object-cover opacity-90"
                                                 onload="this.parentElement.classList.remove('img-placeholder')">
                                             @endif
-                                            <div class="absolute inset-0 flex items-center justify-center">
-                                                <div class="w-10 h-10 bg-black/60 backdrop-blur-sm flex items-center justify-center text-white border border-custom/20 group-hover:bg-primary transition-colors">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                                                        <path d="M8 5v14l11-7z" />
-                                                    </svg>
-                                                </div>
+                                            <div class="absolute top-3 left-3 z-10 text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M8 5v14l11-7z" />
+                                                </svg>
                                             </div>
                                         </div>
-                                        <h4 class="text-base lg:text-lg font-normal serif leading-snug group-hover:text-primary transition-colors line-clamp-1">{{ $video->title }}</h4>
+                                        <h4 class="text-base lg:text-lg font-bold serif leading-snug text-title line-clamp-1">{{ $video->title }}</h4>
                                     </a>
                                     @endif
                                     @endforeach
@@ -1714,6 +1782,7 @@
                         @endif
                     </div>
                 </section>
+                @endif
 
                 <!-- Section: Photo (ছবি) -->
                 @php
@@ -1726,10 +1795,11 @@
                 $gallerySmall2 = $galleryList->get(2);
                 $galleryRight = $galleryList->get(3);
                 @endphp
+                @if(optional($gallerySection)->category_id)
                 <section class="pt-8 pb-6 border-b border-custom">
                     <div class="">
                         <div class="flex items-center gap-3 mb-6">
-                            <h2 class="text-2xl font-bold serif text-gray-900">@if($galleryCategory)<a href="{{ category_url($galleryCategory) }}" class="hover:text-primary transition-colors">{{ $galleryTitle ?: 'ছবি' }}</a>@else{{ $galleryTitle ?: 'ছবি' }}@endif</h2>
+                            <h2 class="text-2xl font-bold serif text-gray-900">@if($galleryCategory)<a href="{{ category_url($galleryCategory) }}">{{ $galleryTitle ?: 'ছবি' }}</a>@else{{ $galleryTitle ?: 'ছবি' }}@endif</h2>
                             <span class="w-4 h-4 bg-primary shrink-0"></span>
                         </div>
 
@@ -1740,8 +1810,13 @@
                                 @php $galleryMainCover = $galleryMain->images->first(); @endphp
                                 <a href="{{ route('gallery.show', $galleryMain->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[200px] md:h-[355px]">
                                     @if($galleryMainCover)
-                                    <img src="{{ storage_image_url($galleryMainCover->image) }}" alt="{{ $galleryMain->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.parentElement.classList.remove('img-placeholder')">
+                                    <img src="{{ storage_image_url($galleryMainCover->image) }}" alt="{{ $galleryMain->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                     @endif
+                                    <div class="absolute top-3 left-3 z-10 text-primary">
+                                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
                                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
                                         <p class="text-white font-serif text-base font-normal leading-tight line-clamp-1">{{ $galleryMain->title }}</p>
                                     </div>
@@ -1756,6 +1831,11 @@
                                         @if($cover)
                                         <img src="{{ storage_image_url($cover->image) }}" alt="{{ $gallery->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                         @endif
+                                        <div class="absolute top-3 left-3 z-10 text-primary">
+                                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
                                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4">
                                             <p class="text-white font-serif text-base font-normal leading-tight line-clamp-1">{{ $gallery->title }}</p>
                                         </div>
@@ -1767,12 +1847,16 @@
 
                             @if($galleryRight)
                             @php $galleryRightCover = $galleryRight->images->first(); @endphp
-                            <a href="{{ route('gallery.show', $galleryRight->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[180px] md:h-[505px]">
+                            <a href="{{ route('gallery.show', $galleryRight->slug) }}" class="img-placeholder group cursor-pointer relative overflow-hidden shadow-md h-[200px] md:h-[551px]">
                                 @if($galleryRightCover)
-                                <img src="{{ storage_image_url($galleryRightCover->image) }}" alt="{{ $galleryRight->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onload="this.parentElement.classList.remove('img-placeholder')">
+                                <img src="{{ storage_image_url($galleryRightCover->image) }}" alt="{{ $galleryRight->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')">
                                 @endif
+                                <div class="absolute top-3 left-3 z-10 text-primary">
+                                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6">
-                                    <span class="bg-primary text-white text-xs font-bold px-2 py-1 w-max mb-3">ফিচারড ফটো</span>
                                     <h3 class="text-white text-xl md:text-3xl font-bold serif leading-tight line-clamp-1">{{ $galleryRight->title }}</h3>
                                 </div>
                             </a>
@@ -1781,6 +1865,7 @@
                         @endif
                     </div>
                 </section>
+                @endif
 
         </div>
 </x-layout>

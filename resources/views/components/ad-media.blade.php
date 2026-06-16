@@ -11,6 +11,7 @@
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
                 loading="lazy"
+                onload="window.adSlotShow?.(this)"
             ></iframe>
         </div>
     @elseif(filled($ad->video) || filled($ad->video_mobile))
@@ -23,7 +24,8 @@
             @if($controls) controls @endif
             playsinline
             preload="metadata"
-            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder')"
+            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
+            onerror="window.adSlotHide?.(this)"
         >
             <source src="{{ storage_image_url($ad->video_mobile) }}" type="video/mp4">
         </video>
@@ -37,7 +39,8 @@
             @if($controls) controls @endif
             playsinline
             preload="metadata"
-            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder')"
+            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
+            onerror="window.adSlotHide?.(this)"
         >
             <source src="{{ storage_image_url($ad->video) }}" type="video/mp4">
         </video>
@@ -50,20 +53,24 @@
             @if($controls) controls @endif
             playsinline
             preload="metadata"
-            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder')"
+            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
+            onerror="window.adSlotHide?.(this)"
         >
             <source src="{{ storage_image_url($ad->video_mobile) }}" type="video/mp4">
         </video>
         @endif
-    @elseif($ad->image)
-        <picture class="block h-full w-full min-h-0 min-w-0 max-w-full">
+    @elseif(filled($ad->image) || filled($ad->image_mobile))
+        <picture class="flex h-full w-full min-h-0 min-w-0 max-w-full items-center justify-center">
             @if(filled($ad->image_mobile))
             <source media="(max-width: 767px)" srcset="{{ storage_image_url($ad->image_mobile) }}">
             @endif
             <img
-                src="{{ storage_image_url($ad->image) }}"
+                src="{{ storage_image_url($ad->image ?: $ad->image_mobile) }}"
                 alt="{{ $ad->caption ?? 'বিজ্ঞাপন' }}"
-                onload="this.closest('.img-placeholder')?.classList.remove('img-placeholder')"
+                loading="eager"
+                decoding="async"
+                onload="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
+                onerror="window.adSlotHide?.(this)"
                 {{ $attributes->except(['autoplay', 'muted', 'loop', 'controls'])->merge(['class' => 'max-w-full min-w-0']) }}
             />
         </picture>
