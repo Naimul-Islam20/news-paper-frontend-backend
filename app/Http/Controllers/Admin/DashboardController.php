@@ -25,12 +25,8 @@ class DashboardController extends Controller
         $todayPosts = Post::where('status', 'published')->whereDate('created_at', Carbon::today())->count();
         $yesterdayPosts = Post::where('status', 'published')->whereDate('created_at', Carbon::yesterday())->count();
         $draftPendingCount = Post::whereIn('status', ['draft', 'pending'])->count();
-        $todayVisitors = (int) VisitorDailyVisitor::whereDate('date', Carbon::today())
-            ->selectRaw('COUNT(DISTINCT visitor_id) as c')
-            ->value('c');
-        $yesterdayVisitors = (int) VisitorDailyVisitor::whereDate('date', Carbon::yesterday())
-            ->selectRaw('COUNT(DISTINCT visitor_id) as c')
-            ->value('c');
+        $todayVisitors = (int) VisitorDailyVisitor::whereDate('date', Carbon::today())->count();
+        $yesterdayVisitors = (int) VisitorDailyVisitor::whereDate('date', Carbon::yesterday())->count();
 
         // Last 10 days window
         $tenDaysAgo = Carbon::today()->subDays(9)->startOfDay();
@@ -98,7 +94,7 @@ class DashboardController extends Controller
 
         $raw = VisitorDailyVisitor::query()
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
-            ->selectRaw('date, COUNT(DISTINCT visitor_id) as unique_visitors')
+            ->selectRaw('date, COUNT(*) as unique_visitors')
             ->groupBy('date')
             ->orderBy('date')
             ->get()
@@ -135,7 +131,7 @@ class DashboardController extends Controller
         // প্রতিদিনের site-wide unique visitors (একই visitor এক দিনে একবার)
         $raw = VisitorDailyVisitor::query()
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
-            ->selectRaw('date, COUNT(DISTINCT visitor_id) as unique_visitors')
+            ->selectRaw('date, COUNT(*) as unique_visitors')
             ->groupBy('date')
             ->orderBy('date')
             ->get();

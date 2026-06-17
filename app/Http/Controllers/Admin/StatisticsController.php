@@ -29,10 +29,10 @@ class StatisticsController extends Controller
             ->get()
             ->keyBy(fn ($r) => $r->date->format('Y-m-d'));
 
-        // Site-wide unique visitors per day: distinct visitor_id per date (not per path)
+        // Site-wide unique visitors per day (one row per visitor per date).
         $uniqueDaily = VisitorDailyVisitor::query()
             ->whereBetween('date', [$dateFrom, $dateTo])
-            ->selectRaw('date, COUNT(DISTINCT visitor_id) as unique_visitors')
+            ->selectRaw('date, COUNT(*) as unique_visitors')
             ->groupBy('date')
             ->orderBy('date', 'desc')
             ->get()
