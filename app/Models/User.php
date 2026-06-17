@@ -79,6 +79,23 @@ class User extends Authenticatable
         return $this->belongsTo(Reporter::class);
     }
 
+    protected static function booted(): void
+    {
+        static::updated(function (User $user) {
+            if (! $user->wasChanged(['name', 'email', 'phone'])) {
+                return;
+            }
+
+            Reporter::query()
+                ->where('sub_editor_id', $user->id)
+                ->update([
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                ]);
+        });
+    }
+
     /**
      * Check if user has access to a given feature key using role_permissions table.
      */

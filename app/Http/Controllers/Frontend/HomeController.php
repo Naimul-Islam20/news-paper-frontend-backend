@@ -17,7 +17,7 @@ class HomeController extends Controller
      */
     public function specialNews(): View
     {
-        $baseQuery = Post::with(['reporter', 'categories.parent'])
+        $baseQuery = Post::with(['reporter.subEditor', 'categories.parent'])
             ->where('is_special_news', true)
             ->where('status', 'published')
             ->latest();

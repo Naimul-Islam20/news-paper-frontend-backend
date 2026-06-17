@@ -22,7 +22,7 @@ class PostResource extends JsonResource
             'slug' => $this->slug,
             'image' => $this->image,
             'image_caption' => $this->image_caption,
-            'reporter' => optional($this->whenLoaded('reporter') ?? $this->reporter)->desk ?? optional($this->whenLoaded('reporter') ?? $this->reporter)->name,
+            'reporter' => reporter_display_label($this->whenLoaded('reporter') ?? $this->reporter),
             'categories' => CategoryResource::collection($this->whenLoaded('categories') ?? $this->categories),
             'status' => $this->status,
             'main_section_layer' => $this->main_section_layer,

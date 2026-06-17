@@ -139,7 +139,7 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
                         </h1>
 
                         <div class="flex flex-col gap-1 pb-2 mb-2">
-                            <span class="text-lg font-bold text-title">{{ optional($video->reporter)->desk ?? optional($video->reporter)->name ?? 'ডিজিটাল ভিডিও ডেস্ক' }}</span>
+                            <span class="text-lg font-bold text-title">{{ reporter_display_label($video->reporter, 'ডিজিটাল ভিডিও ডেস্ক') }}</span>
                             <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-4">
                                 <span class="text-sm md:text-base text-desc">
                                     প্রকাশ : {{ published_at($video->created_at) }}

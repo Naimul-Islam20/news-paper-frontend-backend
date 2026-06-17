@@ -27,7 +27,7 @@ class CategoryController extends Controller
      */
     public function archive(): View|JsonResponse
     {
-        $baseQuery = Post::with(['reporter', 'categories.parent'])
+        $baseQuery = Post::with(['reporter.subEditor', 'categories.parent'])
             ->where('status', 'published')
             ->whereHas('categories', fn ($q) => $q->where('type', 'post'));
 
@@ -66,7 +66,7 @@ class CategoryController extends Controller
 
     private function listingPage(string $title, string $slug): View|JsonResponse
     {
-        $baseQuery = Post::with(['reporter', 'categories.parent'])
+        $baseQuery = Post::with(['reporter.subEditor', 'categories.parent'])
             ->where('status', 'published')
             ->whereHas('categories', fn ($q) => $q->where('type', 'post'))
             ->latest();
@@ -115,7 +115,7 @@ class CategoryController extends Controller
     // post type → national.blade.php design
     private function postCategory(Category $category): View|JsonResponse
     {
-        $baseQuery = Post::with(['reporter', 'categories.parent'])
+        $baseQuery = Post::with(['reporter.subEditor', 'categories.parent'])
             ->whereHas('categories', fn($q) => $q->where('categories.id', $category->id))
             ->where('status', 'published')
             ->latest();

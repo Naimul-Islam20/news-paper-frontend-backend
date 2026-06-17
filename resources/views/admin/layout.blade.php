@@ -687,6 +687,66 @@
         </main>
     </div>
 
+    {{-- Post published notification modal --}}
+    @if(session('post_published'))
+    @php
+        $publishedPost = session('post_published');
+        $publishedStatus = $publishedPost['status'] ?? 'published';
+        $publishedMessage = match ($publishedStatus) {
+            'draft' => 'Post saved as draft.',
+            'pending' => 'Post saved as pending.',
+            default => 'Post published successfully!',
+        };
+        $publishedPostUrl = $publishedStatus === 'published' && ! empty($publishedPost['slug'])
+            ? route('news.show', $publishedPost['slug'])
+            : null;
+    @endphp
+    <div id="post-published-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div
+            class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+            onclick="document.getElementById('post-published-modal')?.remove()"
+            aria-hidden="true"></div>
+        <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="post-published-title"
+            class="relative w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-2xl p-6 text-center">
+            <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h3 id="post-published-title" class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                {{ $publishedMessage }}
+            </h3>
+            @if(! empty($publishedPost['title']))
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+                    {{ $publishedPost['title'] }}
+                </p>
+            @endif
+            <div class="mt-6 flex flex-row items-stretch gap-3">
+                @if($publishedPostUrl)
+                    <a
+                        href="{{ $publishedPostUrl }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex flex-1 items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+                    >
+                        See Post
+                    </a>
+                @endif
+                <button
+                    type="button"
+                    onclick="document.getElementById('post-published-modal')?.remove()"
+                    class="inline-flex flex-1 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Floating flash notification (top modal style) --}}
     @if(session('success') || session('error'))
     @php

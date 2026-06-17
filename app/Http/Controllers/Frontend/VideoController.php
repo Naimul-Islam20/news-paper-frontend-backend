@@ -16,7 +16,7 @@ class VideoController extends Controller
 
     public function show(string $slug): View
     {
-        $video = Video::with(['category', 'reporter'])
+        $video = Video::with(['category', 'reporter.subEditor'])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();

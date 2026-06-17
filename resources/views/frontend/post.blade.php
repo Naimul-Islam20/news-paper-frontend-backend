@@ -233,7 +233,7 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                     <div class="flex flex-col gap-4">
                                     <div class="flex flex-col gap-0">
                                         <span class="text-xl font-medium text-byline">
-                                            {{ $post->reporter->desk ?? $post->reporter->name ?? 'ডিজিটাল ডেস্ক' }}
+                                            {{ reporter_display_label($post->reporter, 'ডিজিটাল ডেস্ক') }}
                                         </span>
                                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                             <span class="text-lg font-normal text-byline">

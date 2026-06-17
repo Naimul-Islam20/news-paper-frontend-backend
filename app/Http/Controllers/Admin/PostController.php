@@ -21,7 +21,7 @@ class PostController extends Controller
     public function index(Request $request): View
     {
         // Base query with relationships and default ordering (latest first)
-        $baseQuery = Post::with(['categories', 'reporter'])->latest();
+        $baseQuery = Post::with(['categories', 'reporter.subEditor'])->latest();
 
         // Filter by category (if selected)
         if ($request->filled('category_id') && $request->category_id !== 'all') {
@@ -149,7 +149,11 @@ class PostController extends Controller
 
         session()->put('clear_post_create_draft', true);
 
-        return redirect()->route('admin.posts.index')->with('success', 'Post published successfully!');
+        return redirect()->route('admin.posts.index')->with('post_published', [
+            'slug'   => $post->slug,
+            'title'  => $post->title,
+            'status' => $post->status,
+        ]);
     }
 
     public function edit($id): View

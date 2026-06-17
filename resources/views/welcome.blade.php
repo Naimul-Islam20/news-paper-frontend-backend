@@ -148,13 +148,13 @@
                                         {{ $post->title }}
                                     </h4>
                                 </a>
-                                @if(optional($post->reporter)->desk || optional($post->reporter)->name)
+                                @if(reporter_display_label($post->reporter))
                                 <div class="flex items-center gap-1.5 pt-1">
                                     <svg class="w-3.5 h-3.5 hidden md:block text-desc" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
                                     <span class="text-[12px] hidden md:block text-desc font-bold text-left ml-0 leading-none">
-                                        {{ $post->reporter->desk ?? $post->reporter->name }}
+                                        {{ reporter_display_label($post->reporter) }}
                                     </span>
                                 </div>
                                 @endif

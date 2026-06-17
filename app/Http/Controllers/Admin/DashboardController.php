@@ -55,7 +55,7 @@ class DashboardController extends Controller
 
         // Top 5 viewed posts in last 10 days (for "Top 5 viewed Posts" card)
         $topPosts = Post::query()
-            ->with(['categories.parent', 'reporter'])
+            ->with(['categories.parent', 'reporter.subEditor'])
             ->where('status', 'published')
             ->whereBetween('created_at', [$tenDaysAgo, $todayEnd])
             ->orderByDesc('views')
@@ -65,7 +65,7 @@ class DashboardController extends Controller
 
         // Latest posts (post-type only) for Newsroom Activity
         $recentPosts = Post::query()
-            ->with(['categories.parent', 'reporter'])
+            ->with(['categories.parent', 'reporter.subEditor'])
             ->where('status', 'published')
             ->orderByDesc('created_at')
             ->limit(10)

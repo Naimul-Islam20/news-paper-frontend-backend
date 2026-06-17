@@ -82,8 +82,8 @@
                                         </h3>
                                     </a>
                                     @if($post->description)
-                                        <p class="text-base md:text-base font-normal text-desc leading-relaxed line-clamp-2 md:line-clamp-1">
-                                            {!! html_entity_decode(\Illuminate\Support\Str::limit(strip_tags($post->description), 100)) !!}
+                                        <p class="text-base font-normal text-desc leading-relaxed line-clamp-3 max-md:line-clamp-2">
+                                            {!! html_entity_decode(\Illuminate\Support\Str::limit(strip_tags($post->description), 250)) !!}
                                         </p>
                                     @endif
                                     <x-post-list-meta :post="$post" />

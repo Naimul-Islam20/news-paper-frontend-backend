@@ -120,7 +120,7 @@ $galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gal
                         </h1>
 
                         <div class="flex flex-col gap-1 pb-2 mb-2">
-                            <span class="text-lg font-bold text-title leading-tight">{{ optional($gallery->reporter)->desk ?? optional($gallery->reporter)->name ?? 'ফটো ডেস্ক' }}</span>
+                            <span class="text-lg font-bold text-title leading-tight">{{ reporter_display_label($gallery->reporter, 'ফটো ডেস্ক') }}</span>
                             <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-4">
                                 <span class="text-sm md:text-base text-desc">
                                     প্রকাশ : {{ published_at($gallery->created_at) }}

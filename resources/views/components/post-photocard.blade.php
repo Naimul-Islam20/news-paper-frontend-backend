@@ -2,9 +2,12 @@
 
 @php
 $siteHost = share_site_label(front_home_url());
+$imageBasename = $post->image ? pathinfo(basename($post->image), PATHINFO_FILENAME) : '';
 $photocardPayload = [
+'id' => $post->id,
 'title' => $post->title,
 'image' => $post->image ? storage_image_url($post->image) : '',
+'imageName' => $imageBasename,
 'slug' => $post->slug,
 'logo' => optional($siteMeta)->site_logo ? storage_image_url($siteMeta->site_logo) : '',
 'siteName' => site_name(),

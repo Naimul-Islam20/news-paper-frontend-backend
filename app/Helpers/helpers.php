@@ -193,7 +193,7 @@ if (! function_exists('post_list_meta_parts')) {
             $parts[] = $categoryName;
         }
 
-        $reporterLabel = trim((string) (optional($post->reporter)->desk ?: optional($post->reporter)->name ?: ''));
+        $reporterLabel = reporter_display_label($post->reporter);
         if ($reporterLabel !== '') {
             $parts[] = $reporterLabel;
         }
@@ -736,6 +736,30 @@ if (! function_exists('person_name_first_word')) {
     }
 }
 
+if (! function_exists('reporter_display_label')) {
+    /**
+     * পোস্ট/ভিডিও/গ্যালারিতে রিপোর্টার লেবেল — ডেস্ক/ধরন প্রথমে, নাম পরে (লাইভ reporters রেকর্ড থেকে)।
+     */
+    function reporter_display_label($reporter, ?string $fallback = null): string
+    {
+        if (! $reporter) {
+            return $fallback ?? '';
+        }
+
+        $desk = trim((string) ($reporter->desk ?? ''));
+        if ($desk !== '') {
+            return $desk;
+        }
+
+        $name = reporter_person_name($reporter);
+        if ($name !== null && $name !== '') {
+            return $name;
+        }
+
+        return $fallback ?? '';
+    }
+}
+
 if (! function_exists('reporter_person_name')) {
     /**
      * রিপোর্টার ধরন/ডেস্ক নয় — রিপোর্টার রেকর্ডের ব্যক্তির নাম (name ফিল্ড)।
@@ -746,11 +770,6 @@ if (! function_exists('reporter_person_name')) {
             return null;
         }
 
-        $name = trim((string) ($reporter->name ?? ''));
-        if ($name !== '') {
-            return $name;
-        }
-
         if ($reporter->relationLoaded('subEditor') || $reporter->sub_editor_id) {
             $name = trim((string) optional($reporter->subEditor)->name);
             if ($name !== '') {
@@ -758,7 +777,9 @@ if (! function_exists('reporter_person_name')) {
             }
         }
 
-        return null;
+        $name = trim((string) ($reporter->name ?? ''));
+
+        return $name !== '' ? $name : null;
     }
 }
 

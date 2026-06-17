@@ -19,14 +19,14 @@ class HomepageController extends Controller
     public function show(): JsonResponse
     {
         // Hero and top strips based on main_section_layer
-        $heroPosts = Post::with(['categories', 'reporter'])
+        $heroPosts = Post::with(['categories', 'reporter.subEditor'])
             ->where('status', 'published')
             ->where('main_section_layer', '1')
             ->latest()
             ->take(2)
             ->get();
 
-        $topStripPosts = Post::with(['categories', 'reporter'])
+        $topStripPosts = Post::with(['categories', 'reporter.subEditor'])
             ->where('status', 'published')
             ->whereIn('main_section_layer', ['2', '3', '4'])
             ->latest()
@@ -41,7 +41,7 @@ class HomepageController extends Controller
             ->get();
 
         $sections = $sectionCategories->map(function (Category $category) {
-            $posts = Post::with(['categories', 'reporter'])
+            $posts = Post::with(['categories', 'reporter.subEditor'])
                 ->whereHas('categories', fn ($q) => $q->where('categories.id', $category->id))
                 ->where('status', 'published')
                 ->latest()

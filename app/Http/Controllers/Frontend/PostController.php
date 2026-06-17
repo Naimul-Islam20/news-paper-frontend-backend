@@ -106,7 +106,7 @@ class PostController extends Controller
         }
 
         // Try finding a Video
-        $video = \App\Models\Video::with(['category', 'reporter'])
+        $video = \App\Models\Video::with(['category', 'reporter.subEditor'])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->first();
@@ -121,7 +121,7 @@ class PostController extends Controller
         }
 
         // Try finding a Gallery
-        $gallery = \App\Models\Gallery::with(['images', 'category', 'reporter'])
+        $gallery = \App\Models\Gallery::with(['images', 'category', 'reporter.subEditor'])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->first();

@@ -16,7 +16,7 @@ class GalleryController extends Controller
 
     public function show(string $slug): View
     {
-        $gallery = Gallery::with(['images', 'category', 'reporter'])
+        $gallery = Gallery::with(['images', 'category', 'reporter.subEditor'])
             ->where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();

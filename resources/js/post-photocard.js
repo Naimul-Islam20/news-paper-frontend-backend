@@ -370,6 +370,41 @@ async function canvasToBlob(canvas) {
     });
 }
 
+function sanitizeFilenamePart(value, fallback = "image") {
+    const cleaned = String(value ?? "")
+        .replace(/\.[^./\\]+$/u, "")
+        .replace(/[^a-z0-9-_]+/gi, "-")
+        .replace(/^-+|-+$/g, "")
+        .toLowerCase();
+
+    return cleaned || fallback;
+}
+
+function imageNameFromUrl(url) {
+    if (!url) {
+        return "";
+    }
+
+    try {
+        const pathname = new URL(url, window.location.href).pathname;
+        const basename = pathname.split("/").pop() || "";
+
+        return sanitizeFilenamePart(basename, "");
+    } catch {
+        return "";
+    }
+}
+
+function buildDownloadFilename(data) {
+    const postId = sanitizeFilenamePart(data.id ?? data.postId ?? "post", "post");
+    const imageName = sanitizeFilenamePart(
+        data.imageName || imageNameFromUrl(data.image),
+        "no-image",
+    );
+
+    return `photocard-${postId}-${imageName}.png`;
+}
+
 async function waitForImages(container) {
     const images = Array.from(container.querySelectorAll("img"));
 
@@ -447,8 +482,7 @@ async function downloadCard(data) {
     try {
         const canvas = await renderPhotocardCanvas(data);
         const blob = await canvasToBlob(canvas);
-        const slug = (data.slug || "post").replace(/[^a-z0-9-_]+/gi, "-");
-        downloadBlob(blob, `photocard-${slug}.png`);
+        downloadBlob(blob, buildDownloadFilename(data));
     } catch (error) {
         console.error("Photocard download failed:", error);
         window.alert("ফটোকার্ড ডাউনলোড করা যায়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।");
