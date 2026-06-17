@@ -21,8 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'feature' => \App\Http\Middleware\EnsureUserCanFeature::class,
         ]);
 
-        // Track visitors (disable instantly on live: VISITOR_TRACKING_ENABLED=false in .env)
-        if (filter_var(env('VISITOR_TRACKING_ENABLED', true), FILTER_VALIDATE_BOOL)) {
+        // Visitor tracking (off by default on live — set VISITOR_TRACKING_ENABLED=true after deploying new TrackVisitorStats.php)
+        if (filter_var(env('VISITOR_TRACKING_ENABLED', false), FILTER_VALIDATE_BOOL)) {
             $middleware->appendToGroup('web', \App\Http\Middleware\TrackVisitorStats::class);
         }
 

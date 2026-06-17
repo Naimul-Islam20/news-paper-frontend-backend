@@ -77,7 +77,7 @@ return [
     |
     */
 
-    'visitor_tracking' => env('VISITOR_TRACKING_ENABLED', true),
+    'visitor_tracking' => env('VISITOR_TRACKING_ENABLED', false),
 
     /*
     |--------------------------------------------------------------------------
