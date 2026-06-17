@@ -69,6 +69,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Visitor tracking
+    |--------------------------------------------------------------------------
+    |
+    | Set VISITOR_TRACKING_ENABLED=false on live to disable stats DB writes
+    | without removing middleware (emergency kill switch).
+    |
+    */
+
+    'visitor_tracking' => env('VISITOR_TRACKING_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |
