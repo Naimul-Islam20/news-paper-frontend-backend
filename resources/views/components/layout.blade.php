@@ -76,7 +76,6 @@
                 clearGoogTrans();
             } else if (wantsEnglish) {
                 setGoogTransEnglish();
-                document.documentElement.classList.add('lang-pending-en');
             }
 
             if (wantsEnglish) {
@@ -92,10 +91,6 @@
         })();
     </script>
     <style>
-        html.lang-pending-en body {
-            visibility: hidden !important;
-        }
-
         html .i18n-en {
             display: none !important;
         }
@@ -197,7 +192,7 @@
         }
     </style>
     @endif
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
 </head>
 
 <body class="antialiased text-slate-900 overflow-x-hidden">
@@ -210,36 +205,6 @@
                 return;
             }
 
-            function revealEnglishPage() {
-                document.documentElement.classList.remove('lang-pending-en');
-            }
-
-            function watchForTranslation() {
-                var html = document.documentElement;
-
-                if (html.classList.contains('translated-ltr')) {
-                    revealEnglishPage();
-                    return;
-                }
-
-                var observer = new MutationObserver(function () {
-                    if (html.classList.contains('translated-ltr')) {
-                        observer.disconnect();
-                        revealEnglishPage();
-                    }
-                });
-
-                observer.observe(html, {
-                    attributes: true,
-                    attributeFilter: ['class'],
-                });
-
-                setTimeout(function () {
-                    observer.disconnect();
-                    revealEnglishPage();
-                }, 6000);
-            }
-
             window.googleTranslateElementInit = function () {
                 new google.translate.TranslateElement({
                     pageLanguage: 'bn',
@@ -247,8 +212,6 @@
                     autoDisplay: false,
                     layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
                 }, 'google_translate_element');
-
-                watchForTranslation();
             };
 
             var script = document.createElement('script');
@@ -356,7 +319,7 @@
 
     <script>
         if (!window.__siteLangEn) {
-            document.documentElement.classList.remove('translated-ltr', 'lang-pending-en');
+            document.documentElement.classList.remove('translated-ltr');
             document.documentElement.lang = 'bn';
         }
     </script>
