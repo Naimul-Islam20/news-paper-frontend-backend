@@ -17,6 +17,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "alpinejs": "^3.15.12",
         "bangla-likhi": "^1.0.1"
     }
 }

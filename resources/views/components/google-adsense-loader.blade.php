@@ -1,79 +1,73 @@
 @if(google_adsense_client())
+@php $adsenseClient = google_adsense_client(); @endphp
 <script>
     (function () {
-        var running = false;
-        var debounceTimer = null;
+        var client = @json($adsenseClient);
+        var scriptRequested = false;
 
         function initAds() {
             if (typeof window.adsbygoogle === 'undefined') {
-                return false;
+                return;
             }
-            var pending = document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-slot]:not([data-adsbygoogle-status])');
-            if (!pending.length) {
-                return false;
-            }
-            pending.forEach(function () {
+            document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-slot]:not([data-adsbygoogle-status])').forEach(function () {
                 try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
             });
-            return true;
         }
+
         function blockAuto() {
             document.querySelectorAll('ins.adsbygoogle:not([data-ad-slot])').forEach(function (el) {
                 el.style.cssText = 'display:none!important;height:0!important;';
             });
         }
+
         function run() {
-            if (running) {
+            blockAuto();
+            initAds();
+        }
+
+        function loadAdsScript(done) {
+            if (typeof window.adsbygoogle !== 'undefined') {
+                done();
                 return;
             }
-            running = true;
-            try {
-                blockAuto();
-                initAds();
-            } finally {
-                running = false;
+
+            if (scriptRequested) {
+                var attempts = 0;
+                var wait = setInterval(function () {
+                    attempts++;
+                    if (typeof window.adsbygoogle !== 'undefined' || attempts > 50) {
+                        clearInterval(wait);
+                        done();
+                    }
+                }, 100);
+                return;
             }
+
+            scriptRequested = true;
+            var tag = document.createElement('script');
+            tag.async = true;
+            tag.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(client);
+            tag.crossOrigin = 'anonymous';
+            tag.onload = done;
+            tag.onerror = done;
+            document.head.appendChild(tag);
         }
-        function scheduleRun() {
-            if (debounceTimer !== null) {
-                clearTimeout(debounceTimer);
-            }
-            debounceTimer = setTimeout(function () {
-                debounceTimer = null;
+
+        function startAds() {
+            loadAdsScript(function () {
                 run();
-            }, 250);
-        }
-        function scheduleRetries() {
-            var delays = [0, 500, 1500, 4000, 8000];
-            delays.forEach(function (ms) {
-                setTimeout(run, ms);
+                [500, 1500, 4000, 8000].forEach(function (ms) {
+                    setTimeout(run, ms);
+                });
             });
         }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', scheduleRetries);
+
+        if (document.readyState === 'complete') {
+            setTimeout(startAds, 200);
         } else {
-            scheduleRetries();
-        }
-        window.addEventListener('load', scheduleRetries);
-        if (typeof MutationObserver !== 'undefined') {
-            new MutationObserver(function (mutations) {
-                for (var i = 0; i < mutations.length; i++) {
-                    var added = mutations[i].addedNodes;
-                    for (var j = 0; j < added.length; j++) {
-                        var node = added[j];
-                        if (node.nodeType !== 1) {
-                            continue;
-                        }
-                        if (
-                            (node.matches && node.matches('ins.adsbygoogle[data-ad-slot]:not([data-adsbygoogle-status])'))
-                            || (node.querySelector && node.querySelector('ins.adsbygoogle[data-ad-slot]:not([data-adsbygoogle-status])'))
-                        ) {
-                            scheduleRun();
-                            return;
-                        }
-                    }
-                }
-            }).observe(document.documentElement, { childList: true, subtree: true });
+            window.addEventListener('load', function () {
+                setTimeout(startAds, 200);
+            }, { once: true });
         }
     })();
 </script>
