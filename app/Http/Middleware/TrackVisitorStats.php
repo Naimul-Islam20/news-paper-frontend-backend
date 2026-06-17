@@ -75,14 +75,40 @@ class TrackVisitorStats
             return false;
         }
 
+        if ($this->isStaticAssetRequest($request)) {
+            return false;
+        }
+
         $secFetchDest = $request->header('Sec-Fetch-Dest');
         if ($secFetchDest !== null && $secFetchDest !== 'document') {
+            return false;
+        }
+
+        $accept = (string) $request->header('Accept', '');
+        if ($accept !== '' && str_contains($accept, 'image/') && ! str_contains($accept, 'text/html')) {
             return false;
         }
 
         $pathForCheck = $request->path();
 
         return ! in_array($pathForCheck, ['favicon.ico', 'robots.txt', 'sitemap.xml'], true);
+    }
+
+    private function isStaticAssetRequest(Request $request): bool
+    {
+        $path = strtolower($request->path());
+
+        if (str_starts_with($path, 'build/') || str_starts_with($path, 'storage/')) {
+            return true;
+        }
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+
+        return in_array($extension, [
+            'webp', 'jpg', 'jpeg', 'png', 'gif', 'svg', 'ico', 'avif',
+            'css', 'js', 'map', 'woff', 'woff2', 'ttf', 'eot',
+            'mp4', 'webm', 'mp3', 'pdf', 'zip',
+        ], true);
     }
 
     private function normalizePath(Request $request): string
