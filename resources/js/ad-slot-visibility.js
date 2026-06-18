@@ -181,14 +181,4 @@
         checkGoogleSlots();
         scheduleGoogleChecks();
     });
-
-    if (typeof MutationObserver !== 'undefined') {
-        new MutationObserver(function () {
-            checkGoogleSlots();
-        }).observe(document.documentElement, {
-            attributes: true,
-            subtree: true,
-            attributeFilter: ['data-ad-status', 'data-adsbygoogle-status'],
-        });
-    }
 })();

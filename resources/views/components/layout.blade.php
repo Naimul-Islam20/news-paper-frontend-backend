@@ -103,6 +103,20 @@
             display: inline !important;
         }
     </style>
+    <script>
+        (function () {
+            function forceVisible() {
+                document.documentElement.classList.remove('lang-pending-en');
+                if (document.body) {
+                    document.body.style.setProperty('visibility', 'visible', 'important');
+                }
+            }
+            forceVisible();
+            document.addEventListener('DOMContentLoaded', forceVisible);
+            window.addEventListener('load', forceVisible);
+            setTimeout(forceVisible, 1500);
+        })();
+    </script>
     <x-font-preload />
     <title>{{ $title ?? site_browser_title() }}</title>
     @if(!empty(optional($siteMeta)->site_keywords))
