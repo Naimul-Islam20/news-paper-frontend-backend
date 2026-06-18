@@ -21,10 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'feature' => \App\Http\Middleware\EnsureUserCanFeature::class,
         ]);
 
-        // Visitor tracking (off by default on live — set VISITOR_TRACKING_ENABLED=true after deploying new TrackVisitorStats.php)
-        if (filter_var(env('VISITOR_TRACKING_ENABLED', false), FILTER_VALIDATE_BOOL)) {
-            $middleware->appendToGroup('web', \App\Http\Middleware\TrackVisitorStats::class);
-        }
+        // সবসময় লোড — চালু/বন্ধ config('app.visitor_tracking') দিয়ে (.env এ config:cache safe)
+        $middleware->appendToGroup('web', \App\Http\Middleware\TrackVisitorStats::class);
 
         // সাইট মেটা (primary_color সহ) প্রতি রিকোয়েস্টে রিফ্রেশ — cPanel/Octane এ boot()-এ share স্টেল হলে রঙ আপডেট দেখা যায় না
         $middleware->prependToGroup('web', \App\Http\Middleware\ShareSiteMeta::class);

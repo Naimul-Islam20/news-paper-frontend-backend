@@ -14,13 +14,11 @@ use Throwable;
 
 class TrackVisitorStats
 {
-    private const TRACKING_ATTRIBUTE = 'visitor_stats_payload';
-
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
 
-        if (! config('app.visitor_tracking', true)) {
+        if (! config('app.visitor_tracking', false)) {
             return $response;
         }
 
@@ -28,37 +26,13 @@ class TrackVisitorStats
             return $response;
         }
 
-        $visitorId = $this->resolveVisitorId($request);
-
-        // DB writes happen in terminate() — browser gets the page first.
-        $request->attributes->set(self::TRACKING_ATTRIBUTE, [
-            'date'       => now()->toDateString(),
-            'path'       => $this->normalizePath($request),
-            'visitor_id' => $visitorId,
-        ]);
+        $this->recordVisit(
+            now()->toDateString(),
+            $this->normalizePath($request),
+            $this->resolveVisitorId($request),
+        );
 
         return $response;
-    }
-
-    /**
-     * Runs after the HTTP response is sent.
-     */
-    public function terminate(Request $request, Response $response): void
-    {
-        if (! config('app.visitor_tracking', true)) {
-            return;
-        }
-
-        $payload = $request->attributes->get(self::TRACKING_ATTRIBUTE);
-        if (! is_array($payload)) {
-            return;
-        }
-
-        $this->recordVisit(
-            (string) $payload['date'],
-            (string) $payload['path'],
-            (string) $payload['visitor_id'],
-        );
     }
 
     private function shouldTrack(Request $request): bool
@@ -98,8 +72,10 @@ class TrackVisitorStats
     {
         $path = strtolower($request->path());
 
-        if (str_starts_with($path, 'build/') || str_starts_with($path, 'storage/')) {
-            return true;
+        foreach (['build/', 'storage/', 'public/build/', 'public/storage/'] as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                return true;
+            }
         }
 
         $extension = pathinfo($path, PATHINFO_EXTENSION);
@@ -113,7 +89,6 @@ class TrackVisitorStats
 
     private function normalizePath(Request $request): string
     {
-        // Decode so /%E0%A6%... and /বাংলা... share one stats row.
         $path = rawurldecode('/' . ltrim($request->path(), '/'));
 
         return mb_strlen($path) > 255 ? mb_substr($path, 0, 255) : $path;
@@ -179,7 +154,6 @@ class TrackVisitorStats
     {
         $now = now()->toDateTimeString();
 
-        // 1) Site-wide unique — এক visitor দিনে একবার (unique index: date + visitor_id).
         DB::table('visitor_daily_visitors')->insertOrIgnore([
             'date'       => $date,
             'path'       => $path,
@@ -188,7 +162,6 @@ class TrackVisitorStats
             'updated_at' => $now,
         ]);
 
-        // 2) Page view — single atomic upsert, no transaction, no Model::save().
         DB::statement(
             'INSERT INTO visitor_stats (`date`, `path`, page_views, unique_visitors, created_at, updated_at)
              VALUES (?, ?, 1, 0, ?, ?)

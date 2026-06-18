@@ -72,12 +72,12 @@ return [
     | Visitor tracking
     |--------------------------------------------------------------------------
     |
-    | Set VISITOR_TRACKING_ENABLED=false on live to disable stats DB writes
-    | without removing middleware (emergency kill switch).
+    | Set VISITOR_TRACKING_ENABLED=false to disable stats on live (emergency kill switch).
+    | Default true — .env এ না লিখলেও visitor stats চালু।
     |
     */
 
-    'visitor_tracking' => env('VISITOR_TRACKING_ENABLED', false),
+    'visitor_tracking' => env('VISITOR_TRACKING_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
