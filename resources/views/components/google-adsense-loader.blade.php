@@ -1,4 +1,4 @@
-@if(google_adsense_client())
+@if(google_adsense_frontend_enabled())
 @php $adsenseClient = google_adsense_client(); @endphp
 <script>
     (function () {

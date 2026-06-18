@@ -437,7 +437,8 @@ class Advertisement extends Model
 
     public function canShowGoogleAd(): bool
     {
-        return filled($this->resolvedGoogleAdSlot())
+        return google_adsense_frontend_enabled()
+            && filled($this->resolvedGoogleAdSlot())
             && filled(google_adsense_client());
     }
 

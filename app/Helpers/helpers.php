@@ -365,6 +365,21 @@ if (! function_exists('google_adsense_client')) {
     }
 }
 
+if (! function_exists('google_adsense_frontend_enabled')) {
+    /**
+     * ফ্রন্টে Google AdSense চালু কিনা — .env kill switch।
+     * Admin-এ Client ID থাকলেও false হলে ফ্রন্টে Google ad/JS লোড হবে না।
+     */
+    function google_adsense_frontend_enabled(): bool
+    {
+        if (! filter_var(config('app.adsense_frontend', false), FILTER_VALIDATE_BOOL)) {
+            return false;
+        }
+
+        return filled(google_adsense_client());
+    }
+}
+
 if (! function_exists('normalize_google_adsense_slot')) {
     /**
      * AdSense unit Slot ID — শুধু সংখ্যা রাখে।

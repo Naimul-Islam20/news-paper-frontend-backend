@@ -4,7 +4,7 @@
 ])
 
 @php
-$client = google_adsense_client();
+$client = google_adsense_frontend_enabled() ? google_adsense_client() : null;
 $slot = google_adsense_slot_for($ad);
 $dims = $ad?->mediaSpecDimensions();
 
