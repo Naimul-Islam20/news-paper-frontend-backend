@@ -32,6 +32,11 @@ Route::get('/lang/{locale}', [LanguageController::class, 'switch'])
     ->whereIn('locale', ['bn', 'en'])
     ->name('lang.switch');
 
+// Local: 503 maintenance page preview (no artisan down needed)
+if (app()->environment('local')) {
+    Route::get('/preview-503', fn () => response(view('errors.503'), 503));
+}
+
 // Public frontend routes (all non-admin, non-API pages)
 Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
 
