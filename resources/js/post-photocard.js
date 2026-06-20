@@ -1,6 +1,7 @@
 const MODAL_ID = "post-photocard-modal";
 const CARD_ID = "post-photocard-card";
 const CARD_WIDTH = 900;
+const PREVIEW_MAX_WIDTH = 600;
 const IMAGE_HEIGHT = 506; // 16:9
 const SECTION_X_PADDING = 24;
 const TITLE_Y_PADDING = 20;
@@ -453,7 +454,7 @@ function applyPreviewScale() {
     cardRoot.style.minHeight = "";
     cardRoot.style.overflow = "visible";
 
-    const available = viewport.clientWidth;
+    const available = Math.min(viewport.clientWidth, PREVIEW_MAX_WIDTH);
     const scale = Math.min(1, available / CARD_WIDTH);
 
     if (scale < 1) {

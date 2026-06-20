@@ -33,11 +33,11 @@ $photocardPayload = [
 <div id="post-photocard-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4" aria-hidden="true" role="dialog" aria-modal="true" aria-label="ফটোকার্ড প্রিভিউ">
     <div class="absolute inset-0 bg-black/70" data-photocard-close></div>
 
-    <div class="relative z-10 w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-white shadow-2xl">
-        <div class="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3">
-            <h3 class="text-lg font-bold text-title">ফটোকার্ড</h3>
+    <div class="relative z-10 w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-white shadow-2xl">
+        <div class="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-2">
+            <h3 class="text-base font-bold text-title">ফটোকার্ড</h3>
             <div class="flex items-center gap-2">
-                <button type="button" data-photocard-download class="px-4 py-2 bg-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity">
+                <button type="button" data-photocard-download class="px-3 py-1.5 bg-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity">
                     ডাউনলোড করুন
                 </button>
                 <button type="button" data-photocard-close class="w-9 h-9 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100" aria-label="বন্ধ করুন">
