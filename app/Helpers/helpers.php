@@ -695,6 +695,37 @@ if (! function_exists('share_site_label')) {
     }
 }
 
+if (! function_exists('photocard_site_domain')) {
+    /**
+     * Photocard footer-এ সম্পূর্ণ domain (যেমন www.example.com)।
+     */
+    function photocard_site_domain(?string $pageUrl = null): string
+    {
+        $url = $pageUrl ?? front_home_url();
+        $host = parse_url($url, PHP_URL_HOST);
+
+        if (! is_string($host) || $host === '') {
+            $host = parse_url((string) config('app.url', ''), PHP_URL_HOST);
+        }
+
+        if (! is_string($host) || $host === '') {
+            return '';
+        }
+
+        $host = strtolower($host);
+
+        if ($host === 'localhost' || filter_var($host, FILTER_VALIDATE_IP)) {
+            return $host;
+        }
+
+        if (! str_starts_with($host, 'www.')) {
+            $host = 'www.'.$host;
+        }
+
+        return $host;
+    }
+}
+
 if (! function_exists('news_url')) {
     /**
      * Build simple news post URL (/{slug}).
