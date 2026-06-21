@@ -182,7 +182,7 @@ function wrapUrlLines(ctx, url, maxWidth, fontSize) {
 }
 
 function footerAreaHeight() {
-    const logoBoxHeight = LOGO_HEIGHT + LOGO_PAD_Y * 2;
+    const logoBoxHeight = LOGO_HEIGHT;
     const textHeight = FOOTER_HINT_SIZE + FOOTER_URL_SIZE + 12;
 
     return Math.max(logoBoxHeight, textHeight) + 18;
@@ -215,7 +215,7 @@ function buildCardHtml(data) {
         : `<div style="width:100%;height:100%;background:linear-gradient(135deg,${primary} 0%,#0f172a 100%);"></div>`;
 
     const logoBlock = data.logo
-        ? `<div style="display:inline-flex;align-items:center;justify-content:center;background:#ffffff;padding:${LOGO_PAD_Y}px ${LOGO_PAD_X}px;box-shadow:0 2px 10px rgba(0,0,0,0.2);"><img ${imageTagAttributes(data.logo)} style="display:block;height:${LOGO_HEIGHT}px;max-width:${LOGO_MAX_WIDTH}px;object-fit:contain;"></div>`
+        ? `<img ${imageTagAttributes(data.logo)} style="display:block;height:${LOGO_HEIGHT}px;max-width:${LOGO_MAX_WIDTH}px;object-fit:contain;">`
         : `<span style="display:block;font-size:36px;font-weight:700;color:#ffffff;line-height:1.2;text-align:right;">${siteName}</span>`;
 
     const dateBlock = date
@@ -467,7 +467,7 @@ async function renderPhotocardCanvas(data) {
             LOGO_MAX_WIDTH,
             logoImage.naturalWidth * (logoHeight / logoImage.naturalHeight),
         );
-        footerLogoBoxWidth = logoWidth + LOGO_PAD_X * 2;
+        footerLogoBoxWidth = logoWidth + 16;
         urlMaxWidth -= footerLogoBoxWidth + 16;
     }
 
@@ -505,21 +505,10 @@ async function renderPhotocardCanvas(data) {
             LOGO_MAX_WIDTH,
             logoImage.naturalWidth * (logoHeight / logoImage.naturalHeight),
         );
-        const boxWidth = footerLogoBoxWidth;
-        const boxHeight = logoHeight + LOGO_PAD_Y * 2;
-        const boxX = CARD_SIZE - SECTION_X_PADDING - boxWidth;
-        const boxY = footerBaseY - boxHeight;
+        const logoX = CARD_SIZE - SECTION_X_PADDING - logoWidth;
+        const logoY = footerBaseY - logoHeight;
 
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-
-        ctx.drawImage(
-            logoImage,
-            boxX + LOGO_PAD_X,
-            boxY + LOGO_PAD_Y,
-            logoWidth,
-            logoHeight,
-        );
+        ctx.drawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
     } else if (siteName) {
         ctx.fillStyle = "#ffffff";
         ctx.font = `700 36px ${PHOTOCARD_FONT}`;
