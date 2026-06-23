@@ -570,14 +570,25 @@ if (! function_exists('google_adsense_configured')) {
     }
 }
 
+if (! function_exists('google_adsense_is_local_request')) {
+    /** Local dev hostname — APP_ENV যাই হোক, 127.0.0.1/localhost-এ ad বন্ধ। */
+    function google_adsense_is_local_request(): bool
+    {
+        $host = strtolower((string) request()->getHost());
+
+        return in_array($host, ['127.0.0.1', 'localhost', '::1'], true)
+            || str_ends_with($host, '.test')
+            || str_ends_with($host, '.local');
+    }
+}
+
 if (! function_exists('google_adsense_frontend_enabled')) {
     /**
-     * ফ্রন্টএন্ডে AdSense — Client ID থাকলে চালু; শুধু local dev-এ বন্ধ (blank/hang এড়াতে)।
-     * আলাদা .env flag লাগে না।
+     * ফ্রন্টএন্ডে AdSense — Client ID + live hostname থাকলে চালু; local dev-এ বন্ধ।
      */
     function google_adsense_frontend_enabled(): bool
     {
-        return google_adsense_configured() && ! app()->environment('local');
+        return google_adsense_configured() && ! google_adsense_is_local_request();
     }
 }
 

@@ -26,6 +26,5 @@ if ($dims && in_array($format, ['header', 'banner'], true)) {
         style="{{ $insStyle }}"
         data-ad-client="{{ $client }}"
         data-ad-slot="{{ $slot }}"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
 @endif
