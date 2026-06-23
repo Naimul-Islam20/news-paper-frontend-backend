@@ -1,114 +1,71 @@
 @if(google_adsense_frontend_enabled())
+@php $adsenseClient = google_adsense_client(); @endphp
+@if($adsenseClient)
 <script>
     (function () {
-        var scriptRequested = false;
-        var scriptLoaded = false;
-        var pendingInits = [];
+        var client = @json($adsenseClient);
 
-        function manualUnits() {
-            return document.querySelectorAll('.google-ad-unit ins.adsbygoogle[data-ad-slot]');
+        function pendingUnits() {
+            return document.querySelectorAll('ins.adsbygoogle[data-ad-slot]:not([data-adsbygoogle-status])');
         }
 
-        function blockAuto() {
+        function blockAutoAds() {
             document.querySelectorAll('ins.adsbygoogle:not([data-ad-slot])').forEach(function (el) {
                 el.style.cssText = 'display:none!important;height:0!important;max-height:0!important;overflow:hidden!important;';
             });
         }
 
-        function initUnit(ins) {
-            if (!ins || ins.getAttribute('data-adsbygoogle-status')) {
-                return;
-            }
-
+        function initUnits() {
             if (typeof window.adsbygoogle === 'undefined') {
-                pendingInits.push(ins);
                 return;
             }
 
-            try {
-                (window.adsbygoogle = window.adsbygoogle || []).push({});
-            } catch (e) {}
+            blockAutoAds();
+            pendingUnits().forEach(function (ins) {
+                try {
+                    (window.adsbygoogle = window.adsbygoogle || []).push({});
+                } catch (e) {}
+            });
         }
 
-        function flushPending() {
-            pendingInits.splice(0).forEach(initUnit);
-            blockAuto();
-        }
-
-        function loadAdsScript(done) {
+        function loadScript(done) {
             if (typeof window.adsbygoogle !== 'undefined') {
-                scriptLoaded = true;
                 done();
                 return;
             }
 
-            if (scriptRequested) {
+            if (document.querySelector('script[data-adsense-loader="1"]')) {
                 var attempts = 0;
                 var wait = setInterval(function () {
                     attempts++;
-                    if (typeof window.adsbygoogle !== 'undefined' || attempts > 40) {
+                    if (typeof window.adsbygoogle !== 'undefined' || attempts > 60) {
                         clearInterval(wait);
-                        scriptLoaded = typeof window.adsbygoogle !== 'undefined';
                         done();
                     }
                 }, 100);
                 return;
             }
 
-            scriptRequested = true;
             var tag = document.createElement('script');
             tag.async = true;
-            tag.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+            tag.setAttribute('data-adsense-loader', '1');
+            tag.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(client);
             tag.crossOrigin = 'anonymous';
-            tag.onload = function () {
-                scriptLoaded = true;
-                done();
-            };
+            tag.onload = done;
             tag.onerror = done;
             document.head.appendChild(tag);
         }
 
         function start() {
-            var units = manualUnits();
-            if (!units.length) {
+            if (!document.querySelector('ins.adsbygoogle[data-ad-slot]')) {
                 return;
             }
 
-            blockAuto();
-
-            if ('IntersectionObserver' in window) {
-                var observer = new IntersectionObserver(function (entries) {
-                    entries.forEach(function (entry) {
-                        if (!entry.isIntersecting) {
-                            return;
-                        }
-                        observer.unobserve(entry.target);
-                        loadAdsScript(function () {
-                            initUnit(entry.target);
-                            flushPending();
-                        });
-                    });
-                }, { rootMargin: '240px 0px' });
-
-                units.forEach(function (ins) {
-                    observer.observe(ins);
+            loadScript(function () {
+                initUnits();
+                [400, 1200, 3000, 6000].forEach(function (ms) {
+                    setTimeout(initUnits, ms);
                 });
-
-                setTimeout(function () {
-                    loadAdsScript(function () {
-                        units.forEach(initUnit);
-                        flushPending();
-                    });
-                }, 2500);
-            } else {
-                loadAdsScript(function () {
-                    units.forEach(initUnit);
-                    flushPending();
-                });
-            }
-
-            [800, 2000, 5000].forEach(function (ms) {
-                setTimeout(blockAuto, ms);
             });
         }
 
@@ -117,6 +74,9 @@
         } else {
             start();
         }
+
+        window.addEventListener('load', start, { once: true });
     })();
 </script>
+@endif
 @endif

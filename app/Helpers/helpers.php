@@ -560,10 +560,19 @@ if (! function_exists('google_adsense_client')) {
     }
 }
 
+if (! function_exists('google_adsense_configured')) {
+    /**
+     * SEO & Meta-তে Client ID সেট আছে কিনা।
+     */
+    function google_adsense_configured(): bool
+    {
+        return filled(google_adsense_client());
+    }
+}
+
 if (! function_exists('google_adsense_frontend_enabled')) {
     /**
-     * ফ্রন্টে Google AdSense চালু কিনা — .env kill switch।
-     * Admin-এ Client ID থাকলেও false হলে ফ্রন্টে Google ad/JS লোড হবে না।
+     * ফ্রন্টে Google AdSense JS চালু কিনা — .env kill switch (HTML/display আলাদা)।
      */
     function google_adsense_frontend_enabled(): bool
     {
@@ -571,7 +580,7 @@ if (! function_exists('google_adsense_frontend_enabled')) {
             return false;
         }
 
-        return filled(google_adsense_client());
+        return google_adsense_configured();
     }
 }
 
