@@ -20,7 +20,7 @@ if ($dims && in_array($format, ['header', 'banner'], true)) {
 }
 @endphp
 
-@if($ad && $client && filled($slot))
+@if($ad && google_adsense_frontend_enabled() && $client && filled($slot))
 <div {{ $attributes->merge(['class' => 'google-ad-unit google-ad-unit--'.$format]) }}>
     <ins class="adsbygoogle"
         style="{{ $insStyle }}"

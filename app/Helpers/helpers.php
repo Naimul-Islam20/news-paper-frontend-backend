@@ -571,10 +571,13 @@ if (! function_exists('google_adsense_configured')) {
 }
 
 if (! function_exists('google_adsense_frontend_enabled')) {
-    /** @deprecated google_adsense_configured() ব্যবহার করুন */
+    /**
+     * ফ্রন্টএন্ডে AdSense — Client ID থাকলে চালু; শুধু local dev-এ বন্ধ (blank/hang এড়াতে)।
+     * আলাদা .env flag লাগে না।
+     */
     function google_adsense_frontend_enabled(): bool
     {
-        return google_adsense_configured();
+        return google_adsense_configured() && ! app()->environment('local');
     }
 }
 

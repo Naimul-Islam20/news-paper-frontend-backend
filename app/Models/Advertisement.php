@@ -437,7 +437,7 @@ class Advertisement extends Model
 
     public function canShowGoogleAd(): bool
     {
-        if (! google_adsense_configured()) {
+        if (! google_adsense_frontend_enabled()) {
             return false;
         }
 

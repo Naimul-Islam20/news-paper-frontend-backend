@@ -17,7 +17,7 @@ class DiagnoseAdsCommand extends Command
         $defaultSlot = google_adsense_default_slot();
         $this->info('Client ID: '.($client ?: '❌ নেই / ভুল format'));
         $this->info('Default Slot: '.($defaultSlot ?: '— (Meta-তে set করুন)'));
-        $this->info('AdSense JS: '.(google_adsense_configured() ? 'চালু (Client ID থাকলেই)' : 'বন্ধ'));
+        $this->info('AdSense frontend: '.(google_adsense_frontend_enabled() ? 'চালু (live)' : (google_adsense_configured() ? 'বন্ধ (local dev)' : 'বন্ধ (Client ID নেই)')));
         $this->newLine();
 
         $query = Advertisement::query()->orderBy('slug');
