@@ -439,7 +439,7 @@ class PostController extends Controller
                 $this->deletePostImageIfUnused($post->image, $post->id);
             }
 
-            $data['image'] = store_public_upload($request->file('image'), 'posts');
+            $data['image'] = store_post_featured_upload($request->file('image'));
 
             return;
         }

@@ -64,10 +64,10 @@
                         x-transition:leave="transition ease-in duration-300 transform"
                         x-transition:leave-start="translate-x-0"
                         x-transition:leave-end="-translate-x-full"
-                        class="fixed inset-y-0 left-0 w-80 bg-white z-[210] shadow-2xl pt-2 px-6 pb-6 overflow-y-auto"
+                        class="fixed inset-y-0 left-0 w-80 bg-primary text-white z-[210] shadow-2xl pt-2 px-6 pb-6 overflow-y-auto"
                         x-cloak>
-                        <div class="flex justify-end items-center mb-2 pb-2 border-b border-black/5">
-                            <button @click="showSidebar = false" class="p-2 hover:bg-slate-100  transition-colors">
+                        <div class="flex justify-end items-center mb-2 pb-2 border-b border-white/20">
+                            <button @click="showSidebar = false" class="p-2 text-white hover:bg-white/10 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
                                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -76,7 +76,7 @@
                         </div>
 
                         <ul class="header-drawer-menu space-y-2">
-                            <li class="border-b border-gray-400 pb-2"><a href="{{ front_home_url() }}" class="block text-xl font-medium hover:text-primary transition-colors flex items-center gap-2">
+                            <li class="border-b border-white/30 pb-2"><a href="{{ front_home_url() }}" class="block text-xl font-medium text-white hover:text-white/80 transition-colors flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                         <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -84,12 +84,12 @@
                                     হোম
                                 </a></li>
                             {{-- সর্বশেষ সর্বদা বাম পাশের প্রথম মেনু (স্থান পরিবর্তন হবে না) --}}
-                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('latest') }}" class="block text-2xl font-medium hover:text-primary transition-colors">সর্বশেষ</a></li>
-                            <li class="border-b border-gray-400 pb-1"><a href="{{ route('special-news') }}" class="block text-2xl font-medium hover:text-primary transition-colors">বিশেষ সংবাদ</a></li>
+                            <li class="border-b border-white/30 pb-1"><a href="{{ route('latest') }}" class="block text-2xl font-medium text-white hover:text-white/80 transition-colors">সর্বশেষ</a></li>
+                            <li class="border-b border-white/30 pb-1"><a href="{{ route('special-news') }}" class="block text-2xl font-medium text-white hover:text-white/80 transition-colors">বিশেষ সংবাদ</a></li>
                             @if(isset($sideMenuCategories) && $sideMenuCategories->isNotEmpty())
                             @foreach($sideMenuCategories as $cat)
-                            <li class="border-b border-gray-400 pb-1">
-                                <a href="{{ route('category.show', $cat->slug) }}" class="block text-2xl font-medium hover:text-primary transition-colors">
+                            <li class="border-b border-white/30 pb-1">
+                                <a href="{{ route('category.show', $cat->slug) }}" class="block text-2xl font-medium text-white hover:text-white/80 transition-colors">
                                     {{ $cat->name }}
                                 </a>
                             </li>

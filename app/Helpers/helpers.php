@@ -103,6 +103,201 @@ if (! function_exists('store_public_upload')) {
     }
 }
 
+if (! function_exists('post_featured_image_spec')) {
+    /**
+     * পোস্ট ফিচার্ড ইমেজ — ১৬:৯, সাইটে সেভ/দেখানোর স্ট্যান্ডার্ড সাইজ।
+     */
+    function post_featured_image_spec(): array
+    {
+        return [
+            'width' => 600,
+            'height' => 338,
+            'jpeg_quality' => 85,
+        ];
+    }
+}
+
+if (! function_exists('apply_exif_orientation_to_gd')) {
+    function apply_exif_orientation_to_gd(\GdImage $image, int $orientation): \GdImage
+    {
+        $rotated = match ($orientation) {
+            2 => (imageflip($image, IMG_FLIP_HORIZONTAL) ? $image : $image),
+            3 => imagerotate($image, 180, 0),
+            4 => (imageflip($image, IMG_FLIP_VERTICAL) ? $image : $image),
+            5 => tap(imagerotate($image, -90, 0), function ($img) {
+                if ($img instanceof \GdImage) {
+                    imageflip($img, IMG_FLIP_HORIZONTAL);
+                }
+            }),
+            6 => imagerotate($image, -90, 0),
+            7 => tap(imagerotate($image, 90, 0), function ($img) {
+                if ($img instanceof \GdImage) {
+                    imageflip($img, IMG_FLIP_HORIZONTAL);
+                }
+            }),
+            8 => imagerotate($image, 90, 0),
+            default => $image,
+        };
+
+        if ($rotated instanceof \GdImage && $rotated !== $image) {
+            imagedestroy($image);
+
+            return $rotated;
+        }
+
+        return $image;
+    }
+}
+
+if (! function_exists('create_gd_image_from_path')) {
+    function create_gd_image_from_path(string $path, ?string $mime = null): ?\GdImage
+    {
+        if (! extension_loaded('gd')) {
+            return null;
+        }
+
+        $mime = $mime ?: (mime_content_type($path) ?: '');
+
+        $image = match (true) {
+            str_contains($mime, 'jpeg'), str_contains($mime, 'jpg') => @imagecreatefromjpeg($path),
+            str_contains($mime, 'png') => @imagecreatefrompng($path),
+            str_contains($mime, 'webp') => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($path) : false,
+            str_contains($mime, 'gif') => @imagecreatefromgif($path),
+            default => false,
+        };
+
+        if (! $image instanceof \GdImage) {
+            return null;
+        }
+
+        if (
+            function_exists('exif_read_data')
+            && (str_contains($mime, 'jpeg') || str_contains($mime, 'jpg'))
+        ) {
+            $exif = @exif_read_data($path);
+            $orientation = (int) ($exif['Orientation'] ?? 0);
+            if ($orientation > 1) {
+                $image = apply_exif_orientation_to_gd($image, $orientation);
+            }
+        }
+
+        return $image;
+    }
+}
+
+if (! function_exists('encode_post_featured_jpeg')) {
+    function encode_post_featured_jpeg(\GdImage $image): ?string
+    {
+        ob_start();
+        $quality = (int) post_featured_image_spec()['jpeg_quality'];
+        $ok = imagejpeg($image, null, $quality);
+        $data = ob_get_clean();
+
+        return ($ok && is_string($data) && $data !== '') ? $data : null;
+    }
+}
+
+if (! function_exists('resize_image_to_post_featured_binary')) {
+    /**
+     * যেকোনো ইমেজ ১৬:৯ center-cover করে ৬০০×৩৩৮ JPEG বাইনারি রিটার্ন করে।
+     */
+    function resize_image_to_post_featured_binary(string $sourcePath, ?string $mime = null): ?string
+    {
+        $image = create_gd_image_from_path($sourcePath, $mime);
+        if (! $image instanceof \GdImage) {
+            return null;
+        }
+
+        $spec = post_featured_image_spec();
+        $targetW = (int) $spec['width'];
+        $targetH = (int) $spec['height'];
+        $targetRatio = $targetW / $targetH;
+
+        $srcW = imagesx($image);
+        $srcH = imagesy($image);
+
+        if ($srcW < 1 || $srcH < 1) {
+            imagedestroy($image);
+
+            return null;
+        }
+
+        $srcRatio = $srcW / $srcH;
+        $ratioTolerance = 0.03;
+
+        if (abs($srcRatio - $targetRatio) <= $ratioTolerance) {
+            $cropX = 0;
+            $cropY = 0;
+            $cropW = $srcW;
+            $cropH = $srcH;
+        } elseif ($srcRatio > $targetRatio) {
+            $cropH = $srcH;
+            $cropW = (int) round($srcH * $targetRatio);
+            $cropX = (int) round(($srcW - $cropW) / 2);
+            $cropY = 0;
+        } else {
+            $cropW = $srcW;
+            $cropH = (int) round($srcW / $targetRatio);
+            $cropX = 0;
+            $cropY = (int) round(($srcH - $cropH) / 2);
+        }
+
+        $dest = imagecreatetruecolor($targetW, $targetH);
+        if (! $dest instanceof \GdImage) {
+            imagedestroy($image);
+
+            return null;
+        }
+
+        imagecopyresampled(
+            $dest,
+            $image,
+            0,
+            0,
+            $cropX,
+            $cropY,
+            $targetW,
+            $targetH,
+            $cropW,
+            $cropH,
+        );
+        imagedestroy($image);
+
+        $binary = encode_post_featured_jpeg($dest);
+        imagedestroy($dest);
+
+        return $binary;
+    }
+}
+
+if (! function_exists('store_post_featured_upload')) {
+    /**
+     * পোস্ট ফিচার্ড ইমেজ আপলোড — ৬০০×৩৩৮ JPEG এ রিসাইজ করে public/posts/ এ সেভ।
+     */
+    function store_post_featured_upload(UploadedFile $file): string
+    {
+        $directory = 'posts';
+        $targetDir = public_path($directory);
+        if (! is_dir($targetDir)) {
+            mkdir($targetDir, 0755, true);
+        }
+
+        $binary = resize_image_to_post_featured_binary(
+            $file->getRealPath() ?: '',
+            $file->getMimeType() ?: null,
+        );
+
+        if ($binary !== null) {
+            $filename = Str::uuid()->toString() . '.jpg';
+            file_put_contents($targetDir . '/' . $filename, $binary);
+
+            return $directory . '/' . $filename;
+        }
+
+        return store_public_upload($file, $directory);
+    }
+}
+
 if (! function_exists('delete_uploaded_media')) {
     /**
      * public/ বা পুরনো storage disk — যেখানে ফাইল আছে সেখান থেকে মুছে দেয়।

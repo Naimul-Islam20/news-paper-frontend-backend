@@ -152,7 +152,7 @@
                                         </div>
                                     @endif
                                 </div>
-                                <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">ছবির অনুপাত: <span class="font-medium text-slate-600 dark:text-slate-300">১৬:৯</span> (উদাহরণ: ১২০০×৬৭৫ px)</p>
+                                <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">ছবির অনুপাত: <span class="font-medium text-slate-600 dark:text-slate-300">১৬:৯</span> — আপলোডের পর সাইটে <span class="font-medium text-slate-600 dark:text-slate-300">৬০০×৩৩৮ px</span> এ সেভ হবে</p>
                                 @error('image') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                             </div>
                             <div>

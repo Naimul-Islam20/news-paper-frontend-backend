@@ -7,7 +7,7 @@
     aria-labelledby="post-image-crop-title">
     <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" data-crop-dismiss></div>
 
-    <div class="post-image-crop-card relative z-10 flex w-full max-w-xl flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:rounded-2xl">
+    <div class="post-image-crop-card relative z-10 flex w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:rounded-2xl">
         <div class="flex shrink-0 items-center gap-2 border-b border-slate-200 px-3 py-2.5 dark:border-slate-800 sm:px-4">
             <h2 id="post-image-crop-title" class="shrink-0 text-sm font-semibold text-slate-900 dark:text-slate-100">
                 ছবি সাজান
@@ -87,14 +87,10 @@
             max-height: calc(100dvh - 1.5rem);
         }
         #post-image-crop-modal .post-image-stage {
-            height: 17rem;
-            max-height: 45dvh;
-        }
-        @media (min-width: 640px) {
-            #post-image-crop-modal .post-image-stage {
-                height: 22rem;
-                max-height: 52dvh;
-            }
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            height: auto;
+            max-height: min(68dvh, 36rem);
         }
         #post-image-crop-wrap {
             position: relative;
@@ -138,10 +134,8 @@
     (function () {
         const TARGET_RATIO = 16 / 9;
         const RATIO_TOLERANCE = 0.015;
-        const MIN_OUTPUT_WIDTH = 1280;
-        const MIN_OUTPUT_HEIGHT = 720;
-        const MAX_OUTPUT_WIDTH = 1920;
-        const MAX_OUTPUT_HEIGHT = 1080;
+        const OUTPUT_WIDTH = 600;
+        const OUTPUT_HEIGHT = 338;
 
         let cropper = null;
         let pendingInput = null;
@@ -225,49 +219,55 @@
             img.src = url;
         }
 
-        function calcFitOutputSize(img) {
-            const nw = img.naturalWidth || img.width;
-            const nh = img.naturalHeight || img.height;
-            let outW = MIN_OUTPUT_WIDTH;
-            let outH = MIN_OUTPUT_HEIGHT;
-
-            const fgScale = Math.min(outW / nw, outH / nh);
-            const fgW = nw * fgScale;
-            const targetFgW = Math.min(nw, 1600);
-
-            if (fgW < targetFgW && nw > fgW) {
-                const mul = targetFgW / fgW;
-                outW = Math.min(MAX_OUTPUT_WIDTH, Math.round(outW * mul));
-                outH = Math.round(outW / TARGET_RATIO);
-            }
-
-            return { width: outW, height: outH };
+        function calcFitOutputSize() {
+            return { width: OUTPUT_WIDTH, height: OUTPUT_HEIGHT };
         }
 
-        function getCropOutputSize(cropper) {
-            const data = cropper.getData(true);
-            let w = Math.max(1, Math.round(data.width));
-            let h = Math.round(w / TARGET_RATIO);
-
-            if (w < MIN_OUTPUT_WIDTH) {
-                w = MIN_OUTPUT_WIDTH;
-                h = MIN_OUTPUT_HEIGHT;
-            } else if (w > MAX_OUTPUT_WIDTH) {
-                w = MAX_OUTPUT_WIDTH;
-                h = MAX_OUTPUT_HEIGHT;
-            }
-
-            return { width: w, height: h };
+        function getCropOutputSize() {
+            return { width: OUTPUT_WIDTH, height: OUTPUT_HEIGHT };
         }
 
-        function getExportFormat(file) {
-            if (file.type === 'image/png') {
-                return { mime: 'image/png', ext: 'png', quality: null };
-            }
-            if (file.type === 'image/webp') {
-                return { mime: 'image/webp', ext: 'webp', quality: 0.95 };
-            }
-            return { mime: 'image/jpeg', ext: 'jpg', quality: 0.95 };
+        function getExportFormat() {
+            return { mime: 'image/jpeg', ext: 'jpg', quality: 0.85 };
+        }
+
+        function drawToOutputCanvas(source, sourceWidth, sourceHeight) {
+            const canvas = document.createElement('canvas');
+            canvas.width = OUTPUT_WIDTH;
+            canvas.height = OUTPUT_HEIGHT;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(source, 0, 0, sourceWidth, sourceHeight, 0, 0, OUTPUT_WIDTH, OUTPUT_HEIGHT);
+
+            return canvas;
+        }
+
+        function applyOutputFileToInput(input, canvas, fileName) {
+            const format = getExportFormat();
+
+            return new Promise(function (resolve) {
+                canvas.toBlob(function (blob) {
+                    if (!blob) {
+                        resolve(false);
+                        return;
+                    }
+
+                    const previewUrl = canvas.toDataURL(format.mime, format.quality);
+                    const baseName = (fileName || 'featured-image').replace(/\.[^.]+$/, '') || 'featured-image';
+                    const output = new File([blob], baseName + '.' + format.ext, {
+                        type: format.mime,
+                        lastModified: Date.now(),
+                    });
+
+                    setFileOnInput(input, output);
+                    applyPreview(input, previewUrl);
+                    document.dispatchEvent(new CustomEvent('post-featured-image-updated', {
+                        detail: { dataUrl: previewUrl, fileName: output.name },
+                    }));
+                    resolve(true);
+                }, format.mime, format.quality);
+            });
         }
 
         function applyPreview(input, dataUrl) {
@@ -301,17 +301,13 @@
             }
         }
 
-        function renderFitCanvas(img, canvas) {
+        function fitBlurAmount(width) {
+            return Math.max(8, Math.round(28 * (width / OUTPUT_WIDTH)));
+        }
+
+        function paintFitFrame(ctx, img, width, height) {
             const nw = img.naturalWidth || img.width;
             const nh = img.naturalHeight || img.height;
-            const size = calcFitOutputSize(img);
-            const width = size.width;
-            const height = size.height;
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
 
             ctx.fillStyle = '#0f172a';
             ctx.fillRect(0, 0, width, height);
@@ -323,7 +319,7 @@
             const coverY = (height - coverH) / 2;
 
             ctx.save();
-            ctx.filter = 'blur(28px) brightness(0.72) saturate(1.15)';
+            ctx.filter = 'blur(' + fitBlurAmount(width) + 'px) brightness(0.72) saturate(1.15)';
             ctx.drawImage(img, 0, 0, nw, nh, coverX, coverY, coverW, coverH);
             ctx.restore();
 
@@ -339,44 +335,16 @@
             const fgY = (height - fgH) / 2;
 
             ctx.drawImage(img, 0, 0, nw, nh, fgX, fgY, fgW, fgH);
-
-            return canvas;
         }
 
-        function renderFitPreview(img, canvas, width, height) {
-            const nw = img.naturalWidth || img.width;
-            const nh = img.naturalHeight || img.height;
-            const w = Math.max(1, Math.round(width));
-            const h = Math.max(1, Math.round(height));
-            canvas.width = w;
-            canvas.height = h;
+        function renderFitCanvas(img, canvas) {
+            const size = calcFitOutputSize();
+            canvas.width = size.width;
+            canvas.height = size.height;
             const ctx = canvas.getContext('2d');
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
-
-            ctx.fillStyle = '#0f172a';
-            ctx.fillRect(0, 0, w, h);
-
-            const coverScale = Math.max(w / nw, h / nh);
-            const coverW = nw * coverScale;
-            const coverH = nh * coverScale;
-            const coverX = (w - coverW) / 2;
-            const coverY = (h - coverH) / 2;
-
-            ctx.save();
-            ctx.filter = 'blur(28px) brightness(0.72) saturate(1.15)';
-            ctx.drawImage(img, 0, 0, nw, nh, coverX, coverY, coverW, coverH);
-            ctx.restore();
-
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.35)';
-            ctx.fillRect(0, 0, w, h);
-
-            const containScale = Math.min(w / nw, h / nh);
-            const fgW = nw * containScale;
-            const fgH = nh * containScale;
-            const fgX = (w - fgW) / 2;
-            const fgY = (h - fgH) / 2;
-            ctx.drawImage(img, 0, 0, nw, nh, fgX, fgY, fgW, fgH);
+            paintFitFrame(ctx, img, size.width, size.height);
 
             return canvas;
         }
@@ -386,8 +354,29 @@
             if (!pendingSourceImage || !fitCanvas || !stage) {
                 return;
             }
+
+            const offscreen = document.createElement('canvas');
+            renderFitCanvas(pendingSourceImage, offscreen);
+
             const rect = stage.getBoundingClientRect();
-            renderFitPreview(pendingSourceImage, fitCanvas, rect.width, rect.height);
+            const displayW = Math.max(1, Math.round(rect.width));
+            const displayH = Math.max(1, Math.round(rect.height));
+
+            fitCanvas.width = displayW;
+            fitCanvas.height = displayH;
+            const ctx = fitCanvas.getContext('2d');
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, displayW, displayH);
+
+            const scale = Math.min(displayW / OUTPUT_WIDTH, displayH / OUTPUT_HEIGHT);
+            const drawW = OUTPUT_WIDTH * scale;
+            const drawH = OUTPUT_HEIGHT * scale;
+            const drawX = (displayW - drawW) / 2;
+            const drawY = (displayH - drawH) / 2;
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(offscreen, drawX, drawY, drawW, drawH);
         }
 
         function observeStageResize() {
@@ -564,15 +553,16 @@
                 const loaded = await loadImageFromFile(file);
 
                 if (isSixteenByNine(loaded.width, loaded.height)) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        applyPreview(input, e.target.result);
-                        document.dispatchEvent(new CustomEvent('post-featured-image-updated', {
-                            detail: { dataUrl: e.target.result, fileName: file.name },
-                        }));
-                    };
-                    reader.readAsDataURL(file);
-                    URL.revokeObjectURL(loaded.url);
+                    const canvas = drawToOutputCanvas(loaded.img, loaded.width, loaded.height);
+                    applyOutputFileToInput(input, canvas, file.name).then(function (ok) {
+                        if (!ok) {
+                            input.value = '';
+                        }
+                        URL.revokeObjectURL(loaded.url);
+                        if (loaded.img && typeof loaded.img.close === 'function') {
+                            loaded.img.close();
+                        }
+                    });
                     return;
                 }
 
@@ -583,7 +573,7 @@
         }
 
         function exportCanvas(canvas, callback) {
-            const format = getExportFormat(pendingFile);
+            const format = getExportFormat();
             canvas.toBlob(function (blob) {
                 const previewUrl = format.quality
                     ? canvas.toDataURL(format.mime, format.quality)

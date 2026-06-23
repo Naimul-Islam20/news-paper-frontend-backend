@@ -133,7 +133,7 @@
                                     </div>
                                     <input type="file" name="image" id="mainImageInput" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" class="absolute inset-0 z-20 opacity-0 cursor-pointer">
                                 </div>
-                                <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">ছবির অনুপাত: <span class="font-medium text-slate-600 dark:text-slate-300">১৬:৯</span> (উদাহরণ: ১২০০×৬৭৫ px)</p>
+                                <p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">ছবির অনুপাত: <span class="font-medium text-slate-600 dark:text-slate-300">১৬:৯</span> — আপলোডের পর সাইটে <span class="font-medium text-slate-600 dark:text-slate-300">৬০০×৩৩৮ px</span> এ সেভ হবে</p>
                                 @error('image') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
                             </div>
                             <div>
@@ -440,7 +440,7 @@
     }
 
     function compressDataUrlForDraft(dataUrl, maxWidth, quality) {
-        maxWidth = maxWidth || 1280;
+        maxWidth = maxWidth || 600;
         quality = quality || 0.85;
         return new Promise(function (resolve, reject) {
             const img = new Image();

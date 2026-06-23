@@ -16,8 +16,6 @@ const FOOTER_URL_LETTER_SPACING = 5;
 const DATE_SIZE = 32;
 const LOGO_HEIGHT = 58;
 const LOGO_MAX_WIDTH = 280;
-const LOGO_PAD_X = 12;
-const LOGO_PAD_Y = 8;
 const EXPORT_SCALE = 1;
 const PHOTOCARD_FONT = "SolaimanLipi, sans-serif";
 const OVERLAY_DARK_SOLID = "rgba(45,5,5,1)";
@@ -123,7 +121,7 @@ function titleFontSize(title) {
 }
 
 function footerUrlMaxWidth(hasLogo) {
-    const logoReserved = hasLogo ? LOGO_MAX_WIDTH + LOGO_PAD_X * 2 + 16 : 0;
+    const logoReserved = hasLogo ? LOGO_MAX_WIDTH + 16 : 0;
 
     return CARD_SIZE - SECTION_X_PADDING * 2 - logoReserved;
 }
@@ -181,7 +179,7 @@ function wrapUrlLines(ctx, url, maxWidth, fontSize) {
     return lines.length > 0 ? lines : [text];
 }
 
-function footerAreaHeight() {
+function footerAreaHeight(hasLogo) {
     const logoBoxHeight = LOGO_HEIGHT;
     const textHeight = FOOTER_HINT_SIZE + FOOTER_URL_SIZE + 12;
 
@@ -222,7 +220,7 @@ function buildCardHtml(data) {
         ? `<p style="position:absolute;top:16px;left:0;right:0;margin:0;text-align:center;color:#ffffff;font-size:${DATE_SIZE}px;font-weight:500;line-height:1.3;text-shadow:0 1px 4px rgba(0,0,0,0.4);">${date}</p>`
         : "";
 
-    const footerReserved = footerAreaHeight();
+    const footerReserved = footerAreaHeight(Boolean(data.logo));
     const dateReserved = dateAreaHeight(Boolean(date));
     const titleTop = 16 + dateReserved + (date ? 8 : 0);
     const titleBottom = footerReserved + 18;
@@ -386,7 +384,7 @@ async function renderPhotocardCanvas(data) {
     await ensurePhotocardFont(FOOTER_HINT_SIZE, "400");
     await ensurePhotocardFont(FOOTER_URL_SIZE, FOOTER_URL_WEIGHT);
 
-    const footerHeight = footerAreaHeight();
+    const footerHeight = footerAreaHeight(Boolean(logoImage));
     const dateHeight = dateAreaHeight(Boolean(date));
     const contentTop = bottomTop + 16;
     const titleBlockTop = contentTop + dateHeight + (date ? 8 : 0);
@@ -468,7 +466,7 @@ async function renderPhotocardCanvas(data) {
             logoImage.naturalWidth * (logoHeight / logoImage.naturalHeight),
         );
         footerLogoBoxWidth = logoWidth + 16;
-        urlMaxWidth -= footerLogoBoxWidth + 16;
+        urlMaxWidth -= footerLogoBoxWidth;
     }
 
     const urlFontSize = fitFooterUrlFontSize(measureCtx, siteUrl, urlMaxWidth);

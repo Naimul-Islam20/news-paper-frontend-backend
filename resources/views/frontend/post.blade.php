@@ -291,7 +291,7 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                             <div class="img-placeholder w-full aspect-video overflow-hidden shadow-md">
                                                 <img src="{{ $postFeaturedImageUrl }}"
                                                     alt="{{ $post->title }}"
-                                                    class="w-full h-full object-cover transition-opacity group-hover:opacity-95"
+                                                    class="w-full h-full object-contain transition-opacity group-hover:opacity-95"
                                                     onload="this.parentElement.classList.remove('img-placeholder')">
                                             </div>
                                         </a>
