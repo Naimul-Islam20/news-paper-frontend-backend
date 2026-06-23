@@ -263,18 +263,9 @@ body {
     line-height: 1.6;
 }
 
-/* অ্যাড লোড না হলে জায়গা নেই — কিন্তু display:none নয় (ইমেজ লোড ব্লক হয়) */
-[data-ad-slot-root].ad-slot-pending {
-    height: 0 !important;
-    max-height: 0 !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    border: 0 !important;
+/* শুধু লোড ব্যর্থ হলে স্লট লুকান */
+[data-ad-slot-root].ad-slot-failed {
+    display: none !important;
 }
 
 /* হেডার অ্যাড + স্টিকি মেনু — স্ক্রলে গ্যাপ ছাড়া একসাথে */

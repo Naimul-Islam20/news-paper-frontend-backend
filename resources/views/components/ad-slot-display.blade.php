@@ -30,7 +30,7 @@ $boxStyle = $ad ? $ad->slotBoxStyle('box') : '';
     @endphp
 
     @if($isStrip)
-        <div class="{{ $stripOuterClass }} {{ $wrapperClass }} ad-slot-pending" data-ad-slot-root @if($variant === 'header') id="header-ad-slot" @endif>
+        <div class="{{ $stripOuterClass }} {{ $wrapperClass }}" data-ad-slot-root @if($variant === 'header') id="header-ad-slot" @endif>
             <div class="container">
                 @if($useLocal)
                 <a href="{{ advertisement_click_url($ad) }}" class="ad-slot-frame ad-slot-local w-full flex items-center justify-center overflow-hidden bg-white img-placeholder" style="{{ $stripBoxStyle }}" target="_blank" rel="noopener">
@@ -44,13 +44,13 @@ $boxStyle = $ad ? $ad->slotBoxStyle('box') : '';
             </div>
         </div>
     @elseif($useLocal && $variant === 'sidebar')
-        <div class="{{ $wrapperClass ?: 'shrink-0 w-full' }} ad-slot-pending" data-ad-slot-root>
+        <div class="{{ $wrapperClass ?: 'shrink-0 w-full' }}" data-ad-slot-root>
             <a href="{{ advertisement_click_url($ad) }}" target="_blank" rel="noopener" class="ad-slot-frame ad-slot-local block img-placeholder group cursor-pointer relative overflow-hidden bg-white w-full {{ $sidebarClass }}" style="{{ $boxStyle }}">
                 <x-ad-picture :ad="$ad" class="{{ $sidebarPictureClass }}" />
             </a>
         </div>
     @elseif($useGoogle && $variant === 'sidebar')
-        <div class="{{ $wrapperClass ?: 'shrink-0 w-full' }} ad-slot-pending" data-ad-slot-root>
+        <div class="{{ $wrapperClass ?: 'shrink-0 w-full' }}" data-ad-slot-root>
             <div class="ad-slot-frame ad-slot-google block relative overflow-hidden bg-white w-full {{ $sidebarClass }}" style="{{ $boxStyle }}">
                 <x-google-ad-unit :ad="$ad" format="sidebar" class="h-full w-full" />
             </div>
@@ -58,7 +58,7 @@ $boxStyle = $ad ? $ad->slotBoxStyle('box') : '';
     @elseif($useLocal && $variant === 'inline')
         @include('frontend.partials.detail-inline-ad', ['ad' => $ad])
     @elseif($useGoogle && $variant === 'inline')
-        <div class="not-prose lg:hidden ad-section my-6 w-full mx-auto {{ $wrapperClass }} ad-slot-pending" data-ad-slot-root>
+        <div class="not-prose lg:hidden ad-section my-6 w-full mx-auto {{ $wrapperClass }}" data-ad-slot-root>
             <div class="ad-slot-frame ad-slot-google block relative overflow-hidden bg-white w-full" style="{{ $boxStyle }}">
                 <x-google-ad-unit :ad="$ad" format="inline" class="h-full w-full" />
             </div>
