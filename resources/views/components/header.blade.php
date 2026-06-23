@@ -29,7 +29,6 @@
     @scroll.window="updateSticky()"
     x-init="
         $data.syncHeaderAd();
-        window.addEventListener('header-ad-changed', () => $data.syncHeaderAd());
         const adEl = document.getElementById('header-ad-slot');
         if (adEl && typeof ResizeObserver !== 'undefined') {
             new ResizeObserver(() => $data.syncHeaderAd()).observe(adEl);

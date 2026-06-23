@@ -15,13 +15,9 @@ class DiagnoseAdsCommand extends Command
     {
         $client = google_adsense_client();
         $defaultSlot = google_adsense_default_slot();
-        $envEnabled = filter_var(config('app.adsense_frontend', false), FILTER_VALIDATE_BOOL);
-        $jsEnabled = google_adsense_frontend_enabled();
-
         $this->info('Client ID: '.($client ?: '❌ নেই / ভুল format'));
         $this->info('Default Slot: '.($defaultSlot ?: '— (Meta-তে set করুন)'));
-        $this->info('GOOGLE_ADSENSE_FRONTEND_ENABLED (.env): '.($envEnabled ? 'true ✓' : 'false ❌'));
-        $this->info('AdSense JS লোড হবে: '.($jsEnabled ? 'হ্যাঁ ✓' : 'না ❌ (true করুন + config:clear)'));
+        $this->info('AdSense JS: '.(google_adsense_configured() ? 'চালু (Client ID থাকলেই)' : 'বন্ধ'));
         $this->newLine();
 
         $query = Advertisement::query()->orderBy('slug');
@@ -51,9 +47,6 @@ class DiagnoseAdsCommand extends Command
         $empty = collect($rows)->where('1', 'খালি')->count();
         $this->newLine();
         $this->line("Google দেখাবে: {$googleReady} slot | খালি: {$empty} slot");
-        if (! $jsEnabled && $googleReady > 0) {
-            $this->warn('⚠️  Slot Google-ready কিন্তু JS বন্ধ — .env-এ GOOGLE_ADSENSE_FRONTEND_ENABLED=true এবং php artisan config:clear');
-        }
         $this->line('Frontend=Google হলে page source-এ data-ad-slot থাকা উচিত।');
 
         return self::SUCCESS;

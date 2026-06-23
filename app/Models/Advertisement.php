@@ -498,10 +498,6 @@ class Advertisement extends Model
         }
 
         if ($this->displayUsesGoogleAd()) {
-            if (! google_adsense_frontend_enabled()) {
-                $reasons[] = 'JS বন্ধ — GOOGLE_ADSENSE_FRONTEND_ENABLED=true + config:clear';
-            }
-
             return ['mode' => 'Google', 'reasons' => $reasons];
         }
         if ($this->displayUsesLocalAd()) {

@@ -334,12 +334,6 @@ body {
     background-color: #fff;
 }
 
-ins.adsbygoogle:not([data-ad-slot]) {
-    display: none !important;
-    height: 0 !important;
-    pointer-events: none !important;
-}
-
 /* মোবাইল — লোকাল অ্যাড: ইমেজ যতটুকু উচ্চতা, ততটুকু জায়গা; max সাইজের বেশি নয় */
 @media (max-width: 767px) {
     [data-ad-slot-root] .ad-slot-frame.ad-slot-local {

@@ -571,15 +571,9 @@ if (! function_exists('google_adsense_configured')) {
 }
 
 if (! function_exists('google_adsense_frontend_enabled')) {
-    /**
-     * ফ্রন্টে Google AdSense JS চালু কিনা — .env kill switch (HTML/display আলাদা)।
-     */
+    /** @deprecated google_adsense_configured() ব্যবহার করুন */
     function google_adsense_frontend_enabled(): bool
     {
-        if (! filter_var(config('app.adsense_frontend', false), FILTER_VALIDATE_BOOL)) {
-            return false;
-        }
-
         return google_adsense_configured();
     }
 }

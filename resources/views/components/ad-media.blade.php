@@ -11,7 +11,6 @@
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
                 loading="lazy"
-                onload="window.adSlotShow?.(this)"
             ></iframe>
         </div>
     @elseif(filled($ad->video) || filled($ad->video_mobile))
@@ -24,7 +23,7 @@
             @if($controls) controls @endif
             playsinline
             preload="metadata"
-            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
+            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder')"
         >
             <source src="{{ storage_image_url($ad->video_mobile) }}" type="video/mp4">
         </video>
@@ -38,7 +37,7 @@
             @if($controls) controls @endif
             playsinline
             preload="metadata"
-            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
+            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder')"
         >
             <source src="{{ storage_image_url($ad->video) }}" type="video/mp4">
         </video>
@@ -51,7 +50,7 @@
             @if($controls) controls @endif
             playsinline
             preload="metadata"
-            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
+            onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder')"
         >
             <source src="{{ storage_image_url($ad->video_mobile) }}" type="video/mp4">
         </video>
@@ -66,7 +65,7 @@
                 alt="{{ $ad->caption ?? 'বিজ্ঞাপন' }}"
                 loading="eager"
                 decoding="async"
-                onload="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
+                onload="this.closest('.img-placeholder')?.classList.remove('img-placeholder')"
                 {{ $attributes->except(['autoplay', 'muted', 'loop', 'controls'])->merge(['class' => 'max-w-full min-w-0']) }}
             />
         </picture>
