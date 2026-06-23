@@ -7,7 +7,7 @@
         headerAdHeight: 0,
         syncHeaderAd() {
             const ad = document.getElementById('header-ad-slot');
-            if (!ad || ad.classList.contains('ad-slot-failed')) {
+            if (!ad) {
                 this.hasHeaderAd = false;
                 this.headerAdHeight = 0;
                 ad?.classList.remove('header-ad-sticky');

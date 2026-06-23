@@ -25,7 +25,6 @@
             playsinline
             preload="metadata"
             onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
-            onerror="window.adSlotHide?.(this)"
         >
             <source src="{{ storage_image_url($ad->video_mobile) }}" type="video/mp4">
         </video>
@@ -40,7 +39,6 @@
             playsinline
             preload="metadata"
             onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
-            onerror="window.adSlotHide?.(this)"
         >
             <source src="{{ storage_image_url($ad->video) }}" type="video/mp4">
         </video>
@@ -54,7 +52,6 @@
             playsinline
             preload="metadata"
             onloadeddata="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
-            onerror="window.adSlotHide?.(this)"
         >
             <source src="{{ storage_image_url($ad->video_mobile) }}" type="video/mp4">
         </video>
@@ -70,7 +67,6 @@
                 loading="eager"
                 decoding="async"
                 onload="this.closest('.img-placeholder')?.classList.remove('img-placeholder'); window.adSlotShow?.(this)"
-                onerror="window.adSlotHide?.(this)"
                 {{ $attributes->except(['autoplay', 'muted', 'loop', 'controls'])->merge(['class' => 'max-w-full min-w-0']) }}
             />
         </picture>
