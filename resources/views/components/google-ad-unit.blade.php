@@ -23,6 +23,8 @@ if ($dims && in_array($format, ['header', 'banner'], true)) {
     <ins class="adsbygoogle"
         style="{{ $insStyle }}"
         data-ad-client="{{ $client }}"
-        data-ad-slot="{{ $slot }}"></ins>
+        data-ad-slot="{{ $slot }}"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
 </div>
 @endif

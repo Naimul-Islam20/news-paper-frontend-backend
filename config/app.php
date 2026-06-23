@@ -84,8 +84,8 @@ return [
     | Google AdSense on frontend
     |--------------------------------------------------------------------------
     |
-    | false = ফ্রন্টে Google AdSense JS/iframe লোড হবে না (local ad ঠিক থাকবে)।
-    | Live site hang হলে এটা false রাখুন; স্থিতিশীল হলে true করুন।
+    | false = ফ্রন্টে Google AdSense JS লোড হবে না (local ad ঠিক থাকবে)।
+    | true হলে শুধু ম্যানুয়াল slot (Auto ON + Slot ID) থাকলে JS লোড হয়।
     |
     */
 

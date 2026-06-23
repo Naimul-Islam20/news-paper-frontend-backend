@@ -437,9 +437,15 @@ class Advertisement extends Model
 
     public function canShowGoogleAd(): bool
     {
-        return google_adsense_frontend_enabled()
-            && filled($this->resolvedGoogleAdSlot())
-            && filled(google_adsense_client());
+        if (! google_adsense_frontend_enabled() || ! filled(google_adsense_client())) {
+            return false;
+        }
+
+        if (! $this->googleAdAutoEnabled()) {
+            return false;
+        }
+
+        return filled($this->resolvedGoogleAdSlot());
     }
 
     /** Local priority — Google শুধু local না চললে fallback */
