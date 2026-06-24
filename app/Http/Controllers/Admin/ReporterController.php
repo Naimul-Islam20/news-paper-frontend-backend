@@ -4,17 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Reporter;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ReporterController extends Controller
 {
     public function index(Request $request)
     {
         $baseQuery = Reporter::query()
-            ->linkedToUser()
-            ->with(['creator', 'subEditor'])
+            ->with(['creator'])
             ->latest();
 
         $query = clone $baseQuery;
@@ -40,7 +37,6 @@ class ReporterController extends Controller
             } else {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%')
-                      ->orWhere('email', 'like', '%' . $search . '%')
                       ->orWhere('desk', 'like', '%' . $search . '%');
                 });
             }
@@ -53,49 +49,59 @@ class ReporterController extends Controller
 
     public function create()
     {
-        $subEditors = User::where('role', 'sub editor')
-            ->where('name', '!=', 'Sub Editor')
-            ->orderBy('name')
-            ->get();
-        return view('admin.reporters.create', compact('subEditors'));
+        return redirect()->route('admin.reporters.index');
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'sub_editor_id' => 'required|exists:users,id',
             'desk' => 'required|string|max:255',
-            'status' => 'nullable|in:active,inactive',
         ], [
-            'sub_editor_id.required' => 'ইউজার নির্বাচন করুন।',
-            'sub_editor_id.exists' => 'অবৈধ ইউজার।',
             'desk.required' => 'রিপোর্টার ধরন/ডেস্ক অবশ্যই লিখতে হবে। পোস্টে রিপোর্টার এই ডেস্ক অনুযায়ী দেখাবে।',
         ]);
 
-        $subEditor = User::findOrFail($request->sub_editor_id);
-        $data = [
-            'name' => $subEditor->name,
-            'email' => $subEditor->email,
-            'phone' => $subEditor->phone ?? null,
-            'desk' => $request->input('desk'),
-            'sub_editor_id' => $subEditor->id,
-            'created_by' => auth()->id(),
-            'status' => $request->input('status', 'active'),
-        ];
+        $desk = trim($request->input('desk'));
 
-        Reporter::create($data);
+        Reporter::create([
+            'name' => $desk,
+            'desk' => $desk,
+            'created_by' => auth()->id(),
+            'status' => 'active',
+        ]);
 
         return redirect()->route('admin.reporters.index')->with('success', 'Reporter created successfully.');
     }
 
+    public function quickStore(Request $request)
+    {
+        $request->validate([
+            'desk' => 'required|string|max:255',
+        ], [
+            'desk.required' => 'রিপোর্টার ধরন/ডেস্ক অবশ্যই লিখতে হবে।',
+        ]);
+
+        $desk = trim($request->input('desk'));
+
+        $reporter = Reporter::create([
+            'name' => $desk,
+            'desk' => $desk,
+            'created_by' => auth()->id(),
+            'status' => 'active',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'reporter' => [
+                'id' => $reporter->id,
+                'desk' => $reporter->desk,
+                'name' => $reporter->name,
+            ],
+        ]);
+    }
+
     public function edit($id)
     {
-        $reporter = Reporter::findOrFail($id);
-        $subEditors = User::where('role', 'sub editor')
-            ->where('name', '!=', 'Sub Editor')
-            ->orderBy('name')
-            ->get();
-        return view('admin.reporters.edit', compact('reporter', 'subEditors'));
+        return redirect()->route('admin.reporters.index');
     }
 
     public function update(Request $request, $id)
@@ -103,24 +109,16 @@ class ReporterController extends Controller
         $reporter = Reporter::findOrFail($id);
 
         $request->validate([
-            'sub_editor_id' => 'required|exists:users,id',
             'desk' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive',
         ], [
-            'sub_editor_id.required' => 'ইউজার নির্বাচন করুন। প্রতিটি রিপোর্টার ধরনের সাথে একটি ইউজার লিংক থাকতে হবে।',
-            'sub_editor_id.exists' => 'অবৈধ ইউজার।',
             'desk.required' => 'রিপোর্টার ধরন/ডেস্ক অবশ্যই লিখতে হবে। পোস্টে রিপোর্টার এই ডেস্ক অনুযায়ী দেখাবে।',
         ]);
 
-        $subEditor = User::findOrFail($request->sub_editor_id);
+        $desk = trim($request->input('desk'));
 
         $reporter->update([
-            'desk' => $request->input('desk'),
-            'sub_editor_id' => $subEditor->id,
-            'name' => $subEditor->name,
-            'email' => $subEditor->email,
-            'phone' => $subEditor->phone ?? null,
-            'status' => $request->input('status'),
+            'desk' => $desk,
+            'name' => $desk,
         ]);
 
         return redirect()->route('admin.reporters.index')->with('success', 'Reporter updated successfully.');

@@ -136,6 +136,7 @@ Route::prefix('admin')
             Route::middleware('feature:posts.manage')->group(function (): void {
                 Route::get('/posts/pick-image', [PostController::class, 'pickImage'])->name('posts.pick-image');
                 Route::post('/posts/pick-image', [PostController::class, 'applyPickedImage'])->name('posts.pick-image.apply');
+                Route::post('/posts/reporters/quick-store', [ReporterController::class, 'quickStore'])->name('posts.reporters.quick-store');
                 Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
                 Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
                 Route::get('/posts/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');

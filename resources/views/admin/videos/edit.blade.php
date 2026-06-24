@@ -45,7 +45,7 @@
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Reporter ধরন/ডেস্ক <span class="text-rose-500">*</span></label>
                             <div class="relative">
                                 <select name="reporter_id" required class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 cursor-pointer text-sm bg-white">
-                                    <option value="">-- Reporter ধরন / ডেস্ক নির্বাচন করুন --</option>
+                                    <option value="">Select</option>
                                     @foreach($reporters as $reporter)
                                         <option value="{{ $reporter->id }}" {{ old('reporter_id', $video->reporter_id) == $reporter->id ? 'selected' : '' }}>{{ $reporter->desk ?: $reporter->name }}</option>
                                     @endforeach

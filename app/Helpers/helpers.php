@@ -966,6 +966,21 @@ if (! function_exists('person_name_first_word')) {
     }
 }
 
+if (! function_exists('person_name_first_two_words')) {
+    function person_name_first_two_words(?string $name): ?string
+    {
+        $name = trim((string) $name);
+        if ($name === '') {
+            return null;
+        }
+
+        $parts = preg_split('/\s+/u', $name);
+        $words = array_slice($parts, 0, 2);
+
+        return $words !== [] ? implode(' ', $words) : null;
+    }
+}
+
 if (! function_exists('reporter_display_label')) {
     /**
      * পোস্ট/ভিডিও/গ্যালারিতে রিপোর্টার লেবেল — ডেস্ক/ধরন প্রথমে, নাম পরে (লাইভ reporters রেকর্ড থেকে)।
@@ -1096,30 +1111,18 @@ if (! function_exists('site_domain')) {
 
 if (! function_exists('post_credit_line')) {
     /**
-     * সাইট নাম (বাংলা) + পোস্টকারী ও রিপোর্টারের প্রথম অক্ষর — যেমন: নিউজ২৪বিডি/এ,এন
+     * সাইট নাম (বাংলা) + পোস্টকারীর নামের প্রথম শব্দ — যেমন: কক্সবাজার কণ্ঠ/Md
      */
     function post_credit_line($post): string
     {
-        $letters = [];
-
-        $creatorLetter = person_name_first_letter(optional($post->creator)->name);
-        if (is_string($creatorLetter) && $creatorLetter !== '') {
-            $letters[] = $creatorLetter;
-        }
-
-        $reporterLetter = person_name_first_letter(reporter_person_name($post->reporter));
-        if (is_string($reporterLetter) && $reporterLetter !== '' && ! in_array($reporterLetter, $letters, true)) {
-            $letters[] = $reporterLetter;
-        }
-
-        if ($letters === []) {
+        $creatorWord = person_name_first_word(optional($post->creator)->name);
+        if ($creatorWord === null || $creatorWord === '') {
             return '';
         }
 
-        $initials = implode(',', $letters);
         $label = site_name_bn();
 
-        return $label !== '' ? $label . '/' . $initials : $initials;
+        return $label !== '' ? $label . '/' . $creatorWord : $creatorWord;
     }
 }
 

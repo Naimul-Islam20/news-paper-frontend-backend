@@ -56,7 +56,7 @@
                                 <label class="block text-xs font-normal text-black mb-1 ml-0.5 uppercase tracking-wide">Reporter ধরন/ডেস্ক <span class="text-rose-500">*</span></label>
                                 <div class="relative">
                                     <select name="reporter_id" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none font-medium cursor-pointer text-black">
-                                        <option value="">-- Reporter ধরন / ডেস্ক নির্বাচন করুন --</option>
+                                        <option value="">Select</option>
                                         @foreach($reporters as $reporter)
                                         <option value="{{ $reporter->id }}" {{ old('reporter_id', $gallery->reporter_id) == $reporter->id ? 'selected' : '' }}>{{ $reporter->desk ?: $reporter->name }}</option>
                                         @endforeach

@@ -160,12 +160,18 @@
 
                         {{-- Reporter --}}
                         <div id="post-reporter-field">
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Reporter ধরন / ডেস্ক <span class="text-rose-500">*</span></label>
+                            <div class="flex items-center justify-between gap-2 mb-2 ml-0.5">
+                                <label class="text-sm font-normal text-slate-900">Reporter <span class="text-rose-500">*</span></label>
+                                <button type="button" onclick="openQuickReporterModal()" class="shrink-0 inline-flex items-center gap-1 px-2 py-1 text-xs font-normal text-indigo-600 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-100 dark:text-indigo-400 dark:bg-indigo-500/15 dark:border-indigo-500/30 dark:hover:bg-indigo-500/25 transition-all" title="নতুন Reporter যোগ করুন">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                    Add
+                                </button>
+                            </div>
                             <div class="relative">
-                                <select name="reporter_id" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 cursor-pointer text-sm">
-                                    <option value="" disabled selected>-- Reporter ধরন / ডেস্ক নির্বাচন করুন --</option>
+                                <select name="reporter_id" id="post-reporter-select" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 focus:ring-1 focus:ring-indigo-500 transition-all outline-none appearance-none font-normal text-slate-900 cursor-pointer text-sm">
+                                    <option value="" disabled {{ old('reporter_id') ? '' : 'selected' }}>Select</option>
                                     @foreach($reporters as $reporter)
-                                        <option value="{{ $reporter->id }}" {{ old('reporter_id') == $reporter->id ? 'selected' : '' }}>{{ $reporter->desk ?: $reporter->name }}@if($reporter->desk && $reporter->name) ({{ $reporter->name }})@endif</option>
+                                        <option value="{{ $reporter->id }}" {{ old('reporter_id') == $reporter->id ? 'selected' : '' }}>{{ $reporter->desk ?: $reporter->name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
@@ -173,6 +179,31 @@
                                 </div>
                             </div>
                             @error('reporter_id') <p class="mt-1 text-xs text-rose-500">{{ $message }}</p> @enderror
+
+                            <div id="quickReporterModal" class="fixed inset-0 z-[9999] hidden text-left">
+                                <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" id="quickReporterModalBackdrop"></div>
+                                <div class="fixed inset-0 flex items-center justify-center p-4" id="quickReporterModalWrap">
+                                    <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 transition-all scale-95 opacity-0 duration-300 pointer-events-auto" id="quickReporterModalContainer">
+                                        <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+                                            <h3 class="text-base font-semibold text-slate-900 dark:text-white">Add Reporter</h3>
+                                            <button type="button" id="quickReporterModalCloseX" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                            </button>
+                                        </div>
+                                        <div class="p-5 space-y-4">
+                                            <div>
+                                                <label class="block text-sm font-normal text-slate-700 dark:text-slate-300 mb-1.5">Reporter ধরন / ডেস্ক <span class="text-rose-500">*</span></label>
+                                                <input type="text" id="quick-reporter-desk" placeholder="যেমন: ডিজিটাল ডেস্ক, সম্পাদকীয়" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm focus:ring-1 focus:ring-indigo-500 transition-all outline-none text-slate-900 dark:text-white">
+                                                <p id="quick-reporter-error" class="mt-1 text-xs text-rose-500 hidden"></p>
+                                            </div>
+                                            <div class="flex items-center gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                                                <button type="button" id="quickReporterModalCancel" class="flex-1 px-5 py-2.5 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-normal rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-sm">Cancel</button>
+                                                <button type="button" id="confirm-quick-reporter-add" class="flex-1 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-normal rounded-lg transition-all shadow-md text-sm">Save Reporter</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Division & District (Commented Out) --}}
@@ -1098,6 +1129,108 @@
         if (qBackdrop) qBackdrop.addEventListener('click', closeQuickTopicModal);
         if (qCloseX) qCloseX.addEventListener('click', closeQuickTopicModal);
         if (qCancel) qCancel.addEventListener('click', closeQuickTopicModal);
+
+        // Quick Add Reporter
+        const qrModal = document.getElementById('quickReporterModal');
+        const qrContainer = document.getElementById('quickReporterModalContainer');
+        const qrBackdrop = document.getElementById('quickReporterModalBackdrop');
+        const qrWrap = document.getElementById('quickReporterModalWrap');
+        const qrCloseX = document.getElementById('quickReporterModalCloseX');
+        const qrCancel = document.getElementById('quickReporterModalCancel');
+        const qrDeskInput = document.getElementById('quick-reporter-desk');
+        const qrError = document.getElementById('quick-reporter-error');
+        const qrConfirm = document.getElementById('confirm-quick-reporter-add');
+        const reporterSelect = document.getElementById('post-reporter-select');
+
+        window.openQuickReporterModal = function() {
+            if (!qrModal || !qrContainer) return;
+            if (qrError) {
+                qrError.classList.add('hidden');
+                qrError.textContent = '';
+            }
+            qrModal.classList.remove('hidden');
+            setTimeout(() => {
+                qrContainer.classList.remove('scale-95', 'opacity-0');
+                qrContainer.classList.add('scale-100', 'opacity-100');
+                if (qrDeskInput) qrDeskInput.focus();
+            }, 10);
+        };
+
+        window.closeQuickReporterModal = function() {
+            if (!qrModal || !qrContainer) return;
+            qrContainer.classList.remove('scale-100', 'opacity-100');
+            qrContainer.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { qrModal.classList.add('hidden'); }, 200);
+        };
+
+        if (qrBackdrop) qrBackdrop.addEventListener('click', closeQuickReporterModal);
+        if (qrWrap) {
+            qrWrap.addEventListener('click', function(e) {
+                if (e.target === qrWrap) closeQuickReporterModal();
+            });
+        }
+        if (qrCloseX) qrCloseX.addEventListener('click', closeQuickReporterModal);
+        if (qrCancel) qrCancel.addEventListener('click', closeQuickReporterModal);
+
+        if (qrConfirm) {
+            qrConfirm.addEventListener('click', async function() {
+                const desk = (qrDeskInput?.value || '').trim();
+                if (!desk) {
+                    if (qrError) {
+                        qrError.textContent = 'রিপোর্টার ধরন/ডেস্ক লিখুন।';
+                        qrError.classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                this.disabled = true;
+                const originalText = this.textContent;
+                this.innerHTML = '<svg class="animate-spin h-3.5 w-3.5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+
+                try {
+                    const response = await fetch("{{ route('admin.posts.reporters.quick-store') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ desk: desk })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success && reporterSelect) {
+                        const label = data.reporter.desk || data.reporter.name;
+                        const option = document.createElement('option');
+                        option.value = data.reporter.id;
+                        option.textContent = label;
+                        option.selected = true;
+                        reporterSelect.appendChild(option);
+                        reporterSelect.value = String(data.reporter.id);
+
+                        if (qrDeskInput) qrDeskInput.value = '';
+                        closeQuickReporterModal();
+                    } else {
+                        const message = data.message
+                            || (data.errors && data.errors.desk && data.errors.desk[0])
+                            || 'Reporter যোগ করা যায়নি।';
+                        if (qrError) {
+                            qrError.textContent = message;
+                            qrError.classList.remove('hidden');
+                        }
+                    }
+                } catch (err) {
+                    if (qrError) {
+                        qrError.textContent = 'Reporter যোগ করা যায়নি। আবার চেষ্টা করুন।';
+                        qrError.classList.remove('hidden');
+                    }
+                } finally {
+                    this.disabled = false;
+                    this.textContent = originalText;
+                }
+            });
+        }
 
         // Auto-slugification for Quick Add
         (function() {

@@ -21,7 +21,7 @@ class PostController extends Controller
     public function index(Request $request): View
     {
         // Base query with relationships and default ordering (latest first)
-        $baseQuery = Post::with(['categories', 'reporter.subEditor'])->latest();
+        $baseQuery = Post::with(['categories', 'reporter.subEditor', 'creator', 'editor'])->latest();
 
         // Filter by category (if selected)
         if ($request->filled('category_id') && $request->category_id !== 'all') {
@@ -201,6 +201,7 @@ class PostController extends Controller
         ]);
 
         $data = $this->buildPostFormData($request, $post);
+        $data['edited_by'] = Auth::id();
 
         if ($request->hasFile('image') || $request->filled('existing_image')) {
             try {
@@ -512,69 +513,35 @@ class PostController extends Controller
         delete_uploaded_media($path);
     }
 
-    /** Reporter লগইন থাকলে শুধু ওই রিপোর্টার; Sub Editor হলে শুধু নিজের reporter desk; নাহলে সব active reporter */
+    /** Admin ইত্যাদির জন্য সব active reporter; Reporter role হলে শুধু নিজের row */
     protected function reportersForCurrentUser()
     {
         $user = auth()->user();
-        if (! $user) {
-            return Reporter::query()
-                ->linkedToUser()
-                ->where('status', 'active')
-                ->orderBy('desk')
-                ->get();
-        }
 
-        // Reporter role হলে: শুধু নিজের reporter row
-        if ($user->role === 'reporter' && $user->reporter_id) {
+        if ($user && $user->role === 'reporter' && $user->reporter_id) {
             return Reporter::query()
-                ->linkedToUser()
                 ->where('id', $user->reporter_id)
                 ->get();
         }
 
-        // Sub Editor হলে: শুধুমাত্র তার sub_editor_id মেলা reporter desk গুলো
-        if ($user->role === 'sub editor') {
-            return Reporter::query()
-                ->linkedToUser()
-                ->where('status', 'active')
-                ->where('sub_editor_id', $user->id)
-                ->orderBy('desk')
-                ->get();
-        }
-
-        // Admin / Senior editor ইত্যাদি: লিংকড ইউজারসহ active reporter
         return Reporter::query()
-            ->linkedToUser()
             ->where('status', 'active')
             ->orderBy('desk')
             ->get();
     }
 
-    /** Reporter/Sub Editor role থাকলে শুধু নিজের desk-এর id সেট হয়; অন্যথায় request থেকে */
+    /** Reporter role থাকলে শুধু নিজের reporter_id; অন্যথায় form থেকে */
     protected function resolveReporterId($requestReporterId)
     {
         $user = auth()->user();
-        if (!$user) {
+        if (! $user) {
             return $requestReporterId;
         }
 
-        // Reporter role: সব সময় নিজের reporter_id
-        if ($user && $user->role === 'reporter' && $user->reporter_id) {
+        if ($user->role === 'reporter' && $user->reporter_id) {
             return $user->reporter_id;
         }
 
-        // Sub Editor role: শুধু তার sub_editor_id মেলা reporter id (থাকলে)
-        if ($user->role === 'sub editor') {
-            $ownReporter = Reporter::where('status', 'active')
-                ->where('sub_editor_id', $user->id)
-                ->first();
-
-            if ($ownReporter) {
-                return $ownReporter->id;
-            }
-        }
-
-        // অন্য সব ক্ষেত্রে form থেকে যা আসছে সেটা রাখি (admin / senior editor ইত্যাদি)
         return $requestReporterId;
     }
 }

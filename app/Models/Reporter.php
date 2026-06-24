@@ -6,27 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reporter extends Model
 {
-    protected static function booted(): void
-    {
-        static::creating(function (Reporter $reporter) {
-            if (! $reporter->sub_editor_id) {
-                throw new \InvalidArgumentException('Reporter requires a linked user.');
-            }
-        });
-
-        static::updating(function (Reporter $reporter) {
-            if (! $reporter->sub_editor_id) {
-                throw new \InvalidArgumentException('Reporter requires a linked user.');
-            }
-        });
-    }
-
-    public function scopeLinkedToUser($query)
-    {
-        return $query->whereNotNull('sub_editor_id')
-            ->whereHas('subEditor');
-    }
-
     protected $fillable = [
         'name',
         'desk',

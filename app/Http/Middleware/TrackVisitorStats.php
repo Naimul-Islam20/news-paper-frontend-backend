@@ -5,10 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\Cookie as SymfonyCookie;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -26,13 +24,15 @@ class TrackVisitorStats
             return $response;
         }
 
+        $visitorId = $this->resolveVisitorId($request);
+
         $this->recordVisit(
             now()->toDateString(),
             $this->normalizePath($request),
-            $this->resolveVisitorId($request),
+            $visitorId,
         );
 
-        return $response;
+        return $this->withVisitorCookie($response, $request, $visitorId);
     }
 
     private function shouldTrack(Request $request): bool
@@ -100,29 +100,28 @@ class TrackVisitorStats
 
         if (is_string($visitorId) && $visitorId !== '' && strlen($visitorId) <= 191) {
             $request->session()->put('visitor_id', $visitorId);
-            $this->queueVisitorCookie($request, $visitorId);
 
             return $visitorId;
         }
 
         $visitorId = (string) Str::uuid();
         $request->session()->put('visitor_id', $visitorId);
-        $this->queueVisitorCookie($request, $visitorId);
 
         return $visitorId;
     }
 
-    private function queueVisitorCookie(Request $request, string $visitorId): void
+    private function withVisitorCookie(Response $response, Request $request, string $visitorId): Response
     {
-        Cookie::queue(new SymfonyCookie(
-            name: 'visitor_id',
-            value: $visitorId,
-            expire: time() + (60 * 60 * 24 * 365),
-            path: '/',
-            secure: $request->isSecure(),
-            httpOnly: true,
-            raw: false,
-            sameSite: SymfonyCookie::SAMESITE_LAX,
+        return $response->withCookie(cookie(
+            'visitor_id',
+            $visitorId,
+            60 * 24 * 365,
+            '/',
+            null,
+            $request->isSecure(),
+            true,
+            false,
+            'lax',
         ));
     }
 
