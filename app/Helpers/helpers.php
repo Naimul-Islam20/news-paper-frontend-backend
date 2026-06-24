@@ -570,14 +570,6 @@ if (! function_exists('google_adsense_configured')) {
     }
 }
 
-if (! function_exists('google_adsense_frontend_enabled')) {
-    /** ফ্রন্টএন্ডে Google AdSense — সব জায়গায় বন্ধ। Admin-এ Client ID থাকলেও show হবে না। */
-    function google_adsense_frontend_enabled(): bool
-    {
-        return false;
-    }
-}
-
 if (! function_exists('normalize_google_adsense_slot')) {
     /**
      * AdSense unit Slot ID — শুধু সংখ্যা রাখে।
@@ -685,16 +677,10 @@ if (! function_exists('ad_has_media')) {
 }
 
 if (! function_exists('ad_should_display')) {
-    /**
-     * ফ্রন্টে অ্যাড দেখানো উচিত কিনা — Local মিডিয়া বা Google Ad (auto fallback)।
-     */
+    /** ফ্রন্টে local ad দেখানো উচিত কিনা। */
     function ad_should_display(?\App\Models\Advertisement $ad): bool
     {
-        if (! $ad) {
-            return false;
-        }
-
-        return $ad->displayUsesLocalAd() || $ad->displayUsesGoogleAd();
+        return $ad?->displayUsesLocalAd() ?? false;
     }
 }
 
@@ -1080,6 +1066,21 @@ if (! function_exists('person_name_first_letter')) {
     }
 }
 
+if (! function_exists('site_name_bn')) {
+    /** Site metadata থেকে বাংলা সাইট নাম (না থাকলে site_name)। */
+    function site_name_bn(): string
+    {
+        $meta = site_meta_record();
+        $name = trim((string) (optional($meta)->site_name_bn ?? ''));
+
+        if ($name !== '') {
+            return $name;
+        }
+
+        return site_name();
+    }
+}
+
 if (! function_exists('site_domain')) {
     /** সাইট ডোমেইন — news24bd.tv (www ছাড়া)। */
     function site_domain(): string
@@ -1095,7 +1096,7 @@ if (! function_exists('site_domain')) {
 
 if (! function_exists('post_credit_line')) {
     /**
-     * news24bd.tv/আই,এম — সাইট ডোমেইন + পোস্টকারী ও রিপোর্টারের প্রথম অক্ষর।
+     * সাইট নাম (বাংলা) + পোস্টকারী ও রিপোর্টারের প্রথম অক্ষর — যেমন: নিউজ২৪বিডি/এ,এন
      */
     function post_credit_line($post): string
     {
@@ -1116,37 +1117,53 @@ if (! function_exists('post_credit_line')) {
         }
 
         $initials = implode(',', $letters);
-        $domain = site_domain();
+        $label = site_name_bn();
 
-        return $domain !== '' ? $domain . '/' . $initials : $initials;
+        return $label !== '' ? $label . '/' . $initials : $initials;
+    }
+}
+
+if (! function_exists('site_role_label')) {
+    function site_role_label(string $role, $siteMeta = null): string
+    {
+        $meta = $siteMeta ?? site_meta_record();
+        $defaults = [
+            'editor' => 'সম্পাদক',
+            'publisher' => 'প্রকাশক',
+        ];
+
+        $field = $role === 'publisher' ? 'publisher_label' : 'editor_label';
+        $label = trim((string) optional($meta)->{$field});
+
+        if ($label !== '') {
+            return $label;
+        }
+
+        return $defaults[$role] ?? '';
     }
 }
 
 if (! function_exists('site_editor_publisher_lines')) {
     /**
-     * সম্পাদক/প্রকাশক ফুটার লাইন — একটা ফিল্ড থাকলে একসাথে, দুটো থাকলে আলাদা।
+     * সম্পাদক/প্রকাশক ফুটার লাইন — যেটা পূরণ আছে শুধু সেটাই দেখাবে।
      *
      * @return array<int, array{label: string, name: string}>
      */
     function site_editor_publisher_lines($siteMeta = null): array
     {
-        $editorName = trim((string) optional($siteMeta)->editor_name);
-        $publisherName = trim((string) optional($siteMeta)->publisher_name);
+        $meta = $siteMeta ?? site_meta_record();
+        $lines = [];
 
-        if ($editorName !== '' && $publisherName !== '') {
-            return [
-                ['label' => 'সম্পাদক', 'name' => $editorName],
-                ['label' => 'প্রকাশক', 'name' => $publisherName],
-            ];
+        $editorName = trim((string) optional($meta)->editor_name);
+        if ($editorName !== '') {
+            $lines[] = ['label' => site_role_label('editor', $meta), 'name' => $editorName];
         }
 
-        $singleName = $editorName !== '' ? $editorName : $publisherName;
-        if ($singleName === '') {
-            return [];
+        $publisherName = trim((string) optional($meta)->publisher_name);
+        if ($publisherName !== '') {
+            $lines[] = ['label' => site_role_label('publisher', $meta), 'name' => $publisherName];
         }
 
-        return [
-            ['label' => 'সম্পাদক ও প্রকাশক', 'name' => $singleName],
-        ];
+        return $lines;
     }
 }

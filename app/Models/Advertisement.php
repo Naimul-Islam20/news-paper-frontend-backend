@@ -430,38 +430,6 @@ class Advertisement extends Model
         return (bool) ($this->google_ad_auto ?? false);
     }
 
-    public function resolvedGoogleAdSlot(): ?string
-    {
-        return google_adsense_slot_for($this);
-    }
-
-    public function canShowGoogleAd(): bool
-    {
-        if (! google_adsense_frontend_enabled()) {
-            return false;
-        }
-
-        if (! $this->googleAdAutoEnabled()) {
-            return false;
-        }
-
-        return filled($this->resolvedGoogleAdSlot());
-    }
-
-    /** Local priority — Google শুধু local না চললে fallback */
-    public function displayUsesGoogleAd(): bool
-    {
-        if ($this->slug === 'home_video') {
-            return false;
-        }
-
-        if ($this->hasRunningLocalAd()) {
-            return false;
-        }
-
-        return $this->canShowGoogleAd();
-    }
-
     public function displayUsesLocalAd(): bool
     {
         return $this->hasRunningLocalAd();
@@ -480,50 +448,16 @@ class Advertisement extends Model
     {
         $this->prepareForFrontDisplay(forAdminPreview: true);
 
-        $reasons = [];
-
-        if (! $this->googleAdAutoEnabled()) {
-            $reasons[] = 'Google Auto OFF';
-        }
-        if (! filled($this->google_ad_slot)) {
-            $reasons[] = filled(google_adsense_default_slot())
-                ? 'Slot ID নেই (Meta default: '.google_adsense_default_slot().')'
-                : 'Slot ID নেই';
-        }
-        if (! filled(google_adsense_client())) {
-            $reasons[] = 'SEO & Meta-তে Client ID নেই';
-        }
-        if ($this->hasRunningLocalAd()) {
-            $reasons[] = 'Local ad চলছে (Google block)';
-        }
-
-        if ($this->displayUsesGoogleAd()) {
-            return ['mode' => 'Google', 'reasons' => $reasons];
-        }
         if ($this->displayUsesLocalAd()) {
-            if ($this->canShowGoogleAd()) {
-                $reasons[] = 'Google ready — Local বন্ধ/Delete করলে Google দেখাবে';
-            }
-
-            return ['mode' => 'Local', 'reasons' => $reasons];
+            return ['mode' => 'Local', 'reasons' => ['Local ad চলছে']];
         }
 
-        if ($this->canShowGoogleAd() && ! $this->googleAdAutoEnabled() && filled(normalize_google_adsense_slot($this->google_ad_slot))) {
-            $reasons[] = 'Auto OFF (display still OK if Slot ID + Client ID আছে)';
-        }
-
-        return ['mode' => 'খালি', 'reasons' => $reasons ?: ['কোনো ad active নেই']];
-    }
-
-    /** @deprecated displayUsesGoogleAd() ব্যবহার করুন */
-    public function usesGoogleAd(): bool
-    {
-        return $this->displayUsesGoogleAd();
+        return ['mode' => 'খালি', 'reasons' => ['কোনো local ad active নেই']];
     }
 
     /**
      * Get ad slot by slug (for frontend and views).
-     * Local চললে local; না থাকলে google_ad_auto + Slot ID থাকলে Google।
+     * শুধু local ad চললে return করে।
      */
     public static function getBySlug(string $slug): ?self
     {
@@ -538,15 +472,7 @@ class Advertisement extends Model
 
         $ad->prepareForFrontDisplay();
 
-        if ($ad->displayUsesLocalAd()) {
-            return $ad;
-        }
-
-        if ($ad->displayUsesGoogleAd()) {
-            return $ad;
-        }
-
-        return null;
+        return $ad->displayUsesLocalAd() ? $ad : null;
     }
 
     public function hasDisplayableMedia(): bool

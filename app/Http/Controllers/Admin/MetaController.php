@@ -27,6 +27,7 @@ class MetaController extends Controller
     {
         $validated = $request->validate([
             'site_name' => ['nullable', 'string', 'max:255'],
+            'site_name_bn' => ['nullable', 'string', 'max:255'],
             'site_title' => ['nullable', 'string', 'max:255'],
             'site_keywords' => ['nullable', 'string', 'max:500'],
             'site_email' => ['nullable', 'email', 'max:255'],
@@ -43,7 +44,9 @@ class MetaController extends Controller
             'map_desc' => ['nullable', 'string', 'max:255'],
             'address_1' => ['nullable', 'string'],
             'editor_name' => ['nullable', 'string', 'max:255'],
+            'editor_label' => ['nullable', 'string', 'max:255'],
             'publisher_name' => ['nullable', 'string', 'max:255'],
+            'publisher_label' => ['nullable', 'string', 'max:255'],
             'google_adsense_client' => ['nullable', 'string', 'max:64'],
             'google_adsense_default_slot' => ['nullable', 'string', 'max:32'],
         ]);

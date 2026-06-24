@@ -39,6 +39,10 @@
                             <input type="text" name="site_name" value="{{ old('site_name', $meta->site_name ?? '') }}" placeholder="E.g. My Newspaper" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div>
+                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">সাইট নাম (বাংলা)</label>
+                            <input type="text" name="site_name_bn" value="{{ old('site_name_bn', $meta->site_name_bn ?? '') }}" placeholder="যেমন: নিউজ টুয়েন্টি ফোর বিডি" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                        </div>
+                        <div>
                             <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">Website Title</label>
                             <input type="text" name="site_title" value="{{ old('site_title', $meta->site_title ?? '') }}" placeholder="SEO Title" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
@@ -203,17 +207,51 @@
                         </h3>
                     </div>
 
+                    @php
+                        $editorLabel = old('editor_label', $meta->editor_label ?? 'সম্পাদক');
+                        $publisherLabel = old('publisher_label', $meta->publisher_label ?? 'প্রকাশক');
+                    @endphp
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">সম্পাদক (Editor Name)</label>
-                            <input type="text" name="editor_name" value="{{ old('editor_name', $meta->editor_name ?? '') }}" placeholder="সম্পাদকের নাম লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <div class="flex items-center gap-2 mb-2 ml-0.5" data-role-label-wrap>
+                                <span class="meta-role-label-text text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{{ $editorLabel }}</span>
+                                <input
+                                    type="text"
+                                    name="editor_label"
+                                    value="{{ $editorLabel }}"
+                                    data-default="সম্পাদক"
+                                    class="meta-role-label-input hidden w-full max-w-[220px] px-2 py-1 rounded-md border border-indigo-200 dark:border-indigo-500/40 bg-white dark:bg-slate-900 text-sm font-normal text-slate-900 outline-none focus:ring-2 focus:ring-indigo-500/30"
+                                >
+                                <button type="button" class="meta-role-label-edit group shrink-0 inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 hover:bg-indigo-600 hover:text-white hover:ring-indigo-600 transition-all" title="লেবেল সম্পাদনা" aria-label="সম্পাদক লেবেল সম্পাদনা">
+                                    <svg class="w-3.5 h-3.5 pointer-events-none transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
+                                        <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5H11a.75.75 0 0 0 0-1.5H5.25Z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <input type="text" name="editor_name" value="{{ old('editor_name', $meta->editor_name ?? '') }}" placeholder="নাম লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 mb-2 ml-0.5">প্রকাশক (Publisher Name)</label>
-                            <input type="text" name="publisher_name" value="{{ old('publisher_name', $meta->publisher_name ?? '') }}" placeholder="প্রকাশকের নাম লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
+                            <div class="flex items-center gap-2 mb-2 ml-0.5" data-role-label-wrap>
+                                <span class="meta-role-label-text text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{{ $publisherLabel }}</span>
+                                <input
+                                    type="text"
+                                    name="publisher_label"
+                                    value="{{ $publisherLabel }}"
+                                    data-default="প্রকাশক"
+                                    class="meta-role-label-input hidden w-full max-w-[220px] px-2 py-1 rounded-md border border-indigo-200 dark:border-indigo-500/40 bg-white dark:bg-slate-900 text-sm font-normal text-slate-900 outline-none focus:ring-2 focus:ring-indigo-500/30"
+                                >
+                                <button type="button" class="meta-role-label-edit group shrink-0 inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 hover:bg-indigo-600 hover:text-white hover:ring-indigo-600 transition-all" title="লেবেল সম্পাদনা" aria-label="প্রকাশক লেবেল সম্পাদনা">
+                                    <svg class="w-3.5 h-3.5 pointer-events-none transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
+                                        <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5H11a.75.75 0 0 0 0-1.5H5.25Z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <input type="text" name="publisher_name" value="{{ old('publisher_name', $meta->publisher_name ?? '') }}" placeholder="নাম লিখুন..." class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-1 focus:ring-indigo-500 transition-all outline-none font-normal text-slate-900 text-sm">
                         </div>
                     </div>
-                    <p class="text-xs text-slate-500 mt-2">একটা ফিল্ড পূরণ করলে ফুটারে দেখাবে: <span class="font-medium">সম্পাদক ও প্রকাশক: নাম</span>। দুটো আলাদা পূরণ করলে সম্পাদক ও প্রকাশক আলাদা লাইনে দেখাবে।</p>
                 </div>
 
                 {{-- Unified Save Button --}}
@@ -230,12 +268,11 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
     function initCKEditor() {
-        if (typeof CKEDITOR !== 'undefined' && document.getElementById('editor')) {
-            CKEDITOR.replace('editor', adminCkeditorConfig({ height: 200 }));
-        }
+        adminLoadCkeditor(function () {
+            adminCkeditorReplace('editor', { height: 200 });
+        });
     }
 
     if (document.readyState === 'complete') {
@@ -258,6 +295,56 @@
         picker.addEventListener('input', function () { hex.value = picker.value; });
         hex.addEventListener('input', syncPicker);
         syncPicker();
+    })();
+
+    (function () {
+        function finishLabelEdit(input) {
+            const wrap = input.closest('[data-role-label-wrap]');
+            if (!wrap) return;
+
+            const text = wrap.querySelector('.meta-role-label-text');
+            const value = input.value.trim() || input.dataset.default || '';
+            input.value = value;
+            if (text) text.textContent = value;
+            input.classList.add('hidden');
+            if (text) text.classList.remove('hidden');
+        }
+
+        document.querySelectorAll('.meta-role-label-edit').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const wrap = btn.closest('[data-role-label-wrap]');
+                if (!wrap) return;
+
+                const text = wrap.querySelector('.meta-role-label-text');
+                const input = wrap.querySelector('.meta-role-label-input');
+                if (!text || !input) return;
+
+                text.classList.add('hidden');
+                input.classList.remove('hidden');
+                input.focus();
+                input.select();
+            });
+        });
+
+        document.querySelectorAll('.meta-role-label-input').forEach(function (input) {
+            input.addEventListener('blur', function () {
+                finishLabelEdit(input);
+            });
+
+            input.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    input.blur();
+                }
+
+                if (event.key === 'Escape') {
+                    const wrap = input.closest('[data-role-label-wrap]');
+                    const text = wrap ? wrap.querySelector('.meta-role-label-text') : null;
+                    input.value = text ? text.textContent.trim() : input.dataset.default || '';
+                    input.blur();
+                }
+            });
+        });
     })();
 </script>
 @endpush

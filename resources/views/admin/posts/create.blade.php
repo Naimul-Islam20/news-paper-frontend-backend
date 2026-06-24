@@ -364,7 +364,6 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
     const POST_CREATE_DRAFT = {
         storageKey: 'admin_post_create_draft_v4',
@@ -618,13 +617,7 @@
             };
         });
 
-        let description = '';
-        if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.editor) {
-            description = CKEDITOR.instances.editor.getData();
-        } else {
-            const editorEl = document.getElementById('editor');
-            if (editorEl) description = editorEl.value;
-        }
+        const description = adminEditorGetData('editor');
 
         const fileInput = document.getElementById('mainImageInput');
         const previewEl = document.getElementById('mainImagePreview');
@@ -838,11 +831,8 @@
             });
         }
 
-        if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.editor && draft.description) {
-            CKEDITOR.instances.editor.setData(draft.description);
-        } else {
-            const editorEl = document.getElementById('editor');
-            if (editorEl && draft.description) editorEl.value = draft.description;
+        if (draft.description) {
+            adminEditorSetData('editor', draft.description);
         }
     }
 
@@ -1292,20 +1282,23 @@
     }
 
     function initCKEditor() {
-        if (typeof CKEDITOR !== 'undefined' && document.getElementById('editor')) {
-            const editor = CKEDITOR.replace('editor', adminCkeditorConfig({ height: 400 }));
-            editor.on('instanceReady', function () {
+        if (!document.getElementById('editor')) {
+            return;
+        }
+
+        adminLoadCkeditor(function () {
+            adminCkeditorReplace('editor', { height: 400 }, function (editor) {
                 editor.on('change', schedulePostCreateDraftSave);
                 if (!POST_CREATE_DRAFT.skipRestore) {
                     try {
                         const draft = JSON.parse(localStorage.getItem(POST_CREATE_DRAFT.storageKey) || 'null');
-                        if (draft && draft.description && !editor.getData()) {
-                            editor.setData(draft.description);
+                        if (draft && draft.description && !adminEditorGetData('editor')) {
+                            adminEditorSetData('editor', draft.description);
                         }
                     } catch (e) {}
                 }
             });
-        }
+        });
     }
 
     if (document.readyState === 'complete') {

@@ -19,6 +19,12 @@
             letter-spacing: normal;
             line-height: 1.6;
         }
+
+        #unicode-input::placeholder,
+        #bijoy-input::placeholder {
+            color: #757575;
+            opacity: 1;
+        }
     </style>
 
     <div class="py-4 md:py-10 min-h-screen notranslate">
@@ -55,7 +61,7 @@
                         rows="9"
                         placeholder="ইউনিকোডের লেখা পেস্ট করুন"
                         data-placeholder-en="Paste Unicode text"
-                        class="w-full px-4 py-3 text-2xl md:text-3xl font-semibold serif text-title leading-tight bg-blue-50 border border-blue-400 rounded-sm focus:border-2 focus:border-blue-500 focus:ring-0 focus:outline-none outline-none resize-y min-h-[220px] h-[220px] overflow-y-auto notranslate placeholder:serif placeholder:font-semibold placeholder:text-slate-400 placeholder:text-2xl md:placeholder:text-3xl placeholder:leading-tight"></textarea>
+                        class="w-full px-4 py-3 text-2xl md:text-3xl font-semibold serif text-title leading-tight bg-blue-50 border border-blue-400 rounded-sm focus:border-2 focus:border-blue-500 focus:ring-0 focus:outline-none outline-none resize-y min-h-[220px] h-[220px] overflow-y-auto notranslate placeholder:serif placeholder:font-semibold placeholder:text-2xl md:placeholder:text-3xl placeholder:leading-tight"></textarea>
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center gap-2 md:gap-3">
@@ -95,11 +101,7 @@
                         rows="9"
                         placeholder="বিজয়ের লেখা পেস্ট করুন"
                         data-placeholder-en="Paste Bijoy text"
-                        class="w-full px-4 py-3 text-base md:text-lg leading-relaxed bg-blue-50 border border-blue-400 rounded-sm focus:border-2 focus:border-blue-500 focus:ring-0 focus:outline-none outline-none resize-y min-h-[220px] h-[220px] overflow-y-auto bijoy-text notranslate placeholder:text-lg md:placeholder:text-xl"></textarea>
-                    <p class="px-4 pb-3 text-xs text-slate-500">
-                        <span class="i18n-bn">বিজয় লেখা SutonnyMJ font-এ দেখানো হয় — Word/InDesign-এ paste করতে হলে সেখানেও Bijoy font লাগবে।</span>
-                        <span class="i18n-en">Bijoy text is shown in SutonnyMJ — paste into Word/InDesign with a Bijoy font installed.</span>
-                    </p>
+                        class="w-full px-4 py-3 text-xl md:text-2xl leading-relaxed bg-blue-50 border border-blue-400 rounded-sm focus:border-2 focus:border-blue-500 focus:ring-0 focus:outline-none outline-none resize-y min-h-[220px] h-[220px] overflow-y-auto bijoy-text notranslate placeholder:text-xl md:placeholder:text-2xl"></textarea>
                 </div>
 
             </div>

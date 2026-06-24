@@ -1,4 +1,4 @@
-{{-- Local বা Google Ad — Local priority; Google fallback --}}
+{{-- Local Ad — slot display --}}
 @props([
     'slug' => null,
     'ad' => null,
@@ -12,7 +12,6 @@
 @php
 $ad = $ad ?? ($slug ? ad_slot($slug) : null);
 $isStrip = in_array($variant, ['header', 'banner'], true);
-$stripFormat = $variant === 'header' ? 'header' : 'banner';
 $isBelowMenu = in_array($slug, ['below_menu', 'category_below_menu', 'details_below_menu'], true);
 $stripOuterClass = match (true) {
     $variant === 'header' => 'hidden w-full md:flex md:py-0 bg-white',
@@ -24,46 +23,23 @@ $boxStyle = $ad ? $ad->slotBoxStyle('box') : '';
 @endphp
 
 @if($ad && ad_should_display($ad))
-    @php
-        $useLocal = $ad->displayUsesLocalAd();
-        $useGoogle = ! $useLocal && $ad->displayUsesGoogleAd();
-    @endphp
-
     @if($isStrip)
         <div class="{{ $stripOuterClass }} {{ $wrapperClass }}" data-ad-slot-root @if($variant === 'header') id="header-ad-slot" @endif>
             <div class="container">
-                @if($useLocal)
                 <a href="{{ advertisement_click_url($ad) }}" class="ad-slot-frame ad-slot-local w-full flex items-center justify-center overflow-hidden bg-white img-placeholder" style="{{ $stripBoxStyle }}" target="_blank" rel="noopener">
                     <x-ad-picture :ad="$ad" class="{{ $pictureClass }}" />
                 </a>
-                @elseif($useGoogle)
-                <div class="ad-slot-frame ad-slot-google w-full flex items-center justify-center overflow-hidden bg-white" style="{{ $stripBoxStyle }}">
-                    <x-google-ad-unit :ad="$ad" :format="$stripFormat" />
-                </div>
-                @endif
             </div>
         </div>
-    @elseif($useLocal && $variant === 'sidebar')
+    @elseif($variant === 'sidebar')
         <div class="{{ $wrapperClass ?: 'shrink-0 w-full' }}" data-ad-slot-root>
             <a href="{{ advertisement_click_url($ad) }}" target="_blank" rel="noopener" class="ad-slot-frame ad-slot-local block img-placeholder group cursor-pointer relative overflow-hidden bg-white w-full {{ $sidebarClass }}" style="{{ $boxStyle }}">
                 <x-ad-picture :ad="$ad" class="{{ $sidebarPictureClass }}" />
             </a>
         </div>
-    @elseif($useGoogle && $variant === 'sidebar')
-        <div class="{{ $wrapperClass ?: 'shrink-0 w-full' }}" data-ad-slot-root>
-            <div class="ad-slot-frame ad-slot-google block relative overflow-hidden bg-white w-full {{ $sidebarClass }}" style="{{ $boxStyle }}">
-                <x-google-ad-unit :ad="$ad" format="sidebar" class="h-full w-full" />
-            </div>
-        </div>
-    @elseif($useLocal && $variant === 'inline')
+    @elseif($variant === 'inline')
         @include('frontend.partials.detail-inline-ad', ['ad' => $ad])
-    @elseif($useGoogle && $variant === 'inline')
-        <div class="not-prose lg:hidden ad-section my-6 w-full mx-auto {{ $wrapperClass }}" data-ad-slot-root>
-            <div class="ad-slot-frame ad-slot-google block relative overflow-hidden bg-white w-full" style="{{ $boxStyle }}">
-                <x-google-ad-unit :ad="$ad" format="inline" class="h-full w-full" />
-            </div>
-        </div>
     @endif
 @elseif($slug)
-<!-- ad-slot:{{ $slug }} status=empty (local+google both off) -->
+<!-- ad-slot:{{ $slug }} status=empty -->
 @endif

@@ -9,15 +9,11 @@ class DiagnoseAdsCommand extends Command
 {
     protected $signature = 'ads:diagnose {slug? : Optional slot slug}';
 
-    protected $description = 'Google/Local ad slot status — live server-এ check করতে';
+    protected $description = 'Local ad slot status — live server-এ check করতে';
 
     public function handle(): int
     {
-        $client = google_adsense_client();
-        $defaultSlot = google_adsense_default_slot();
-        $this->info('Client ID: '.($client ?: '❌ নেই / ভুল format'));
-        $this->info('Default Slot: '.($defaultSlot ?: '— (Meta-তে set করুন)'));
-        $this->info('AdSense frontend: বন্ধ (সব slot-এ Google ad off)');
+        $this->info('Frontend: শুধু Local ad (Google ad frontend থেকে সরানো)');
         $this->newLine();
 
         $query = Advertisement::query()->orderBy('slug');
@@ -32,22 +28,19 @@ class DiagnoseAdsCommand extends Command
                 $ad->slug,
                 $d['mode'],
                 $ad->hasRunningLocalAd() ? 'হ্যাঁ' : 'না',
-                ($ad->google_ad_auto ?? false) ? 'ON' : 'OFF',
-                $ad->google_ad_slot ?: ($defaultSlot ?: '—'),
                 implode('; ', $d['reasons']),
             ];
         }
 
         $this->table(
-            ['Slug', 'Frontend', 'Local চলছে', 'Auto', 'Slot ID', 'Reasons'],
+            ['Slug', 'Frontend', 'Local চলছে', 'Reasons'],
             $rows
         );
 
-        $googleReady = collect($rows)->where('1', 'Google')->count();
+        $local = collect($rows)->where('1', 'Local')->count();
         $empty = collect($rows)->where('1', 'খালি')->count();
         $this->newLine();
-        $this->line("Google দেখাবে: {$googleReady} slot | খালি: {$empty} slot");
-        $this->line('Frontend=Google হলে page source-এ data-ad-slot থাকা উচিত।');
+        $this->line("Local দেখাবে: {$local} slot | খালি: {$empty} slot");
 
         return self::SUCCESS;
     }

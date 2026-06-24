@@ -16,6 +16,9 @@ const FOOTER_URL_LETTER_SPACING = 5;
 const DATE_SIZE = 32;
 const LOGO_HEIGHT = 58;
 const LOGO_MAX_WIDTH = 280;
+const IMAGE_ICON_WATERMARK_SIZE = 112;
+const IMAGE_ICON_WATERMARK_OPACITY = 0.48;
+const IMAGE_ICON_PADDING = 24;
 const EXPORT_SCALE = 1;
 const PHOTOCARD_FONT = "SolaimanLipi, sans-serif";
 const OVERLAY_DARK_SOLID = "rgba(45,5,5,1)";
@@ -190,6 +193,51 @@ function dateAreaHeight(hasDate) {
     return hasDate ? DATE_SIZE + 18 : 0;
 }
 
+function imageWatermarkStyle(
+    size = IMAGE_ICON_WATERMARK_SIZE,
+    padding = IMAGE_ICON_PADDING,
+    opacity = IMAGE_ICON_WATERMARK_OPACITY,
+) {
+    return `position:absolute;top:${padding}px;right:${padding}px;width:${size}px;height:${size}px;border-radius:9999px;object-fit:cover;z-index:3;opacity:${opacity};pointer-events:none;`;
+}
+
+function drawImageWatermarkIcon(ctx, iconImage) {
+    if (!iconImage) {
+        return;
+    }
+
+    const size = IMAGE_ICON_WATERMARK_SIZE;
+    const drawX = CARD_SIZE - IMAGE_ICON_PADDING - size;
+    const drawY = IMAGE_ICON_PADDING;
+    const centerX = drawX + size / 2;
+    const centerY = drawY + size / 2;
+    const radius = size / 2;
+
+    ctx.save();
+    ctx.globalAlpha = IMAGE_ICON_WATERMARK_OPACITY;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+
+    const srcRatio = iconImage.naturalWidth / iconImage.naturalHeight;
+    let sx = 0;
+    let sy = 0;
+    let sw = iconImage.naturalWidth;
+    let sh = iconImage.naturalHeight;
+
+    if (srcRatio > 1) {
+        sw = sh;
+        sx = (iconImage.naturalWidth - sw) / 2;
+    } else {
+        sh = sw;
+        sy = (iconImage.naturalHeight - sh) / 2;
+    }
+
+    ctx.drawImage(iconImage, sx, sy, sw, sh, drawX, drawY, size, size);
+    ctx.restore();
+}
+
 function buildCardHtml(data) {
     const title = escapeHtml(data.title);
     const siteName = escapeHtml(data.siteName || "");
@@ -212,6 +260,10 @@ function buildCardHtml(data) {
         ? `<img ${imageTagAttributes(data.image)} style="display:block;width:100%;height:100%;object-fit:cover;object-position:center top;">`
         : `<div style="width:100%;height:100%;background:linear-gradient(135deg,${primary} 0%,#0f172a 100%);"></div>`;
 
+    const imageIconBlock = data.icon
+        ? `<img ${imageTagAttributes(data.icon)} aria-hidden="true" style="${imageWatermarkStyle()}">`
+        : "";
+
     const logoBlock = data.logo
         ? `<img ${imageTagAttributes(data.logo)} style="display:block;height:${LOGO_HEIGHT}px;max-width:${LOGO_MAX_WIDTH}px;object-fit:contain;">`
         : `<span style="display:block;font-size:36px;font-weight:700;color:#ffffff;line-height:1.2;text-align:right;">${siteName}</span>`;
@@ -229,6 +281,7 @@ function buildCardHtml(data) {
         <div class="post-photocard-export" style="position:relative;display:flex;flex-direction:column;width:${CARD_SIZE}px;height:${CARD_SIZE}px;flex-shrink:0;background:${OVERLAY_DARK_SOLID};font-family:'SolaimanLipi',sans-serif;overflow:hidden;box-shadow:0 10px 40px rgba(15,23,42,0.15);">
             <div class="post-photocard-image" style="position:relative;width:${CARD_SIZE}px;height:${IMAGE_HEIGHT}px;flex-shrink:0;overflow:hidden;line-height:0;">
                 ${imageBlock}
+                ${imageIconBlock}
             </div>
 
             <div class="post-photocard-bottom" style="position:relative;width:${CARD_SIZE}px;height:${BOTTOM_HEIGHT}px;flex-shrink:0;background:transparent;overflow:hidden;z-index:2;">
@@ -370,9 +423,10 @@ async function renderPhotocardCanvas(data) {
     const lineHeight = Math.round(fontSize * 1.35);
     const titleMaxWidth = CARD_SIZE - TITLE_X_PADDING * 2;
 
-    const [postImage, logoImage] = await Promise.all([
+    const [postImage, logoImage, iconImage] = await Promise.all([
         loadImage(data.image),
         loadImage(data.logo),
+        loadImage(data.icon),
     ]);
 
     const bottomTop = IMAGE_HEIGHT;
@@ -421,6 +475,8 @@ async function renderPhotocardCanvas(data) {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, CARD_SIZE, IMAGE_HEIGHT);
     }
+
+    drawImageWatermarkIcon(ctx, iconImage);
 
     drawUnifiedOverlayGradient(ctx, CARD_SIZE);
 

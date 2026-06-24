@@ -333,7 +333,6 @@
             document.documentElement.lang = 'bn';
         }
     </script>
-    <x-google-adsense-loader />
     @stack('scripts')
 </body>
 

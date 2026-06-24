@@ -80,8 +80,18 @@
 
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-        if (selector === '#post-description-field' && typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.editor) {
-            CKEDITOR.instances.editor.focus();
+        if (selector === '#post-description-field') {
+            if (typeof adminEditorGetData === 'function') {
+                const editorEl = document.getElementById('editor');
+                if (editorEl) {
+                    editorEl.focus({ preventScroll: true });
+                }
+                return;
+            }
+
+            if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.editor) {
+                CKEDITOR.instances.editor.focus();
+            }
             return;
         }
 
@@ -136,7 +146,9 @@
         }
 
         let description = '';
-        if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.editor) {
+        if (typeof adminEditorGetData === 'function') {
+            description = stripHtml(adminEditorGetData('editor'));
+        } else if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.editor) {
             description = stripHtml(CKEDITOR.instances.editor.getData());
         } else {
             const editor = form.querySelector('#editor');

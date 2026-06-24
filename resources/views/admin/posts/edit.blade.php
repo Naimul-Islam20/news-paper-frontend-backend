@@ -380,7 +380,6 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const subtitleToggle = document.getElementById('toggle-post-subtitle');
@@ -758,9 +757,13 @@
     }
 
     function initCKEditor() {
-        if (typeof CKEDITOR !== 'undefined' && document.getElementById('editor')) {
-            CKEDITOR.replace('editor', adminCkeditorConfig({ height: 400 }));
+        if (!document.getElementById('editor')) {
+            return;
         }
+
+        adminLoadCkeditor(function () {
+            adminCkeditorReplace('editor', { height: 400 });
+        });
     }
 
     if (document.readyState === 'complete') {

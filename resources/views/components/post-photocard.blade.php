@@ -10,6 +10,7 @@ $photocardPayload = [
 'imageName' => $imageBasename,
 'slug' => $post->slug,
 'logo' => optional($siteMeta)->site_logo ? storage_image_url($siteMeta->site_logo) : '',
+'icon' => optional($siteMeta)->site_icon ? storage_image_url($siteMeta->site_icon) : '',
 'siteName' => site_name(),
 'siteUrl' => $siteDomain,
 'primaryColor' => optional($siteMeta)->primary_color ?: '#28a745',

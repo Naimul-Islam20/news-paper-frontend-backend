@@ -10,6 +10,7 @@ class SiteMeta extends Model
 
     protected $fillable = [
         'site_name',
+        'site_name_bn',
         'site_title',
         'site_keywords',
         'site_email',
@@ -27,7 +28,9 @@ class SiteMeta extends Model
         'map_desc',
         'address_1',
         'editor_name',
+        'editor_label',
         'publisher_name',
+        'publisher_label',
         'google_adsense_client',
         'google_adsense_default_slot',
     ];
