@@ -15,7 +15,7 @@ class VideoController extends Controller
 {
     public function index(Request $request): View
     {
-        $baseQuery = Video::with('category')->latest();
+        $baseQuery = Video::with(['category', 'creator', 'editor'])->latest();
 
         $query = clone $baseQuery;
 
@@ -73,6 +73,7 @@ class VideoController extends Controller
         $data = [
             'category_id'   => $request->category_id,
             'reporter_id'   => $this->resolveReporterId($request->reporter_id),
+            'created_by'    => Auth::id(),
             'title'         => $request->title,
             'slug'          => $slug,
             'youtube_link'  => $request->youtube_link,
@@ -124,6 +125,7 @@ class VideoController extends Controller
         $video->description   = $request->description;
         $video->status        = $request->status;
         $video->is_main_video = $request->is_main_video;
+        $video->edited_by     = Auth::id();
 
         if ($request->hasFile('image')) {
             delete_uploaded_media($video->image);

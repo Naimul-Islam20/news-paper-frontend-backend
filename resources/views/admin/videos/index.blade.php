@@ -41,6 +41,8 @@
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-24 text-center">Main?</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-28">Status</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-28">Date</th>
+                        <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-28">Published By</th>
+                        <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 w-28">Edited By</th>
                         <th class="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-slate-100 text-right w-24">Action</th>
                     </tr>
                 </thead>
@@ -92,6 +94,12 @@
                             <div class="text-xs font-normal text-slate-600 dark:text-slate-400">{{ $video->created_at->format('d M Y') }}</div>
                             <div class="text-[10px] text-slate-400">{{ $video->created_at->format('h:i A') }}</div>
                         </td>
+                        <td class="py-3 px-4">
+                            <span class="text-xs font-normal text-slate-600 dark:text-slate-300">{{ person_name_first_two_words(optional($video->creator)->name) ?? 'N/A' }}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="text-xs font-normal text-slate-600 dark:text-slate-300">{{ person_name_first_two_words(optional($video->editor)->name) ?? '—' }}</span>
+                        </td>
                         <td class="py-3 px-4 text-right">
                             <div class="flex items-center justify-end gap-1">
                                 <a href="{{ route('admin.videos.edit', $video->id) }}" class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-colors" title="Edit">
@@ -109,7 +117,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="py-10 text-center text-slate-400 text-sm">No videos found. <a href="{{ route('admin.videos.create') }}" class="text-indigo-500 hover:underline">Add your first video.</a></td>
+                        <td colspan="11" class="py-10 text-center text-slate-400 text-sm">No videos found. <a href="{{ route('admin.videos.create') }}" class="text-indigo-500 hover:underline">Add your first video.</a></td>
                     </tr>
                     @endforelse
                 </tbody>

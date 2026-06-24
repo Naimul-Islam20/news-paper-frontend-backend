@@ -16,7 +16,7 @@ class GalleryController extends Controller
 {
     public function index(Request $request): View
     {
-        $baseQuery = Gallery::with('images')->latest();
+        $baseQuery = Gallery::with(['images', 'creator', 'editor'])->latest();
 
         $query = clone $baseQuery;
 
@@ -76,6 +76,7 @@ class GalleryController extends Controller
         $gallery = Gallery::create([
             'category_id' => $request->category_id,
             'reporter_id' => $this->resolveReporterId($request->reporter_id),
+            'created_by'  => Auth::id(),
             'title'       => $request->title,
             'slug'        => $slug,
             'description' => $request->description,
@@ -132,6 +133,7 @@ class GalleryController extends Controller
         $gallery->slug        = $this->makeUniqueSlug($baseSlug, $gallery->id);
         $gallery->description = $request->description;
         $gallery->status      = $request->status;
+        $gallery->edited_by   = Auth::id();
         $gallery->save();
 
         // Update existing images: description + optional image replace

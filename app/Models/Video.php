@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Video extends Model
 {
     protected $fillable = [
-        'category_id', 'reporter_id', 'title', 'slug', 'youtube_link', 'image',
+        'category_id', 'reporter_id', 'created_by', 'edited_by', 'title', 'slug', 'youtube_link', 'image',
         'description', 'status', 'is_main_video',
     ];
 
@@ -19,5 +19,15 @@ class Video extends Model
     public function reporter()
     {
         return $this->belongsTo(Reporter::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function editor()
+    {
+        return $this->belongsTo(User::class, 'edited_by');
     }
 }
