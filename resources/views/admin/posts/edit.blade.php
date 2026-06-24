@@ -236,12 +236,42 @@
 
                         {{-- Topics (Tags) moved to Sidebar --}}
                         <div>
-                            <label class="block text-sm font-normal text-slate-900 dark:text-slate-200 mb-2 ml-0.5">Post Topics / Tags</label>
-                            <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 shadow-inner">
-                                <div id="topics-interface" class="space-y-4">
+                            <label class="block text-xs font-normal text-slate-900 dark:text-slate-200 mb-1.5 ml-0.5">Post Topics / Tags</label>
+                            <div class="p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 shadow-inner">
+                                <div id="topics-interface" class="space-y-2.5">
+                                    @php
+                                        $permanentTopics = $topics->where('can_delete', false)->sortBy('name');
+                                        $otherTopics = $topics->where('can_delete', true);
+                                    @endphp
+
+                                    {{-- Location: Division / District / Upazila --}}
+                                    <div class="grid grid-cols-3 gap-1.5">
+                                        <div>
+                                            <label for="division-topic-select" class="block text-[10px] font-bold text-slate-700 dark:text-slate-300 mb-0.5">বিভাগ</label>
+                                            <select id="division-topic-select" class="w-full px-2 py-1 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-[11px] focus:ring-1 focus:ring-indigo-500 outline-none text-slate-900 dark:text-slate-100">
+                                                <option value="">নির্বাচন</option>
+                                                @foreach ($permanentTopics as $topic)
+                                                    <option value="{{ $topic->id }}" data-name="{{ $topic->name }}">{{ $topic->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="district-topic-select" class="block text-[10px] font-bold text-slate-700 dark:text-slate-300 mb-0.5">জেলা</label>
+                                            <select id="district-topic-select" class="w-full px-2 py-1 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-[11px] focus:ring-1 focus:ring-indigo-500 outline-none text-slate-900 dark:text-slate-100" disabled>
+                                                <option value="">নির্বাচন</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="upazila-topic-select" class="block text-[10px] font-bold text-slate-700 dark:text-slate-300 mb-0.5">উপজেলা</label>
+                                            <select id="upazila-topic-select" class="w-full px-2 py-1 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-[11px] focus:ring-1 focus:ring-indigo-500 outline-none text-slate-900 dark:text-slate-100" disabled>
+                                                <option value="">নির্বাচন</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                     {{-- Selected Topics Container --}}
-                                    <div id="selected-topics-area" class="flex flex-wrap gap-2 min-h-[40px] p-2 bg-white dark:bg-slate-900 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 font-medium">
-                                        <p id="no-topics-selected" class="text-xs text-slate-400 italic py-1 font-normal">No topics selected</p>
+                                    <div id="selected-topics-area" class="flex flex-wrap gap-1.5 min-h-[32px] p-1.5 bg-white dark:bg-slate-900 rounded-md border border-dashed border-slate-300 dark:border-slate-700 font-medium">
+                                        <p id="no-topics-selected" class="text-[10px] text-slate-400 italic py-0.5 font-normal">No topics selected</p>
                                     </div>
 
                                     {{-- Search & Create Container --}}
@@ -296,33 +326,10 @@
                                         </div>
                                     </div>
 
-                                    @php 
-                                        $permanentTopics = $topics->where('can_delete', false);
-                                        $otherTopics = $topics->where('can_delete', true);
-                                    @endphp
-
-                                    <div id="topics-selector-container" class="max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                                        {{-- Permanent Topics (Divisions) --}}
-                                        <div class="mb-4">
-                                            <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-2 font-bold">বিভাগসমূহ</p>
-                                            <div class="flex flex-wrap gap-1.5">
-                                                @foreach($permanentTopics as $topic)
-                                                    <div 
-                                                        class="topic-chip available cursor-pointer px-2.5 py-1 text-xs font-normal bg-rose-50 text-rose-700 border border-rose-100 rounded-full hover:bg-rose-100 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30 dark:hover:bg-rose-500/25 transition-all"
-                                                        data-id="{{ $topic->id }}"
-                                                        data-name="{{ $topic->name }}"
-                                                        data-slug="{{ $topic->slug }}"
-                                                        data-permanent="true"
-                                                    >
-                                                        {{ $topic->name }}
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-
+                                    <div id="topics-selector-container" class="max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
                                         {{-- Other Topics --}}
                                         <div>
-                                            <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-2 font-bold">অন্যান্য</p>
+                                            <p class="text-[9px] uppercase tracking-widest text-slate-400 mb-1 font-bold">অন্যান্য</p>
                                             <div id="other-topics-list" class="flex flex-wrap gap-1.5 font-medium">
                                                 @foreach($otherTopics as $idx => $topic)
                                                     <div 
@@ -437,23 +444,321 @@
         const placeholder = document.getElementById('no-topics-selected');
         const showMoreBtn = document.getElementById('show-more-topics');
         const searchInput = document.getElementById('topic-search-input');
-        const allChips = document.querySelectorAll('.topic-chip.available');
-        
+        const divisionSelect = document.getElementById('division-topic-select');
+        const districtSelect = document.getElementById('district-topic-select');
+        const upazilaSelect = document.getElementById('upazila-topic-select');
+        const allChips = document.querySelectorAll('#other-topics-list .topic-chip.available');
+        const divisionDistricts = @json(
+            collect(bangladesh_division_districts_map())->mapWithKeys(
+                fn ($districts, $division) => [$division => bangladesh_districts_for_division($division)]
+            )
+        );
+        const districtUpazilas = @json(bangladesh_district_upazilas_map());
+        const topicCatalog = @json($topics->map(fn ($t) => ['id' => (string) $t->id, 'name' => $t->name, 'permanent' => ! $t->can_delete])->values());
+
         const selectedIds = new Set();
+        const activeLocationTags = { division: null, district: null, upazila: null };
+
+        function countSelectedTagChips() {
+            return area.querySelectorAll('div[data-id]').length;
+        }
+
+        function updatePlaceholderVisibility() {
+            if (!placeholder) {
+                return;
+            }
+
+            if (countSelectedTagChips() === 0) {
+                placeholder.classList.remove('hidden');
+            } else {
+                placeholder.classList.add('hidden');
+            }
+        }
+
+        function findTopicIdByName(name) {
+            const found = topicCatalog.find(function (topic) {
+                return topic.name === name;
+            });
+            return found ? found.id : null;
+        }
+
+        async function ensureTopicId(name) {
+            const existingId = findTopicIdByName(name);
+            if (existingId) {
+                return existingId;
+            }
+
+            const response = await fetch("{{ route('admin.topics.quick-store') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ name: name }),
+            });
+
+            const data = await response.json();
+            if (!data.success || !data.topic) {
+                throw new Error(data.message || 'Topic create failed');
+            }
+
+            topicCatalog.push({
+                id: String(data.topic.id),
+                name: data.topic.name,
+                permanent: false,
+            });
+
+            return String(data.topic.id);
+        }
+
+        function resetDistrictSelect() {
+            if (!districtSelect) {
+                return;
+            }
+            districtSelect.innerHTML = '<option value="">নির্বাচন</option>';
+            districtSelect.value = '';
+            districtSelect.disabled = true;
+        }
+
+        function resetUpazilaSelect() {
+            if (!upazilaSelect) {
+                return;
+            }
+            upazilaSelect.innerHTML = '<option value="">নির্বাচন</option>';
+            upazilaSelect.value = '';
+            upazilaSelect.disabled = true;
+        }
+
+        function populateDistrictOptions(divisionName) {
+            if (!districtSelect) {
+                return;
+            }
+
+            resetDistrictSelect();
+            resetUpazilaSelect();
+
+            const districts = divisionDistricts[divisionName] || [];
+            if (!divisionName || districts.length === 0) {
+                return;
+            }
+
+            districts.forEach(function (district) {
+                const option = document.createElement('option');
+                option.value = district;
+                option.textContent = district;
+                districtSelect.appendChild(option);
+            });
+
+            districtSelect.disabled = false;
+        }
+
+        function populateUpazilaOptions(districtName) {
+            if (!upazilaSelect) {
+                return;
+            }
+
+            resetUpazilaSelect();
+
+            const upazilas = districtUpazilas[districtName] || [];
+            if (!districtName || upazilas.length === 0) {
+                return;
+            }
+
+            upazilas.forEach(function (upazila) {
+                const option = document.createElement('option');
+                option.value = upazila;
+                option.textContent = upazila;
+                upazilaSelect.appendChild(option);
+            });
+
+            upazilaSelect.disabled = false;
+        }
+
+        function removeTopic(id) {
+            id = String(id);
+            selectedIds.delete(id);
+
+            const chip = area.querySelector(`div[data-id="${id}"]`);
+            if (chip) {
+                chip.remove();
+            }
+
+            const input = document.getElementById(`input-topic-${id}`);
+            if (input) {
+                input.remove();
+            }
+
+            const selectorChip = document.querySelector(`.topic-chip.available[data-id="${id}"]`);
+            if (selectorChip) {
+                selectorChip.classList.remove('opacity-40', 'pointer-events-none');
+            }
+
+            updatePlaceholderVisibility();
+        }
+
+        function clearLocationTopic(type) {
+            const prevId = activeLocationTags[type];
+            if (!prevId) {
+                return;
+            }
+
+            const input = document.getElementById(`input-topic-location-${type}`);
+            if (input) {
+                input.remove();
+            }
+
+            selectedIds.delete(String(prevId));
+            activeLocationTags[type] = null;
+
+            const selectorChip = document.querySelector(`.topic-chip.available[data-id="${prevId}"]`);
+            if (selectorChip) {
+                selectorChip.classList.remove('opacity-40', 'pointer-events-none');
+            }
+        }
+
+        function setLocationTopic(type, id) {
+            clearLocationTopic(type);
+
+            if (!id) {
+                return;
+            }
+
+            id = String(id);
+            selectedIds.add(id);
+            activeLocationTags[type] = id;
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'topic_ids[]';
+            input.value = id;
+            input.id = `input-topic-location-${type}`;
+            input.dataset.locationTopic = type;
+            hiddenContainer.appendChild(input);
+        }
+
+        function addTopic(id, name) {
+            id = String(id);
+            if (selectedIds.has(id)) {
+                return;
+            }
+
+            selectedIds.add(id);
+            updatePlaceholderVisibility();
+
+            const chip = document.createElement('div');
+            chip.className = 'px-2 py-0.5 text-[10px] font-normal border rounded-full flex items-center gap-1 transition-all bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30';
+            chip.dataset.id = id;
+            chip.innerHTML = `
+                ${name}
+                <button type="button" class="remove-topic font-bold hover:text-red-600">&times;</button>
+            `;
+            area.appendChild(chip);
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'topic_ids[]';
+            input.value = id;
+            input.id = `input-topic-${id}`;
+            hiddenContainer.appendChild(input);
+
+            const selectorChip = document.querySelector(`.topic-chip.available[data-id="${id}"]`);
+            if (selectorChip) {
+                selectorChip.classList.add('opacity-40', 'pointer-events-none');
+            }
+        }
+
+        function replaceLocationTag(type, id) {
+            if (type === 'division') {
+                clearLocationTopic('district');
+                clearLocationTopic('upazila');
+                resetDistrictSelect();
+                resetUpazilaSelect();
+            } else if (type === 'district') {
+                clearLocationTopic('upazila');
+                resetUpazilaSelect();
+            }
+
+            setLocationTopic(type, id || null);
+        }
+
+        function syncDivisionControls(divisionName) {
+            if (!divisionSelect || !divisionName) {
+                return;
+            }
+
+            const divOption = Array.from(divisionSelect.options).find(function (option) {
+                return option.dataset.name === divisionName;
+            });
+
+            if (divOption) {
+                divisionSelect.value = divOption.value;
+                replaceLocationTag('division', divOption.value);
+                populateDistrictOptions(divisionName);
+            }
+        }
+
+        function restoreExistingTopic(id, name, permanent) {
+            id = String(id);
+
+            if (permanent) {
+                if (divisionSelect) {
+                    divisionSelect.value = id;
+                }
+                replaceLocationTag('division', id);
+                populateDistrictOptions(name);
+                return;
+            }
+
+            const divisionName = Object.keys(divisionDistricts).find(function (division) {
+                return (divisionDistricts[division] || []).includes(name);
+            });
+
+            if (divisionName) {
+                syncDivisionControls(divisionName);
+                if (districtSelect) {
+                    districtSelect.value = name;
+                }
+                replaceLocationTag('district', id);
+                populateUpazilaOptions(name);
+                return;
+            }
+
+            const districtName = Object.keys(districtUpazilas).find(function (district) {
+                return (districtUpazilas[district] || []).includes(name);
+            });
+
+            if (districtName) {
+                const parentDivision = Object.keys(divisionDistricts).find(function (division) {
+                    return (divisionDistricts[division] || []).includes(districtName);
+                });
+
+                if (parentDivision) {
+                    syncDivisionControls(parentDivision);
+                    if (districtSelect) {
+                        districtSelect.value = districtName;
+                    }
+                    populateUpazilaOptions(districtName);
+                }
+
+                if (upazilaSelect) {
+                    upazilaSelect.value = name;
+                }
+                replaceLocationTag('upazila', id);
+                return;
+            }
+
+            addTopic(id, name);
+        }
 
         // Search logic
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 const query = this.value.toLowerCase().trim();
-                
+
                 if (query === '') {
-                    // Reset to initial state
                     allChips.forEach((chip, idx) => {
-                        // Only show first 40 of 'other' topics + all permanent
-                        const isPermanent = chip.dataset.permanent === 'true';
-                        const otherIdx = Array.from(document.querySelectorAll('#other-topics-list .topic-chip.available')).indexOf(chip);
-                        
-                        if (isPermanent || (otherIdx !== -1 && otherIdx < 40)) {
+                        if (idx < 40) {
                             chip.classList.remove('hidden');
                         } else {
                             chip.classList.add('hidden');
@@ -463,7 +768,6 @@
                     return;
                 }
 
-                // Filtering
                 allChips.forEach(chip => {
                     const name = chip.dataset.name.toLowerCase();
                     const slug = chip.dataset.slug ? chip.dataset.slug.toLowerCase() : '';
@@ -478,64 +782,73 @@
             });
         }
 
-        function addTopic(id, name, isPermanent) {
-            id = id.toString();
-            if (selectedIds.has(id)) return;
-            selectedIds.add(id);
-
-            // Hide placeholder
-            if (placeholder) placeholder.classList.add('hidden');
-
-            // Create chip in selected area
-            const chip = document.createElement('div');
-            chip.className = `px-2.5 py-1 text-xs font-normal border rounded-full flex items-center gap-1.5 transition-all ${isPermanent ? 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30' : 'bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30'}`;
-            chip.dataset.id = id;
-            chip.innerHTML = `
-                ${name}
-                <button type="button" class="remove-topic font-bold hover:text-red-600">&times;</button>
-            `;
-            area.appendChild(chip);
-
-            // Add hidden input
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'topic_ids[]';
-            input.value = id;
-            input.id = `input-topic-${id}`;
-            hiddenContainer.appendChild(input);
-
-            // Mark in selector
-            const selectorChip = document.querySelector(`.topic-chip.available[data-id="${id}"]`);
-            if (selectorChip) selectorChip.classList.add('opacity-40', 'pointer-events-none');
-        }
-
-        function removeTopic(id) {
-            id = id.toString();
-            selectedIds.delete(id);
-            
-            // Remove chip
-            const chip = area.querySelector(`div[data-id="${id}"]`);
-            if (chip) chip.remove();
-
-            // Remove hidden input
-            const input = document.getElementById(`input-topic-${id}`);
-            if (input) input.remove();
-
-            // Show placeholder if empty
-            if (selectedIds.size === 0 && placeholder) {
-                placeholder.classList.remove('hidden');
-            }
-
-            // Unmark in selector
-            const selectorChip = document.querySelector(`.topic-chip.available[data-id="${id}"]`);
-            if (selectorChip) selectorChip.classList.remove('opacity-40', 'pointer-events-none');
-        }
-
-        // Handle clicks on available chips
-        document.querySelectorAll('.topic-chip.available').forEach(chip => {
+        document.querySelectorAll('#other-topics-list .topic-chip.available').forEach(chip => {
             chip.addEventListener('click', function() {
-                addTopic(this.dataset.id, this.dataset.name, this.dataset.permanent === 'true');
+                addTopic(this.dataset.id, this.dataset.name);
             });
+        });
+
+        if (divisionSelect) {
+            divisionSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const divisionName = selectedOption ? selectedOption.dataset.name || selectedOption.textContent.trim() : '';
+                const divisionId = this.value;
+
+                if (!divisionId) {
+                    replaceLocationTag('division', null);
+                    return;
+                }
+
+                replaceLocationTag('division', divisionId);
+                populateDistrictOptions(divisionName);
+            });
+        }
+
+        if (districtSelect) {
+            districtSelect.addEventListener('change', async function() {
+                const districtName = this.value;
+
+                if (!districtName) {
+                    replaceLocationTag('district', null);
+                    return;
+                }
+
+                try {
+                    const topicId = await ensureTopicId(districtName);
+                    replaceLocationTag('district', topicId);
+                    populateUpazilaOptions(districtName);
+                } catch (error) {
+                    this.value = '';
+                    alert('জেলা ট্যাগ যোগ করা যায়নি।');
+                }
+            });
+        }
+
+        if (upazilaSelect) {
+            upazilaSelect.addEventListener('change', async function() {
+                const upazilaName = this.value;
+
+                if (!upazilaName) {
+                    replaceLocationTag('upazila', null);
+                    return;
+                }
+
+                try {
+                    const topicId = await ensureTopicId(upazilaName);
+                    replaceLocationTag('upazila', topicId);
+                } catch (error) {
+                    this.value = '';
+                    alert('উপজেলা ট্যাগ যোগ করা যায়নি।');
+                }
+            });
+        }
+
+        // Handle removal
+        area.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-topic')) {
+                const chip = e.target.closest('div');
+                removeTopic(chip.dataset.id);
+            }
         });
 
         // Modal Helpers
@@ -640,7 +953,7 @@
 
                     if (data.success) {
                         // Add to selected
-                        addTopic(data.topic.id, data.topic.name, false);
+                        addTopic(data.topic.id, data.topic.name);
                         
                         // Clear and close
                         nameInput.value = '';
@@ -671,14 +984,6 @@
                 }
             });
         }
-
-        // Handle removal
-        area.addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-topic')) {
-                const chip = e.target.closest('div');
-                removeTopic(chip.dataset.id);
-            }
-        });
 
         // Auto-load on Scroll (Infinite Scroll)
         const sentinel = document.getElementById('topics-loader-sentinel');
@@ -714,18 +1019,16 @@
         }
 
         // Pre-fill selections
-        @php 
-            $selectedTopicIds = old('topic_ids', $post->topics->pluck('id')->toArray());
+        @php
+            $selectedTopicItems = collect(old('topic_ids', $post->topics->pluck('id')->toArray()))
+                ->map(fn ($id) => $topics->firstWhere('id', $id))
+                ->filter()
+                ->sortByDesc(fn ($t) => $t->can_delete ? 0 : 1);
         @endphp
-        
-        @if(!empty($selectedTopicIds))
-            @foreach($selectedTopicIds as $id)
-                @php $t = $topics->firstWhere('id', $id); @endphp
-                @if($t)
-                    addTopic("{{ $t->id }}", "{{ $t->name }}", {{ $t->can_delete ? 'false' : 'true' }});
-                @endif
-            @endforeach
-        @endif
+
+        @foreach ($selectedTopicItems as $t)
+            restoreExistingTopic("{{ $t->id }}", @json($t->name), {{ $t->can_delete ? 'false' : 'true' }});
+        @endforeach
     }
 
     // Hero Layer: একটাই সিলেক্ট থাকবে, বাকি ৩টা অটো আনচেক

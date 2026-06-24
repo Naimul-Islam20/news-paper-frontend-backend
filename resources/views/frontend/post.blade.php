@@ -330,11 +330,11 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                     </div>
                                     @endif
 
-                                    <!-- অনুসন্ধান বিষয় (Dynamic Topics) -->
+                                    <!-- বিষয় (Dynamic Topics) -->
                                     @if($post->topics->isNotEmpty())
                                     <div class="mt-8 pt-6 border-t border-slate-100 px-0 lg:px-[125px] no-print">
                                         <div class="flex flex-wrap items-center gap-2">
-                                            <span class="text-lg font-bold text-slate-700 mr-2">অনুসন্ধান বিষয় :</span>
+                                            <span class="text-lg font-bold text-slate-700 mr-2">বিষয় :</span>
                                             @foreach($post->topics as $topic)
                                             <a href="{{ route('topic.show', ['slug' => $topic->slug]) }}" class="px-3 py-1 bg-slate-100 hover:bg-primary hover:text-white text-slate-700 text-base font-semibold transition-all rounded-sm">
                                                 {{ $topic->name }}

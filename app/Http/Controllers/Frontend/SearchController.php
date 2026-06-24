@@ -19,31 +19,59 @@ class SearchController extends Controller
      */
     public function index(Request $request, $slug = null): View
     {
-        // যদি স্লাগ (slug) থাকে তবে সেটাকে কুয়েরি হিসেবে নেওয়া, নতুবা সার্চ বক্সের ইনপুট নেওয়া
+        $district = trim((string) $request->get('district', ''));
+        $upazila = trim((string) $request->get('upazila', ''));
+        $topic = null;
+        $isDivisionTopic = false;
+        $divisionName = '';
+
         if ($slug) {
             $topic = Topic::where('slug', $slug)->first();
-            $query = $topic ? $topic->name : str_replace('-', ' ', $slug);
+            $divisionName = $topic ? $topic->name : str_replace('-', ' ', $slug);
+            $isDivisionTopic = ($topic && ! $topic->can_delete)
+                || array_key_exists($divisionName, bangladesh_division_districts_map());
+
+            if ($isDivisionTopic) {
+                $query = bangladesh_regional_search_label($divisionName, $district ?: null, $upazila ?: null);
+            } else {
+                $query = $topic ? $topic->name : $divisionName;
+            }
         } else {
             $query = trim((string) $request->get('q', ''));
         }
-        $limit = 20;
+
+        $limit = $isDivisionTopic ? 50 : 20;
 
         $items = collect();
 
-        if ($query !== '') {
+        if ($query !== '' || $slug) {
             $term = '%' . $query . '%';
 
-            // Posts (published)
             $postsQuery = Post::with(['categories.parent', 'topics'])
                 ->where('status', 'published');
 
             if ($slug) {
-                // If slug exists, strictly find posts with that specific topic slug
-                $postsQuery->whereHas('topics', function($sq) use ($slug) {
-                    $sq->where('slug', $slug);
-                });
+                if ($isDivisionTopic) {
+                    $locationNames = bangladesh_regional_search_location_names(
+                        $divisionName,
+                        $district ?: null,
+                        $upazila ?: null
+                    );
+                    $topicIds = bangladesh_topic_ids_for_location_names($locationNames);
+
+                    if ($topicIds !== []) {
+                        $postsQuery->whereHas('topics', function ($topicQuery) use ($topicIds) {
+                            $topicQuery->whereIn('topics.id', $topicIds);
+                        });
+                    } else {
+                        $postsQuery->whereRaw('1 = 0');
+                    }
+                } else {
+                    $postsQuery->whereHas('topics', function ($topicQuery) use ($slug) {
+                        $topicQuery->where('slug', $slug);
+                    });
+                }
             } else {
-                // Normal search box query
                 $postsQuery->where(function ($q) use ($term) {
                     $q->where('title', 'like', $term)
                         ->orWhere('description', 'like', $term)

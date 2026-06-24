@@ -1170,3 +1170,223 @@ if (! function_exists('site_editor_publisher_lines')) {
         return $lines;
     }
 }
+
+if (! function_exists('bangladesh_division_districts_map')) {
+    /**
+     * বিভাগ অনুযায়ী জেলার তালিকা (বাংলা নাম কী হিসেবে)।
+     *
+     * @return array<string, list<string>>
+     */
+    function bangladesh_division_districts_map(): array
+    {
+        return [
+            'ঢাকা' => [
+                'ঢাকা', 'ফরিদপুর', 'গাজীপুর', 'গোপালগঞ্জ', 'কিশোরগঞ্জ', 'মাদারীপুর', 'মানিকগঞ্জ',
+                'মুন্সিগঞ্জ', 'নারায়ণগঞ্জ', 'নরসিংদী', 'রাজবারী', 'শরীয়তপুর', 'টাঙ্গাইল',
+            ],
+            'চট্টগ্রাম' => [
+                'বান্দরবান', 'ব্রাহ্মণবাড়িয়া', 'চাঁদপুর', 'চট্টগ্রাম', 'কুমিল্লা', 'কক্সবাজার',
+                'ফেনী', 'খাগড়াছড়ি', 'লক্ষ্মীপুর', 'নোয়াখালী', 'রাঙ্গামাটি',
+            ],
+            'রাজশাহী' => [
+                'বগুড়া', 'চাঁপাইনবাবগঞ্জ', 'জয়পুরহাট', 'নওগাঁ', 'নাটোর', 'পাবনা', 'রাজশাহী', 'সিরাজগঞ্জ',
+            ],
+            'খুলনা' => [
+                'বাগেরহাট', 'চুয়াডাঙ্গা', 'যশোর', 'ঝিনাইদহ', 'খুলনা', 'কুষ্টিয়া', 'মাগুরা',
+                'মেহেরপুর', 'নড়াইল', 'সাতক্ষীরা',
+            ],
+            'বরিশাল' => [
+                'বরগুনা', 'বরিশাল', 'ভোলা', 'ঝালকাঠি', 'পটুয়াখালী', 'পিরোজপুর',
+            ],
+            'সিলেট' => [
+                'হবিগঞ্জ', 'মৌলভীবাজার', 'সুনামগঞ্জ', 'সিলেট',
+            ],
+            'রংপুর' => [
+                'দিনাজপুর', 'গাইবান্ধা', 'কুড়িগ্রাম', 'লালমনিরহাট', 'নীলফামারী', 'পঞ্চগড়', 'রংপুর', 'ঠাকুরগাঁও',
+            ],
+            'ময়মনসিংহ' => [
+                'জামালপুর', 'ময়মনসিংহ', 'নেত্রকোণা', 'শেরপুর',
+            ],
+        ];
+    }
+}
+
+if (! function_exists('bangladesh_districts_for_division')) {
+    /**
+     * নির্দিষ্ট বিভাগের জেলা (বাংলা বর্ণানুক্রমিক)।
+     *
+     * @return list<string>
+     */
+    function bangladesh_districts_for_division(?string $division): array
+    {
+        if ($division === null || $division === '') {
+            return [];
+        }
+
+        $districts = bangladesh_division_districts_map()[$division] ?? [];
+
+        if (class_exists(\Collator::class)) {
+            $collator = new \Collator('bn_BD');
+            $collator->sort($districts);
+        } else {
+            sort($districts, SORT_STRING);
+        }
+
+        return $districts;
+    }
+}
+
+if (! function_exists('bangladesh_districts')) {
+    /**
+     * বাংলাদেশের ৬৪টি জেলার তালিকা (বাংলায়, বর্ণানুক্রমিক)।
+     *
+     * @return list<string>
+     */
+    function bangladesh_districts(): array
+    {
+        $districts = array_merge(...array_values(bangladesh_division_districts_map()));
+
+        if (class_exists(\Collator::class)) {
+            $collator = new \Collator('bn_BD');
+            $collator->sort($districts);
+        } else {
+            sort($districts, SORT_STRING);
+        }
+
+        return $districts;
+    }
+}
+
+if (! function_exists('bangladesh_district_upazilas_map')) {
+    /**
+     * জেলা অনুযায়ী উপজেলার তালিকা (বাংলা নাম কী হিসেবে)।
+     *
+     * @return array<string, list<string>>
+     */
+    function bangladesh_district_upazilas_map(): array
+    {
+        static $map = null;
+
+        if ($map !== null) {
+            return $map;
+        }
+
+        $path = config_path('bangladesh_district_upazilas.json');
+        $decoded = is_readable($path)
+            ? json_decode((string) file_get_contents($path), true)
+            : null;
+
+        $map = is_array($decoded) ? $decoded : [];
+
+        return $map;
+    }
+}
+
+if (! function_exists('bangladesh_upazilas_for_district')) {
+    /**
+     * নির্দিষ্ট জেলার উপজেলা (বাংলা বর্ণানুক্রমিক)।
+     *
+     * @return list<string>
+     */
+    function bangladesh_upazilas_for_district(?string $district): array
+    {
+        if ($district === null || $district === '') {
+            return [];
+        }
+
+        return bangladesh_district_upazilas_map()[$district] ?? [];
+    }
+}
+
+if (! function_exists('bangladesh_regional_search_location_names')) {
+    /**
+     * এলাকার খবর সার্চ: বিভাগ/জেলা/উপজেলা অনুযায়ী মিলতে হবে এমন সব লোকেশন ট্যাগের নাম।
+     *
+     * @return list<string>
+     */
+    function bangladesh_regional_search_location_names(string $division, ?string $district = null, ?string $upazila = null): array
+    {
+        if ($upazila !== null && $upazila !== '') {
+            return [$upazila];
+        }
+
+        if ($district !== null && $district !== '') {
+            return array_values(array_unique(array_merge([$district], bangladesh_upazilas_for_district($district))));
+        }
+
+        $names = [$division];
+
+        foreach (bangladesh_districts_for_division($division) as $districtName) {
+            $names[] = $districtName;
+            $names = array_merge($names, bangladesh_upazilas_for_district($districtName));
+        }
+
+        return array_values(array_unique($names));
+    }
+}
+
+if (! function_exists('bangladesh_regional_search_label')) {
+    /**
+     * এলাকার খবর সার্চ রেজাল্ট পেজের শিরোনাম।
+     */
+    function bangladesh_regional_search_label(string $division, ?string $district = null, ?string $upazila = null): string
+    {
+        if ($upazila !== null && $upazila !== '') {
+            return $upazila;
+        }
+
+        if ($district !== null && $district !== '') {
+            return $district;
+        }
+
+        return $division . ' বিভাগ';
+    }
+}
+
+if (! function_exists('bangladesh_normalize_location_name')) {
+    /**
+     * লোকেশন নাম তুলনার জন্য স্বাভাবিকীকরণ (বাংলা ইউনিকোড পার্থক্য সামলাতে)।
+     */
+    function bangladesh_normalize_location_name(string $name): string
+    {
+        $name = trim($name);
+
+        if (class_exists(\Normalizer::class)) {
+            $name = \Normalizer::normalize($name, \Normalizer::FORM_KD) ?: $name;
+            $name = preg_replace('/\p{Mn}/u', '', $name) ?? $name;
+        }
+
+        $name = str_replace(['ড়', 'ড়', 'য়', 'য়'], ['র', 'র', 'য', 'য'], $name);
+
+        return mb_strtolower($name, 'UTF-8');
+    }
+}
+
+if (! function_exists('bangladesh_topic_ids_for_location_names')) {
+    /**
+     * লোকেশন নাম অনুযায়ী topic id (ইউনিকোড-নিরাপদ মিল)।
+     *
+     * @param  list<string>  $names
+     * @return list<int>
+     */
+    function bangladesh_topic_ids_for_location_names(array $names): array
+    {
+        if ($names === []) {
+            return [];
+        }
+
+        $targets = [];
+        foreach ($names as $name) {
+            $targets[bangladesh_normalize_location_name($name)] = true;
+        }
+
+        $ids = [];
+        foreach (\App\Models\Topic::query()->get(['id', 'name']) as $topic) {
+            if (isset($targets[bangladesh_normalize_location_name($topic->name)])) {
+                $ids[] = (int) $topic->id;
+            }
+        }
+
+        return array_values(array_unique($ids));
+    }
+}

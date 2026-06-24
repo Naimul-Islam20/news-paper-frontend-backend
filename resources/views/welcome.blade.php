@@ -879,16 +879,16 @@
                                     <!-- District -->
                                     <div>
                                         <label class="block text-sm font-bold text-gray-700 mb-1">জেলা</label>
-                                        <select class="w-full border-custom  text-sm focus:ring-primary focus:border-primary py-2.5 bg-white">
-                                            <option>জেলা নির্বাচন করুন</option>
+                                        <select id="district-select" class="w-full border-custom text-sm focus:ring-primary focus:border-primary py-2.5 bg-white" disabled>
+                                            <option value="">প্রথমে বিভাগ নির্বাচন করুন</option>
                                         </select>
                                     </div>
 
                                     <!-- Upazila -->
                                     <div>
                                         <label class="block text-sm font-bold text-gray-700 mb-1">উপজেলা</label>
-                                        <select class="w-full border-custom  text-sm focus:ring-primary focus:border-primary py-2.5 bg-white">
-                                            <option>উপজেলা নির্বাচন করুন</option>
+                                        <select id="upazila-select" class="w-full border-custom text-sm focus:ring-primary focus:border-primary py-2.5 bg-white" disabled>
+                                            <option value="">প্রথমে জেলা নির্বাচন করুন</option>
                                         </select>
                                     </div>
 
@@ -903,17 +903,107 @@
 
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function() {
+                                        const divisionDistricts = @json(
+                                            collect(bangladesh_division_districts_map())->mapWithKeys(
+                                                fn ($districts, $division) => [$division => bangladesh_districts_for_division($division)]
+                                            )
+                                        );
+                                        const districtUpazilas = @json(bangladesh_district_upazilas_map());
                                         const searchBtn = document.getElementById('regional-search-btn');
                                         const divisionSelect = document.getElementById('division-select');
+                                        const districtSelect = document.getElementById('district-select');
+                                        const upazilaSelect = document.getElementById('upazila-select');
+
+                                        function resetUpazila() {
+                                            if (!upazilaSelect) {
+                                                return;
+                                            }
+
+                                            upazilaSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+                                            upazilaSelect.value = '';
+                                            upazilaSelect.disabled = true;
+                                        }
+
+                                        function populateUpazilas(district) {
+                                            if (!upazilaSelect) {
+                                                return;
+                                            }
+
+                                            const upazilas = districtUpazilas[district] || [];
+                                            upazilaSelect.innerHTML = '<option value="">উপজেলা নির্বাচন করুন</option>';
+
+                                            if (!district || upazilas.length === 0) {
+                                                resetUpazila();
+                                                return;
+                                            }
+
+                                            upazilas.forEach(function(upazila) {
+                                                const option = document.createElement('option');
+                                                option.value = upazila;
+                                                option.textContent = upazila;
+                                                upazilaSelect.appendChild(option);
+                                            });
+
+                                            upazilaSelect.disabled = false;
+                                        }
+
+                                        function populateDistricts(division) {
+                                            if (!districtSelect) {
+                                                return;
+                                            }
+
+                                            resetUpazila();
+
+                                            const districts = divisionDistricts[division] || [];
+                                            districtSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
+
+                                            if (!division || districts.length === 0) {
+                                                districtSelect.innerHTML = '<option value="">প্রথমে বিভাগ নির্বাচন করুন</option>';
+                                                districtSelect.value = '';
+                                                districtSelect.disabled = true;
+                                                return;
+                                            }
+
+                                            districts.forEach(function(district) {
+                                                const option = document.createElement('option');
+                                                option.value = district;
+                                                option.textContent = district;
+                                                districtSelect.appendChild(option);
+                                            });
+
+                                            districtSelect.disabled = false;
+                                        }
+
+                                        if (divisionSelect) {
+                                            divisionSelect.addEventListener('change', function() {
+                                                populateDistricts(this.value);
+                                            });
+                                        }
+
+                                        if (districtSelect) {
+                                            districtSelect.addEventListener('change', function() {
+                                                populateUpazilas(this.value);
+                                            });
+                                        }
 
                                         if (searchBtn && divisionSelect) {
                                             searchBtn.addEventListener('click', function() {
                                                 const slug = divisionSelect.value;
-                                                if (slug) {
-                                                    window.location.href = '/topic/' + slug;
-                                                } else {
+                                                if (!slug) {
                                                     alert('দয়া করে একটি বিভাগ নির্বাচন করুন।');
+                                                    return;
                                                 }
+
+                                                const params = new URLSearchParams();
+                                                if (districtSelect && districtSelect.value) {
+                                                    params.set('district', districtSelect.value);
+                                                }
+                                                if (upazilaSelect && upazilaSelect.value) {
+                                                    params.set('upazila', upazilaSelect.value);
+                                                }
+
+                                                const queryString = params.toString();
+                                                window.location.href = '/topic/' + encodeURIComponent(slug) + (queryString ? '?' + queryString : '');
                                             });
                                         }
                                     });
