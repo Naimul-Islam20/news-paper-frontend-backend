@@ -137,7 +137,20 @@ function imageTagAttributes(url) {
     const src = escapeHtml(resolved);
     const crossOrigin = isCrossOriginUrl(resolved) ? ' crossorigin="anonymous"' : "";
 
-    return `src="${src}" alt=""${crossOrigin}`;
+    return `src="${src}" alt="" decoding="sync"${crossOrigin}`;
+}
+
+function iconRenderZoom(iconImage, targetSize) {
+    if (!iconImage?.naturalWidth || !iconImage?.naturalHeight) {
+        return 1;
+    }
+
+    const maxDim = Math.max(iconImage.naturalWidth, iconImage.naturalHeight);
+    if (maxDim >= targetSize * 0.75) {
+        return ALT_SEAM_ICON_ZOOM;
+    }
+
+    return Math.min(1, maxDim / targetSize);
 }
 
 function parsePayload(button) {
@@ -381,7 +394,7 @@ function altSeamIconBlockHtml(iconUrl) {
 
     const size = ALT_SEAM_ICON_SIZE;
 
-    return `<div aria-hidden="true" style="position:absolute;left:50%;top:${IMAGE_HEIGHT}px;transform:translate(-50%,-50%);width:${size}px;height:${size}px;border-radius:9999px;overflow:hidden;z-index:5;pointer-events:none;"><img ${imageTagAttributes(iconUrl)} style="display:block;width:100%;height:100%;object-fit:cover;border:0;opacity:${ALT_SEAM_ICON_OPACITY};transform:scale(${ALT_SEAM_ICON_ZOOM});transform-origin:center center;"></div>`;
+    return `<div aria-hidden="true" style="position:absolute;left:50%;top:${IMAGE_HEIGHT}px;transform:translate(-50%,-50%);width:${size}px;height:${size}px;border-radius:9999px;overflow:hidden;z-index:5;pointer-events:none;"><img ${imageTagAttributes(iconUrl)} data-photocard-icon style="display:block;width:100%;height:100%;object-fit:cover;border:0;opacity:${ALT_SEAM_ICON_OPACITY};transform-origin:center center;"></div>`;
 }
 
 function drawImageWatermarkIcon(
@@ -436,8 +449,21 @@ function drawImageWatermarkIcon(
     const zoomDrawX = centerX - drawSize / 2;
     const zoomDrawY = centerY - drawSize / 2;
 
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
     ctx.drawImage(iconImage, sx, sy, sw, sh, zoomDrawX, zoomDrawY, drawSize, drawSize);
     ctx.restore();
+}
+
+function applyIconZoomToDom(iconImage) {
+    if (!iconImage?.naturalWidth) {
+        return;
+    }
+
+    document.querySelectorAll("img[data-photocard-icon]").forEach((img) => {
+        const zoom = iconRenderZoom(iconImage, ALT_SEAM_ICON_SIZE);
+        img.style.transform = `scale(${zoom})`;
+    });
 }
 
 function footerAreaHeightAlt(hasDate, urlFontSize = FOOTER_URL_SIZE_ALT) {
@@ -474,7 +500,7 @@ function buildCardHtml(data) {
         : `<div style="width:100%;height:100%;background:linear-gradient(135deg,${primary} 0%,#0f172a 100%);"></div>`;
 
     const imageIconBlock = data.icon
-        ? `<img ${imageTagAttributes(data.icon)} aria-hidden="true" style="${imageWatermarkStyle()}">`
+        ? `<img ${imageTagAttributes(data.icon)} data-photocard-icon aria-hidden="true" style="${imageWatermarkStyle()}">`
         : "";
 
     const logoBlock = data.logo
@@ -625,22 +651,39 @@ function closeModal() {
 }
 
 function loadImage(url) {
-    return new Promise((resolve) => {
-        const resolved = resolveAssetUrl(url);
-        if (!resolved) {
-            resolve(null);
-            return;
+    const candidates = [];
+
+    const resolved = resolveAssetUrl(url);
+    if (resolved) {
+        candidates.push(resolved);
+        if (resolved.startsWith("/storage/meta/")) {
+            candidates.push(resolved.replace("/storage/meta/", "/meta/"));
+        } else if (resolved.startsWith("/meta/")) {
+            candidates.push("/storage" + resolved);
+        }
+    }
+
+    const tryOne = (src) =>
+        new Promise((resolve) => {
+            const img = new Image();
+            if (isCrossOriginUrl(src)) {
+                img.crossOrigin = "anonymous";
+            }
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = src;
+        });
+
+    return (async () => {
+        for (const src of candidates) {
+            const img = await tryOne(src);
+            if (img) {
+                return img;
+            }
         }
 
-        const img = new Image();
-        if (isCrossOriginUrl(resolved)) {
-            img.crossOrigin = "anonymous";
-        }
-
-        img.onload = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = resolved;
-    });
+        return null;
+    })();
 }
 
 function wrapTextLines(ctx, text, maxWidth) {
@@ -780,7 +823,13 @@ async function renderPhotocardCanvas(data) {
         ctx.fillRect(0, 0, CARD_SIZE, IMAGE_HEIGHT);
     }
 
-    drawImageWatermarkIcon(ctx, iconImage);
+    drawImageWatermarkIcon(
+        ctx,
+        iconImage,
+        null,
+        IMAGE_ICON_WATERMARK_OPACITY,
+        iconImage ? iconRenderZoom(iconImage, IMAGE_ICON_WATERMARK_SIZE) : 1,
+    );
 
     drawUnifiedOverlayGradient(ctx, CARD_SIZE);
 
@@ -963,7 +1012,7 @@ async function renderAltPhotocardCanvas(data) {
             size: ALT_SEAM_ICON_SIZE,
         },
         ALT_SEAM_ICON_OPACITY,
-        ALT_SEAM_ICON_ZOOM,
+        iconImage ? iconRenderZoom(iconImage, ALT_SEAM_ICON_SIZE) : ALT_SEAM_ICON_ZOOM,
     );
 
     ctx.fillStyle = "#ffffff";
@@ -1155,6 +1204,11 @@ async function renderPreview(data) {
     cardAltRoot.innerHTML = buildCardHtmlForVariant(data, inactiveDesign());
 
     await Promise.all([waitForImages(cardRoot), waitForImages(cardAltRoot)]);
+
+    const iconImage = await loadImage(data.icon);
+    if (iconImage) {
+        applyIconZoomToDom(iconImage);
+    }
 
     replaceBrokenImages(cardRoot, data.primaryColor);
     replaceBrokenImages(cardAltRoot, data.primaryColor);

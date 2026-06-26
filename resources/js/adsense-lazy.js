@@ -25,11 +25,109 @@
         return Number.isFinite(parsed) && parsed > 0 ? parsed : 90;
     }
 
-    function slotWidth(frame) {
-        const frameW = frame?.clientWidth || 0;
-        const docW = document.documentElement.clientWidth;
+    function frameWidth(frame) {
+        let w = frame?.clientWidth || 0;
 
-        return Math.max(280, frameW > 0 ? frameW : docW);
+        if (w > 0) {
+            return w;
+        }
+
+        w = frame?.offsetWidth || 0;
+        if (w > 0) {
+            return w;
+        }
+
+        const parent = frame?.parentElement;
+        if (parent) {
+            w = parent.clientWidth || parent.offsetWidth || 0;
+            if (w > 0) {
+                return w;
+            }
+        }
+
+        return frame?.getAttribute('data-ad-layout') === 'box' ? 300 : 320;
+    }
+
+    function boxHeightFromAspect(frame, width, capH) {
+        const styles = getComputedStyle(frame);
+        const ar = styles.aspectRatio;
+
+        if (ar && ar !== 'auto') {
+            if (ar.includes('/')) {
+                const parts = ar.split('/').map((part) => parseFloat(part.trim()));
+
+                if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
+                    return Math.min(capH, Math.round(width * (parts[1] / parts[0])));
+                }
+            } else {
+                const ratio = parseFloat(ar);
+
+                if (Number.isFinite(ratio) && ratio > 0) {
+                    return Math.min(capH, Math.round(width / ratio));
+                }
+            }
+        }
+
+        const maxW = parseInt(styles.getPropertyValue('--ad-max-width'), 10);
+        const maxH = parseInt(styles.getPropertyValue('--ad-max-height'), 10);
+
+        if (maxW > 0 && maxH > 0) {
+            return Math.min(capH, Math.round(width * (maxH / maxW)));
+        }
+
+        return Math.min(capH, Math.round(width * 0.75));
+    }
+
+    function frameMetrics(frame, mobile) {
+        const layout = frame.getAttribute('data-ad-layout') || 'strip';
+        const capH = frameLimit(frame, mobile);
+        const width = frameWidth(frame);
+
+        if (layout === 'box') {
+            const measured = frame.clientHeight;
+            const height =
+                measured > 0 ? Math.min(capH, measured) : boxHeightFromAspect(frame, width, capH);
+
+            return { width, height, layout };
+        }
+
+        return { width, height: capH, layout };
+    }
+
+    function prepareBoxFrame(frame, height) {
+        if (frame.getAttribute('data-ad-layout') !== 'box' || height <= 0) {
+            return;
+        }
+
+        frame.style.height = height + 'px';
+        frame.style.minHeight = height + 'px';
+    }
+
+    function fitBoxIframe(iframe, frame, targetH) {
+        const frameW = frame.clientWidth || frameWidth(frame);
+        const frameH = frame.clientHeight > 0 ? frame.clientHeight : targetH;
+
+        if (frameW < 1 || frameH < 1) {
+            return;
+        }
+
+        let adW = iframe.offsetWidth;
+        let adH = iframe.offsetHeight;
+
+        if (!adW || !adH) {
+            adW = parseInt(iframe.getAttribute('width'), 10) || frameW;
+            adH = parseInt(iframe.getAttribute('height'), 10) || frameH;
+        }
+
+        const scale = Math.min(frameW / adW, frameH / adH, 1);
+        const w = Math.max(1, Math.round(adW * scale));
+        const h = Math.max(1, Math.round(adH * scale));
+
+        iframe.style.width = w + 'px';
+        iframe.style.height = h + 'px';
+        iframe.style.maxWidth = '100%';
+        iframe.style.maxHeight = frameH + 'px';
+        iframe.style.marginInline = 'auto';
     }
 
     function clampIframe(ins) {
@@ -39,12 +137,20 @@
             return false;
         }
 
-        const maxH = frameLimit(frame, isMobile());
-        iframe.style.width = '100%';
-        iframe.style.maxWidth = '100%';
-        iframe.style.maxHeight = maxH + 'px';
-        iframe.style.height = 'auto';
+        const { width, height, layout } = frameMetrics(frame, isMobile());
+
         iframe.style.display = 'block';
+
+        if (layout === 'box') {
+            prepareBoxFrame(frame, height);
+            fitBoxIframe(iframe, frame, height);
+        } else {
+            iframe.style.width = '100%';
+            iframe.style.maxWidth = '100%';
+            iframe.style.maxHeight = height + 'px';
+            iframe.style.height = 'auto';
+            iframe.style.marginInline = 'auto';
+        }
 
         return true;
     }
@@ -56,16 +162,18 @@
         }
 
         const mobile = isMobile();
-        const layout = frame.getAttribute('data-ad-layout') || 'strip';
-        const maxH = frameLimit(frame, mobile);
-        const width = slotWidth(frame);
+        const { width, height, layout } = frameMetrics(frame, mobile);
+
+        if (layout === 'box') {
+            prepareBoxFrame(frame, height);
+        }
 
         ins.style.width = '100%';
         ins.style.maxWidth = '100%';
-        ins.style.maxHeight = maxH + 'px';
+        ins.style.maxHeight = height + 'px';
         ins.setAttribute('data-ad-format', layout === 'strip' ? 'horizontal' : 'rectangle');
         ins.setAttribute('data-ad-width', String(Math.round(width)));
-        ins.setAttribute('data-ad-height', String(maxH));
+        ins.setAttribute('data-ad-height', String(Math.round(height)));
     }
 
     function fillUnit(ins) {
@@ -103,6 +211,15 @@
                 hideSlot(ins);
             }
         }, 8000);
+
+        window.setTimeout(() => clampIframe(ins), 1500);
+        window.setTimeout(() => clampIframe(ins), 3000);
+    }
+
+    function clampAllBoxAds() {
+        document.querySelectorAll('ins.adsbygoogle[data-ad-loaded="1"]').forEach((ins) => {
+            clampIframe(ins);
+        });
     }
 
     function loadScript(client) {
@@ -207,6 +324,12 @@
         } else {
             window.addEventListener('load', run, { once: true });
         }
+
+        let resizeTimer = 0;
+        window.addEventListener('resize', () => {
+            window.clearTimeout(resizeTimer);
+            resizeTimer = window.setTimeout(clampAllBoxAds, 200);
+        });
     }
 
     scheduleInit();

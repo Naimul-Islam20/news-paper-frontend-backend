@@ -87,7 +87,7 @@ if (! function_exists('storage_image_url')) {
 
 if (! function_exists('storage_image_src')) {
     /**
-     * ফ্রন্টএন্ড embed (photocard ইত্যাদি) — same-origin path, www/APP_URL mismatch এ icon ভাঙে না।
+     * ফ্রন্টএন্ড embed — storage_image_url এর মতোই path (live এ ভুল /storage/ path রোধ)।
      */
     function storage_image_src(?string $path): string
     {
@@ -95,16 +95,95 @@ if (! function_exists('storage_image_src')) {
             return '';
         }
 
-        $url = storage_image_url($path);
-        $parts = parse_url($url);
+        if (Str::startsWith($path, ['http://', 'https://'])) {
+            $parts = parse_url($path);
 
-        if (! is_array($parts) || empty($parts['path'])) {
-            return $url;
+            return ($parts['path'] ?? '/') . (isset($parts['query']) && $parts['query'] !== '' ? '?' . $parts['query'] : '');
         }
 
-        $query = isset($parts['query']) && $parts['query'] !== '' ? '?' . $parts['query'] : '';
+        $path = ltrim($path, '/');
 
-        return $parts['path'] . $query;
+        $directPublicPrefixes = ['posts/', 'videos/', 'galleries/', 'users/', 'advertisements/', 'pages/', 'meta/'];
+        $isManagedUploadPath = false;
+        foreach ($directPublicPrefixes as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                $isManagedUploadPath = true;
+                break;
+            }
+        }
+
+        if ($isManagedUploadPath && is_file(public_path($path))) {
+            return '/' . $path;
+        }
+
+        if (Storage::disk('public')->exists($path)) {
+            return '/storage/' . $path;
+        }
+
+        if ($isManagedUploadPath) {
+            return '/' . $path;
+        }
+
+        return '/storage/' . $path;
+    }
+}
+
+if (! function_exists('photocard_image_pixel_count')) {
+    function photocard_image_pixel_count(?string $path): int
+    {
+        if (! filled($path)) {
+            return 0;
+        }
+
+        $relative = ltrim($path, '/');
+        $candidates = [
+            public_path($relative),
+            storage_path('app/public/' . $relative),
+        ];
+
+        foreach ($candidates as $full) {
+            if (! is_file($full)) {
+                continue;
+            }
+
+            $size = @getimagesize($full);
+            if (! is_array($size)) {
+                continue;
+            }
+
+            return (int) ($size[0] * $size[1]);
+        }
+
+        return 0;
+    }
+}
+
+if (! function_exists('photocard_icon_src')) {
+    /**
+     * ফটোকার্ড ওয়াটারমার্ক — সাইট আইকন/লোগোর মধ্যে বড় ও স্পষ্ট ফাইল (live এ ছোট favicon ঝাপসা হওয়া রোধ)।
+     */
+    function photocard_icon_src(?\App\Models\SiteMeta $meta): string
+    {
+        if (! $meta) {
+            return '';
+        }
+
+        $bestPath = null;
+        $bestPixels = 0;
+
+        foreach ([$meta->site_icon, $meta->site_logo] as $candidate) {
+            if (! filled($candidate)) {
+                continue;
+            }
+
+            $pixels = photocard_image_pixel_count($candidate);
+            if ($pixels >= $bestPixels) {
+                $bestPixels = $pixels;
+                $bestPath = $candidate;
+            }
+        }
+
+        return $bestPath ? storage_image_src($bestPath) : '';
     }
 }
 
