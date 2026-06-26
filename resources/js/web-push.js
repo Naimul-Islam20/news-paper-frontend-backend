@@ -54,11 +54,13 @@ function supportsPush() {
 function showPrompt(root) {
     root.classList.remove('hidden');
     root.setAttribute('aria-hidden', 'false');
+    window.dispatchEvent(new CustomEvent('push-prompt-toggle'));
 }
 
 function hidePrompt(root, rememberDismiss = false) {
     root.classList.add('hidden');
     root.setAttribute('aria-hidden', 'true');
+    window.dispatchEvent(new CustomEvent('push-prompt-toggle'));
 
     if (rememberDismiss) {
         try {
@@ -223,10 +225,21 @@ function initWebPushPrompt() {
     const swUrl = root.dataset.swUrl || '/sw.js';
     const yesBtn = root.querySelector('[data-push-yes]');
     const noBtn = root.querySelector('[data-push-no]');
+    const noBtnSecondary = root.querySelector('[data-push-no-secondary]');
 
-    if (!configUrl || !subscribeUrl || !yesBtn || !noBtn) {
+    if (!configUrl || !subscribeUrl || !yesBtn) {
         return;
     }
+
+    const dismissPrompt = () => hidePrompt(root, true);
+
+    const bindNoButtons = () => {
+        [noBtn, noBtnSecondary].forEach((btn) => {
+            if (btn) {
+                btn.addEventListener('click', dismissPrompt);
+            }
+        });
+    };
 
     let config = null;
     let subscribeInFlight = false;
@@ -238,7 +251,12 @@ function initWebPushPrompt() {
 
         subscribeInFlight = true;
         setYesLoading(yesBtn, true);
-        noBtn.disabled = true;
+        if (noBtn) {
+            noBtn.disabled = true;
+        }
+        if (noBtnSecondary) {
+            noBtnSecondary.disabled = true;
+        }
 
         try {
             sessionStorage.setItem(STORAGE_PENDING, '1');
@@ -261,11 +279,21 @@ function initWebPushPrompt() {
                 } catch (retryError) {
                     console.error('Push subscribe retry failed:', retryError);
                     setYesLoading(yesBtn, false);
-                    noBtn.disabled = false;
+                    if (noBtn) {
+                        noBtn.disabled = false;
+                    }
+                    if (noBtnSecondary) {
+                        noBtnSecondary.disabled = false;
+                    }
                 }
             } else {
                 setYesLoading(yesBtn, false);
-                noBtn.disabled = false;
+                if (noBtn) {
+                    noBtn.disabled = false;
+                }
+                if (noBtnSecondary) {
+                    noBtnSecondary.disabled = false;
+                }
             }
         } finally {
             subscribeInFlight = false;
@@ -312,9 +340,7 @@ function initWebPushPrompt() {
                 { passive: true },
             );
 
-            noBtn.addEventListener('click', () => {
-                hidePrompt(root, true);
-            });
+            bindNoButtons();
 
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState !== 'visible' || !config) {

@@ -297,6 +297,7 @@
                 new ResizeObserver(syncMainHeaderOffset).observe(shell);
             }
             window.addEventListener('load', syncMainHeaderOffset, { once: true });
+            window.addEventListener('push-prompt-toggle', syncMainHeaderOffset);
         });
 
         function scrollToTopGlobal() {
