@@ -130,20 +130,20 @@
     <link rel="icon" href="{{ storage_image_url($siteMeta->site_icon) }}" type="image/png">
     @endif
 
-    {{-- Open Graph & Twitter Card: শেয়ার প্রিভিউ — ইমেজ + টাইটেল + site domain --}}
+    {{-- Open Graph: শেয়ার প্রিভিউ — ইমেজ + টাইটেল; image-এর নিচের site name/domain বাদ (নিচের URL domain থাকবে) --}}
     @php
     $hasShareMeta = (isset($metaImage) && $metaImage !== '') || isset($ogTitle);
     $shareTitle = $ogTitle ?? $title ?? site_name();
     $sharePageUrl = isset($shareUrl) && trim((string) $shareUrl) !== '' ? trim((string) $shareUrl) : url()->current();
-    $shareSiteLabel = share_site_label($sharePageUrl);
+    $shareDescription = isset($ogDescription) ? trim((string) $ogDescription) : '';
     @endphp
     @if($hasShareMeta)
     <link rel="canonical" href="{{ $sharePageUrl }}">
     <meta property="og:type" content="article">
     <meta property="og:url" content="{{ $sharePageUrl }}">
     <meta property="og:title" content="{{ $shareTitle }}">
-    @if($shareSiteLabel !== '')
-    <meta property="og:description" content="{{ $shareSiteLabel }}">
+    @if($shareDescription !== '')
+    <meta property="og:description" content="{{ $shareDescription }}">
     @endif
     @if(isset($metaImage) && trim($metaImage) !== '')
     @php
@@ -155,12 +155,11 @@
     <meta property="og:image:secure_url" content="{{ $shareImageUrlHttps }}">
     <meta name="twitter:image" content="{{ $shareImageUrlHttps }}">
     @endif
-    <meta property="og:site_name" content="{{ site_name() }}">
     <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $shareTitle }}">
-    @if($shareSiteLabel !== '')
-    <meta name="twitter:description" content="{{ $shareSiteLabel }}">
+    @if($shareDescription !== '')
+    <meta name="twitter:description" content="{{ $shareDescription }}">
     @endif
     @else
     {{-- সাধারণ পেজ: শেয়ার করলে সাইটের ডিফল্ট --}}
