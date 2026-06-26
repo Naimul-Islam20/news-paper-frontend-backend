@@ -85,6 +85,29 @@ if (! function_exists('storage_image_url')) {
     }
 }
 
+if (! function_exists('storage_image_src')) {
+    /**
+     * ফ্রন্টএন্ড embed (photocard ইত্যাদি) — same-origin path, www/APP_URL mismatch এ icon ভাঙে না।
+     */
+    function storage_image_src(?string $path): string
+    {
+        if (! $path) {
+            return '';
+        }
+
+        $url = storage_image_url($path);
+        $parts = parse_url($url);
+
+        if (! is_array($parts) || empty($parts['path'])) {
+            return $url;
+        }
+
+        $query = isset($parts['query']) && $parts['query'] !== '' ? '?' . $parts['query'] : '';
+
+        return $parts['path'] . $query;
+    }
+}
+
 if (! function_exists('store_public_upload')) {
     /**
      * আপলোড ফাইল public/{directory}/ এ সেভ করে DB তে রাখার জন্য রিলেটিভ পাথ রিটার্ন করে।

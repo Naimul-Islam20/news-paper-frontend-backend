@@ -99,15 +99,43 @@ function unifiedOverlayGradientCss() {
 function isCrossOriginUrl(url) {
     try {
         const parsed = new URL(url, window.location.href);
-        return parsed.origin !== window.location.origin;
+        const pageHost = window.location.hostname.replace(/^www\./i, "");
+        const assetHost = parsed.hostname.replace(/^www\./i, "");
+
+        return assetHost !== pageHost || parsed.protocol !== window.location.protocol;
     } catch {
         return false;
     }
 }
 
+function resolveAssetUrl(url) {
+    if (!url) {
+        return url;
+    }
+
+    if (url.startsWith("/")) {
+        return url;
+    }
+
+    try {
+        const parsed = new URL(url, window.location.href);
+        const pageHost = window.location.hostname.replace(/^www\./i, "");
+        const assetHost = parsed.hostname.replace(/^www\./i, "");
+
+        if (assetHost === pageHost) {
+            return parsed.pathname + parsed.search;
+        }
+    } catch {
+        return url;
+    }
+
+    return url;
+}
+
 function imageTagAttributes(url) {
-    const src = escapeHtml(url);
-    const crossOrigin = isCrossOriginUrl(url) ? ' crossorigin="anonymous"' : "";
+    const resolved = resolveAssetUrl(url);
+    const src = escapeHtml(resolved);
+    const crossOrigin = isCrossOriginUrl(resolved) ? ' crossorigin="anonymous"' : "";
 
     return `src="${src}" alt=""${crossOrigin}`;
 }
@@ -381,8 +409,6 @@ function drawImageWatermarkIcon(
         centerY = drawY + size / 2;
     }
 
-    const drawX = centerX - size / 2;
-    const drawY = centerY - size / 2;
     const radius = size / 2;
 
     ctx.save();
@@ -600,19 +626,20 @@ function closeModal() {
 
 function loadImage(url) {
     return new Promise((resolve) => {
-        if (!url) {
+        const resolved = resolveAssetUrl(url);
+        if (!resolved) {
             resolve(null);
             return;
         }
 
         const img = new Image();
-        if (isCrossOriginUrl(url)) {
+        if (isCrossOriginUrl(resolved)) {
             img.crossOrigin = "anonymous";
         }
 
         img.onload = () => resolve(img);
         img.onerror = () => resolve(null);
-        img.src = url;
+        img.src = resolved;
     });
 }
 

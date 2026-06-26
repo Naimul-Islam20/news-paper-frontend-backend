@@ -192,13 +192,7 @@
     @if ($__primaryOk)
     <style>
         :root {
-            --color-primary: {
-                    {
-                    $__primary
-                }
-            }
-
-            !important;
+            --color-primary: {{ $__primary }} !important;
             --site-name: "{{ site_name() }}";
         }
     </style>
