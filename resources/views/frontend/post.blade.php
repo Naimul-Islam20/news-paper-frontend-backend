@@ -12,7 +12,7 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
 
                     <x-ad-slot-display slug="details_below_menu" variant="banner" wrapper-class="no-print" />
 
-                    <div class="py-4 md:py-10 min-h-screen bg-white">
+                    <div class="pt-2 pb-4 md:pt-4 md:pb-10 min-h-screen bg-white">
                         <div class="container">
                             @php
                             \Carbon\Carbon::setLocale('bn');

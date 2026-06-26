@@ -3,7 +3,7 @@
 
         <x-ad-slot-display slug="category_below_menu" variant="banner" />
 
-        <div class="py-4 md:py-10 min-h-screen">
+        <div class="pt-2 pb-4 md:pt-4 md:pb-10 min-h-screen">
             <div class="container">
                 @php \Carbon\Carbon::setLocale('bn'); @endphp
 

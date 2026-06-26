@@ -7,7 +7,7 @@
 
         <div class="container">
             <!-- Hero Section -->
-            <section class="flex flex-col lg:grid lg:grid-cols-[2.7fr_6.3fr_3fr] gap-6 lg:gap-3 mb-4 border-b border-custom pb-4">
+            <section class="flex flex-col lg:grid lg:grid-cols-[2.7fr_6.3fr_3fr] gap-6 lg:gap-3 mb-3 border-b border-custom pb-3">
                 <!-- Left Column: Top Stories (Order 2 on mobile, Order 1 on Desktop) -->
                 <div class="lg:border-r border-custom lg:pr-3 text-left order-2 lg:order-1">
                     @forelse($hero_layer_4_posts as $index => $post)

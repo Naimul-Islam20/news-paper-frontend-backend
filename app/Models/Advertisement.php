@@ -178,9 +178,9 @@ class Advertisement extends Model
 
         $title = 'স্লট অ্যাড';
         if ($this->starts_at && $this->ends_at) {
-            $title .= ' ('.$this->starts_at->format('d M Y, H:i').' – '.$this->ends_at->format('d M Y, H:i').')';
+            $title .= ' (' . $this->starts_at->format('d M Y, H:i') . ' – ' . $this->ends_at->format('d M Y, H:i') . ')';
         } elseif ($this->ends_at) {
-            $title .= ' (মেয়াদ শেষ '.$this->ends_at->format('d M Y, H:i').')';
+            $title .= ' (মেয়াদ শেষ ' . $this->ends_at->format('d M Y, H:i') . ')';
         }
 
         AdvertisementQueueItem::query()->create([
@@ -218,7 +218,7 @@ class Advertisement extends Model
     {
         static::query()
             ->orderBy('id')
-            ->each(fn (self $ad) => $ad->archiveExpiredSlotIfNeeded());
+            ->each(fn(self $ad) => $ad->archiveExpiredSlotIfNeeded());
     }
 
     /**
@@ -479,7 +479,7 @@ class Advertisement extends Model
     {
         $ad = static::query()
             ->where('slug', $slug)
-            ->with(['queueItems' => fn ($q) => $q->whereNull('expired_at')->orderBy('sort_order')->orderBy('id')])
+            ->with(['queueItems' => fn($q) => $q->whereNull('expired_at')->orderBy('sort_order')->orderBy('id')])
             ->first();
 
         if (! $ad) {
@@ -517,7 +517,7 @@ class Advertisement extends Model
      */
     public function mediaSpec(): ?array
     {
-        $spec = config('advertisement_slots.media_specs.'.$this->slug);
+        $spec = config('advertisement_slots.media_specs.' . $this->slug);
 
         return is_array($spec) ? $spec : null;
     }
@@ -543,6 +543,6 @@ class Advertisement extends Model
             return null;
         }
 
-        return 'রেশিও '.$spec['ratio'].' · '.$spec['size'];
+        return 'রেশিও ' . $spec['ratio'] . ' · ' . $spec['size'];
     }
 }

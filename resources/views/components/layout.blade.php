@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script>
-        (function () {
+        (function() {
             var STORAGE_KEY = 'site_lang';
 
             function readPref() {
@@ -42,7 +42,7 @@
                     }
                 }
 
-                domains.forEach(function (domain) {
+                domains.forEach(function(domain) {
                     var cookie = 'googtrans=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
                     if (domain) {
                         cookie += ';domain=' + domain;
@@ -80,8 +80,8 @@
 
             if (wantsEnglish) {
                 document.documentElement.classList.add('site-lang-en');
-                document.addEventListener('DOMContentLoaded', function () {
-                    document.querySelectorAll('[data-placeholder-en]').forEach(function (el) {
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelectorAll('[data-placeholder-en]').forEach(function(el) {
                         el.placeholder = el.getAttribute('data-placeholder-en');
                     });
                 });
@@ -104,7 +104,7 @@
         }
     </style>
     <script>
-        (function () {
+        (function() {
             function forceVisible() {
                 document.documentElement.classList.remove('lang-pending-en');
                 if (document.body) {
@@ -185,9 +185,6 @@
     @endif
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @if(google_adsense_configured())
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ google_adsense_client() }}" crossorigin="anonymous"></script>
-    @endif
     @php
     $__primary = optional($siteMeta)->primary_color ?? null;
     $__primaryOk = is_string($__primary) && preg_match('/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/', $__primary);
@@ -195,7 +192,13 @@
     @if ($__primaryOk)
     <style>
         :root {
-            --color-primary: {{ $__primary }} !important;
+            --color-primary: {
+                    {
+                    $__primary
+                }
+            }
+
+            !important;
             --site-name: "{{ site_name() }}";
         }
     </style>
@@ -213,12 +216,12 @@
     <div id="google_translate_element" class="hidden" aria-hidden="true"></div>
 
     <script>
-        (function () {
+        (function() {
             if (!window.__siteLangEn) {
                 return;
             }
 
-            window.googleTranslateElementInit = function () {
+            window.googleTranslateElementInit = function() {
                 new google.translate.TranslateElement({
                     pageLanguage: 'bn',
                     includedLanguages: 'bn,en',

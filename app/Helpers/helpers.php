@@ -539,11 +539,11 @@ if (! function_exists('normalize_google_adsense_client')) {
         }
 
         if (preg_match('/^(?:ca-pub-|pub-)(\d+)$/i', preg_replace('/\s+/', '', $raw), $m)) {
-            return 'ca-pub-'.$m[1];
+            return 'ca-pub-' . $m[1];
         }
 
         if (preg_match('/^\d+$/', preg_replace('/\s+/', '', $raw))) {
-            return 'ca-pub-'.preg_replace('/\s+/', '', $raw);
+            return 'ca-pub-' . preg_replace('/\s+/', '', $raw);
         }
 
         return null;
@@ -607,6 +607,34 @@ if (! function_exists('google_adsense_slot_for')) {
     }
 }
 
+if (! function_exists('ad_show_google')) {
+    /**
+     * ফ্রন্টে এই স্লটে Google Ad দেখানো হবে কিনা (প্রতি পেজে সীমা + একই slug একবার)।
+     */
+    function ad_show_google(?\App\Models\Advertisement $ad): bool
+    {
+        if (! $ad || ! $ad->displayUsesGoogleAd()) {
+            return false;
+        }
+
+        static $claimed = [];
+        $key = (string) ($ad->slug ?? $ad->id);
+        if (array_key_exists($key, $claimed)) {
+            return $claimed[$key];
+        }
+
+        static $count = 0;
+        $max = max(1, (int) config('advertisement_slots.google_ads_max_per_page', 2));
+        if ($count >= $max) {
+            return $claimed[$key] = false;
+        }
+
+        $count++;
+
+        return $claimed[$key] = true;
+    }
+}
+
 if (! function_exists('ad_media_spec_dimensions')) {
     /**
      * config/advertisement_slots media_specs.size → ['width' => int, 'height' => int]
@@ -642,19 +670,24 @@ if (! function_exists('ad_slot_box_style')) {
     {
         $dims = ad_media_spec_dimensions($ad?->mediaSpec());
         if (! $dims) {
+            $stripMobileH = 90;
+            $boxMobileH = 240;
+
             return $layout === 'strip'
-                ? 'width:100%;height:90px;min-height:90px;max-height:90px;--ad-max-width:100%;--ad-max-height:90px;'
-                : 'width:100%;aspect-ratio:4/3;max-height:240px;--ad-max-width:100%;--ad-max-height:240px;';
+                ? "width:100%;height:90px;min-height:90px;max-height:90px;--ad-max-width:100%;--ad-max-height:90px;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$stripMobileH}px;"
+                : "width:100%;aspect-ratio:4/3;max-height:240px;--ad-max-width:100%;--ad-max-height:240px;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$boxMobileH}px;";
         }
 
         $width = $dims['width'];
         $height = $dims['height'];
+        $mobileMaxH = $layout === 'strip' ? $height : min($height, 240);
+        $mobileVars = "--ad-mobile-max-width:100%;--ad-mobile-max-height:{$mobileMaxH}px;";
 
         if ($layout === 'strip') {
-            return "width:100%;max-width:{$width}px;height:{$height}px;min-height:{$height}px;max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;";
+            return "width:100%;max-width:{$width}px;height:{$height}px;min-height:{$height}px;max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;{$mobileVars}";
         }
 
-        return "width:100%;max-width:{$width}px;aspect-ratio:{$width}/{$height};max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;";
+        return "width:100%;max-width:{$width}px;aspect-ratio:{$width}/{$height};max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;{$mobileVars}";
     }
 }
 
@@ -677,7 +710,7 @@ if (! function_exists('ad_has_media')) {
 }
 
 if (! function_exists('ad_should_display')) {
-    /** ফ্রন্টে এই স্লটে কিছু দেখানো উচিত কিনা (local বা Google)। */
+    /** ফ্রন্টে এই স্লটে কিছু দেখানোর যোগ্য কিনা (local বা Google eligible)। */
     function ad_should_display(?\App\Models\Advertisement $ad): bool
     {
         if (! $ad) {
@@ -912,7 +945,7 @@ if (! function_exists('photocard_site_domain')) {
         }
 
         if ($withWww) {
-            $host = 'www.'.$host;
+            $host = 'www.' . $host;
         }
 
         return $host;
@@ -1190,31 +1223,84 @@ if (! function_exists('bangladesh_division_districts_map')) {
     {
         return [
             'ঢাকা' => [
-                'ঢাকা', 'ফরিদপুর', 'গাজীপুর', 'গোপালগঞ্জ', 'কিশোরগঞ্জ', 'মাদারীপুর', 'মানিকগঞ্জ',
-                'মুন্সিগঞ্জ', 'নারায়ণগঞ্জ', 'নরসিংদী', 'রাজবারী', 'শরীয়তপুর', 'টাঙ্গাইল',
+                'ঢাকা',
+                'ফরিদপুর',
+                'গাজীপুর',
+                'গোপালগঞ্জ',
+                'কিশোরগঞ্জ',
+                'মাদারীপুর',
+                'মানিকগঞ্জ',
+                'মুন্সিগঞ্জ',
+                'নারায়ণগঞ্জ',
+                'নরসিংদী',
+                'রাজবারী',
+                'শরীয়তপুর',
+                'টাঙ্গাইল',
             ],
             'চট্টগ্রাম' => [
-                'বান্দরবান', 'ব্রাহ্মণবাড়িয়া', 'চাঁদপুর', 'চট্টগ্রাম', 'কুমিল্লা', 'কক্সবাজার',
-                'ফেনী', 'খাগড়াছড়ি', 'লক্ষ্মীপুর', 'নোয়াখালী', 'রাঙ্গামাটি',
+                'বান্দরবান',
+                'ব্রাহ্মণবাড়িয়া',
+                'চাঁদপুর',
+                'চট্টগ্রাম',
+                'কুমিল্লা',
+                'কক্সবাজার',
+                'ফেনী',
+                'খাগড়াছড়ি',
+                'লক্ষ্মীপুর',
+                'নোয়াখালী',
+                'রাঙ্গামাটি',
             ],
             'রাজশাহী' => [
-                'বগুড়া', 'চাঁপাইনবাবগঞ্জ', 'জয়পুরহাট', 'নওগাঁ', 'নাটোর', 'পাবনা', 'রাজশাহী', 'সিরাজগঞ্জ',
+                'বগুড়া',
+                'চাঁপাইনবাবগঞ্জ',
+                'জয়পুরহাট',
+                'নওগাঁ',
+                'নাটোর',
+                'পাবনা',
+                'রাজশাহী',
+                'সিরাজগঞ্জ',
             ],
             'খুলনা' => [
-                'বাগেরহাট', 'চুয়াডাঙ্গা', 'যশোর', 'ঝিনাইদহ', 'খুলনা', 'কুষ্টিয়া', 'মাগুরা',
-                'মেহেরপুর', 'নড়াইল', 'সাতক্ষীরা',
+                'বাগেরহাট',
+                'চুয়াডাঙ্গা',
+                'যশোর',
+                'ঝিনাইদহ',
+                'খুলনা',
+                'কুষ্টিয়া',
+                'মাগুরা',
+                'মেহেরপুর',
+                'নড়াইল',
+                'সাতক্ষীরা',
             ],
             'বরিশাল' => [
-                'বরগুনা', 'বরিশাল', 'ভোলা', 'ঝালকাঠি', 'পটুয়াখালী', 'পিরোজপুর',
+                'বরগুনা',
+                'বরিশাল',
+                'ভোলা',
+                'ঝালকাঠি',
+                'পটুয়াখালী',
+                'পিরোজপুর',
             ],
             'সিলেট' => [
-                'হবিগঞ্জ', 'মৌলভীবাজার', 'সুনামগঞ্জ', 'সিলেট',
+                'হবিগঞ্জ',
+                'মৌলভীবাজার',
+                'সুনামগঞ্জ',
+                'সিলেট',
             ],
             'রংপুর' => [
-                'দিনাজপুর', 'গাইবান্ধা', 'কুড়িগ্রাম', 'লালমনিরহাট', 'নীলফামারী', 'পঞ্চগড়', 'রংপুর', 'ঠাকুরগাঁও',
+                'দিনাজপুর',
+                'গাইবান্ধা',
+                'কুড়িগ্রাম',
+                'লালমনিরহাট',
+                'নীলফামারী',
+                'পঞ্চগড়',
+                'রংপুর',
+                'ঠাকুরগাঁও',
             ],
             'ময়মনসিংহ' => [
-                'জামালপুর', 'ময়মনসিংহ', 'নেত্রকোণা', 'শেরপুর',
+                'জামালপুর',
+                'ময়মনসিংহ',
+                'নেত্রকোণা',
+                'শেরপুর',
             ],
         ];
     }

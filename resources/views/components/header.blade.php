@@ -339,7 +339,7 @@
 
         <nav
             class="z-50 bg-white md:border-b border-slate-200 transition-all duration-300"
-            :class="isSticky ? 'py-1 md:fixed md:left-0 md:w-full md:py-1.5 max-md:shadow-[0_10px_32px_-6px_rgba(15,23,42,0.16),0_-10px_32px_-6px_rgba(15,23,42,0.16)] md:shadow-none' : 'relative py-1.5 md:pt-3 md:pb-0.5 max-md:shadow-[0_6px_22px_-4px_rgba(15,23,42,0.12),0_-6px_22px_-4px_rgba(15,23,42,0.12)] md:shadow-none'"
+            :class="isSticky ? 'py-1 md:fixed md:left-0 md:w-full md:py-1 max-md:shadow-[0_10px_32px_-6px_rgba(15,23,42,0.16),0_-10px_32px_-6px_rgba(15,23,42,0.16)] md:shadow-none' : 'relative py-1 md:pt-2 md:pb-0 max-md:shadow-[0_6px_22px_-4px_rgba(15,23,42,0.12),0_-6px_22px_-4px_rgba(15,23,42,0.12)] md:shadow-none'"
             :style="isSticky ? (hasHeaderAd ? { top: headerAdHeight + 'px' } : { top: '0px' }) : null">
             <div class="container">
                 <div
