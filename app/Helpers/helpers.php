@@ -677,10 +677,14 @@ if (! function_exists('ad_has_media')) {
 }
 
 if (! function_exists('ad_should_display')) {
-    /** ফ্রন্টে local ad দেখানো উচিত কিনা। */
+    /** ফ্রন্টে এই স্লটে কিছু দেখানো উচিত কিনা (local বা Google)। */
     function ad_should_display(?\App\Models\Advertisement $ad): bool
     {
-        return $ad?->displayUsesLocalAd() ?? false;
+        if (! $ad) {
+            return false;
+        }
+
+        return $ad->displayUsesLocalAd() || $ad->displayUsesGoogleAd();
     }
 }
 
@@ -692,11 +696,15 @@ if (! function_exists('ad_slot')) {
     function ad_slot(string $slug): ?\App\Models\Advertisement
     {
         $ad = \App\Models\Advertisement::getBySlug($slug);
-        if ($ad && $ad->displayUsesLocalAd()) {
+        if (! $ad) {
+            return null;
+        }
+
+        if ($ad->displayUsesLocalAd()) {
             advertisement_bump_view_once($ad);
         }
 
-        return $ad;
+        return ad_should_display($ad) ? $ad : null;
     }
 }
 
@@ -881,9 +889,9 @@ if (! function_exists('share_site_label')) {
 
 if (! function_exists('photocard_site_domain')) {
     /**
-     * Photocard footer-এ সম্পূর্ণ domain (যেমন www.example.com)।
+     * Photocard footer-এ domain। $withWww=true হলে www.example.com, false হলে example.com।
      */
-    function photocard_site_domain(?string $pageUrl = null): string
+    function photocard_site_domain(?string $pageUrl = null, bool $withWww = true): string
     {
         $url = $pageUrl ?? front_home_url();
         $host = parse_url($url, PHP_URL_HOST);
@@ -897,12 +905,13 @@ if (! function_exists('photocard_site_domain')) {
         }
 
         $host = strtolower($host);
+        $host = preg_replace('/^www\./i', '', $host) ?? $host;
 
         if ($host === 'localhost' || filter_var($host, FILTER_VALIDATE_IP)) {
             return $host;
         }
 
-        if (! str_starts_with($host, 'www.')) {
+        if ($withWww) {
             $host = 'www.'.$host;
         }
 
@@ -1294,7 +1303,36 @@ if (! function_exists('bangladesh_upazilas_for_district')) {
             return [];
         }
 
-        return bangladesh_district_upazilas_map()[$district] ?? [];
+        $map = bangladesh_district_upazilas_map();
+
+        if (isset($map[$district])) {
+            $upazilas = $map[$district];
+        } else {
+            $target = bangladesh_normalize_location_name($district);
+            $upazilas = [];
+
+            foreach ($map as $key => $list) {
+                if (bangladesh_normalize_location_name($key) === $target) {
+                    $upazilas = $list;
+                    break;
+                }
+            }
+        }
+
+        if ($upazilas === []) {
+            return [];
+        }
+
+        $upazilas = array_values($upazilas);
+
+        if (class_exists(\Collator::class)) {
+            $collator = new \Collator('bn_BD');
+            $collator->sort($upazilas);
+        } else {
+            sort($upazilas, SORT_STRING);
+        }
+
+        return $upazilas;
     }
 }
 

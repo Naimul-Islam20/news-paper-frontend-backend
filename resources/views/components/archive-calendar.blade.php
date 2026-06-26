@@ -26,12 +26,11 @@ $currentYear = (int) now()->year;
 $currentMonth = (int) now()->month;
 $postDates = collect($datesWithPosts)->flip();
 $selectedKey = $selectedDate?->format('Y-m-d');
-$activeDate = ($selectedDate ?? $today)->copy()->startOfDay();
-$activeKey = $activeDate->format('Y-m-d');
+$activeKey = $selectedKey;
 $years = ! empty($archiveYears) ? $archiveYears : [$monthStart->year];
 @endphp
 
-<div class="archive-calendar-wrap border border-slate-300 bg-[#EFEFEF] p-3 md:p-4 notranslate">
+<div class="archive-calendar-wrap border border-slate-300 bg-[#EFEFEF] p-3 md:p-4 notranslate" data-calendar-month="{{ $monthStart->format('Y-m') }}">
     <div class="grid grid-cols-2 gap-2 mb-3">
         <select
             class="archive-month-select w-full border border-slate-300 bg-white px-2 py-1.5 text-xs md:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary rounded-sm"
@@ -60,23 +59,32 @@ $years = ! empty($archiveYears) ? $archiveYears : [$monthStart->year];
     </div>
 
     <div class="flex items-center justify-between mb-3">
-        <a href="{{ route('archive', array_filter(['month' => $prevMonth, 'date' => $selectedKey])) }}"
-            class="p-1 text-slate-800 hover:text-primary transition-colors"
+        <button
+            type="button"
+            data-archive-cal-month="{{ $prevMonth }}"
+            class="archive-cal-nav p-1 text-slate-800 hover:text-primary transition-colors"
             aria-label="আগের মাস">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-        </a>
-        <div class="text-sm md:text-base font-bold text-slate-900 text-center">
-            {{ $toBn($activeDate->day) }} {{ $bnMonths[$activeDate->month - 1] }} {{ $toBn($activeDate->year) }}
+        </button>
+        <div class="archive-cal-label text-sm md:text-base font-bold text-slate-900 text-center">
+            @if($selectedDate)
+                {{ $toBn($selectedDate->day) }} {{ $bnMonths[$selectedDate->month - 1] }} {{ $toBn($selectedDate->year) }}
+            @else
+                {{ $bnMonths[$monthStart->month - 1] }} {{ $toBn($monthStart->year) }}
+            @endif
         </div>
-        <a href="{{ route('archive', array_filter(['month' => $nextMonth, 'date' => $selectedKey])) }}"
-            class="p-1 text-slate-800 hover:text-primary transition-colors {{ $canGoNext ? '' : 'pointer-events-none opacity-30' }}"
-            aria-label="পরের মাস">
+        <button
+            type="button"
+            data-archive-cal-month="{{ $nextMonth }}"
+            class="archive-cal-nav p-1 text-slate-800 hover:text-primary transition-colors {{ $canGoNext ? '' : 'opacity-30 cursor-not-allowed' }}"
+            aria-label="পরের মাস"
+            @disabled(! $canGoNext)>
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
-        </a>
+        </button>
     </div>
 
     <div class="bg-[#EFEFEF] rounded-sm overflow-hidden border border-slate-300">
@@ -120,39 +128,10 @@ $years = ! empty($archiveYears) ? $archiveYears : [$monthStart->year];
 
     @if($selectedDate)
     <div class="mt-3 pt-3 border-t border-slate-200 text-center">
-        <a href="{{ route('archive', ['month' => $monthStart->format('Y-m')]) }}"
+        <a href="{{ route('archive') }}"
             class="text-xs md:text-sm font-medium text-primary hover:underline">
             সব খবর দেখুন
         </a>
     </div>
     @endif
 </div>
-
-<script>
-    (function() {
-        document.querySelectorAll('.archive-calendar-wrap').forEach(function(wrap) {
-            var monthSelect = wrap.querySelector('.archive-month-select');
-            var yearSelect = wrap.querySelector('.archive-year-select');
-            if (!monthSelect || !yearSelect) return;
-
-            var selectedDate = monthSelect.dataset.selectedDate || '';
-
-            function goToArchiveMonthYear() {
-                var month = monthSelect.value;
-                var year = yearSelect.value;
-                var monthParam = year + '-' + month;
-                var url = new URL(@json(route('archive')), window.location.origin);
-                url.searchParams.set('month', monthParam);
-
-                if (selectedDate && selectedDate.indexOf(monthParam) === 0) {
-                    url.searchParams.set('date', selectedDate);
-                }
-
-                window.location.href = url.toString();
-            }
-
-            monthSelect.addEventListener('change', goToArchiveMonthYear);
-            yearSelect.addEventListener('change', goToArchiveMonthYear);
-        });
-    })();
-</script>

@@ -13,7 +13,7 @@ class DiagnoseAdsCommand extends Command
 
     public function handle(): int
     {
-        $this->info('Frontend: শুধু Local ad (Google ad frontend থেকে সরানো)');
+        $this->info('Frontend: Local ad অথবা Google Ad fallback');
         $this->newLine();
 
         $query = Advertisement::query()->orderBy('slug');
@@ -38,9 +38,10 @@ class DiagnoseAdsCommand extends Command
         );
 
         $local = collect($rows)->where('1', 'Local')->count();
+        $google = collect($rows)->where('1', 'Google')->count();
         $empty = collect($rows)->where('1', 'খালি')->count();
         $this->newLine();
-        $this->line("Local দেখাবে: {$local} slot | খালি: {$empty} slot");
+        $this->line("Local: {$local} | Google: {$google} | খালি: {$empty} slot");
 
         return self::SUCCESS;
     }

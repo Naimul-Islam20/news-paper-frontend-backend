@@ -871,7 +871,7 @@
                                         <select id="division-select" class="w-full border-custom  text-sm focus:ring-primary focus:border-primary py-2.5 bg-white">
                                             <option value="">বিভাগ নির্বাচন করুন</option>
                                             @foreach($divisions as $division)
-                                            <option value="{{ $division->slug }}">{{ $division->name }}</option>
+                                            <option value="{{ $division->slug }}" data-name="{{ $division->name }}">{{ $division->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -904,11 +904,40 @@
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function() {
                                         const divisionDistricts = @json(
-                                            collect(bangladesh_division_districts_map())->mapWithKeys(
-                                                fn ($districts, $division) => [$division => bangladesh_districts_for_division($division)]
+                                            $divisions->mapWithKeys(
+                                                fn ($division) => [$division->slug => bangladesh_districts_for_division($division->name)]
                                             )
                                         );
-                                        const districtUpazilas = @json(bangladesh_district_upazilas_map());
+                                        const districtUpazilas = @json(
+                                            collect(bangladesh_district_upazilas_map())->mapWithKeys(
+                                                fn ($upazilas, $district) => [$district => bangladesh_upazilas_for_district($district)]
+                                            )
+                                        );
+
+                                        function normalizeLocationName(name) {
+                                            return String(name || '').trim()
+                                                .replace(/[\u09DC\u09DD\u09DF\u09CE]/g, '\u09AF')
+                                                .toLowerCase();
+                                        }
+
+                                        function upazilasForDistrict(district) {
+                                            if (!district) {
+                                                return [];
+                                            }
+
+                                            if (districtUpazilas[district]) {
+                                                return districtUpazilas[district];
+                                            }
+
+                                            const target = normalizeLocationName(district);
+                                            for (const [key, upazilas] of Object.entries(districtUpazilas)) {
+                                                if (normalizeLocationName(key) === target) {
+                                                    return upazilas;
+                                                }
+                                            }
+
+                                            return [];
+                                        }
                                         const searchBtn = document.getElementById('regional-search-btn');
                                         const divisionSelect = document.getElementById('division-select');
                                         const districtSelect = document.getElementById('district-select');
@@ -929,7 +958,7 @@
                                                 return;
                                             }
 
-                                            const upazilas = districtUpazilas[district] || [];
+                                            const upazilas = upazilasForDistrict(district);
                                             upazilaSelect.innerHTML = '<option value="">উপজেলা নির্বাচন করুন</option>';
 
                                             if (!district || upazilas.length === 0) {

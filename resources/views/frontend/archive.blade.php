@@ -39,7 +39,7 @@
                     </div>
                 </div>
 
-                <div class="mb-3 md:hidden">
+                <div class="archive-calendar-slot mb-3 md:hidden">
                     <x-archive-calendar
                         :calendar-month="$calendarMonth"
                         :selected-date="$selectedDate"
@@ -149,11 +149,13 @@
                     </div>
 
                     <div class="hidden md:flex flex-col gap-4 w-full min-w-0 md:pl-4">
-                        <x-archive-calendar
-                            :calendar-month="$calendarMonth"
-                            :selected-date="$selectedDate"
-                            :dates-with-posts="$datesWithPosts"
-                            :archive-years="$archiveYears" />
+                        <div class="archive-calendar-slot">
+                            <x-archive-calendar
+                                :calendar-month="$calendarMonth"
+                                :selected-date="$selectedDate"
+                                :dates-with-posts="$datesWithPosts"
+                                :archive-years="$archiveYears" />
+                        </div>
 
                         @php
                         $adCategoryRight1 = ad_slot('category_right_1');
@@ -165,4 +167,84 @@
                 </section>
             </div>
         </div>
+
+        <script>
+        (function() {
+            var calendarUrl = @json(route('archive.calendar'));
+            var loading = false;
+
+            function selectedDateFromUrl() {
+                return new URL(window.location.href).searchParams.get('date') || '';
+            }
+
+            function loadArchiveCalendars(monthParam) {
+                if (!monthParam || loading) {
+                    return;
+                }
+
+                loading = true;
+                var url = new URL(calendarUrl, window.location.origin);
+                url.searchParams.set('month', monthParam);
+
+                var selectedDate = selectedDateFromUrl();
+                if (selectedDate && selectedDate.indexOf(monthParam) === 0) {
+                    url.searchParams.set('date', selectedDate);
+                }
+
+                fetch(url.toString(), {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                    .then(function(res) {
+                        if (!res.ok) {
+                            throw new Error('calendar fetch failed');
+                        }
+                        return res.json();
+                    })
+                    .then(function(data) {
+                        if (!data.html) {
+                            return;
+                        }
+                        document.querySelectorAll('.archive-calendar-slot').forEach(function(slot) {
+                            slot.innerHTML = data.html;
+                        });
+                    })
+                    .catch(function() {})
+                    .finally(function() {
+                        loading = false;
+                    });
+            }
+
+            document.addEventListener('click', function(event) {
+                var nav = event.target.closest('[data-archive-cal-month]');
+                if (!nav || nav.disabled) {
+                    return;
+                }
+
+                event.preventDefault();
+                loadArchiveCalendars(nav.getAttribute('data-archive-cal-month'));
+            });
+
+            document.addEventListener('change', function(event) {
+                if (!event.target.matches('.archive-month-select, .archive-year-select')) {
+                    return;
+                }
+
+                var wrap = event.target.closest('.archive-calendar-wrap');
+                if (!wrap) {
+                    return;
+                }
+
+                var monthSelect = wrap.querySelector('.archive-month-select');
+                var yearSelect = wrap.querySelector('.archive-year-select');
+                if (!monthSelect || !yearSelect) {
+                    return;
+                }
+
+                loadArchiveCalendars(yearSelect.value + '-' + monthSelect.value);
+            });
+        })();
+        </script>
 </x-layout>

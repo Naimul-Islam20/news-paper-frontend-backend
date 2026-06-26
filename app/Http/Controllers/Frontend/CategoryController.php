@@ -31,15 +31,19 @@ class CategoryController extends Controller
             ->where('status', 'published')
             ->whereHas('categories', fn ($q) => $q->where('type', 'post'));
 
+        $monthInput = request()->input('month');
         $selectedDate = $this->parseArchiveDate(request()->input('date'));
+        $calendarMonth = $this->parseArchiveMonth($monthInput, $selectedDate);
+
+        if ($selectedDate && $monthInput && ! $selectedDate->isSameMonth($calendarMonth)) {
+            $selectedDate = null;
+        }
 
         if ($selectedDate) {
             $baseQuery->where('created_at', '<=', $selectedDate->copy()->endOfDay());
         }
 
         $baseQuery->latest();
-
-        $calendarMonth = $this->parseArchiveMonth(request()->input('month'), $selectedDate);
         $datesWithPosts = $this->archiveDatesWithPosts($calendarMonth);
         $archiveYears = $this->archiveAvailableYears();
 
@@ -62,6 +66,32 @@ class CategoryController extends Controller
             'frontend.archive',
             'frontend.partials.archive-posts'
         );
+    }
+
+    /**
+     * আর্কাইভ ক্যালেন্ডার — মাস বদলাতে AJAX (URL পরিবর্তন ছাড়া)।
+     */
+    public function archiveCalendar(): JsonResponse
+    {
+        $monthInput = request()->input('month');
+        $selectedDate = $this->parseArchiveDate(request()->input('date'));
+        $calendarMonth = $this->parseArchiveMonth($monthInput, $selectedDate);
+
+        if ($selectedDate && $monthInput && ! $selectedDate->isSameMonth($calendarMonth)) {
+            $selectedDate = null;
+        }
+
+        $datesWithPosts = $this->archiveDatesWithPosts($calendarMonth);
+        $archiveYears = $this->archiveAvailableYears();
+
+        return response()->json([
+            'html' => view('components.archive-calendar', compact(
+                'calendarMonth',
+                'selectedDate',
+                'datesWithPosts',
+                'archiveYears',
+            ))->render(),
+        ]);
     }
 
     private function listingPage(string $title, string $slug): View|JsonResponse

@@ -435,6 +435,19 @@ class Advertisement extends Model
         return $this->hasRunningLocalAd();
     }
 
+    public function displayUsesGoogleAd(): bool
+    {
+        if ($this->slug === 'home_video' || $this->displayUsesLocalAd()) {
+            return false;
+        }
+
+        if (! $this->googleAdAutoEnabled() || ! google_adsense_configured()) {
+            return false;
+        }
+
+        return filled(google_adsense_slot_for($this));
+    }
+
     /** ফ্রন্ট/অ্যাডমিন প্রিভিউ: কিউ মার্জ + মেয়াদ reconcile */
     public function prepareForFrontDisplay(bool $forAdminPreview = false): self
     {
@@ -452,12 +465,15 @@ class Advertisement extends Model
             return ['mode' => 'Local', 'reasons' => ['Local ad চলছে']];
         }
 
-        return ['mode' => 'খালি', 'reasons' => ['কোনো local ad active নেই']];
+        if ($this->displayUsesGoogleAd()) {
+            return ['mode' => 'Google', 'reasons' => ['Local নেই — Google Ad fallback']];
+        }
+
+        return ['mode' => 'খালি', 'reasons' => ['কোনো local বা Google ad active নেই']];
     }
 
     /**
      * Get ad slot by slug (for frontend and views).
-     * শুধু local ad চললে return করে।
      */
     public static function getBySlug(string $slug): ?self
     {
@@ -472,7 +488,7 @@ class Advertisement extends Model
 
         $ad->prepareForFrontDisplay();
 
-        return $ad->displayUsesLocalAd() ? $ad : null;
+        return $ad;
     }
 
     public function hasDisplayableMedia(): bool

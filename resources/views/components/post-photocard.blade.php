@@ -1,7 +1,8 @@
 @props(['post'])
 
 @php
-$siteDomain = photocard_site_domain(front_home_url());
+$siteDomain = photocard_site_domain(front_home_url(), true);
+$siteDomainAlt = photocard_site_domain(front_home_url(), false);
 $imageBasename = $post->image ? pathinfo(basename($post->image), PATHINFO_FILENAME) : '';
 $photocardPayload = [
 'id' => $post->id,
@@ -13,6 +14,7 @@ $photocardPayload = [
 'icon' => optional($siteMeta)->site_icon ? storage_image_url($siteMeta->site_icon) : '',
 'siteName' => site_name(),
 'siteUrl' => $siteDomain,
+'siteUrlAlt' => $siteDomainAlt,
 'primaryColor' => optional($siteMeta)->primary_color ?: '#28a745',
 'date' => published_at($post->created_at, 'd M Y'),
 ];
@@ -35,7 +37,7 @@ $photocardPayload = [
 <div id="post-photocard-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4" aria-hidden="true" role="dialog" aria-modal="true" aria-label="ফটোকার্ড প্রিভিউ">
     <div class="absolute inset-0 bg-black/70" data-photocard-close></div>
 
-    <div id="post-photocard-panel" class="relative z-10 flex flex-col bg-white shadow-2xl overflow-hidden">
+    <div id="post-photocard-panel" class="relative z-10 flex flex-col bg-white shadow-2xl overflow-hidden max-w-[95vw]">
         <div data-photocard-header class="flex-shrink-0 flex items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-2">
             <h3 class="text-base font-bold text-title">ফটোকার্ড</h3>
             <div class="flex items-center gap-2">
@@ -55,8 +57,24 @@ $photocardPayload = [
             </div>
         </div>
 
-        <div id="post-photocard-viewport" class="overflow-hidden leading-none">
-            <div id="post-photocard-card" class="inline-block"></div>
+        <div id="post-photocard-body" class="flex flex-row items-start gap-3 px-3 pt-3 pb-0 overflow-hidden">
+            <div class="flex-1 min-w-0 flex justify-center self-start">
+                <div id="post-photocard-viewport" class="overflow-hidden leading-none shrink-0 block bg-[#2d0505]">
+                    <div id="post-photocard-card" class="block"></div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2 shrink-0 self-start">
+                <button
+                    type="button"
+                    id="post-photocard-thumb-btn"
+                    class="p-1 border-2 border-slate-200 rounded-lg hover:border-primary transition-colors cursor-pointer overflow-hidden leading-none bg-white"
+                    title="অন্য ডিজাইন দেখুন"
+                    aria-label="অন্য ডিজাইন দেখুন">
+                    <div id="post-photocard-viewport-alt" class="overflow-hidden leading-none block">
+                        <div id="post-photocard-card-alt" class="block"></div>
+                    </div>
+                </button>
+            </div>
         </div>
     </div>
 </div>

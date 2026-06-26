@@ -1,31 +1,59 @@
 const MODAL_ID = "post-photocard-modal";
 const PANEL_ID = "post-photocard-panel";
 const CARD_ID = "post-photocard-card";
+const CARD_ALT_ID = "post-photocard-card-alt";
 const VIEWPORT_ID = "post-photocard-viewport";
-const MODAL_MAX_CARD_SIZE = 600;
+const VIEWPORT_ALT_ID = "post-photocard-viewport-alt";
+const BODY_ID = "post-photocard-body";
+const THUMB_BTN_ID = "post-photocard-thumb-btn";
+const MODAL_MAX_CARD_SIZE = 660;
+const THUMB_DISPLAY_SIZE = 112;
 const CARD_SIZE = 1080;
 const IMAGE_ASPECT = 16 / 9;
-const IMAGE_HEIGHT = Math.round(CARD_SIZE / IMAGE_ASPECT);
+const IMAGE_HEIGHT = Math.floor((CARD_SIZE * 9) / 16);
 const BOTTOM_HEIGHT = CARD_SIZE - IMAGE_HEIGHT;
 const SECTION_X_PADDING = 68;
+const FOOTER_BAR_X_PADDING = 36;
 const TITLE_X_PADDING = 44;
 const FOOTER_HINT_SIZE = 32;
-const FOOTER_URL_SIZE = 36;
+const FOOTER_HINT_TEXT_PRIMARY = "বিস্তারিত কমেন্টে ...";
+const FOOTER_HINT_TEXT_ALT = "বিস্তারিত কমেন্টে";
+const FOOTER_HINT_ICON_SIZE = 28;
+const FOOTER_HINT_ICON_GAP = 10;
+const CARET_DOUBLE_DOWN_DUOTONE = {
+    fill: "M208,56l-80,80L48,56Z",
+    detail: "M213.66,141.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,204.69l74.34-74.35a8,8,0,0,1,11.32,11.32Zm-171.32-80A8,8,0,0,1,48,48H208a8,8,0,0,1,5.66,13.66l-80,80a8,8,0,0,1-11.32,0Zm25,2.34L128,124.69,188.69,64Z",
+};
+const FOOTER_URL_SIZE_PRIMARY = 36;
+const FOOTER_URL_SIZE_ALT = FOOTER_HINT_SIZE;
 const FOOTER_URL_WEIGHT = "500";
 const FOOTER_URL_LETTER_SPACING = 5;
-const DATE_SIZE = 32;
+const DATE_SIZE_PRIMARY = 32;
+const DATE_SIZE_ALT = FOOTER_HINT_SIZE;
 const LOGO_HEIGHT = 58;
 const LOGO_MAX_WIDTH = 280;
 const IMAGE_ICON_WATERMARK_SIZE = 112;
 const IMAGE_ICON_WATERMARK_OPACITY = 0.48;
+const ALT_SEAM_ICON_OPACITY = 1;
+const ALT_SEAM_ICON_SIZE = 136;
+const ALT_SEAM_ICON_ZOOM = 1.18;
 const IMAGE_ICON_PADDING = 24;
 const EXPORT_SCALE = 1;
 const PHOTOCARD_FONT = "SolaimanLipi, sans-serif";
 const OVERLAY_DARK_SOLID = "rgba(45,5,5,1)";
+const ALT_BOTTOM_BAR_BG = "rgba(96, 28, 28, 0.96)";
+const ALT_BOTTOM_BAR_PADDING_Y = 14;
+const BOTTOM_BOX_COLOR_TOP = OVERLAY_DARK_SOLID;
+const BOTTOM_BOX_COLOR_MID = "rgba(56,12,12,1)";
+const BOTTOM_BOX_COLOR_BOTTOM = "rgba(72,18,18,1)";
+const ALT_BOTTOM_BOX_TOP_BORDER = 8;
+const ALT_BOTTOM_BOX_TOP_BORDER_COLOR_CENTER = "#F97316";
+const ALT_BOTTOM_BOX_TOP_BORDER_COLOR_EDGE = "#9A3412";
 const IMAGE_OVERLAY_DARK_BAND = 0;
 const IMAGE_OVERLAY_FADE_BAND = 0.18;
 
 let currentPhotocardData = null;
+let activeDesign = "alt";
 
 function unifiedOverlayMetrics() {
     const imageDarkBand = Math.round(IMAGE_HEIGHT * IMAGE_OVERLAY_DARK_BAND);
@@ -105,22 +133,95 @@ function escapeHtml(value) {
         .replace(/"/g, "&quot;");
 }
 
+function caretDoubleDownDuotoneSvgHtml(sizePx = FOOTER_HINT_ICON_SIZE) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="${sizePx}" height="${sizePx}" fill="currentColor" aria-hidden="true" style="display:block;flex-shrink:0;opacity:0.95;"><path d="${CARET_DOUBLE_DOWN_DUOTONE.fill}" opacity="0.2"/><path d="${CARET_DOUBLE_DOWN_DUOTONE.detail}"/></svg>`;
+}
+
+function footerHintWithIconsHtml() {
+    const icon = caretDoubleDownDuotoneSvgHtml();
+
+    return `<div style="display:flex;align-items:center;justify-content:center;gap:${FOOTER_HINT_ICON_GAP}px;white-space:nowrap;">${icon}<div style="font-size:${FOOTER_HINT_SIZE}px;font-weight:400;line-height:1.35;opacity:0.95;">${FOOTER_HINT_TEXT_ALT}</div>${icon}</div>`;
+}
+
+function drawCaretDoubleDownDuotone(
+    ctx,
+    centerX,
+    bottomY,
+    size,
+    color = "#ffffff",
+) {
+    const scale = size / 256;
+
+    ctx.save();
+    ctx.translate(centerX - size / 2, bottomY - size);
+    ctx.scale(scale, scale);
+    ctx.fillStyle = color;
+
+    ctx.globalAlpha = 0.2;
+    ctx.fill(new Path2D(CARET_DOUBLE_DOWN_DUOTONE.fill));
+
+    ctx.globalAlpha = 0.95;
+    ctx.fill(new Path2D(CARET_DOUBLE_DOWN_DUOTONE.detail));
+
+    ctx.restore();
+}
+
+function drawFooterHintWithIcons(
+    ctx,
+    centerX,
+    bottomY,
+    {
+        fontSize = FOOTER_HINT_SIZE,
+        iconSize = FOOTER_HINT_ICON_SIZE,
+        iconGap = FOOTER_HINT_ICON_GAP,
+        text = FOOTER_HINT_TEXT_ALT,
+        color = "rgba(255,255,255,0.95)",
+    } = {},
+) {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.font = `400 ${fontSize}px ${PHOTOCARD_FONT}`;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "bottom";
+
+    const textWidth = ctx.measureText(text).width;
+    const totalWidth = iconSize * 2 + iconGap * 2 + textWidth;
+    const startX = centerX - totalWidth / 2;
+
+    drawCaretDoubleDownDuotone(
+        ctx,
+        startX + iconSize / 2,
+        bottomY,
+        iconSize,
+        "#ffffff",
+    );
+    ctx.fillText(text, startX + iconSize + iconGap, bottomY);
+    drawCaretDoubleDownDuotone(
+        ctx,
+        startX + iconSize + iconGap + textWidth + iconGap + iconSize / 2,
+        bottomY,
+        iconSize,
+        "#ffffff",
+    );
+    ctx.restore();
+}
+
 function titleFontSize(title) {
     const length = String(title ?? "").length;
 
     if (length > 120) {
-        return 42;
+        return 50;
     }
 
     if (length > 80) {
-        return 48;
+        return 56;
     }
 
     if (length > 50) {
-        return 54;
+        return 62;
     }
 
-    return 60;
+    return 68;
 }
 
 function footerUrlMaxWidth(hasLogo) {
@@ -140,8 +241,13 @@ function measureFooterUrlText(ctx, text, fontSize) {
     return ctx.measureText(String(text ?? "")).width;
 }
 
-function fitFooterUrlFontSize(ctx, url, maxWidth) {
-    const sizes = [FOOTER_URL_SIZE, 32, 28, 24, 22, 20, 18];
+function fitFooterUrlFontSize(
+    ctx,
+    url,
+    maxWidth,
+    baseSize = FOOTER_URL_SIZE_PRIMARY,
+) {
+    const sizes = [baseSize, 32, 28, 24, 22, 20, 18];
     const text = String(url ?? "");
 
     for (const size of sizes) {
@@ -184,13 +290,13 @@ function wrapUrlLines(ctx, url, maxWidth, fontSize) {
 
 function footerAreaHeight(hasLogo) {
     const logoBoxHeight = LOGO_HEIGHT;
-    const textHeight = FOOTER_HINT_SIZE + FOOTER_URL_SIZE + 12;
+    const textHeight = FOOTER_HINT_SIZE + FOOTER_URL_SIZE_PRIMARY + 12;
 
     return Math.max(logoBoxHeight, textHeight) + 18;
 }
 
 function dateAreaHeight(hasDate) {
-    return hasDate ? DATE_SIZE + 18 : 0;
+    return hasDate ? DATE_SIZE_PRIMARY + 18 : 0;
 }
 
 function imageWatermarkStyle(
@@ -201,20 +307,86 @@ function imageWatermarkStyle(
     return `position:absolute;top:${padding}px;right:${padding}px;width:${size}px;height:${size}px;border-radius:9999px;object-fit:cover;z-index:3;opacity:${opacity};pointer-events:none;`;
 }
 
-function drawImageWatermarkIcon(ctx, iconImage) {
+function altSeamIconCenterY() {
+    return IMAGE_HEIGHT;
+}
+
+function altBottomBoxTopBorderGradientCss() {
+    return `linear-gradient(to right, ${ALT_BOTTOM_BOX_TOP_BORDER_COLOR_EDGE} 0%, ${ALT_BOTTOM_BOX_TOP_BORDER_COLOR_CENTER} 50%, ${ALT_BOTTOM_BOX_TOP_BORDER_COLOR_EDGE} 100%)`;
+}
+
+function photocardBottomBoxBackgroundCss() {
+    return `linear-gradient(to bottom, ${BOTTOM_BOX_COLOR_TOP} 0%, ${BOTTOM_BOX_COLOR_MID} 52%, ${BOTTOM_BOX_COLOR_BOTTOM} 100%)`;
+}
+
+function drawPhotocardBottomBoxBackground(ctx) {
+    const gradient = ctx.createLinearGradient(
+        0,
+        IMAGE_HEIGHT,
+        0,
+        IMAGE_HEIGHT + BOTTOM_HEIGHT,
+    );
+    gradient.addColorStop(0, BOTTOM_BOX_COLOR_TOP);
+    gradient.addColorStop(0.52, BOTTOM_BOX_COLOR_MID);
+    gradient.addColorStop(1, BOTTOM_BOX_COLOR_BOTTOM);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, IMAGE_HEIGHT, CARD_SIZE, BOTTOM_HEIGHT);
+}
+
+function altBottomBoxTopBorderHtml() {
+    return `<div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:${ALT_BOTTOM_BOX_TOP_BORDER}px;background:${altBottomBoxTopBorderGradientCss()};z-index:4;pointer-events:none;"></div>`;
+}
+
+function drawAltBottomBoxTopBorder(ctx) {
+    const gradient = ctx.createLinearGradient(0, 0, CARD_SIZE, 0);
+    gradient.addColorStop(0, ALT_BOTTOM_BOX_TOP_BORDER_COLOR_EDGE);
+    gradient.addColorStop(0.5, ALT_BOTTOM_BOX_TOP_BORDER_COLOR_CENTER);
+    gradient.addColorStop(1, ALT_BOTTOM_BOX_TOP_BORDER_COLOR_EDGE);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, IMAGE_HEIGHT, CARD_SIZE, ALT_BOTTOM_BOX_TOP_BORDER);
+}
+
+function altSeamIconBlockHtml(iconUrl) {
+    if (!iconUrl) {
+        return "";
+    }
+
+    const size = ALT_SEAM_ICON_SIZE;
+
+    return `<div aria-hidden="true" style="position:absolute;left:50%;top:${IMAGE_HEIGHT}px;transform:translate(-50%,-50%);width:${size}px;height:${size}px;border-radius:9999px;overflow:hidden;z-index:5;pointer-events:none;"><img ${imageTagAttributes(iconUrl)} style="display:block;width:100%;height:100%;object-fit:cover;border:0;opacity:${ALT_SEAM_ICON_OPACITY};transform:scale(${ALT_SEAM_ICON_ZOOM});transform-origin:center center;"></div>`;
+}
+
+function drawImageWatermarkIcon(
+    ctx,
+    iconImage,
+    position = null,
+    opacity = IMAGE_ICON_WATERMARK_OPACITY,
+    zoom = 1,
+) {
     if (!iconImage) {
         return;
     }
 
-    const size = IMAGE_ICON_WATERMARK_SIZE;
-    const drawX = CARD_SIZE - IMAGE_ICON_PADDING - size;
-    const drawY = IMAGE_ICON_PADDING;
-    const centerX = drawX + size / 2;
-    const centerY = drawY + size / 2;
+    const size = position?.size ?? IMAGE_ICON_WATERMARK_SIZE;
+    let centerX;
+    let centerY;
+
+    if (position) {
+        centerX = position.centerX;
+        centerY = position.centerY;
+    } else {
+        const drawX = CARD_SIZE - IMAGE_ICON_PADDING - size;
+        const drawY = IMAGE_ICON_PADDING;
+        centerX = drawX + size / 2;
+        centerY = drawY + size / 2;
+    }
+
+    const drawX = centerX - size / 2;
+    const drawY = centerY - size / 2;
     const radius = size / 2;
 
     ctx.save();
-    ctx.globalAlpha = IMAGE_ICON_WATERMARK_OPACITY;
+    ctx.globalAlpha = opacity;
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.closePath();
@@ -234,8 +406,22 @@ function drawImageWatermarkIcon(ctx, iconImage) {
         sy = (iconImage.naturalHeight - sh) / 2;
     }
 
-    ctx.drawImage(iconImage, sx, sy, sw, sh, drawX, drawY, size, size);
+    const drawSize = size * zoom;
+    const zoomDrawX = centerX - drawSize / 2;
+    const zoomDrawY = centerY - drawSize / 2;
+
+    ctx.drawImage(iconImage, sx, sy, sw, sh, zoomDrawX, zoomDrawY, drawSize, drawSize);
     ctx.restore();
+}
+
+function footerAreaHeightAlt(hasDate, urlFontSize = FOOTER_URL_SIZE_ALT) {
+    const contentHeight = Math.max(
+        hasDate ? DATE_SIZE_ALT : 0,
+        FOOTER_HINT_SIZE,
+        urlFontSize,
+    );
+
+    return contentHeight + ALT_BOTTOM_BAR_PADDING_Y * 2;
 }
 
 function buildCardHtml(data) {
@@ -254,6 +440,7 @@ function buildCardHtml(data) {
         measureCtx,
         data.siteUrl,
         urlMaxWidth,
+        FOOTER_URL_SIZE_PRIMARY,
     );
 
     const imageBlock = data.image
@@ -269,7 +456,7 @@ function buildCardHtml(data) {
         : `<span style="display:block;font-size:36px;font-weight:700;color:#ffffff;line-height:1.2;text-align:right;">${siteName}</span>`;
 
     const dateBlock = date
-        ? `<p style="position:absolute;top:16px;left:0;right:0;margin:0;text-align:center;color:#ffffff;font-size:${DATE_SIZE}px;font-weight:500;line-height:1.3;text-shadow:0 1px 4px rgba(0,0,0,0.4);">${date}</p>`
+        ? `<p style="position:absolute;top:16px;left:0;right:0;margin:0;text-align:center;color:#ffffff;font-size:${DATE_SIZE_PRIMARY}px;font-weight:500;line-height:1.3;text-shadow:0 1px 4px rgba(0,0,0,0.4);">${date}</p>`
         : "";
 
     const footerReserved = footerAreaHeight(Boolean(data.logo));
@@ -284,13 +471,13 @@ function buildCardHtml(data) {
                 ${imageIconBlock}
             </div>
 
-            <div class="post-photocard-bottom" style="position:relative;width:${CARD_SIZE}px;height:${BOTTOM_HEIGHT}px;flex-shrink:0;background:transparent;overflow:hidden;z-index:2;">
+            <div class="post-photocard-bottom" style="position:relative;width:${CARD_SIZE}px;height:${BOTTOM_HEIGHT}px;flex-shrink:0;background:${photocardBottomBoxBackgroundCss()};overflow:hidden;z-index:2;">
                 <div style="position:relative;z-index:2;height:100%;box-sizing:border-box;">
                     ${dateBlock}
                     <h1 style="position:absolute;left:${TITLE_X_PADDING}px;right:${TITLE_X_PADDING}px;top:${titleTop}px;bottom:${titleBottom}px;margin:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:${fontSize}px;line-height:1.32;font-weight:700;color:#ffffff;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,0.45);">${title}</h1>
                     <div style="position:absolute;left:${SECTION_X_PADDING}px;right:${SECTION_X_PADDING}px;bottom:18px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;z-index:3;">
                         <div style="flex:1;min-width:0;text-align:left;color:#ffffff;">
-                            <div style="font-size:${FOOTER_HINT_SIZE}px;font-weight:400;line-height:1.35;opacity:0.95;">বিস্তারিত কমেন্টে ...</div>
+                            <div style="font-size:${FOOTER_HINT_SIZE}px;font-weight:400;line-height:1.35;opacity:0.95;">${FOOTER_HINT_TEXT_PRIMARY}</div>
                             <div style="font-size:${urlFontSize}px;font-weight:${FOOTER_URL_WEIGHT};line-height:1.25;margin-top:6px;letter-spacing:${FOOTER_URL_LETTER_SPACING}px;word-break:break-all;">${siteUrl}</div>
                         </div>
                         <div style="flex-shrink:0;">${logoBlock}</div>
@@ -302,12 +489,99 @@ function buildCardHtml(data) {
     `;
 }
 
+function buildAltCardHtml(data) {
+    const title = escapeHtml(data.title);
+    const siteUrl = escapeHtml(data.siteUrlAlt ?? data.siteUrl ?? "");
+    const date = escapeHtml(data.date || "");
+    const primary = escapeHtml(data.primaryColor || "#28a745");
+    const fontSize = titleFontSize(data.title);
+    const measureCanvas = document.createElement("canvas");
+    const measureCtx = measureCanvas.getContext("2d");
+    const urlFontSize = fitFooterUrlFontSize(
+        measureCtx,
+        data.siteUrlAlt ?? data.siteUrl,
+        LOGO_MAX_WIDTH,
+        FOOTER_URL_SIZE_ALT,
+    );
+
+    const imageBlock = data.image
+        ? `<img ${imageTagAttributes(data.image)} style="display:block;width:100%;height:100%;object-fit:cover;object-position:center top;">`
+        : `<div style="width:100%;height:100%;background:linear-gradient(135deg,${primary} 0%,#0f172a 100%);"></div>`;
+
+    const footerReserved = footerAreaHeightAlt(Boolean(date), urlFontSize);
+    const titleTop = 16;
+    const titleBottom = footerReserved + 12;
+
+    const dateBlock = date
+        ? `<div style="font-size:${DATE_SIZE_ALT}px;font-weight:400;line-height:1.35;opacity:0.95;color:#ffffff;text-shadow:0 1px 4px rgba(0,0,0,0.35);">${date}</div>`
+        : "";
+
+    const bottomIconBlock = altSeamIconBlockHtml(data.icon);
+
+    return `
+        <div class="post-photocard-export-alt" style="position:relative;display:flex;flex-direction:column;width:${CARD_SIZE}px;height:${CARD_SIZE}px;flex-shrink:0;background:${OVERLAY_DARK_SOLID};font-family:'SolaimanLipi',sans-serif;overflow:hidden;box-shadow:0 10px 40px rgba(15,23,42,0.15);">
+            <div class="post-photocard-image" style="position:relative;width:${CARD_SIZE}px;height:${IMAGE_HEIGHT}px;flex-shrink:0;overflow:hidden;line-height:0;">
+                ${imageBlock}
+            </div>
+
+            <div class="post-photocard-bottom" style="position:relative;width:${CARD_SIZE}px;height:${BOTTOM_HEIGHT}px;flex-shrink:0;background:${photocardBottomBoxBackgroundCss()};overflow:hidden;z-index:2;box-sizing:border-box;">
+                ${altBottomBoxTopBorderHtml()}
+                <div style="position:relative;z-index:2;height:100%;box-sizing:border-box;">
+                    <h1 style="position:absolute;left:${TITLE_X_PADDING}px;right:${TITLE_X_PADDING}px;top:${titleTop}px;bottom:${titleBottom}px;margin:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:${fontSize}px;line-height:1.32;font-weight:700;color:#ffffff;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,0.45);">${title}</h1>
+                    <div style="position:absolute;left:0;right:0;bottom:0;z-index:3;box-sizing:border-box;background:${ALT_BOTTOM_BAR_BG};padding:${ALT_BOTTOM_BAR_PADDING_Y}px ${FOOTER_BAR_X_PADDING}px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
+                        <div style="flex:1;min-width:0;text-align:left;color:#ffffff;">
+                            ${dateBlock}
+                        </div>
+                        <div style="flex-shrink:0;text-align:center;color:#ffffff;">
+                            ${footerHintWithIconsHtml()}
+                        </div>
+                        <div style="flex:1;min-width:0;text-align:right;color:#ffffff;">
+                            <div style="font-size:${urlFontSize}px;font-weight:${FOOTER_URL_WEIGHT};line-height:1.25;letter-spacing:${FOOTER_URL_LETTER_SPACING}px;word-break:break-all;">${siteUrl}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            ${bottomIconBlock}
+        </div>
+    `;
+}
+
+function buildCardHtmlForVariant(data, variant) {
+    return variant === "alt" ? buildAltCardHtml(data) : buildCardHtml(data);
+}
+
+function inactiveDesign() {
+    return activeDesign === "primary" ? "alt" : "primary";
+}
+
+function getThumbButton() {
+    return document.getElementById(THUMB_BTN_ID);
+}
+
+function getCardAltRoot() {
+    return document.getElementById(CARD_ALT_ID);
+}
+
+function getCardViewportAlt() {
+    return document.getElementById(VIEWPORT_ALT_ID);
+}
+
+function getCardBody() {
+    return document.getElementById(BODY_ID);
+}
+
 function getModal() {
     return document.getElementById(MODAL_ID);
 }
 
 function getCardRoot() {
     return document.getElementById(CARD_ID);
+}
+
+function getPreviewCardEl(cardRoot) {
+    return cardRoot?.querySelector(
+        ".post-photocard-export, .post-photocard-export-alt",
+    );
 }
 
 function closeModal() {
@@ -317,6 +591,7 @@ function closeModal() {
     }
 
     currentPhotocardData = null;
+    activeDesign = "alt";
     resetModalLayout();
     modal.classList.add("hidden");
     modal.setAttribute("aria-hidden", "true");
@@ -392,6 +667,8 @@ function drawCoverImage(ctx, img, destX, destY, destW, destH) {
 }
 
 function drawUnifiedOverlayGradient(ctx, cardHeight = CARD_SIZE) {
+    drawPhotocardBottomBoxBackground(ctx);
+
     const { height } = unifiedOverlayMetrics();
     const topY = cardHeight - height;
     const gradient = ctx.createLinearGradient(0, cardHeight, 0, topY);
@@ -433,10 +710,10 @@ async function renderPhotocardCanvas(data) {
 
     await ensurePhotocardFont(fontSize);
     if (date) {
-        await ensurePhotocardFont(DATE_SIZE, "500");
+        await ensurePhotocardFont(DATE_SIZE_PRIMARY, "500");
     }
     await ensurePhotocardFont(FOOTER_HINT_SIZE, "400");
-    await ensurePhotocardFont(FOOTER_URL_SIZE, FOOTER_URL_WEIGHT);
+    await ensurePhotocardFont(FOOTER_URL_SIZE_PRIMARY, FOOTER_URL_WEIGHT);
 
     const footerHeight = footerAreaHeight(Boolean(logoImage));
     const dateHeight = dateAreaHeight(Boolean(date));
@@ -482,7 +759,7 @@ async function renderPhotocardCanvas(data) {
 
     if (date) {
         ctx.fillStyle = "#ffffff";
-        ctx.font = `500 ${DATE_SIZE}px ${PHOTOCARD_FONT}`;
+        ctx.font = `500 ${DATE_SIZE_PRIMARY}px ${PHOTOCARD_FONT}`;
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         ctx.shadowColor = "rgba(0,0,0,0.4)";
@@ -525,7 +802,12 @@ async function renderPhotocardCanvas(data) {
         urlMaxWidth -= footerLogoBoxWidth;
     }
 
-    const urlFontSize = fitFooterUrlFontSize(measureCtx, siteUrl, urlMaxWidth);
+    const urlFontSize = fitFooterUrlFontSize(
+        measureCtx,
+        siteUrl,
+        urlMaxWidth,
+        FOOTER_URL_SIZE_PRIMARY,
+    );
     await ensurePhotocardFont(urlFontSize, FOOTER_URL_WEIGHT);
     const urlLines = wrapUrlLines(
         measureCtx,
@@ -542,7 +824,7 @@ async function renderPhotocardCanvas(data) {
     ctx.fillStyle = "rgba(255,255,255,0.95)";
     ctx.font = `400 ${FOOTER_HINT_SIZE}px ${PHOTOCARD_FONT}`;
     ctx.letterSpacing = "0px";
-    ctx.fillText("বিস্তারিত কমেন্টে ...", SECTION_X_PADDING, footerHintY);
+    ctx.fillText(FOOTER_HINT_TEXT_PRIMARY, SECTION_X_PADDING, footerHintY);
 
     ctx.fillStyle = "#ffffff";
     setFooterUrlTextStyle(ctx, urlFontSize);
@@ -570,6 +852,150 @@ async function renderPhotocardCanvas(data) {
         ctx.textBaseline = "bottom";
         ctx.fillText(siteName, CARD_SIZE - SECTION_X_PADDING, footerBaseY);
     }
+
+    return canvas;
+}
+
+async function renderAltPhotocardCanvas(data) {
+    const primary = data.primaryColor || "#28a745";
+    const title = String(data.title ?? "");
+    const siteUrl = String(data.siteUrlAlt ?? data.siteUrl ?? "");
+    const date = String(data.date ?? "");
+    const fontSize = titleFontSize(title);
+    const lineHeight = Math.round(fontSize * 1.35);
+    const titleMaxWidth = CARD_SIZE - TITLE_X_PADDING * 2;
+
+    const [postImage, iconImage] = await Promise.all([
+        loadImage(data.image),
+        loadImage(data.icon),
+    ]);
+
+    const bottomTop = IMAGE_HEIGHT;
+
+    await ensurePhotocardFont(fontSize);
+    if (date) {
+        await ensurePhotocardFont(DATE_SIZE_ALT, "400");
+    }
+    await ensurePhotocardFont(FOOTER_HINT_SIZE, "400");
+    await ensurePhotocardFont(FOOTER_URL_SIZE_ALT, FOOTER_URL_WEIGHT);
+
+    const measureCanvas = document.createElement("canvas");
+    const measureCtx = measureCanvas.getContext("2d");
+    const urlFontSize = fitFooterUrlFontSize(
+        measureCtx,
+        siteUrl,
+        LOGO_MAX_WIDTH,
+        FOOTER_URL_SIZE_ALT,
+    );
+    await ensurePhotocardFont(urlFontSize, FOOTER_URL_WEIGHT);
+
+    const footerHeight = footerAreaHeightAlt(Boolean(date), urlFontSize);
+    const titleBlockTop = bottomTop + 16;
+    const titleBlockBottom = CARD_SIZE - footerHeight - 12;
+    const titleBlockHeight = Math.max(0, titleBlockBottom - titleBlockTop);
+
+    measureCtx.font = `700 ${fontSize}px ${PHOTOCARD_FONT}`;
+    const titleLines = wrapTextLines(measureCtx, title, titleMaxWidth);
+    const titleContentHeight = titleLines.length * lineHeight;
+    const titleStartY =
+        titleBlockTop +
+        Math.max(0, (titleBlockHeight - titleContentHeight) / 2);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(CARD_SIZE * EXPORT_SCALE);
+    canvas.height = Math.round(CARD_SIZE * EXPORT_SCALE);
+
+    const ctx = canvas.getContext("2d");
+    ctx.scale(EXPORT_SCALE, EXPORT_SCALE);
+
+    if (postImage) {
+        drawCoverImage(ctx, postImage, 0, 0, CARD_SIZE, IMAGE_HEIGHT);
+    } else {
+        const gradient = ctx.createLinearGradient(
+            0,
+            0,
+            CARD_SIZE,
+            IMAGE_HEIGHT,
+        );
+        gradient.addColorStop(0, primary);
+        gradient.addColorStop(1, "#0f172a");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, CARD_SIZE, IMAGE_HEIGHT);
+    }
+
+    drawPhotocardBottomBoxBackground(ctx);
+
+    drawAltBottomBoxTopBorder(ctx);
+
+    drawImageWatermarkIcon(
+        ctx,
+        iconImage,
+        {
+            centerX: CARD_SIZE / 2,
+            centerY: altSeamIconCenterY(),
+            size: ALT_SEAM_ICON_SIZE,
+        },
+        ALT_SEAM_ICON_OPACITY,
+        ALT_SEAM_ICON_ZOOM,
+    );
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `700 ${fontSize}px ${PHOTOCARD_FONT}`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.shadowColor = "rgba(0,0,0,0.45)";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 2;
+
+    titleLines.forEach((line, index) => {
+        ctx.fillText(line, CARD_SIZE / 2, titleStartY + index * lineHeight);
+    });
+
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    const barHeight = footerHeight;
+    const barTop = CARD_SIZE - barHeight;
+    ctx.fillStyle = ALT_BOTTOM_BAR_BG;
+    ctx.fillRect(0, barTop, CARD_SIZE, barHeight);
+
+    const footerBaseY = CARD_SIZE - ALT_BOTTOM_BAR_PADDING_Y;
+
+    if (date) {
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `400 ${DATE_SIZE_ALT}px ${PHOTOCARD_FONT}`;
+        ctx.textAlign = "left";
+        ctx.textBaseline = "bottom";
+        ctx.shadowColor = "rgba(0,0,0,0.4)";
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetY = 1;
+        ctx.fillText(date, FOOTER_BAR_X_PADDING, footerBaseY);
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+    }
+
+    drawFooterHintWithIcons(ctx, CARD_SIZE / 2, footerBaseY);
+
+    const urlLines = wrapUrlLines(
+        measureCtx,
+        siteUrl,
+        LOGO_MAX_WIDTH,
+        urlFontSize,
+    );
+    const urlLineHeight = Math.round(urlFontSize * 1.25);
+
+    ctx.fillStyle = "#ffffff";
+    setFooterUrlTextStyle(ctx, urlFontSize);
+    ctx.textAlign = "right";
+    ctx.textBaseline = "bottom";
+    urlLines.forEach((line, index) => {
+        const lineY =
+            footerBaseY - (urlLines.length - 1 - index) * urlLineHeight;
+        ctx.fillText(line, CARD_SIZE - FOOTER_BAR_X_PADDING, lineY);
+    });
+    ctx.letterSpacing = "0px";
 
     return canvas;
 }
@@ -631,13 +1057,43 @@ function sanitizeFilenamePart(value, fallback = "image") {
     return cleaned || fallback;
 }
 
-function buildDownloadFilename(data) {
+function buildDownloadFilename(data, variant = "primary") {
     const postId = sanitizeFilenamePart(
         data.id ?? data.postId ?? "post",
         "post",
     );
 
+    if (variant === "alt") {
+        return `photo-card-${postId}-design-2.png`;
+    }
+
     return `photo-card-${postId}.png`;
+}
+
+async function downloadAltCard(data, downloadBtn = null) {
+    const modal = getModal();
+    const btn =
+        downloadBtn || modal?.querySelector("[data-photocard-download]");
+
+    if (btn && !downloadBtn) {
+        btn.disabled = true;
+    }
+
+    try {
+        const canvas = await renderAltPhotocardCanvas(data);
+        const blob = await canvasToBlob(canvas);
+        downloadBlob(blob, buildDownloadFilename(data, "alt"));
+    } catch (error) {
+        console.error("Alt photocard download failed:", error);
+        window.alert(
+            "ডিজাইন ২ ডাউনলোড করা যায়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।",
+        );
+        throw error;
+    } finally {
+        if (btn && !downloadBtn) {
+            btn.disabled = false;
+        }
+    }
 }
 
 async function waitForImages(container) {
@@ -662,17 +1118,33 @@ async function waitForImages(container) {
 
 async function renderPreview(data) {
     const cardRoot = getCardRoot();
-    if (!cardRoot) {
+    const cardAltRoot = getCardAltRoot();
+
+    if (!cardRoot || !cardAltRoot) {
         return;
     }
 
-    cardRoot.innerHTML = buildCardHtml(data);
-    await waitForImages(cardRoot);
+    cardRoot.innerHTML = buildCardHtmlForVariant(data, activeDesign);
+    cardAltRoot.innerHTML = buildCardHtmlForVariant(data, inactiveDesign());
+
+    await Promise.all([waitForImages(cardRoot), waitForImages(cardAltRoot)]);
+
     replaceBrokenImages(cardRoot, data.primaryColor);
+    replaceBrokenImages(cardAltRoot, data.primaryColor);
+
     await new Promise((resolve) =>
         requestAnimationFrame(() => requestAnimationFrame(resolve)),
     );
     applyPreviewScale();
+}
+
+async function swapActiveDesign() {
+    if (!currentPhotocardData) {
+        return;
+    }
+
+    activeDesign = inactiveDesign();
+    await renderPreview(currentPhotocardData);
 }
 
 function ensurePreviewScaler(cardRoot, cardEl) {
@@ -690,6 +1162,26 @@ function ensurePreviewScaler(cardRoot, cardEl) {
     return scaler;
 }
 
+function scalePreviewCard(cardRoot, cardEl, displaySize) {
+    const previewScaler = ensurePreviewScaler(cardRoot, cardEl);
+    const displayScale = displaySize / CARD_SIZE;
+
+    previewScaler.style.width = `${displaySize}px`;
+    previewScaler.style.height = `${displaySize}px`;
+    previewScaler.style.overflow = "hidden";
+
+    cardRoot.style.display = "block";
+    cardRoot.style.lineHeight = "0";
+    cardRoot.style.width = `${displaySize}px`;
+    cardRoot.style.height = `${displaySize}px`;
+    cardRoot.style.overflow = "hidden";
+
+    cardEl.style.width = `${CARD_SIZE}px`;
+    cardEl.style.height = `${CARD_SIZE}px`;
+    cardEl.style.transform = `scale(${displayScale})`;
+    cardEl.style.transformOrigin = "top left";
+}
+
 function getModalPanel() {
     return document.getElementById(PANEL_ID);
 }
@@ -697,6 +1189,8 @@ function getModalPanel() {
 function resetModalLayout() {
     const panel = getModalPanel();
     const viewport = getCardViewport();
+    const viewportAlt = getCardViewportAlt();
+    const body = getCardBody();
 
     if (panel) {
         panel.style.width = "";
@@ -704,11 +1198,20 @@ function resetModalLayout() {
         panel.style.maxWidth = "";
     }
 
-    if (viewport) {
-        viewport.style.width = "";
-        viewport.style.height = "";
-        viewport.style.flex = "";
+    if (body) {
+        body.style.width = "";
+        body.style.height = "";
     }
+
+    [viewport, viewportAlt].forEach((node) => {
+        if (!node) {
+            return;
+        }
+
+        node.style.width = "";
+        node.style.height = "";
+        node.style.flex = "";
+    });
 }
 
 function getCardViewport() {
@@ -717,78 +1220,127 @@ function getCardViewport() {
 
 function applyPreviewScale() {
     const cardRoot = getCardRoot();
-    const cardEl = cardRoot?.querySelector(".post-photocard-export");
+    const cardAltRoot = getCardAltRoot();
+    const cardEl = getPreviewCardEl(cardRoot);
+    const cardAltEl = getPreviewCardEl(cardAltRoot);
     const viewport = getCardViewport();
+    const viewportAlt = getCardViewportAlt();
     const panel = getModalPanel();
-    if (!cardEl || !viewport || !panel) {
+    const body = getCardBody();
+    const thumbBtn = getThumbButton();
+
+    if (!cardEl || !cardAltEl || !viewport || !viewportAlt || !panel) {
         return;
     }
 
-    const scaler = cardRoot.querySelector(".post-photocard-scaler");
+    [cardRoot, cardAltRoot].forEach((root) => {
+        const scaler = root?.querySelector(".post-photocard-scaler");
+        const el = getPreviewCardEl(root);
 
-    cardEl.style.transform = "";
-    cardEl.style.transformOrigin = "";
-    cardRoot.style.width = "";
-    cardRoot.style.height = "";
-    cardRoot.style.overflow = "";
+        if (el) {
+            el.style.transform = "";
+            el.style.transformOrigin = "";
+        }
 
-    if (scaler) {
-        scaler.style.width = "";
-        scaler.style.height = "";
-    }
+        if (root) {
+            root.style.width = "";
+            root.style.height = "";
+            root.style.overflow = "";
+        }
+
+        if (scaler) {
+            scaler.style.width = "";
+            scaler.style.height = "";
+        }
+    });
 
     const header = panel.querySelector("[data-photocard-header]");
     const headerHeight = header?.offsetHeight ?? 52;
     const modalGutter = 40;
-    const maxWidth = Math.min(
-        window.innerWidth - modalGutter,
-        MODAL_MAX_CARD_SIZE,
-    );
-    const maxHeight = Math.min(
-        window.innerHeight - modalGutter - headerHeight,
-        MODAL_MAX_CARD_SIZE,
-    );
-    const scale = Math.min(1, maxWidth / CARD_SIZE, maxHeight / CARD_SIZE);
-    const scaled = Math.round(CARD_SIZE * scale);
+    const bodyGap = 12;
+    const bodyPaddingX = 24;
+    const bodyPaddingTop = 12;
+    const thumbBorder = 8;
+    const thumbSlot = THUMB_DISPLAY_SIZE + thumbBorder;
+    const availableWidth = window.innerWidth - modalGutter;
+    const availableHeight =
+        window.innerHeight - modalGutter - headerHeight - bodyPaddingTop;
 
-    panel.style.width = `${scaled}px`;
-    panel.style.maxWidth = `${scaled}px`;
-    panel.style.height = `${scaled + headerHeight}px`;
+    const originalMaxWidth = Math.min(
+        MODAL_MAX_CARD_SIZE,
+        availableWidth - bodyPaddingX,
+    );
+    const originalMaxHeight = Math.min(MODAL_MAX_CARD_SIZE, availableHeight);
+    let mainScale = Math.min(
+        1,
+        originalMaxWidth / CARD_SIZE,
+        originalMaxHeight / CARD_SIZE,
+    );
+    let mainScaled = Math.floor(CARD_SIZE * mainScale);
 
-    viewport.style.width = `${scaled}px`;
-    viewport.style.height = `${scaled}px`;
+    let panelWidth = mainScaled + bodyGap + thumbSlot + bodyPaddingX;
+    if (panelWidth > availableWidth) {
+        const fitMainWidth =
+            availableWidth - bodyPaddingX - bodyGap - thumbSlot;
+        mainScale = Math.min(mainScale, fitMainWidth / CARD_SIZE);
+        mainScaled = Math.floor(CARD_SIZE * mainScale);
+        panelWidth = mainScaled + bodyGap + thumbSlot + bodyPaddingX;
+    }
+
+    const thumbScaled = THUMB_DISPLAY_SIZE;
+
+    panel.style.width = `${panelWidth}px`;
+    panel.style.maxWidth = `${availableWidth}px`;
+    panel.style.height = "";
+
+    if (body) {
+        body.style.width = `${mainScaled + bodyGap + thumbSlot}px`;
+        body.style.height = "";
+    }
+
+    viewport.style.width = `${mainScaled}px`;
+    viewport.style.height = `${mainScaled}px`;
     viewport.style.flex = "0 0 auto";
 
-    const previewScaler = ensurePreviewScaler(cardRoot, cardEl);
+    viewportAlt.style.width = `${thumbScaled}px`;
+    viewportAlt.style.height = `${thumbScaled}px`;
+    viewportAlt.style.flex = "0 0 auto";
 
-    previewScaler.style.width = `${scaled}px`;
-    previewScaler.style.height = `${scaled}px`;
-    cardRoot.style.width = `${scaled}px`;
-    cardRoot.style.height = `${scaled}px`;
-
-    if (scale < 1) {
-        cardEl.style.transform = `scale(${scale})`;
-        cardEl.style.transformOrigin = "top left";
+    if (thumbBtn) {
+        thumbBtn.style.width = `${thumbSlot}px`;
+        thumbBtn.style.height = `${thumbSlot}px`;
     }
+
+    scalePreviewCard(cardRoot, cardEl, mainScaled);
+    scalePreviewCard(cardAltRoot, cardAltEl, thumbScaled);
 }
 
 async function downloadCard(data) {
-    const cardRoot = getCardRoot();
-    if (!cardRoot?.querySelector(".post-photocard-export")) {
-        window.alert("ফটোকার্ড তৈরি করা যায়নি। আবার চেষ্টা করুন।");
-        return;
-    }
-
     const modal = getModal();
     const downloadBtn = modal?.querySelector("[data-photocard-download]");
+
     if (downloadBtn) {
         downloadBtn.disabled = true;
     }
 
     try {
+        if (activeDesign === "alt") {
+            await downloadAltCard(data, downloadBtn);
+            return;
+        }
+
+        const cardRoot = getCardRoot();
+        if (
+            !cardRoot?.querySelector(".post-photocard-export") &&
+            !cardRoot?.querySelector(".post-photocard-export-alt")
+        ) {
+            window.alert("ফটোকার্ড তৈরি করা যায়নি। আবার চেষ্টা করুন।");
+            return;
+        }
+
         const canvas = await renderPhotocardCanvas(data);
         const blob = await canvasToBlob(canvas);
-        downloadBlob(blob, buildDownloadFilename(data));
+        downloadBlob(blob, buildDownloadFilename(data, "primary"));
     } catch (error) {
         console.error("Photocard download failed:", error);
         window.alert(
@@ -810,6 +1362,7 @@ function openModal(button) {
     }
 
     currentPhotocardData = data;
+    activeDesign = "alt";
     modal.classList.remove("hidden");
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("overflow-hidden");
@@ -832,6 +1385,13 @@ function initPostPhotocard() {
             if (currentPhotocardData) {
                 void downloadCard(currentPhotocardData);
             }
+            return;
+        }
+
+        const thumbBtn = event.target.closest("#post-photocard-thumb-btn");
+        if (thumbBtn) {
+            event.preventDefault();
+            void swapActiveDesign();
             return;
         }
 

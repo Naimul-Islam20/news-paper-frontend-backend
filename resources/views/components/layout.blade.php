@@ -185,6 +185,9 @@
     @endif
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if(google_adsense_configured())
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ google_adsense_client() }}" crossorigin="anonymous"></script>
+    @endif
     @php
     $__primary = optional($siteMeta)->primary_color ?? null;
     $__primaryOk = is_string($__primary) && preg_match('/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/', $__primary);

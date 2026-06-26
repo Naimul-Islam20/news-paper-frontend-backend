@@ -12,6 +12,14 @@
             src: url("{{ asset('fonts/SutonnyMJ.ttf') }}") format("truetype");
         }
 
+        #unicode-input {
+            font-family: "SolaimanLipi", ui-sans-serif, sans-serif !important;
+            font-weight: 400 !important;
+            font-synthesis: none !important;
+            -webkit-text-stroke: 0.3px currentColor;
+            paint-order: stroke fill;
+        }
+
         #bijoy-input.bijoy-text {
             font-family: "SutonnyMJ", "SutonnyMJ Regular", monospace !important;
             font-weight: 400 !important;
@@ -61,7 +69,7 @@
                         rows="9"
                         placeholder="ইউনিকোডের লেখা পেস্ট করুন"
                         data-placeholder-en="Paste Unicode text"
-                        class="w-full px-4 py-3 text-2xl md:text-3xl font-semibold serif text-title leading-tight bg-blue-50 border border-blue-400 rounded-sm focus:border-2 focus:border-blue-500 focus:ring-0 focus:outline-none outline-none resize-y min-h-[220px] h-[220px] overflow-y-auto notranslate placeholder:serif placeholder:font-semibold placeholder:text-2xl md:placeholder:text-3xl placeholder:leading-tight"></textarea>
+                        class="w-full px-4 py-3 text-2xl md:text-3xl serif text-title leading-tight bg-blue-50 border border-blue-400 rounded-sm focus:border-2 focus:border-blue-500 focus:ring-0 focus:outline-none outline-none resize-y min-h-[220px] h-[220px] overflow-y-auto notranslate placeholder:serif placeholder:text-2xl md:placeholder:text-3xl placeholder:leading-tight"></textarea>
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center gap-2 md:gap-3">

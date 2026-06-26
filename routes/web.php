@@ -49,6 +49,7 @@ Route::get('/latest', [FrontendCategoryController::class, 'latest'])->name('late
 
 // আর্কাইভ – সর্বশেষ পেজের মতো UI
 Route::get('/archive', [FrontendCategoryController::class, 'archive'])->name('archive');
+Route::get('/archive/calendar', [FrontendCategoryController::class, 'archiveCalendar'])->name('archive.calendar');
 
 // Category listing routes
 Route::get('/category/{slug}', [FrontendCategoryController::class, 'show'])->name('category.show');
@@ -122,10 +123,8 @@ Route::prefix('admin')
                 Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
                 Route::get('/sub-categories', [SubCategoryController::class, 'index'])->name('sub-categories.index');
 
-                // Topic Routes
                 Route::get('/topics', [App\Http\Controllers\Admin\TopicController::class, 'index'])->name('topics.index');
                 Route::post('/topics', [App\Http\Controllers\Admin\TopicController::class, 'store'])->name('topics.store');
-                Route::post('/topics/quick-store', [App\Http\Controllers\Admin\TopicController::class, 'quickStore'])->name('topics.quick-store');
                 Route::put('/topics/{id}', [App\Http\Controllers\Admin\TopicController::class, 'update'])->name('topics.update');
                 Route::delete('/topics/{id}', [App\Http\Controllers\Admin\TopicController::class, 'destroy'])->name('topics.destroy');
             });
@@ -137,6 +136,7 @@ Route::prefix('admin')
                 Route::get('/posts/pick-image', [PostController::class, 'pickImage'])->name('posts.pick-image');
                 Route::post('/posts/pick-image', [PostController::class, 'applyPickedImage'])->name('posts.pick-image.apply');
                 Route::post('/posts/reporters/quick-store', [ReporterController::class, 'quickStore'])->name('posts.reporters.quick-store');
+                Route::post('/topics/quick-store', [App\Http\Controllers\Admin\TopicController::class, 'quickStore'])->name('topics.quick-store');
                 Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
                 Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
                 Route::get('/posts/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');

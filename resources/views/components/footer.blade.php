@@ -53,13 +53,13 @@
             <!-- Column 2: Category Links (Span 4) -->
             <div class="col-span-2 md:col-span-4 md:px-1 py-3 md:py-4 md:border-r md:border-slate-300">
                 @if(isset($footerCol2) && $footerCol2->isNotEmpty())
-                <div class="grid w-full grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-base md:text-xl">
+                <div class="grid w-full grid-cols-2 gap-x-4 gap-y-1 text-base md:text-xl">
                     @foreach($footerCol2 as $cat)
                     <a href="{{ route('category.show', $cat->slug) }}" class="block w-full font-medium hover:text-primary transition-all">{{ $cat->name }}</a>
                     @endforeach
                 </div>
                 @else
-                <div class="grid w-full grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-base md:text-xl">
+                <div class="grid w-full grid-cols-2 gap-x-4 gap-y-1 text-base md:text-xl">
                     <a href="{{ route('gallery.index') }}" class="block w-full font-medium hover:text-primary transition-all">ছবি</a>
                     <a href="{{ route('videos.index') }}" class="block w-full font-medium hover:text-primary transition-all">ভিডিও</a>
                 </div>
