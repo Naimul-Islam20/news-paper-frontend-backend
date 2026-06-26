@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\Post;
 use App\Models\Setting;
+use App\Observers\PostObserver;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -15,6 +17,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureForcedRootUrl();
+
+        Post::observe(PostObserver::class);
 
         // Share header/footer categories with all frontend layout views
         View::composer(

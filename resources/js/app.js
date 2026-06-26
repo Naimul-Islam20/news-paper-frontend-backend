@@ -1,5 +1,6 @@
 import './bootstrap';
 import './post-photocard';
+import './web-push';
 import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;

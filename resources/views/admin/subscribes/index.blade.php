@@ -7,7 +7,53 @@
 <div class="py-1 w-full mx-auto">
     <div class="max-w-6xl mx-auto space-y-8">
 
-        {{-- Section 1: Send Subscription Email Form --}}
+        {{-- Section 1: Browser Push Notifications --}}
+        <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div class="p-4 sm:p-6">
+                <div class="pb-6 border-b border-slate-100 dark:border-slate-800 mb-6 sm:mb-8 flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                        <h3 class="text-lg font-medium text-slate-900 dark:text-white">Browser Push Notification</h3>
+                        <p class="text-sm text-slate-500 mt-1">ভিজিটর "হ্যাঁ" দিলে নতুন পোস্ট পাবলিশ হলে তাদের ফোন/ব্রাউজারে খবর যাবে।</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs uppercase tracking-wide text-slate-500">Subscribers</p>
+                        <p class="text-2xl font-semibold text-slate-900 dark:text-white">{{ number_format($pushSubscriberCount ?? 0) }}</p>
+                        <p class="text-xs mt-1 {{ ($pushEnabled ?? false) ? 'text-emerald-600' : 'text-amber-600' }}">
+                            {{ ($pushEnabled ?? false) ? 'সক্রিয়' : 'সেটআপ প্রয়োজন' }}
+                        </p>
+                    </div>
+                </div>
+
+                @if(!($pushEnabled ?? false))
+                <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                    সার্ভারে <code class="font-mono text-xs">php artisan webpush:vapid</code> চালিয়ে .env-এ VAPID keys যোগ করুন, তারপর <code class="font-mono text-xs">php artisan migrate</code>।
+                </div>
+                @endif
+
+                <form action="{{ route('admin.subscribes.push-test') }}" method="POST" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="block text-sm font-normal text-slate-900 mb-2">শিরোনাম</label>
+                        <input type="text" name="title" required value="{{ site_name_bn() ?: site_name() }}" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-normal text-slate-900 mb-2">বার্তা</label>
+                        <input type="text" name="body" required placeholder="নতুন খবর প্রকাশিত হয়েছে" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-normal text-slate-900 mb-2">লিংক (ঐচ্ছিক)</label>
+                        <input type="url" name="link" placeholder="{{ front_home_url() }}" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 text-sm">
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg" @disabled(!($pushEnabled ?? false))>
+                            টেস্ট Push পাঠান
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- Section 2: Send Subscription Email Form --}}
         <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div class="p-4 sm:p-6">
                 <div class="pb-6 border-b border-slate-100 dark:border-slate-800 mb-6 sm:mb-8">
@@ -48,7 +94,7 @@
             </div>
         </div>
 
-        {{-- Section 2: Subscriber List --}}
+        {{-- Section 3: Subscriber List --}}
         <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <h3 class="text-sm font-medium text-slate-900 dark:text-white">Subscriber List</h3>

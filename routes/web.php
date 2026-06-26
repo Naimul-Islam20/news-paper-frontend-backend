@@ -71,6 +71,10 @@ Route::post('/subscribe', function (\Illuminate\Http\Request $request) {
     return back()->with('subscribe_success', 'সাবস্ক্রাইব করার জন্য ধন্যবাদ।');
 })->name('frontend.subscribe');
 
+Route::get('/push/config', [\App\Http\Controllers\PushSubscriptionController::class, 'config'])->name('push.config');
+Route::post('/push/subscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'subscribe'])->name('push.subscribe');
+Route::delete('/push/unsubscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'unsubscribe'])->name('push.unsubscribe');
+
 Route::get('/ad/click/{advertisement}', AdvertisementClickController::class)
     ->whereNumber('advertisement')
     ->middleware('throttle:120,1')
@@ -203,6 +207,7 @@ Route::prefix('admin')
             Route::middleware('feature:subscribes.view')->group(function (): void {
                 Route::get('/subscribes', [SubscribeController::class, 'index'])->name('subscribes.index');
                 Route::post('/subscribes', [SubscribeController::class, 'store'])->name('subscribes.store');
+                Route::post('/subscribes/push-test', [SubscribeController::class, 'sendTestPush'])->name('subscribes.push-test');
             });
 
             Route::middleware('feature:users.manage')->group(function (): void {
