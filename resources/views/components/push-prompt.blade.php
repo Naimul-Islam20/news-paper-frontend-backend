@@ -1,37 +1,38 @@
 <div
     id="push-prompt-root"
-    class="hidden fixed inset-x-0 bottom-0 z-[110] p-3 sm:p-4 pointer-events-none"
+    class="hidden w-full bg-slate-900 text-white border-b border-slate-800"
     aria-hidden="true"
     role="dialog"
     aria-label="নোটিফিকেশন অনুরোধ"
     data-push-config-url="{{ route('push.config') }}"
     data-push-subscribe-url="{{ route('push.subscribe') }}"
-    data-push-unsubscribe-url="{{ route('push.unsubscribe') }}">
-    <div class="pointer-events-auto mx-auto max-w-lg rounded-xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
-        <div class="flex items-start gap-3 p-4">
+    data-push-unsubscribe-url="{{ route('push.unsubscribe') }}"
+    data-sw-url="{{ asset('sw.js') }}">
+    <div class="container flex flex-wrap items-center justify-between gap-2 py-2 px-3 sm:px-4">
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             @if(!empty(optional($siteMeta)->site_icon))
-            <img src="{{ storage_image_url($siteMeta->site_icon) }}" alt="" width="48" height="48" class="w-12 h-12 rounded-full object-contain bg-slate-50 shrink-0 border border-slate-100">
+            <img src="{{ storage_image_url($siteMeta->site_icon) }}" alt="" width="32" height="32" class="w-8 h-8 rounded-full object-contain bg-white shrink-0">
             @else
-            <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-bold text-lg">
+            <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shrink-0 font-bold text-sm">
                 {{ mb_substr(site_name_bn() ?: site_name(), 0, 1) }}
             </div>
             @endif
-            <div class="flex-1 min-w-0 pt-0.5">
-                <p class="text-sm font-bold text-slate-900 leading-snug">{{ site_name_bn() ?: site_name() }}</p>
-                <p class="text-sm text-slate-600 mt-1 leading-relaxed">সর্বশেষ খবর পেতে নোটিফিকেশন চালু করবেন?</p>
-            </div>
+            <p class="text-xs sm:text-sm leading-snug text-white/95">
+                <span class="font-semibold">{{ site_name_bn() ?: site_name() }}</span>
+                <span class="text-white/80"> — সর্বশেষ খবর পেতে নোটিফিকেশন চালু করবেন?</span>
+            </p>
         </div>
-        <div class="grid grid-cols-2 border-t border-slate-100">
+        <div class="flex items-center gap-2 shrink-0 ml-auto">
             <button
                 type="button"
                 data-push-no
-                class="py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors border-r border-slate-100">
+                class="px-3 py-1.5 text-xs sm:text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 rounded transition-colors">
                 না
             </button>
             <button
                 type="button"
                 data-push-yes
-                class="py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors">
+                class="px-4 py-1.5 text-xs sm:text-sm font-semibold bg-primary text-white hover:opacity-90 rounded transition-opacity min-w-[4.5rem]">
                 হ্যাঁ
             </button>
         </div>

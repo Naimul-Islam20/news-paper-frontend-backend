@@ -334,8 +334,6 @@
         }
     </script>
     @stack('scripts')
-
-    <x-push-prompt />
 </body>
 
 </html>
