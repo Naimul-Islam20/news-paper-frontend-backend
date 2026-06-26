@@ -27,6 +27,10 @@
     --color-caption: #787878;
 }
 
+html {
+    overflow-x: clip;
+}
+
 html,
 body {
     font-family: var(--font-sans);
@@ -271,11 +275,26 @@ body {
         left: 0;
         right: 0;
         width: 100%;
+        max-width: 100%;
         z-index: 60;
         padding: 0 !important;
         margin: 0;
         background: #fff;
+        overflow-x: clip;
+        box-sizing: border-box;
     }
+
+    #header-ad-slot {
+        max-width: 100%;
+        overflow-x: clip;
+        box-sizing: border-box;
+    }
+}
+
+/* হেডার / মেনুর নিচের অ্যাড — container width (site width) */
+[data-ad-slot-root] .container .ad-slot-frame {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* মেনুর নিচের অ্যাড — কম গ্যাপ */

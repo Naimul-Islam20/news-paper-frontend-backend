@@ -40,6 +40,10 @@
                         .special-grid {
                             grid-template-columns: 9.1fr 2.9fr;
                         }
+
+                        .special-grid > * {
+                            min-width: 0;
+                        }
                     }
 
                     .national-grid {
@@ -87,9 +91,9 @@
                                     <span class="text-xs font-medium">{{ $featured->created_at->diffForHumans() }}</span>
                                 </div>
                             </div>
-                            <div class="flex-shrink-0 group overflow-hidden w-full md:w-auto">
+                            <div class="min-w-0 group overflow-hidden w-full md:w-auto md:max-w-[55%]">
                                 <a href="{{ news_url($featured) }}">
-                                    <div class="img-placeholder w-full aspect-video md:aspect-auto md:w-[625px] md:h-[355px]">
+                                    <div class="img-placeholder w-full aspect-video md:aspect-[625/355]">
                                         <img
                                             src="{{ storage_image_url($featured->image) }}"
                                             alt="{{ $featured->title }}"

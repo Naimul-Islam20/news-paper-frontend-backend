@@ -29,20 +29,13 @@
     @scroll.window="updateSticky()"
     x-init="
         $data.syncHeaderAd();
-        const adEl = document.getElementById('header-ad-slot');
-        if (adEl && typeof ResizeObserver !== 'undefined') {
-            new ResizeObserver(() => $data.syncHeaderAd()).observe(adEl);
-        }
-        if (adEl && typeof MutationObserver !== 'undefined') {
-            new MutationObserver(() => $data.syncHeaderAd()).observe(adEl, { attributes: true, attributeFilter: ['class'] });
-        }
-        window.addEventListener('load', () => $data.syncHeaderAd());
+        window.addEventListener('load', () => $data.syncHeaderAd(), { once: true });
         $data.updateSticky();
     ">
     <!-- Mobile Fixed / Desktop Shared Wrapper -->
-    <div id="site-header-shell" class="fixed top-0 left-0 w-full z-50 bg-white md:relative md:z-auto border-b border-slate-100 md:border-b-0 shadow-sm md:shadow-none">
+    <div id="site-header-shell" class="fixed top-0 left-0 w-full max-w-full z-50 bg-white md:relative md:z-auto border-b border-slate-100 md:border-b-0 shadow-sm md:shadow-none overflow-x-clip">
         <!-- Main Header -->
-        <header class="bg-white pt-0 md:pt-1 overflow-visible">
+        <header class="bg-white pt-0 md:pt-1 overflow-x-clip max-w-full">
             <!-- Sidebar Drawer Contents -->
             <template x-teleport="body">
                 <div>

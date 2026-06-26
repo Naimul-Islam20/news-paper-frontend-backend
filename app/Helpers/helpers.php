@@ -664,7 +664,7 @@ if (! function_exists('ad_slot_box_style')) {
     /**
      * Advertisement slot box — config size = min & max (local + Google একই)।
      *
-     * @param  'strip'|'box'  $layout  strip = full-width banner; box = sidebar/inline
+     * @param  'strip'|'full-strip'|'box'  $layout  strip = container banner; full-strip = site full width; box = sidebar/inline
      */
     function ad_slot_box_style(?\App\Models\Advertisement $ad, string $layout = 'strip'): string
     {
@@ -673,6 +673,10 @@ if (! function_exists('ad_slot_box_style')) {
             $stripMobileH = 90;
             $boxMobileH = 240;
 
+            if ($layout === 'full-strip') {
+                return "width:100%;max-width:100%;height:90px;min-height:90px;max-height:90px;--ad-max-width:100%;--ad-max-height:90px;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$stripMobileH}px;";
+            }
+
             return $layout === 'strip'
                 ? "width:100%;height:90px;min-height:90px;max-height:90px;--ad-max-width:100%;--ad-max-height:90px;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$stripMobileH}px;"
                 : "width:100%;aspect-ratio:4/3;max-height:240px;--ad-max-width:100%;--ad-max-height:240px;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$boxMobileH}px;";
@@ -680,8 +684,12 @@ if (! function_exists('ad_slot_box_style')) {
 
         $width = $dims['width'];
         $height = $dims['height'];
-        $mobileMaxH = $layout === 'strip' ? $height : min($height, 240);
+        $mobileMaxH = $layout === 'strip' || $layout === 'full-strip' ? $height : min($height, 240);
         $mobileVars = "--ad-mobile-max-width:100%;--ad-mobile-max-height:{$mobileMaxH}px;";
+
+        if ($layout === 'full-strip') {
+            return "width:100%;max-width:100%;height:{$height}px;min-height:{$height}px;max-height:{$height}px;--ad-max-width:100%;--ad-max-height:{$height}px;{$mobileVars}";
+        }
 
         if ($layout === 'strip') {
             return "width:100%;max-width:{$width}px;height:{$height}px;min-height:{$height}px;max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;{$mobileVars}";

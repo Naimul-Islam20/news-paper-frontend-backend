@@ -211,7 +211,7 @@
     @endif
 </head>
 
-<body class="antialiased text-slate-900 overflow-x-hidden">
+<body class="antialiased text-slate-900 overflow-x-clip max-w-full">
 
     <div id="google_translate_element" class="hidden" aria-hidden="true"></div>
 
@@ -238,7 +238,7 @@
 
     <x-header />
 
-    <main id="main-content" class="pb-4 md:pb-6 pt-0">
+    <main id="main-content" class="pb-4 md:pb-6 pt-0 overflow-x-clip max-w-full">
         {{ $slot }}
     </main>
 
@@ -302,7 +302,7 @@
             if (shell && typeof ResizeObserver !== 'undefined') {
                 new ResizeObserver(syncMainHeaderOffset).observe(shell);
             }
-            window.addEventListener('load', syncMainHeaderOffset);
+            window.addEventListener('load', syncMainHeaderOffset, { once: true });
         });
 
         function scrollToTopGlobal() {
