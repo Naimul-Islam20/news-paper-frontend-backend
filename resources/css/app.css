@@ -172,6 +172,21 @@ header nav ul a,
     color: #212121;
 }
 
+/* Chrome/Safari “Desktop site” — full desktop layout, screen-এ fit, শুধু vertical scroll */
+html.browser-desktop-site,
+html.browser-desktop-site body,
+html.browser-desktop-site #main-content {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+}
+
+html.browser-desktop-site #site-header-shell {
+    position: relative !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+}
+
 /* নিউজ/পোস্ট টাইটেল — হোভারে primary রঙ হবে না */
 .group:hover :is(h1, h2, h3, h4).text-title,
 :is(h1, h2, h3, h4).text-title:hover {
@@ -204,6 +219,10 @@ header nav ul a,
 
 .post-description > p:first-of-type {
     font-weight: 700 !important;
+}
+
+.post-description > p:not(:first-of-type) {
+    font-weight: 400 !important;
 }
 
 @utility text-caption {

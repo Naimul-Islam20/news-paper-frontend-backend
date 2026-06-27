@@ -885,9 +885,8 @@ if (! function_exists('tighten_post_description_paragraph_spacing')) {
                 $style = 'margin:0!important;padding:0!important;';
                 if ($index === 1) {
                     $style .= 'font-weight:700!important;';
-                }
-                if ($index > 1) {
-                    $style .= 'padding-top:0.7em!important;';
+                } else {
+                    $style .= 'font-weight:400!important;padding-top:0.7em!important;';
                 }
 
                 $tag = $match[0];

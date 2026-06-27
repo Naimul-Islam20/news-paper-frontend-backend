@@ -108,7 +108,15 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                     }
                                 }
 
-                                /* পোস্ট বিবরণ — সব প্যারার মাঝের gap (blade inline, build ছাড়াও) */
+                                /* পোস্ট বিবরণ — প্রথম প্যারা bold, বাকি normal */
+                                .post-description > p:first-of-type {
+                                    font-weight: 700 !important;
+                                }
+
+                                .post-description > p:not(:first-of-type) {
+                                    font-weight: 400 !important;
+                                }
+
                                 .post-description p {
                                     margin: 0 !important;
                                     padding: 0 !important;

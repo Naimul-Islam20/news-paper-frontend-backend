@@ -4,6 +4,72 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+    (function () {
+        var WIDTH = 1380;
+
+        function isBrowserDesktopSiteRequest() {
+            var ua = navigator.userAgent || '';
+            var mobileUa = /Mobile|iPhone|iPod|Android.*Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+            var shortSide = Math.min(window.screen.width || 0, window.screen.height || 0);
+            var phoneLike = shortSide > 0 && shortSide <= 820;
+
+            if (!phoneLike) {
+                return false;
+            }
+
+            // Chrome/Firefox Android: desktop UA on phone
+            if (!mobileUa) {
+                return true;
+            }
+
+            // iOS Safari: mobile UA but ~980px layout (Request Desktop Website)
+            var layoutWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+
+            return layoutWidth >= 980;
+        }
+
+        function applyBrowserDesktopViewport() {
+            if (document.documentElement.classList.contains('browser-desktop-site')) {
+                return;
+            }
+
+            if (!isBrowserDesktopSiteRequest()) {
+                return;
+            }
+
+            var meta = document.querySelector('meta[name="viewport"]');
+            if (meta) {
+                var screenWidth = Math.min(
+                    window.screen.width || 390,
+                    window.innerWidth || window.screen.width || 390,
+                );
+                var scale = Math.max(0.2, Math.min(1, screenWidth / WIDTH));
+                var scaleText = scale.toFixed(4);
+
+                meta.setAttribute(
+                    'content',
+                    'width=' +
+                        WIDTH +
+                        ', initial-scale=' +
+                        scaleText +
+                        ', minimum-scale=' +
+                        scaleText +
+                        ', maximum-scale=3, user-scalable=yes',
+                );
+
+                document.documentElement.style.setProperty('--browser-desktop-scale', scaleText);
+            }
+
+            document.documentElement.classList.add('browser-desktop-site');
+        }
+
+        try {
+            applyBrowserDesktopViewport();
+            document.addEventListener('DOMContentLoaded', applyBrowserDesktopViewport, { once: true });
+        } catch (e) {}
+    })();
+    </script>
     @php
     $adsenseClient = google_adsense_client();
     @endphp
@@ -341,7 +407,7 @@
             const shell = document.getElementById('site-header-shell');
             const main = document.getElementById('main-content');
             if (!shell || !main) return;
-            if (window.matchMedia('(min-width: 768px)').matches) {
+            if (window.matchMedia('(min-width: 768px)').matches || document.documentElement.classList.contains('browser-desktop-site')) {
                 main.style.paddingTop = '';
             } else {
                 const extraGap = 12;
