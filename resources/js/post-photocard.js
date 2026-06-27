@@ -17,6 +17,8 @@ const FOOTER_BAR_X_PADDING = 36;
 const TITLE_X_PADDING = 44;
 const TITLE_FONT_WEIGHT = 600;
 const FOOTER_HINT_SIZE = 32;
+const FOOTER_HINT_SIZE_PRIMARY = 40;
+const FOOTER_HINT_WEIGHT_PRIMARY = "700";
 const FOOTER_HINT_TEXT_PRIMARY = "বিস্তারিত কমেন্টে ...";
 const FOOTER_HINT_TEXT_ALT = "বিস্তারিত কমেন্টে";
 const FOOTER_HINT_ICON_SIZE = 28;
@@ -37,6 +39,8 @@ const IMAGE_ICON_WATERMARK_OPACITY = 0.48;
 const ALT_SEAM_ICON_OPACITY = 1;
 const ALT_SEAM_ICON_SIZE = 136;
 const ALT_SEAM_ICON_ZOOM = 1.18;
+const ALT_TITLE_TOP_GAP = 16;
+const ALT_TITLE_BOTTOM_GAP = 12;
 const IMAGE_ICON_PADDING = 24;
 const EXPORT_SCALE = 1;
 const PHOTOCARD_FONT = "SolaimanLipi, sans-serif";
@@ -256,18 +260,18 @@ function titleFontSize(title) {
     const length = String(title ?? "").length;
 
     if (length > 120) {
-        return 53;
+        return 69;
     }
 
     if (length > 80) {
-        return 59;
+        return 75;
     }
 
     if (length > 50) {
-        return 65;
+        return 81;
     }
 
-    return 69;
+    return 83;
 }
 
 function footerUrlMaxWidth(hasLogo) {
@@ -332,7 +336,7 @@ function wrapUrlLines(ctx, url, maxWidth, fontSize) {
 
 function footerAreaHeight(hasLogo) {
     const logoBoxHeight = LOGO_HEIGHT;
-    const textHeight = FOOTER_HINT_SIZE + FOOTER_HINT_SIZE + 12;
+    const textHeight = FOOTER_HINT_SIZE_PRIMARY + 6;
 
     return Math.max(logoBoxHeight, textHeight) + 18;
 }
@@ -487,24 +491,35 @@ function footerAreaHeightAlt(hasDate, urlFontSize = FOOTER_URL_SIZE_ALT) {
     return contentHeight + ALT_BOTTOM_BAR_PADDING_Y * 2;
 }
 
+function altTitleBlockInsets() {
+    return {
+        top: Math.ceil(ALT_SEAM_ICON_SIZE / 2) + ALT_TITLE_TOP_GAP,
+        bottom: footerAreaHeightAlt(true) + ALT_TITLE_BOTTOM_GAP,
+    };
+}
+
+function altTitleBlockInsetsForFooter(footerReserved) {
+    return {
+        top: Math.ceil(ALT_SEAM_ICON_SIZE / 2) + ALT_TITLE_TOP_GAP,
+        bottom: footerReserved + ALT_TITLE_BOTTOM_GAP,
+    };
+}
+
+function altTitleStartY(blockTop, blockHeight, contentHeight) {
+    const freeSpace = Math.max(0, blockHeight - contentHeight);
+    const bias = freeSpace > 0 ? Math.round(freeSpace * 0.58) : 0;
+
+    return blockTop + bias;
+}
+
 function buildCardHtml(data) {
     const title = escapeHtml(data.title);
     const siteName = escapeHtml(data.siteName || "");
-    const siteUrl = escapeHtml(data.siteUrl || "");
     const date = escapeHtml(data.date || "");
     const primary = escapeHtml(data.primaryColor || "#28a745");
     const fontSize = titleFontSize(data.title);
     const unifiedOverlay = unifiedOverlayGradientCss();
     const { height: overlayHeight } = unifiedOverlayMetrics();
-    const urlMaxWidth = footerUrlMaxWidth(Boolean(data.logo));
-    const measureCanvas = document.createElement("canvas");
-    const measureCtx = measureCanvas.getContext("2d");
-    const urlFontSize = fitFooterUrlFontSize(
-        measureCtx,
-        data.siteUrl,
-        urlMaxWidth,
-        FOOTER_URL_SIZE_PRIMARY,
-    );
 
     const imageBlock = data.image
         ? `<img ${imageTagAttributes(data.image)} style="display:block;width:100%;height:100%;object-fit:cover;object-position:center top;">`
@@ -535,8 +550,7 @@ function buildCardHtml(data) {
                     <h1 style="position:absolute;left:${TITLE_X_PADDING}px;right:${TITLE_X_PADDING}px;top:${titleTop}px;bottom:${titleBottom}px;margin:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:${fontSize}px;line-height:1.32;font-weight:${TITLE_FONT_WEIGHT};color:#ffffff;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,0.45);">${title}</h1>
                     <div style="position:absolute;left:${SECTION_X_PADDING}px;right:${SECTION_X_PADDING}px;bottom:18px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;z-index:3;">
                         <div style="flex:1;min-width:0;text-align:left;color:#ffffff;">
-                            <div style="font-size:${FOOTER_HINT_SIZE}px;font-weight:400;line-height:1.35;opacity:0.95;">${FOOTER_HINT_TEXT_PRIMARY}</div>
-                            <div style="font-size:${urlFontSize}px;font-weight:${FOOTER_URL_WEIGHT};line-height:1.25;margin-top:6px;word-break:break-all;">${siteUrl}</div>
+                            <div style="font-size:${FOOTER_HINT_SIZE_PRIMARY}px;font-weight:${FOOTER_HINT_WEIGHT_PRIMARY};line-height:1.35;opacity:0.98;">${FOOTER_HINT_TEXT_PRIMARY}</div>
                         </div>
                         <div style="flex-shrink:0;">${logoBlock}</div>
                     </div>
@@ -567,8 +581,23 @@ function buildAltCardHtml(data) {
         : `<div style="width:100%;height:100%;background:linear-gradient(135deg,${primary} 0%,#0f172a 100%);"></div>`;
 
     const footerReserved = footerAreaHeightAlt(Boolean(date), urlFontSize);
-    const titleTop = 16;
-    const titleBottom = footerReserved + 12;
+    const titleInsets = altTitleBlockInsetsForFooter(footerReserved);
+    const titleTop = titleInsets.top;
+    const titleBottom = titleInsets.bottom;
+    const titleMaxWidth = CARD_SIZE - TITLE_X_PADDING * 2;
+    const titleLineHeight = Math.round(fontSize * 1.32);
+    measureCtx.font = `${TITLE_FONT_WEIGHT} ${fontSize}px ${PHOTOCARD_FONT}`;
+    const titleLines = wrapTextLines(measureCtx, data.title, titleMaxWidth);
+    const titleContentHeight = titleLines.length * titleLineHeight;
+    const titleBlockHeight = Math.max(
+        0,
+        BOTTOM_HEIGHT - titleTop - titleBottom,
+    );
+    const titlePaddingTop = altTitleStartY(
+        0,
+        titleBlockHeight,
+        titleContentHeight,
+    );
 
     const dateBlock = date
         ? `<div style="font-size:${DATE_SIZE_ALT}px;font-weight:400;line-height:1.35;opacity:0.95;color:#ffffff;text-shadow:0 1px 4px rgba(0,0,0,0.35);">${date}</div>`
@@ -585,7 +614,7 @@ function buildAltCardHtml(data) {
             <div class="post-photocard-bottom" style="position:relative;width:${CARD_SIZE}px;height:${BOTTOM_HEIGHT}px;flex-shrink:0;background:${photocardBottomBoxBackgroundCss()};overflow:hidden;z-index:2;box-sizing:border-box;">
                 ${altBottomBoxTopBorderHtml()}
                 <div style="position:relative;z-index:2;height:100%;box-sizing:border-box;">
-                    <h1 style="position:absolute;left:${TITLE_X_PADDING}px;right:${TITLE_X_PADDING}px;top:${titleTop}px;bottom:${titleBottom}px;margin:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:${fontSize}px;line-height:1.32;font-weight:${TITLE_FONT_WEIGHT};color:#ffffff;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,0.45);">${title}</h1>
+                    <h1 style="position:absolute;left:${TITLE_X_PADDING}px;right:${TITLE_X_PADDING}px;top:${titleTop}px;bottom:${titleBottom}px;margin:0;display:flex;align-items:flex-start;justify-content:center;overflow:hidden;padding-top:${titlePaddingTop}px;font-size:${fontSize}px;line-height:1.32;font-weight:${TITLE_FONT_WEIGHT};color:#ffffff;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,0.45);">${title}</h1>
                     <div style="position:absolute;left:0;right:0;bottom:0;z-index:3;box-sizing:border-box;background:${ALT_BOTTOM_BAR_BG};padding:${ALT_BOTTOM_BAR_PADDING_Y}px ${FOOTER_BAR_X_PADDING}px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
                         <div style="flex:1;min-width:0;text-align:left;color:#ffffff;">
                             ${dateBlock}
@@ -770,7 +799,6 @@ async function renderPhotocardCanvas(data) {
     const primary = data.primaryColor || "#28a745";
     const title = String(data.title ?? "");
     const siteName = String(data.siteName ?? "");
-    const siteUrl = String(data.siteUrl ?? "");
     const date = String(data.date ?? "");
     const fontSize = titleFontSize(title);
     const lineHeight = Math.round(fontSize * 1.35);
@@ -787,8 +815,7 @@ async function renderPhotocardCanvas(data) {
     if (date) {
         await ensurePhotocardFont(DATE_SIZE_PRIMARY, "500");
     }
-    await ensurePhotocardFont(FOOTER_HINT_SIZE, "400");
-    await ensurePhotocardFont(FOOTER_URL_SIZE_PRIMARY, FOOTER_URL_WEIGHT);
+    await ensurePhotocardFont(FOOTER_HINT_SIZE_PRIMARY, FOOTER_HINT_WEIGHT_PRIMARY);
 
     const footerHeight = footerAreaHeight(Boolean(logoImage));
     const dateHeight = dateAreaHeight(Boolean(date));
@@ -862,51 +889,12 @@ async function renderPhotocardCanvas(data) {
 
     const footerBaseY = CARD_SIZE - 18;
 
-    let urlMaxWidth = CARD_SIZE - SECTION_X_PADDING * 2;
-    let footerLogoBoxWidth = 0;
-
-    if (logoImage) {
-        const logoHeight = LOGO_HEIGHT;
-        const logoWidth = Math.min(
-            LOGO_MAX_WIDTH,
-            logoImage.naturalWidth * (logoHeight / logoImage.naturalHeight),
-        );
-        footerLogoBoxWidth = logoWidth + 16;
-        urlMaxWidth -= footerLogoBoxWidth;
-    }
-
-    const urlFontSize = fitFooterUrlFontSize(
-        measureCtx,
-        siteUrl,
-        urlMaxWidth,
-        FOOTER_URL_SIZE_PRIMARY,
-    );
-    await ensurePhotocardFont(urlFontSize, FOOTER_URL_WEIGHT);
-    const urlLines = wrapUrlLines(
-        measureCtx,
-        siteUrl,
-        urlMaxWidth,
-        urlFontSize,
-    );
-    const urlLineHeight = Math.round(urlFontSize * 1.25);
-    const urlBlockHeight = urlLines.length * urlLineHeight;
-    const footerHintY = footerBaseY - urlBlockHeight - 6;
-
     ctx.textAlign = "left";
     ctx.textBaseline = "bottom";
-    ctx.fillStyle = "rgba(255,255,255,0.95)";
-    ctx.font = `400 ${FOOTER_HINT_SIZE}px ${PHOTOCARD_FONT}`;
+    ctx.fillStyle = "rgba(255,255,255,0.98)";
+    ctx.font = `${FOOTER_HINT_WEIGHT_PRIMARY} ${FOOTER_HINT_SIZE_PRIMARY}px ${PHOTOCARD_FONT}`;
     ctx.letterSpacing = "0px";
-    ctx.fillText(FOOTER_HINT_TEXT_PRIMARY, SECTION_X_PADDING, footerHintY);
-
-    ctx.fillStyle = "#ffffff";
-    setFooterUrlTextStyle(ctx, urlFontSize);
-    urlLines.forEach((line, index) => {
-        const lineY =
-            footerBaseY - (urlLines.length - 1 - index) * urlLineHeight;
-        ctx.fillText(line, SECTION_X_PADDING, lineY);
-    });
-    ctx.letterSpacing = "0px";
+    ctx.fillText(FOOTER_HINT_TEXT_PRIMARY, SECTION_X_PADDING, footerBaseY);
 
     if (logoImage) {
         const logoHeight = LOGO_HEIGHT;
@@ -963,16 +951,18 @@ async function renderAltPhotocardCanvas(data) {
     await ensurePhotocardFont(urlFontSize, FOOTER_URL_WEIGHT);
 
     const footerHeight = footerAreaHeightAlt(Boolean(date), urlFontSize);
-    const titleBlockTop = bottomTop + 16;
-    const titleBlockBottom = CARD_SIZE - footerHeight - 12;
+    const titleBlockTop = bottomTop + Math.ceil(ALT_SEAM_ICON_SIZE / 2) + ALT_TITLE_TOP_GAP;
+    const titleBlockBottom = CARD_SIZE - footerHeight - ALT_TITLE_BOTTOM_GAP;
     const titleBlockHeight = Math.max(0, titleBlockBottom - titleBlockTop);
 
     measureCtx.font = `${TITLE_FONT_WEIGHT} ${fontSize}px ${PHOTOCARD_FONT}`;
     const titleLines = wrapTextLines(measureCtx, title, titleMaxWidth);
     const titleContentHeight = titleLines.length * lineHeight;
-    const titleStartY =
-        titleBlockTop +
-        Math.max(0, (titleBlockHeight - titleContentHeight) / 2);
+    const titleStartY = altTitleStartY(
+        titleBlockTop,
+        titleBlockHeight,
+        titleContentHeight,
+    );
 
     const canvas = document.createElement("canvas");
     canvas.width = Math.round(CARD_SIZE * EXPORT_SCALE);
