@@ -28,7 +28,6 @@ const CARET_DOUBLE_DOWN_DUOTONE = {
 const FOOTER_URL_SIZE_PRIMARY = FOOTER_HINT_SIZE;
 const FOOTER_URL_SIZE_ALT = FOOTER_HINT_SIZE;
 const FOOTER_URL_WEIGHT = "500";
-const FOOTER_URL_LETTER_SPACING = 5;
 const DATE_SIZE_PRIMARY = 32;
 const DATE_SIZE_ALT = FOOTER_HINT_SIZE;
 const LOGO_HEIGHT = 58;
@@ -257,18 +256,18 @@ function titleFontSize(title) {
     const length = String(title ?? "").length;
 
     if (length > 120) {
-        return 53;
+        return 49;
     }
 
     if (length > 80) {
-        return 59;
+        return 55;
     }
 
     if (length > 50) {
-        return 65;
+        return 61;
     }
 
-    return 69;
+    return 65;
 }
 
 function footerUrlMaxWidth(hasLogo) {
@@ -279,7 +278,6 @@ function footerUrlMaxWidth(hasLogo) {
 
 function setFooterUrlTextStyle(ctx, fontSize) {
     ctx.font = `${FOOTER_URL_WEIGHT} ${fontSize}px ${PHOTOCARD_FONT}`;
-    ctx.letterSpacing = `${FOOTER_URL_LETTER_SPACING}px`;
 }
 
 function measureFooterUrlText(ctx, text, fontSize) {
@@ -544,7 +542,7 @@ function buildCardHtml(data) {
                     <div style="position:absolute;left:${SECTION_X_PADDING}px;right:${SECTION_X_PADDING}px;bottom:18px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;z-index:3;">
                         <div style="flex:1;min-width:0;text-align:left;color:#ffffff;">
                             <div style="font-size:${FOOTER_HINT_SIZE}px;font-weight:400;line-height:1.35;opacity:0.95;">${FOOTER_HINT_TEXT_PRIMARY}</div>
-                            <div style="font-size:${urlFontSize}px;font-weight:${FOOTER_URL_WEIGHT};line-height:1.25;margin-top:6px;letter-spacing:${FOOTER_URL_LETTER_SPACING}px;word-break:break-all;">${siteUrl}</div>
+                            <div style="font-size:${urlFontSize}px;font-weight:${FOOTER_URL_WEIGHT};line-height:1.25;margin-top:6px;word-break:break-all;">${siteUrl}</div>
                         </div>
                         <div style="flex-shrink:0;">${logoBlock}</div>
                     </div>
@@ -602,7 +600,7 @@ function buildAltCardHtml(data) {
                             ${footerHintWithIconsHtml()}
                         </div>
                         <div style="flex:1;min-width:0;text-align:right;color:#ffffff;">
-                            <div style="font-size:${urlFontSize}px;font-weight:${FOOTER_URL_WEIGHT};line-height:1.25;letter-spacing:${FOOTER_URL_LETTER_SPACING}px;word-break:break-all;">${siteUrl}</div>
+                            <div style="font-size:${urlFontSize}px;font-weight:${FOOTER_URL_WEIGHT};line-height:1.25;word-break:break-all;">${siteUrl}</div>
                         </div>
                     </div>
                 </div>
