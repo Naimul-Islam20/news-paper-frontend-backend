@@ -4,6 +4,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @php
+    $adsenseClient = google_adsense_client();
+    @endphp
+    @if($adsenseClient)
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+    <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net">
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+    <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin>
+    <link rel="preload" href="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ e($adsenseClient) }}" as="script" crossorigin>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ e($adsenseClient) }}" crossorigin="anonymous"></script>
+    @endif
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script>
         (function() {
@@ -185,16 +196,63 @@
     @endif
 
     @php
-    $adsenseClient = google_adsense_client();
     $__primary = optional($siteMeta)->primary_color ?? null;
     $__primaryOk = is_string($__primary) && preg_match('/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/', $__primary);
     @endphp
-    @if($adsenseClient)
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
-    <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin>
-    <link rel="preload" href="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ e($adsenseClient) }}" as="script" crossorigin>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ e($adsenseClient) }}" crossorigin="anonymous"></script>
-    @endif
+
+    <style>
+        /* below-menu Google ad — প্রথম paint-এই জায়গা reserve (CLS রোধ) */
+        [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) {
+            display: block !important;
+            position: relative !important;
+            overflow: hidden !important;
+            width: 100% !important;
+        }
+        [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) .ad-slot-size-hold {
+            display: block !important;
+            width: 100% !important;
+            aspect-ratio: var(--ad-aspect-ratio, 13 / 1) !important;
+            max-height: var(--ad-mobile-max-height, var(--ad-max-height, 100px)) !important;
+            visibility: hidden !important;
+        }
+        @media (max-width: 767px) {
+            [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) {
+                height: auto !important;
+                min-height: 0 !important;
+                max-height: none !important;
+            }
+        }
+        @media (min-width: 768px) {
+            [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) {
+                height: var(--ad-max-height, 100px) !important;
+                min-height: var(--ad-max-height, 100px) !important;
+                max-height: var(--ad-max-height, 100px) !important;
+            }
+            [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) .ad-slot-size-hold {
+                display: none !important;
+            }
+        }
+        [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle {
+            display: block !important;
+            width: 100% !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+        }
+        @media (min-width: 768px) {
+            [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle {
+                position: absolute !important;
+                inset: 0 !important;
+                height: 100% !important;
+            }
+        }
+        @media (max-width: 767px) {
+            [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle {
+                position: absolute !important;
+                inset: 0 !important;
+                height: 100% !important;
+            }
+        }
+    </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @if ($__primaryOk)

@@ -365,13 +365,31 @@ body {
     .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) {
     width: 100% !important;
     max-width: min(100%, var(--ad-max-width, 1300px)) !important;
-    position: relative;
-    overflow: hidden;
+    position: relative !important;
+    overflow: hidden !important;
+    display: block !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+[data-ad-slot-root][data-ad-below-menu]
+    .container
+    .ad-slot-frame.ad-slot-local {
     display: flex !important;
     align-items: center;
     justify-content: center;
-    margin-left: auto;
-    margin-right: auto;
+}
+
+[data-ad-slot-root][data-ad-below-menu]
+    .container
+    .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"])
+    .ad-slot-size-hold {
+    display: block;
+    width: 100%;
+    aspect-ratio: var(--ad-aspect-ratio, 13 / 1);
+    max-height: var(--ad-mobile-max-height, var(--ad-max-height, 100px));
+    visibility: hidden;
+    pointer-events: none;
 }
 
 @media (min-width: 768px) {
@@ -384,16 +402,29 @@ body {
         max-height: var(--ad-max-height, 100px) !important;
         aspect-ratio: auto !important;
     }
+
+    [data-ad-slot-root][data-ad-below-menu]
+        .container
+        .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"])
+        .ad-slot-size-hold {
+        display: none !important;
+    }
 }
 
 @media (max-width: 767px) {
-    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame.ad-slot-local,
-    [data-ad-slot-root][data-ad-below-menu]
-        .container
-        .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) {
+    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame.ad-slot-local {
         aspect-ratio: var(--ad-aspect-ratio, 13 / 1) !important;
         height: auto !important;
         max-height: var(--ad-mobile-max-height, var(--ad-max-height, 100px)) !important;
+    }
+
+    [data-ad-slot-root][data-ad-below-menu]
+        .container
+        .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        aspect-ratio: auto !important;
     }
 }
 
@@ -411,7 +442,8 @@ body {
 
 [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle {
     display: block !important;
-    position: relative !important;
+    position: absolute !important;
+    inset: 0 !important;
     overflow: hidden !important;
     width: 100% !important;
     height: 100% !important;
@@ -626,17 +658,18 @@ body {
         object-fit: contain !important;
     }
 
-    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle {
-        display: block !important;
-        position: relative !important;
-        overflow: hidden !important;
-        width: 100% !important;
-        height: 100% !important;
-        max-width: 100% !important;
-        max-height: 100% !important;
-        margin: 0 !important;
-        box-sizing: border-box;
-    }
+        [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle {
+            display: block !important;
+            position: absolute !important;
+            inset: 0 !important;
+            overflow: hidden !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            margin: 0 !important;
+            box-sizing: border-box;
+        }
 
     [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle > div,
     [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle > div > div {

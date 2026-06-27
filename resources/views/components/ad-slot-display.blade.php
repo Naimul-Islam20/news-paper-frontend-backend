@@ -46,7 +46,7 @@ $showGoogle = $ad && ad_show_google($ad);
     @if($isStrip)
         <div class="{{ $stripOuterClass }} {{ $wrapperClass }} w-full max-w-full min-w-0" data-ad-slot-root data-ad-google @if($isBelowMenu) data-ad-below-menu @endif @if($variant === 'header') id="header-ad-slot" @endif>
             <div class="container">
-                <x-google-ad-unit :ad="$ad" layout="strip" :eager="$isBelowMenu || $variant === 'header'" />
+                <x-google-ad-unit :ad="$ad" layout="strip" />
             </div>
         </div>
     @elseif($variant === 'sidebar')
