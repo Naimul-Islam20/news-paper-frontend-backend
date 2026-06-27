@@ -256,18 +256,18 @@ function titleFontSize(title) {
     const length = String(title ?? "").length;
 
     if (length > 120) {
-        return 49;
+        return 53;
     }
 
     if (length > 80) {
-        return 55;
+        return 59;
     }
 
     if (length > 50) {
-        return 61;
+        return 65;
     }
 
-    return 65;
+    return 69;
 }
 
 function footerUrlMaxWidth(hasLogo) {
