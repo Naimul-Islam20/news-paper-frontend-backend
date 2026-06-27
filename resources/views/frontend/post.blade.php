@@ -220,7 +220,7 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                         </p>
                                         @endif
 
-                                        <h1 class="text-[1.75rem] md:text-[2.375rem] font-semibold serif text-title leading-tight">
+                                        <h1 class="text-[2rem] md:text-[2.5rem] font-semibold serif text-title leading-tight">
                                             {{ $post->title }}
                                         </h1>
 
