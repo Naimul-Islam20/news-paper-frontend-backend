@@ -39,7 +39,7 @@
         <div class="container max-w-4xl">
 
             <div class="mb-6 md:mb-10 text-left">
-                <h1 class="text-2xl md:text-3xl font-semibold serif text-title mb-2">
+                <h1 class="text-2xl md:text-3xl font-normal serif text-title mb-2">
                     Unicode to Bijoy - Bangla text Converter
                 </h1>
 
@@ -76,29 +76,25 @@
                     <button
                         type="button"
                         onclick="banglaUnicodeToBijoy()"
-                        class="px-4 py-2 text-sm font-semibold text-white rounded-sm"
-                        style="background-color:#2563eb">
+                        class="px-4 py-2 text-sm font-semibold text-white bg-primary hover:opacity-90 transition-all rounded-sm">
                         Unicode to Bijoy
                     </button>
                     <button
                         type="button"
                         onclick="banglaBijoyToUnicode()"
-                        class="px-4 py-2 text-sm font-semibold text-white rounded-sm"
-                        style="background-color:#1e293b">
+                        class="px-4 py-2 text-sm font-semibold text-white bg-primary hover:opacity-90 transition-all rounded-sm">
                         Bijoy to Unicode
                     </button>
                     <button
                         type="button"
                         onclick="banglaFixBroken()"
-                        class="px-4 py-2 text-sm font-semibold rounded-sm"
-                        style="border:1px solid #f59e0b;color:#b45309;background-color:#fffbeb">
+                        class="px-4 py-2 text-sm font-semibold text-white bg-primary hover:opacity-90 transition-all rounded-sm">
                         Fix Bijoy Broken
                     </button>
                     <button
                         type="button"
                         onclick="banglaClearAll()"
-                        class="px-4 py-2 text-sm font-semibold rounded-sm"
-                        style="border:1px solid #cbd5e1;color:#334155;background-color:#fff">
+                        class="px-4 py-2 text-sm font-semibold text-white bg-primary hover:opacity-90 transition-all rounded-sm">
                         Clear text
                     </button>
                 </div>

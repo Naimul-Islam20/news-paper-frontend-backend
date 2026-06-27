@@ -399,6 +399,10 @@ class PostController extends Controller
 
         $data['subtitle'] = trim((string) ($data['subtitle'] ?? '')) ?: null;
 
+        if (isset($data['description']) && is_string($data['description'])) {
+            $data['description'] = sanitize_post_description_for_storage($data['description']);
+        }
+
         $points = collect($request->input('sub_title_points', []))
             ->map(fn ($value) => is_string($value) ? trim($value) : '')
             ->filter(fn ($value) => $value !== '')

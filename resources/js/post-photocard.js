@@ -25,8 +25,8 @@ const CARET_DOUBLE_DOWN_DUOTONE = {
     fill: "M208,56l-80,80L48,56Z",
     detail: "M213.66,141.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,204.69l74.34-74.35a8,8,0,0,1,11.32,11.32Zm-171.32-80A8,8,0,0,1,48,48H208a8,8,0,0,1,5.66,13.66l-80,80a8,8,0,0,1-11.32,0Zm25,2.34L128,124.69,188.69,64Z",
 };
-const FOOTER_URL_SIZE_PRIMARY = FOOTER_HINT_SIZE;
-const FOOTER_URL_SIZE_ALT = FOOTER_HINT_SIZE;
+const FOOTER_URL_SIZE_PRIMARY = 28;
+const FOOTER_URL_SIZE_ALT = 28;
 const FOOTER_URL_WEIGHT = "500";
 const DATE_SIZE_PRIMARY = 32;
 const DATE_SIZE_ALT = FOOTER_HINT_SIZE;
@@ -293,13 +293,12 @@ function fitFooterUrlFontSize(
     baseSize = FOOTER_URL_SIZE_PRIMARY,
 ) {
     const text = String(url ?? "");
-    const targetSize = FOOTER_HINT_SIZE;
 
-    if (measureFooterUrlText(ctx, text, targetSize) <= maxWidth) {
-        return targetSize;
+    if (measureFooterUrlText(ctx, text, baseSize) <= maxWidth) {
+        return baseSize;
     }
 
-    return targetSize;
+    return baseSize;
 }
 
 function wrapUrlLines(ctx, url, maxWidth, fontSize) {
@@ -555,7 +554,7 @@ function buildCardHtml(data) {
 
 function buildAltCardHtml(data) {
     const title = escapeHtml(data.title);
-    const siteUrl = escapeHtml(data.siteUrlAlt ?? data.siteUrl ?? "");
+    const siteUrl = escapeHtml(data.siteUrl || "");
     const date = escapeHtml(data.date || "");
     const primary = escapeHtml(data.primaryColor || "#28a745");
     const fontSize = titleFontSize(data.title);
@@ -563,7 +562,7 @@ function buildAltCardHtml(data) {
     const measureCtx = measureCanvas.getContext("2d");
     const urlFontSize = fitFooterUrlFontSize(
         measureCtx,
-        data.siteUrlAlt ?? data.siteUrl,
+        data.siteUrl,
         LOGO_MAX_WIDTH,
         FOOTER_URL_SIZE_ALT,
     );
@@ -947,7 +946,7 @@ async function renderPhotocardCanvas(data) {
 async function renderAltPhotocardCanvas(data) {
     const primary = data.primaryColor || "#28a745";
     const title = String(data.title ?? "");
-    const siteUrl = String(data.siteUrlAlt ?? data.siteUrl ?? "");
+    const siteUrl = String(data.siteUrl ?? "");
     const date = String(data.date ?? "");
     const fontSize = titleFontSize(title);
     const lineHeight = Math.round(fontSize * 1.35);
@@ -1296,6 +1295,7 @@ function resetModalLayout() {
     if (body) {
         body.style.width = "";
         body.style.height = "";
+        body.style.gap = "";
     }
 
     [viewport, viewportAlt].forEach((node) => {
@@ -1307,6 +1307,13 @@ function resetModalLayout() {
         node.style.height = "";
         node.style.flex = "";
     });
+
+    const thumbBtn = getThumbButton();
+    if (thumbBtn) {
+        thumbBtn.style.width = "";
+        thumbBtn.style.height = "";
+        thumbBtn.style.padding = "";
+    }
 }
 
 function getCardViewport() {
@@ -1356,41 +1363,39 @@ function applyPreviewScale() {
     const bodyPaddingX = 24;
     const bodyPaddingTop = 12;
     const thumbBorder = 8;
-    const thumbSlot = THUMB_DISPLAY_SIZE + thumbBorder;
-    const availableWidth = window.innerWidth - modalGutter;
+    const refMain = MODAL_MAX_CARD_SIZE;
+    const refThumb = THUMB_DISPLAY_SIZE;
+    const refThumbSlot = refThumb + thumbBorder;
+    const refBodyWidth = refMain + bodyGap + refThumbSlot;
+    const refPanelWidth = refBodyWidth + bodyPaddingX;
+
+    const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const availableWidth = viewportWidth - modalGutter;
     const availableHeight =
-        window.innerHeight - modalGutter - headerHeight - bodyPaddingTop;
+        viewportHeight - modalGutter - headerHeight - bodyPaddingTop;
 
-    const originalMaxWidth = Math.min(
-        MODAL_MAX_CARD_SIZE,
-        availableWidth - bodyPaddingX,
-    );
-    const originalMaxHeight = Math.min(MODAL_MAX_CARD_SIZE, availableHeight);
-    let mainScale = Math.min(
+    const layoutScale = Math.min(
         1,
-        originalMaxWidth / CARD_SIZE,
-        originalMaxHeight / CARD_SIZE,
+        availableWidth / refPanelWidth,
+        availableHeight / refMain,
     );
-    let mainScaled = Math.floor(CARD_SIZE * mainScale);
 
-    let panelWidth = mainScaled + bodyGap + thumbSlot + bodyPaddingX;
-    if (panelWidth > availableWidth) {
-        const fitMainWidth =
-            availableWidth - bodyPaddingX - bodyGap - thumbSlot;
-        mainScale = Math.min(mainScale, fitMainWidth / CARD_SIZE);
-        mainScaled = Math.floor(CARD_SIZE * mainScale);
-        panelWidth = mainScaled + bodyGap + thumbSlot + bodyPaddingX;
-    }
-
-    const thumbScaled = THUMB_DISPLAY_SIZE;
+    const mainScaled = Math.max(1, Math.floor(refMain * layoutScale));
+    const thumbScaled = Math.max(1, Math.floor(refThumb * layoutScale));
+    const thumbSlot =
+        thumbScaled + Math.max(1, Math.ceil(thumbBorder * layoutScale));
+    const scaledBodyGap = Math.max(1, Math.ceil(bodyGap * layoutScale));
+    const panelWidth = mainScaled + scaledBodyGap + thumbSlot + bodyPaddingX;
 
     panel.style.width = `${panelWidth}px`;
     panel.style.maxWidth = `${availableWidth}px`;
     panel.style.height = "";
 
     if (body) {
-        body.style.width = `${mainScaled + bodyGap + thumbSlot}px`;
+        body.style.width = `${mainScaled + scaledBodyGap + thumbSlot}px`;
         body.style.height = "";
+        body.style.gap = `${scaledBodyGap}px`;
     }
 
     viewport.style.width = `${mainScaled}px`;
@@ -1404,6 +1409,7 @@ function applyPreviewScale() {
     if (thumbBtn) {
         thumbBtn.style.width = `${thumbSlot}px`;
         thumbBtn.style.height = `${thumbSlot}px`;
+        thumbBtn.style.padding = `${Math.max(1, Math.ceil(4 * layoutScale))}px`;
     }
 
     scalePreviewCard(cardRoot, cardEl, mainScaled);
@@ -1503,6 +1509,12 @@ function initPostPhotocard() {
     });
 
     window.addEventListener("resize", () => {
+        if (currentPhotocardData && !getModal()?.classList.contains("hidden")) {
+            applyPreviewScale();
+        }
+    });
+
+    window.visualViewport?.addEventListener("resize", () => {
         if (currentPhotocardData && !getModal()?.classList.contains("hidden")) {
             applyPreviewScale();
         }

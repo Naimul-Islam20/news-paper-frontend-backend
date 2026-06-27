@@ -2,7 +2,6 @@
 
 @php
 $siteDomain = photocard_site_domain(front_home_url(), true);
-$siteDomainAlt = photocard_site_domain(front_home_url(), false);
 $imageBasename = $post->image ? pathinfo(basename($post->image), PATHINFO_FILENAME) : '';
 $photocardPayload = [
 'id' => $post->id,
@@ -14,7 +13,6 @@ $photocardPayload = [
 'icon' => photocard_icon_src($siteMeta),
 'siteName' => site_name(),
 'siteUrl' => $siteDomain,
-'siteUrlAlt' => $siteDomainAlt,
 'primaryColor' => optional($siteMeta)->primary_color ?: '#28a745',
 'date' => published_at($post->created_at, 'd M Y'),
 ];

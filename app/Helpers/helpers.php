@@ -900,11 +900,41 @@ if (! function_exists('strip_empty_post_description_paragraphs')) {
     }
 }
 
-if (! function_exists('normalize_post_description_rest_paragraph_inner_html')) {
+if (! function_exists('strip_post_description_bold_styles')) {
     /**
-     * প্রথম প্যারা ছাড়া বাকি প্যারার ভিতরের bold (<b>/<strong>/inline style) সরায়।
+     * যেকোনো ট্যাগের style attribute থেকে bold font-weight সরায় (CKEditor wrapper div ইত্যাদি)।
      */
-    function normalize_post_description_rest_paragraph_inner_html(string $inner): string
+    function strip_post_description_bold_styles(string $html): string
+    {
+        $prev = null;
+
+        while ($prev !== $html) {
+            $prev = $html;
+            $html = preg_replace_callback(
+                '/\sstyle=(["\'])(.*?)\1/i',
+                static function (array $m): string {
+                    $style = preg_replace(
+                        '/(?:^|;\s*)font-weight\s*:\s*(?:bold|700|800|900)\s*;?/i',
+                        '',
+                        $m[2]
+                    ) ?? $m[2];
+                    $style = trim($style, '; ');
+
+                    return $style === '' ? '' : ' style="'.$style.'"';
+                },
+                $html
+            ) ?? $html;
+        }
+
+        return $html;
+    }
+}
+
+if (! function_exists('strip_post_description_inline_bold')) {
+    /**
+     * প্যারার ভিতরের <b>/<strong> ও inline bold style সরায়।
+     */
+    function strip_post_description_inline_bold(string $inner): string
     {
         $prev = null;
         while ($prev !== $inner) {
@@ -928,6 +958,94 @@ if (! function_exists('normalize_post_description_rest_paragraph_inner_html')) {
     }
 }
 
+if (! function_exists('normalize_post_description_rest_paragraph_inner_html')) {
+    /** @deprecated Use strip_post_description_inline_bold() */
+    function normalize_post_description_rest_paragraph_inner_html(string $inner): string
+    {
+        return strip_post_description_inline_bold($inner);
+    }
+}
+
+if (! function_exists('split_post_description_double_br_paragraphs')) {
+    /**
+     * একটিমাত্র <p>-এর ভিতর <br><br> দিয়ে আলাদা প্যারা থাকলে আলাদা <p>-তে ভাগ করে।
+     */
+    function split_post_description_double_br_paragraphs(string $html): string
+    {
+        if ($html === '' || ! str_contains(strtolower($html), '<p')) {
+            return $html;
+        }
+
+        return preg_replace_callback(
+            '/<p\b([^>]*)>(.*?)<\/p>/is',
+            static function (array $match): string {
+                $attrs = $match[1];
+                $inner = strip_post_description_inline_bold($match[2]);
+
+                if (! preg_match('/<br\s*\/?>\s*<br\s*\/?>/i', $inner)) {
+                    if (is_empty_description_paragraph_inner($inner)) {
+                        return '';
+                    }
+
+                    return '<p'.$attrs.'>'.$inner.'</p>';
+                }
+
+                $parts = preg_split('/<br\s*\/?>\s*<br\s*\/?>/i', $inner) ?: [];
+                $blocks = [];
+
+                foreach ($parts as $part) {
+                    $part = trim($part);
+                    if ($part === '' || is_empty_description_paragraph_inner($part)) {
+                        continue;
+                    }
+                    $blocks[] = '<p'.$attrs.'>'.$part.'</p>';
+                }
+
+                return $blocks === [] ? '' : implode('', $blocks);
+            },
+            $html
+        ) ?? $html;
+    }
+}
+
+if (! function_exists('sanitize_post_description_for_storage')) {
+    /**
+     * সেভের আগে বিবরণ পরিষ্কার — ম্যানুয়াল bold সরায়; ফ্রন্টে শুধু প্রথম প্যারা bold হবে।
+     */
+    function sanitize_post_description_for_storage(string $html): string
+    {
+        if (trim($html) === '') {
+            return $html;
+        }
+
+        $html = strip_post_description_bold_styles($html);
+        $html = split_post_description_double_br_paragraphs($html);
+        $html = strip_empty_post_description_paragraphs($html);
+
+        if ($html === '' || ! str_contains(strtolower($html), '<p')) {
+            return $html;
+        }
+
+        return preg_replace_callback(
+            '/<p\b([^>]*)>(.*?)<\/p>/is',
+            static function (array $match): string {
+                if (is_empty_description_paragraph_inner($match[2])) {
+                    return '';
+                }
+
+                $attrs = trim($match[1]);
+                $attrs = trim(preg_replace('/\sstyle=(["\']).*?\1/i', '', ' '.$attrs) ?? $attrs);
+                $attrs = trim(preg_replace('/\sclass=(["\']).*?\1/i', '', ' '.$attrs) ?? $attrs);
+                $inner = strip_post_description_inline_bold($match[2]);
+                $attrStr = $attrs !== '' ? ' '.$attrs : '';
+
+                return '<p'.$attrStr.'>'.$inner.'</p>';
+            },
+            $html
+        ) ?? $html;
+    }
+}
+
 if (! function_exists('tighten_post_description_paragraph_spacing')) {
     /**
      * পোস্ট বিবরণ — প্রথম প্যারা bold, বাকি normal (inline + class; CSS build ছাড়াও কাজ করে)।
@@ -938,6 +1056,8 @@ if (! function_exists('tighten_post_description_paragraph_spacing')) {
             return $html;
         }
 
+        $html = strip_post_description_bold_styles($html);
+        $html = split_post_description_double_br_paragraphs($html);
         $html = strip_empty_post_description_paragraphs($html);
         if ($html === '' || ! str_contains(strtolower($html), '<p')) {
             return $html;
@@ -955,9 +1075,7 @@ if (! function_exists('tighten_post_description_paragraph_spacing')) {
                 $index++;
                 $isFirst = $index === 1;
                 $className = $isFirst ? 'post-desc-p-first' : 'post-desc-p-rest';
-                $inner = $isFirst
-                    ? $match[2]
-                    : normalize_post_description_rest_paragraph_inner_html($match[2]);
+                $inner = strip_post_description_inline_bold($match[2]);
 
                 $style = 'margin:0!important;padding:0!important;';
                 $style .= $isFirst
