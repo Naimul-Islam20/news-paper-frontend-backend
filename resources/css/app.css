@@ -92,6 +92,17 @@ header nav ul a,
     -webkit-text-stroke: 0;
 }
 
+header nav ul {
+    font-size: 1.3125rem;
+    line-height: 1.35;
+}
+
+@media (min-width: 768px) {
+    header nav ul {
+        font-size: 1.375rem;
+    }
+}
+
 /* হেডার উপরের লিংক — বাংলা কনভার্টার | আর্কাইভ | English */
 .header-utility-links,
 .header-utility-links a,
@@ -213,7 +224,13 @@ html.browser-desktop-site #site-header-shell {
     padding: 0 !important;
 }
 
-.post-description p ~ p {
+.post-description.prose :where(p, li, blockquote) {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.post-description p ~ p,
+.post-description p.post-desc-p-rest {
     padding-top: 0.7em !important;
 }
 

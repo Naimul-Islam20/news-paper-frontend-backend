@@ -128,7 +128,13 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                     padding: 0 !important;
                                 }
 
-                                .post-description p ~ p {
+                                .post-description.prose :where(p, li, blockquote) {
+                                    margin-top: 0 !important;
+                                    margin-bottom: 0 !important;
+                                }
+
+                                .post-description p ~ p,
+                                .post-description p.post-desc-p-rest {
                                     padding-top: 0.7em !important;
                                 }
 
@@ -333,7 +339,7 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                     $hasDetailsRightAds = ad_should_display($adDetailsRight1)
                                     || ad_should_display($adDetailsRight2);
 
-                                    $descRaw = $post->description ?? '';
+                                    $descRaw = strip_empty_post_description_paragraphs($post->description ?? '');
                                     $mobileAd1 = ad_should_display($adDetailsRight1)
                                     ? view('frontend.partials.detail-inline-ad', ['ad' => $adDetailsRight1])->render()
                                     : '';

@@ -357,7 +357,7 @@
                     </div>
 
                     <div class="flex-1 overflow-x-auto overflow-y-hidden no-scrollbar py-0 flex items-center justify-between">
-                        <ul class="flex justify-start items-center gap-4 md:gap-6 text-xl md:text-xl whitespace-nowrap py-0.5 md:py-0.5">
+                        <ul class="flex justify-start items-center gap-4 md:gap-6 text-[1.3125rem] md:text-[1.375rem] whitespace-nowrap py-0.5 md:py-0.5">
                             {{-- সর্বশেষ সর্বদা হেডার মেনুর বাম পাশের প্রথম আইটেম (স্থান অপরিবর্তিত) --}}
                             <li><a href="{{ route('latest') }}" class="font-normal hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('latest') ? 'text-primary border-primary' : '' }}">সর্বশেষ</a></li>
                             <li><a href="{{ route('special-news') }}" class="font-normal hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('special-news') ? 'text-primary border-primary' : '' }}">বিশেষ সংবাদ</a></li>

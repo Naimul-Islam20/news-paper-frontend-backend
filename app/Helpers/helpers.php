@@ -866,6 +866,40 @@ if (! function_exists('inject_post_detail_ads_between_paragraphs')) {
     }
 }
 
+if (! function_exists('is_empty_description_paragraph_inner')) {
+    /**
+     * CKEditor-এর খালি প্যারা (<p>&nbsp;</p>, <p><br></p> ইত্যাদি) শনাক্ত করে।
+     */
+    function is_empty_description_paragraph_inner(string $inner): bool
+    {
+        $normalized = preg_replace('/<(br|hr)\b[^>]*\/?>/i', '', $inner) ?? $inner;
+        $text = html_entity_decode(strip_tags($normalized), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = str_replace(["\xc2\xa0", "\u{00a0}"], '', $text);
+
+        return trim($text) === '';
+    }
+}
+
+if (! function_exists('strip_empty_post_description_paragraphs')) {
+    /**
+     * বিবরণ HTML থেকে খালি প্যারা সরায় — live-এ প্যারার মাঝে অতিরিক্ত gap এড়ায়।
+     */
+    function strip_empty_post_description_paragraphs(string $html): string
+    {
+        if ($html === '' || ! str_contains(strtolower($html), '<p')) {
+            return $html;
+        }
+
+        return preg_replace_callback(
+            '/<p\b([^>]*)>(.*?)<\/p>/is',
+            static function (array $match): string {
+                return is_empty_description_paragraph_inner($match[2]) ? '' : $match[0];
+            },
+            $html
+        ) ?? $html;
+    }
+}
+
 if (! function_exists('normalize_post_description_rest_paragraph_inner_html')) {
     /**
      * প্রথম প্যারা ছাড়া বাকি প্যারার ভিতরের bold (<b>/<strong>/inline style) সরায়।
@@ -904,11 +938,20 @@ if (! function_exists('tighten_post_description_paragraph_spacing')) {
             return $html;
         }
 
+        $html = strip_empty_post_description_paragraphs($html);
+        if ($html === '' || ! str_contains(strtolower($html), '<p')) {
+            return $html;
+        }
+
         $index = 0;
 
         return preg_replace_callback(
             '/<p\b([^>]*)>(.*?)<\/p>/is',
             static function (array $match) use (&$index): string {
+                if (is_empty_description_paragraph_inner($match[2])) {
+                    return '';
+                }
+
                 $index++;
                 $isFirst = $index === 1;
                 $className = $isFirst ? 'post-desc-p-first' : 'post-desc-p-rest';
