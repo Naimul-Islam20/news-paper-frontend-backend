@@ -1,5 +1,5 @@
 /**
- * Google AdSense — পেজ লোডের পর idle-এ lazy load (blank/hang রোধ)।
+ * Google AdSense — priority slot তৎক্ষণাৎ, বাকি viewport-এ lazy load।
  */
 (function () {
     const isMobile = () => window.matchMedia('(max-width: 767px)').matches;
@@ -78,15 +78,26 @@
         return Math.min(capH, Math.round(width * 0.75));
     }
 
+    function isBelowMenuStrip(frame) {
+        return (
+            Boolean(frame?.closest('[data-ad-below-menu]')) &&
+            frame?.getAttribute('data-ad-layout') !== 'box'
+        );
+    }
+
     function frameMetrics(frame, mobile) {
         const layout = frame.getAttribute('data-ad-layout') || 'strip';
         const capH = frameLimit(frame, mobile);
         const width = frameWidth(frame);
 
+        if (isBelowMenuStrip(frame)) {
+            const height = mobile ? boxHeightFromAspect(frame, width, capH) : capH;
+
+            return { width, height, layout };
+        }
+
         if (layout === 'box') {
-            const measured = frame.clientHeight;
-            const height =
-                measured > 0 ? Math.min(capH, measured) : boxHeightFromAspect(frame, width, capH);
+            const height = boxHeightFromAspect(frame, width, capH);
 
             return { width, height, layout };
         }
@@ -101,6 +112,141 @@
 
         frame.style.height = height + 'px';
         frame.style.minHeight = height + 'px';
+    }
+
+    function prepareStripFrame(frame, height) {
+        if (frame.getAttribute('data-ad-layout') === 'box' || height <= 0) {
+            return;
+        }
+
+        frame.style.height = height + 'px';
+        frame.style.minHeight = height + 'px';
+    }
+
+    function prepareFilledFrame(ins, frame, height, layout) {
+        if (layout === 'box') {
+            prepareBoxFrame(frame, height);
+        } else if (isBelowMenuStrip(frame)) {
+            prepareStripFrame(frame, height);
+        } else {
+            return;
+        }
+
+        ins.style.height = height + 'px';
+        ins.style.minHeight = height + 'px';
+        ins.style.position = 'relative';
+        ins.style.overflow = 'hidden';
+    }
+
+    function fitStripIframe(iframe, frame, targetH) {
+        const frameW = frame.clientWidth || frameWidth(frame);
+        const frameH = frame.clientHeight > 0 ? frame.clientHeight : targetH;
+
+        if (frameW < 1 || frameH < 1) {
+            return;
+        }
+
+        let adW = iframe.offsetWidth;
+        let adH = iframe.offsetHeight;
+
+        if (!adW || !adH) {
+            adW = parseInt(iframe.getAttribute('width'), 10) || frameW;
+            adH = parseInt(iframe.getAttribute('height'), 10) || frameH;
+        }
+
+        if (adW < 1 || adH < 1) {
+            adW = frameW;
+            adH = frameH;
+        }
+
+        // full width — local strip banner এর মতো প্রস্থ পূর্ণ
+        const scale = frameW / adW;
+        const w = Math.max(1, Math.round(adW * scale));
+        const h = Math.max(1, Math.round(adH * scale));
+
+        iframe.style.position = 'absolute';
+        iframe.style.left = '50%';
+        iframe.style.top = '50%';
+        iframe.style.transform = 'translate(-50%, -50%)';
+        iframe.style.width = w + 'px';
+        iframe.style.height = h + 'px';
+        iframe.style.maxWidth = 'none';
+        iframe.style.maxHeight = 'none';
+        iframe.style.marginInline = '0';
+        iframe.style.display = 'block';
+        iframe.style.border = '0';
+    }
+
+    function syncGoogleStripHosts(ins) {
+        if (!ins) {
+            return;
+        }
+
+        ins.querySelectorAll('div').forEach((host) => {
+            host.style.position = 'absolute';
+            host.style.inset = '0';
+            host.style.width = '100%';
+            host.style.maxWidth = '100%';
+            host.style.height = '100%';
+            host.style.maxHeight = '100%';
+            host.style.overflow = 'hidden';
+            host.style.margin = '0';
+        });
+    }
+
+    function fitBelowMenuStripIframe(iframe, frame, targetH) {
+        const frameW = frame.clientWidth || frameWidth(frame);
+        const frameH = frame.clientHeight > 0 ? frame.clientHeight : targetH;
+
+        if (frameW < 1 || frameH < 1) {
+            return;
+        }
+
+        let adW = iframe.offsetWidth;
+        let adH = iframe.offsetHeight;
+
+        if (!adW || !adH) {
+            adW = parseInt(iframe.getAttribute('width'), 10) || frameW;
+            adH = parseInt(iframe.getAttribute('height'), 10) || Math.round(frameW / 13);
+        }
+
+        if (adW < 1 || adH < 1) {
+            adW = frameW;
+            adH = Math.round(frameW / 13);
+        }
+
+        // local strip — container width পূর্ণ, height cap
+        const w = frameW;
+        const h = Math.min(frameH, Math.max(1, Math.round((adH / adW) * w)));
+
+        const ins = iframe.closest('ins.adsbygoogle');
+        syncGoogleStripHosts(ins);
+
+        iframe.style.position = 'absolute';
+        iframe.style.left = '0';
+        iframe.style.top = '50%';
+        iframe.style.transform = 'translateY(-50%)';
+        iframe.style.width = w + 'px';
+        iframe.style.height = h + 'px';
+        iframe.style.maxWidth = 'none';
+        iframe.style.maxHeight = frameH + 'px';
+        iframe.style.margin = '0';
+        iframe.style.display = 'block';
+        iframe.style.border = '0';
+    }
+
+    function fitFilledIframe(iframe, frame, targetH, layout) {
+        if (layout === 'box') {
+            fitBoxIframe(iframe, frame, targetH);
+            return;
+        }
+
+        if (isBelowMenuStrip(frame)) {
+            fitBelowMenuStripIframe(iframe, frame, targetH);
+            return;
+        }
+
+        fitStripIframe(iframe, frame, targetH);
     }
 
     function fitBoxIframe(iframe, frame, targetH) {
@@ -119,15 +265,27 @@
             adH = parseInt(iframe.getAttribute('height'), 10) || frameH;
         }
 
-        const scale = Math.min(frameW / adW, frameH / adH, 1);
+        if (adW < 1 || adH < 1) {
+            adW = frameW;
+            adH = frameH;
+        }
+
+        // object-cover — local sidebar ad এর মতো frame পূর্ণ করতে scale
+        const scale = Math.max(frameW / adW, frameH / adH);
         const w = Math.max(1, Math.round(adW * scale));
         const h = Math.max(1, Math.round(adH * scale));
 
+        iframe.style.position = 'absolute';
+        iframe.style.left = '50%';
+        iframe.style.top = '50%';
+        iframe.style.transform = 'translate(-50%, -50%)';
         iframe.style.width = w + 'px';
         iframe.style.height = h + 'px';
-        iframe.style.maxWidth = '100%';
-        iframe.style.maxHeight = frameH + 'px';
-        iframe.style.marginInline = 'auto';
+        iframe.style.maxWidth = 'none';
+        iframe.style.maxHeight = 'none';
+        iframe.style.marginInline = '0';
+        iframe.style.display = 'block';
+        iframe.style.border = '0';
     }
 
     function clampIframe(ins) {
@@ -141,9 +299,9 @@
 
         iframe.style.display = 'block';
 
-        if (layout === 'box') {
-            prepareBoxFrame(frame, height);
-            fitBoxIframe(iframe, frame, height);
+        if (layout === 'box' || isBelowMenuStrip(frame)) {
+            prepareFilledFrame(ins, frame, height, layout);
+            fitFilledIframe(iframe, frame, height, layout);
         } else {
             iframe.style.width = '100%';
             iframe.style.maxWidth = '100%';
@@ -163,34 +321,35 @@
 
         const mobile = isMobile();
         const { width, height, layout } = frameMetrics(frame, mobile);
+        const belowMenu = isBelowMenuStrip(frame);
 
-        if (layout === 'box') {
-            prepareBoxFrame(frame, height);
+        if (layout === 'box' || belowMenu) {
+            prepareFilledFrame(ins, frame, height, layout);
         }
 
+        ins.style.display = 'block';
         ins.style.width = '100%';
         ins.style.maxWidth = '100%';
+
+        if (belowMenu) {
+            ins.style.height = height + 'px';
+            ins.style.minHeight = height + 'px';
+            ins.style.maxHeight = height + 'px';
+            ins.style.marginInline = 'auto';
+            ins.setAttribute('data-ad-format', 'horizontal');
+            ins.setAttribute('data-ad-width', String(Math.round(width)));
+            ins.setAttribute('data-ad-height', String(Math.round(height)));
+
+            return;
+        }
+
         ins.style.maxHeight = height + 'px';
         ins.setAttribute('data-ad-format', layout === 'strip' ? 'horizontal' : 'rectangle');
         ins.setAttribute('data-ad-width', String(Math.round(width)));
         ins.setAttribute('data-ad-height', String(Math.round(height)));
     }
 
-    function fillUnit(ins) {
-        if (ins.getAttribute('data-ad-loaded') === '1') {
-            return;
-        }
-
-        tuneForViewport(ins);
-        ins.setAttribute('data-ad-loaded', '1');
-
-        try {
-            (window.adsbygoogle = window.adsbygoogle || []).push({});
-        } catch {
-            hideSlot(ins);
-            return;
-        }
-
+    function watchUnit(ins) {
         let done = false;
         const finish = () => {
             if (done) {
@@ -205,21 +364,70 @@
         const mo = new MutationObserver(finish);
         mo.observe(ins, { childList: true, subtree: true });
 
+        finish();
+
         window.setTimeout(() => {
             mo.disconnect();
-            if (!done && !clampIframe(ins)) {
+            if (!done && !clampIframe(ins) && !ins.hasAttribute('data-ad-eager')) {
                 hideSlot(ins);
             }
         }, 8000);
 
-        window.setTimeout(() => clampIframe(ins), 1500);
-        window.setTimeout(() => clampIframe(ins), 3000);
+        window.setTimeout(() => clampIframe(ins), 100);
+        window.setTimeout(() => clampIframe(ins), 500);
+    }
+
+    function fillUnit(ins) {
+        if (ins.getAttribute('data-ad-loaded') === '1') {
+            watchUnit(ins);
+            return;
+        }
+
+        tuneForViewport(ins);
+        ins.setAttribute('data-ad-loaded', '1');
+
+        try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch {
+            hideSlot(ins);
+            return;
+        }
+
+        watchUnit(ins);
     }
 
     function clampAllBoxAds() {
+        reserveBelowMenuSlots();
         document.querySelectorAll('ins.adsbygoogle[data-ad-loaded="1"]').forEach((ins) => {
             clampIframe(ins);
         });
+    }
+
+    function reserveBelowMenuSlots() {
+        document
+            .querySelectorAll(
+                '[data-ad-below-menu] .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"])',
+            )
+            .forEach((frame) => {
+                const ins = frame.querySelector('ins.adsbygoogle');
+                if (!ins) {
+                    return;
+                }
+
+                const { height } = frameMetrics(frame, isMobile());
+                if (height < 1) {
+                    return;
+                }
+
+                prepareStripFrame(frame, height);
+                ins.style.display = 'block';
+                ins.style.position = 'relative';
+                ins.style.overflow = 'hidden';
+                ins.style.width = '100%';
+                ins.style.height = height + 'px';
+                ins.style.minHeight = height + 'px';
+                ins.style.maxHeight = height + 'px';
+            });
     }
 
     function loadScript(client) {
@@ -228,7 +436,8 @@
         }
 
         loadPromise = new Promise((resolve, reject) => {
-            if (document.querySelector('script[src*="adsbygoogle.js"]')) {
+            const existing = document.querySelector('script[src*="adsbygoogle.js"]');
+            if (existing) {
                 resolve();
                 return;
             }
@@ -247,6 +456,12 @@
         return loadPromise;
     }
 
+    function isPriorityUnit(ins) {
+        return Boolean(
+            ins.closest('[data-ad-below-menu]') || ins.closest('#header-ad-slot'),
+        );
+    }
+
     function drainQueue() {
         if (draining || !queue.length) {
             return;
@@ -261,7 +476,7 @@
             }
             fillUnit(ins);
             if (queue.length) {
-                window.setTimeout(step, 600);
+                step();
             } else {
                 draining = false;
             }
@@ -289,11 +504,22 @@
         }
         started = true;
 
-        const units = document.querySelectorAll(
-            'ins.adsbygoogle[data-ad-client]:not([data-ad-loaded])',
+        const units = Array.from(
+            document.querySelectorAll(
+                'ins.adsbygoogle[data-ad-client]:not([data-ad-loaded])',
+            ),
         );
 
         if (!units.length) {
+            return;
+        }
+
+        const priority = units.filter((unit) => isPriorityUnit(unit));
+        const deferred = units.filter((unit) => !isPriorityUnit(unit));
+
+        priority.forEach((unit) => enqueue(unit));
+
+        if (!deferred.length) {
             return;
         }
 
@@ -308,29 +534,34 @@
                         enqueue(entry.target);
                     });
                 },
-                { rootMargin: '100px 0px', threshold: 0 },
+                { rootMargin: '200px 0px', threshold: 0 },
             );
-            units.forEach((u) => io.observe(u));
+            deferred.forEach((unit) => io.observe(unit));
         } else {
-            units.forEach(enqueue);
+            deferred.forEach((unit) => enqueue(unit));
         }
     }
 
-    function scheduleInit() {
-        const run = () => window.setTimeout(initLazyLoad, 1200);
-
-        if (document.readyState === 'complete') {
-            run();
-        } else {
-            window.addEventListener('load', run, { once: true });
-        }
-
-        let resizeTimer = 0;
-        window.addEventListener('resize', () => {
-            window.clearTimeout(resizeTimer);
-            resizeTimer = window.setTimeout(clampAllBoxAds, 200);
-        });
+    function watchEagerUnits() {
+        document
+            .querySelectorAll('ins.adsbygoogle[data-ad-eager][data-ad-loaded="1"]')
+            .forEach((ins) => {
+                tuneForViewport(ins);
+                watchUnit(ins);
+            });
     }
 
-    scheduleInit();
+    function boot() {
+        reserveBelowMenuSlots();
+        watchEagerUnits();
+        initLazyLoad();
+    }
+
+    boot();
+
+    let resizeTimer = 0;
+    window.addEventListener('resize', () => {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(clampAllBoxAds, 200);
+    });
 })();

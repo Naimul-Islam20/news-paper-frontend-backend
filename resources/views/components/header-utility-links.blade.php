@@ -1,8 +1,8 @@
 @props(['variant' => 'inline'])
 
 @php
-    $menuLinkClass = 'font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all';
-    $isMenuVariant = $variant === 'menu';
+$menuLinkClass = 'font-normal hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all';
+$isMenuVariant = $variant === 'menu';
 @endphp
 
 @if($isMenuVariant)
@@ -48,7 +48,7 @@
     </li>
 </ul>
 @else
-<div class="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs md:text-sm font-medium text-slate-800 {{ $attributes->get('class') }}">
+<div class="header-utility-links flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs md:text-sm font-normal text-slate-800 {{ $attributes->get('class') }}">
     <a href="{{ route('bangla-converter') }}"
         class="hover:text-primary transition-colors whitespace-nowrap {{ request()->routeIs('bangla-converter') ? 'text-primary' : '' }}"
         title="Unicode to Bijoy - Bangla text Converter">

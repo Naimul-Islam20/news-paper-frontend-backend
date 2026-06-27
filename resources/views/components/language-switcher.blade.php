@@ -58,7 +58,7 @@
     <button
         type="button"
         @click="toggleLang()"
-        {{ $attributes->merge(['class' => 'inline p-0 m-0 bg-transparent border-0 font-medium text-inherit hover:text-primary transition-colors cursor-pointer']) }}
+        {{ $attributes->merge(['class' => 'inline p-0 m-0 bg-transparent border-0 font-normal text-inherit hover:text-primary transition-colors cursor-pointer']) }}
         :aria-label="lang === 'bn' ? 'Switch to English' : 'বাংলায় ফিরুন'">
         <span x-text="label()"></span>
     </button>

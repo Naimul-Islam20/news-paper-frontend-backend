@@ -108,6 +108,16 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                     }
                                 }
 
+                                /* পোস্ট বিবরণ — সব প্যারার মাঝের gap (blade inline, build ছাড়াও) */
+                                .post-description p {
+                                    margin: 0 !important;
+                                    padding: 0 !important;
+                                }
+
+                                .post-description p ~ p {
+                                    padding-top: 0.7em !important;
+                                }
+
                                 /* প্রিন্ট সেটিংস */
                                 @@media print {
 
@@ -210,7 +220,7 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                         </p>
                                         @endif
 
-                                        <h1 class="text-2xl md:text-4xl font-bold serif text-title leading-tight">
+                                        <h1 class="text-[1.75rem] md:text-[2.375rem] font-semibold serif text-title leading-tight">
                                             {{ $post->title }}
                                         </h1>
 
@@ -316,11 +326,13 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                     $mobileAd2 = ad_should_display($adDetailsRight2)
                                     ? view('frontend.partials.detail-inline-ad', ['ad' => $adDetailsRight2])->render()
                                     : '';
-                                    $descriptionForBody = inject_post_detail_ads_between_paragraphs($descRaw, $mobileAd1, $mobileAd2);
+                                    $descriptionForBody = tighten_post_description_paragraph_spacing(
+                                        inject_post_detail_ads_between_paragraphs($descRaw, $mobileAd1, $mobileAd2)
+                                    );
                                     @endphp
 
                                     <!-- নিউজ ডেসক্রিপশন — মোবাইলে অ্যাড প্যারা-ফাঁকে (lg:hidden ব্লক ভিতরে) -->
-                                    <div class="post-description prose prose-lg max-w-none text-title text-xl font-normal space-y-6 pt-4 px-0 lg:px-[125px] text-justify leading-[1.8]">
+                                    <div class="post-description prose prose-lg max-w-none text-title text-[1.25rem] md:text-[1.3125rem] font-extralight pt-4 px-0 lg:px-[125px] text-justify leading-[1.5]">
                                         {!! $descriptionForBody !!}
                                     </div>
 
@@ -387,17 +399,17 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
 
                             <!-- এ সম্পর্কিত আরও পড়ুন (নিচে পরের ৪টা) -->
                             @if($related->skip(2)->take(4)->isNotEmpty())
-                            <div class="mt-12 md:mt-[100px] pt-8 md:pt-[60px] related-section-bottom">
-                                <div class="flex items-center gap-3 mb-8">
+                            <div class="mt-6 md:mt-[100px] pt-4 md:pt-[60px] pb-2 md:pb-0 related-section-bottom">
+                                <div class="flex items-center gap-3 mb-4 md:mb-8">
                                     <div class="w-2 h-8 bg-primary"></div>
                                     <h3 class="text-xl md:text-3xl font-bold serif text-title">এ সম্পর্কিত আরও পড়ুন</h3>
                                 </div>
 
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
                                     @foreach($related->skip(2)->take(4) as $rel)
                                     <a
                                         href="{{ route('news.show', [$rel->slug]) }}"
-                                        class="group cursor-pointer flex flex-row md:flex-col gap-2 md:gap-3 pb-3 border-b border-gray-100 md:border-0 md:pb-0 last:border-0 last:pb-0">
+                                        class="group cursor-pointer flex flex-row md:flex-col gap-2 md:gap-3">
                                         <div class="img-placeholder w-36 h-24 md:w-full md:h-auto md:aspect-[3/2] shrink-0 overflow-hidden relative shadow-sm border border-gray-100">
                                             <img src="{{ storage_image_url($rel->image) ?: 'https://loremflickr.com/600/400/news?lock='.$rel->id }}"
                                                 alt="{{ $rel->title }}"

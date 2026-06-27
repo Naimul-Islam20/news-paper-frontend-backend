@@ -29,7 +29,7 @@ $showGoogle = $ad && ad_show_google($ad);
         <div class="{{ $stripOuterClass }} {{ $wrapperClass }} w-full max-w-full min-w-0" data-ad-slot-root @if($isBelowMenu) data-ad-below-menu @endif @if($variant === 'header') id="header-ad-slot" @endif>
             <div class="container">
                 <a href="{{ advertisement_click_url($ad) }}" class="ad-slot-frame ad-slot-local w-full min-w-0 flex items-center justify-center overflow-hidden bg-white img-placeholder" style="{{ $stripBoxStyle }}" target="_blank" rel="noopener">
-                    <x-ad-picture :ad="$ad" class="{{ $pictureClass }}" />
+                    <x-ad-picture :ad="$ad" class="{{ $pictureClass }}" :fetchpriority="$isBelowMenu ? 'high' : null" />
                 </a>
             </div>
         </div>
@@ -46,7 +46,7 @@ $showGoogle = $ad && ad_show_google($ad);
     @if($isStrip)
         <div class="{{ $stripOuterClass }} {{ $wrapperClass }} w-full max-w-full min-w-0" data-ad-slot-root data-ad-google @if($isBelowMenu) data-ad-below-menu @endif @if($variant === 'header') id="header-ad-slot" @endif>
             <div class="container">
-                <x-google-ad-unit :ad="$ad" layout="strip" />
+                <x-google-ad-unit :ad="$ad" layout="strip" :eager="$isBelowMenu || $variant === 'header'" />
             </div>
         </div>
     @elseif($variant === 'sidebar')

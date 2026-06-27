@@ -84,13 +84,21 @@ main section,
     font-family: "SolaimanLipi", ui-sans-serif, sans-serif;
 }
 
-/* হেডার মেনু — medium (রিপোর্টারের মতো) */
+/* হেডার মেনু — regular (stroke ছাড়া, চিকন) */
 header nav ul a,
 .header-drawer-menu a {
     font-weight: 400;
     font-synthesis: none;
-    -webkit-text-stroke: 0.2px currentColor;
-    paint-order: stroke fill;
+    -webkit-text-stroke: 0;
+}
+
+/* হেডার উপরের লিংক — বাংলা কনভার্টার | আর্কাইভ | English */
+.header-utility-links,
+.header-utility-links a,
+.header-utility-links button {
+    font-weight: 400;
+    font-synthesis: none;
+    -webkit-text-stroke: 0;
 }
 
 /* হেডার তারিখ — বাংলা, স্বাভাবিক স্পেসিং */
@@ -172,6 +180,30 @@ header nav ul a,
 
 @utility text-byline {
     color: #292929;
+}
+
+/* পোস্ট বিবরণ — শব্দ ও লাইনের মাঝের ফাঁক কম */
+.post-description {
+    word-spacing: -0.06em;
+    line-height: 1.5;
+}
+
+.post-description :is(p, li, blockquote) {
+    line-height: 1.5;
+}
+
+/* প্যারা → প্যারার মাঝের ১-লাইন ফাঁক একটু কম (margin collapse এড়াতে padding) */
+.post-description p {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.post-description p ~ p {
+    padding-top: 0.7em !important;
+}
+
+.post-description > p:first-of-type {
+    font-weight: 700 !important;
 }
 
 @utility text-caption {
@@ -326,6 +358,90 @@ body {
     }
 }
 
+/* মেনুর নিচের strip — header container width, local ad এর মতো */
+[data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame.ad-slot-local,
+[data-ad-slot-root][data-ad-below-menu]
+    .container
+    .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) {
+    width: 100% !important;
+    max-width: min(100%, var(--ad-max-width, 1300px)) !important;
+    position: relative;
+    overflow: hidden;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (min-width: 768px) {
+    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame.ad-slot-local,
+    [data-ad-slot-root][data-ad-below-menu]
+        .container
+        .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) {
+        height: var(--ad-max-height, 100px) !important;
+        min-height: var(--ad-max-height, 100px) !important;
+        max-height: var(--ad-max-height, 100px) !important;
+        aspect-ratio: auto !important;
+    }
+}
+
+@media (max-width: 767px) {
+    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame.ad-slot-local,
+    [data-ad-slot-root][data-ad-below-menu]
+        .container
+        .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) {
+        aspect-ratio: var(--ad-aspect-ratio, 13 / 1) !important;
+        height: auto !important;
+        max-height: var(--ad-mobile-max-height, var(--ad-max-height, 100px)) !important;
+    }
+}
+
+[data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame picture,
+[data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame img,
+[data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame video,
+[data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame .ad-slot-media:not(ins) {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center;
+}
+
+[data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle {
+    display: block !important;
+    position: relative !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+}
+
+[data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle > div,
+[data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle > div > div {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+}
+
+[data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame iframe {
+    border: 0;
+    aspect-ratio: auto !important;
+    left: 0 !important;
+    right: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+}
+
 /* Google + Local — একই slot সাইজ (config max); Google বেশি জায়গা নেয় না */
 [data-ad-slot-root][data-ad-collapsed] {
     display: none !important;
@@ -345,7 +461,12 @@ body {
     object-position: center;
 }
 
-[data-ad-slot-root] .ad-slot-frame.ad-slot-google iframe {
+[data-ad-slot-root]:not([data-ad-below-menu])
+    .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"])
+    iframe,
+[data-ad-slot-root][data-ad-below-menu]
+    .ad-slot-frame.ad-slot-google[data-ad-layout="box"]
+    iframe {
     display: block;
     width: 100% !important;
     max-width: 100% !important;
@@ -356,27 +477,26 @@ body {
     object-position: center;
 }
 
-/* Sidebar/box Google ad — frame-এর ভিতরে পুরো ad (কাটা যাবে না) */
-[data-ad-slot-root] .ad-slot-frame.ad-slot-google[data-ad-layout='box'] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Sidebar/box Google ad — frame-এর ভিতরে পুরো ad (local object-cover এর মতো) */
+[data-ad-slot-root] .ad-slot-frame.ad-slot-google[data-ad-layout="box"] {
+    display: block;
+    position: relative;
+    overflow: hidden;
 }
 
-[data-ad-slot-root] .ad-slot-frame.ad-slot-google[data-ad-layout='box'] ins.adsbygoogle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+[data-ad-slot-root]
+    .ad-slot-frame.ad-slot-google[data-ad-layout="box"]
+    ins.adsbygoogle {
+    display: block;
+    position: relative;
+    overflow: hidden;
     width: 100%;
     height: 100%;
     max-height: 100%;
 }
 
-[data-ad-slot-root] .ad-slot-frame.ad-slot-google[data-ad-layout='box'] iframe {
-    width: auto !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    height: auto !important;
+[data-ad-slot-root] .ad-slot-frame.ad-slot-google[data-ad-layout="box"] iframe {
+    border: 0;
 }
 
 /* Google AdSense — config box-এর ভিতরে; clip শুধু frame-এ */
@@ -408,8 +528,9 @@ body {
 
 /* মোবাইল — strip অ্যাড; box (800×600 sidebar) আলাদা */
 @media (max-width: 767px) {
-    [data-ad-slot-root] .ad-slot-frame.ad-slot-local,
-    [data-ad-slot-root] .ad-slot-frame.ad-slot-google:not([data-ad-layout='box']) {
+    [data-ad-slot-root]:not([data-ad-below-menu]) .ad-slot-frame.ad-slot-local,
+    [data-ad-slot-root]:not([data-ad-below-menu])
+        .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"]) {
         height: auto !important;
         min-height: 0 !important;
         aspect-ratio: auto !important;
@@ -420,13 +541,15 @@ body {
         ) !important;
     }
 
-    [data-ad-slot-root] .ad-slot-frame.ad-slot-google[data-ad-layout='box'] {
+    [data-ad-slot-root] .ad-slot-frame.ad-slot-google[data-ad-layout="box"] {
         width: 100% !important;
         max-width: min(
             100%,
             var(--ad-mobile-max-width, var(--ad-max-width, 100%))
         ) !important;
         max-height: var(--ad-mobile-max-height, 240px) !important;
+        aspect-ratio: var(--ad-aspect-ratio, 4 / 3) !important;
+        height: auto !important;
     }
 
     [data-ad-slot-root] .ad-slot-frame.ad-slot-local picture,
@@ -436,9 +559,11 @@ body {
         max-width: 100%;
     }
 
-    [data-ad-slot-root] .ad-slot-frame.ad-slot-local img,
-    [data-ad-slot-root] .ad-slot-frame.ad-slot-local .ad-slot-media,
-    [data-ad-slot-root] .ad-slot-frame.ad-slot-google:not([data-ad-layout='box']) ins.adsbygoogle {
+    [data-ad-slot-root]:not([data-ad-below-menu]) .ad-slot-frame.ad-slot-local img,
+    [data-ad-slot-root]:not([data-ad-below-menu]) .ad-slot-frame.ad-slot-local .ad-slot-media,
+    [data-ad-slot-root]:not([data-ad-below-menu])
+        .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"])
+        ins.adsbygoogle {
         display: block;
         width: 100% !important;
         height: auto !important;
@@ -449,10 +574,12 @@ body {
         margin-inline: auto;
     }
 
-    [data-ad-slot-root] .ad-slot-frame.ad-slot-google[data-ad-layout='box'] ins.adsbygoogle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    [data-ad-slot-root]
+        .ad-slot-frame.ad-slot-google[data-ad-layout="box"]
+        ins.adsbygoogle {
+        display: block;
+        position: relative;
+        overflow: hidden;
         width: 100% !important;
         height: 100% !important;
         max-width: 100%;
@@ -471,19 +598,63 @@ body {
         margin-inline: auto;
     }
 
-    [data-ad-slot-root] .ad-slot-frame.ad-slot-local iframe,
-    [data-ad-slot-root] .ad-slot-frame.ad-slot-google:not([data-ad-layout='box']) iframe {
+    [data-ad-slot-root]:not([data-ad-below-menu]) .ad-slot-frame.ad-slot-local iframe,
+    [data-ad-slot-root]:not([data-ad-below-menu])
+        .ad-slot-frame.ad-slot-google:not([data-ad-layout="box"])
+        iframe {
         width: 100%;
         max-height: var(--ad-mobile-max-height, var(--ad-max-height, 90px));
         aspect-ratio: 16 / 9;
         height: auto;
     }
 
-    [data-ad-slot-root] .ad-slot-frame.ad-slot-google[data-ad-layout='box'] iframe {
-        width: auto;
-        max-width: 100%;
-        max-height: 100%;
-        aspect-ratio: auto;
-        height: auto;
+    [data-ad-slot-root]
+        .ad-slot-frame.ad-slot-google[data-ad-layout="box"]
+        iframe {
+        border: 0;
+    }
+
+    /* মেনুর নিচে — মোবাইল strip (desktop rules উপরে global media query তে) */
+    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame img,
+    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame video,
+    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame .ad-slot-media:not(ins) {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        aspect-ratio: auto !important;
+        object-fit: contain !important;
+    }
+
+    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle {
+        display: block !important;
+        position: relative !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box;
+    }
+
+    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle > div,
+    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame ins.adsbygoogle > div > div {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+    }
+
+    [data-ad-slot-root][data-ad-below-menu] .container .ad-slot-frame iframe {
+        border: 0;
+        aspect-ratio: auto !important;
+        left: 0 !important;
+        max-width: none !important;
+        margin: 0 !important;
     }
 }

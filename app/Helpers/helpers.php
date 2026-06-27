@@ -731,28 +731,29 @@ if (! function_exists('ad_slot_box_style')) {
             $boxMobileH = 240;
 
             if ($layout === 'full-strip') {
-                return "width:100%;max-width:100%;height:90px;min-height:90px;max-height:90px;--ad-max-width:100%;--ad-max-height:90px;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$stripMobileH}px;";
+                return "width:100%;max-width:100%;height:90px;min-height:90px;max-height:90px;--ad-max-width:100%;--ad-max-height:90px;--ad-aspect-ratio:1300/90;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$stripMobileH}px;";
             }
 
             return $layout === 'strip'
-                ? "width:100%;height:90px;min-height:90px;max-height:90px;--ad-max-width:100%;--ad-max-height:90px;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$stripMobileH}px;"
-                : "width:100%;aspect-ratio:4/3;max-height:240px;--ad-max-width:100%;--ad-max-height:240px;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$boxMobileH}px;";
+                ? "width:100%;height:90px;min-height:90px;max-height:90px;--ad-max-width:100%;--ad-max-height:90px;--ad-aspect-ratio:1300/90;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$stripMobileH}px;"
+                : "width:100%;aspect-ratio:4/3;max-height:240px;--ad-max-width:100%;--ad-max-height:240px;--ad-aspect-ratio:4/3;--ad-mobile-max-width:100%;--ad-mobile-max-height:{$boxMobileH}px;";
         }
 
         $width = $dims['width'];
         $height = $dims['height'];
         $mobileMaxH = $layout === 'strip' || $layout === 'full-strip' ? $height : min($height, 240);
         $mobileVars = "--ad-mobile-max-width:100%;--ad-mobile-max-height:{$mobileMaxH}px;";
+        $aspectVar = "--ad-aspect-ratio:{$width}/{$height};";
 
         if ($layout === 'full-strip') {
-            return "width:100%;max-width:100%;height:{$height}px;min-height:{$height}px;max-height:{$height}px;--ad-max-width:100%;--ad-max-height:{$height}px;{$mobileVars}";
+            return "width:100%;max-width:100%;height:{$height}px;min-height:{$height}px;max-height:{$height}px;--ad-max-width:100%;--ad-max-height:{$height}px;{$aspectVar}{$mobileVars}";
         }
 
         if ($layout === 'strip') {
-            return "width:100%;max-width:{$width}px;height:{$height}px;min-height:{$height}px;max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;{$mobileVars}";
+            return "width:100%;max-width:{$width}px;height:{$height}px;min-height:{$height}px;max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;{$aspectVar}{$mobileVars}";
         }
 
-        return "width:100%;max-width:{$width}px;aspect-ratio:{$width}/{$height};max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;{$mobileVars}";
+        return "width:100%;max-width:{$width}px;aspect-ratio:{$width}/{$height};max-height:{$height}px;margin-left:auto;margin-right:auto;--ad-max-width:{$width}px;--ad-max-height:{$height}px;{$aspectVar}{$mobileVars}";
     }
 }
 
@@ -862,6 +863,47 @@ if (! function_exists('inject_post_detail_ads_between_paragraphs')) {
         }
 
         return $html;
+    }
+}
+
+if (! function_exists('tighten_post_description_paragraph_spacing')) {
+    /**
+     * পোস্ট বিবরণ — প্যারা থেকে প্যারার মাঝের gap কমায় (প্রতিটি <p>-এ inline, build ছাড়াও কাজ করে)।
+     */
+    function tighten_post_description_paragraph_spacing(string $html): string
+    {
+        if ($html === '' || ! str_contains(strtolower($html), '<p')) {
+            return $html;
+        }
+
+        $index = 0;
+
+        return preg_replace_callback(
+            '/<p\b[^>]*>/i',
+            static function (array $match) use (&$index): string {
+                $index++;
+                $style = 'margin:0!important;padding:0!important;';
+                if ($index === 1) {
+                    $style .= 'font-weight:700!important;';
+                }
+                if ($index > 1) {
+                    $style .= 'padding-top:0.7em!important;';
+                }
+
+                $tag = $match[0];
+                if (preg_match('/style=(["\'])(.*?)\1/i', $tag)) {
+                    return preg_replace(
+                        '/style=(["\'])(.*?)\1/i',
+                        'style=$1'.$style.'$1',
+                        $tag,
+                        1
+                    );
+                }
+
+                return preg_replace('/<p\b/i', '<p style="'.$style.'"', $tag, 1);
+            },
+            $html
+        ) ?? $html;
     }
 }
 
@@ -1218,7 +1260,7 @@ if (! function_exists('site_domain')) {
 
 if (! function_exists('post_credit_line')) {
     /**
-     * সাইট নাম (বাংলা) + পোস্টকারীর নামের প্রথম শব্দ — যেমন: কক্সবাজার কণ্ঠ/Md
+     * সাইট নাম (বাংলা) + পোস্টকারীর নামের প্রথম শব্দ — যেমন: কক্সবাজার কণ্ঠ / Md
      */
     function post_credit_line($post): string
     {
@@ -1229,7 +1271,7 @@ if (! function_exists('post_credit_line')) {
 
         $label = site_name_bn();
 
-        return $label !== '' ? $label . '/' . $creatorWord : $creatorWord;
+        return $label !== '' ? $label . ' / ' . $creatorWord : $creatorWord;
     }
 }
 

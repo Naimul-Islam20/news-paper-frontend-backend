@@ -15,6 +15,7 @@ const BOTTOM_HEIGHT = CARD_SIZE - IMAGE_HEIGHT;
 const SECTION_X_PADDING = 68;
 const FOOTER_BAR_X_PADDING = 36;
 const TITLE_X_PADDING = 44;
+const TITLE_FONT_WEIGHT = 600;
 const FOOTER_HINT_SIZE = 32;
 const FOOTER_HINT_TEXT_PRIMARY = "বিস্তারিত কমেন্টে ...";
 const FOOTER_HINT_TEXT_ALT = "বিস্তারিত কমেন্টে";
@@ -24,7 +25,7 @@ const CARET_DOUBLE_DOWN_DUOTONE = {
     fill: "M208,56l-80,80L48,56Z",
     detail: "M213.66,141.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,204.69l74.34-74.35a8,8,0,0,1,11.32,11.32Zm-171.32-80A8,8,0,0,1,48,48H208a8,8,0,0,1,5.66,13.66l-80,80a8,8,0,0,1-11.32,0Zm25,2.34L128,124.69,188.69,64Z",
 };
-const FOOTER_URL_SIZE_PRIMARY = 36;
+const FOOTER_URL_SIZE_PRIMARY = FOOTER_HINT_SIZE;
 const FOOTER_URL_SIZE_ALT = FOOTER_HINT_SIZE;
 const FOOTER_URL_WEIGHT = "500";
 const FOOTER_URL_LETTER_SPACING = 5;
@@ -102,7 +103,10 @@ function isCrossOriginUrl(url) {
         const pageHost = window.location.hostname.replace(/^www\./i, "");
         const assetHost = parsed.hostname.replace(/^www\./i, "");
 
-        return assetHost !== pageHost || parsed.protocol !== window.location.protocol;
+        return (
+            assetHost !== pageHost ||
+            parsed.protocol !== window.location.protocol
+        );
     } catch {
         return false;
     }
@@ -135,7 +139,9 @@ function resolveAssetUrl(url) {
 function imageTagAttributes(url) {
     const resolved = resolveAssetUrl(url);
     const src = escapeHtml(resolved);
-    const crossOrigin = isCrossOriginUrl(resolved) ? ' crossorigin="anonymous"' : "";
+    const crossOrigin = isCrossOriginUrl(resolved)
+        ? ' crossorigin="anonymous"'
+        : "";
 
     return `src="${src}" alt="" decoding="sync"${crossOrigin}`;
 }
@@ -251,18 +257,18 @@ function titleFontSize(title) {
     const length = String(title ?? "").length;
 
     if (length > 120) {
-        return 50;
+        return 53;
     }
 
     if (length > 80) {
-        return 56;
+        return 59;
     }
 
     if (length > 50) {
-        return 62;
+        return 65;
     }
 
-    return 68;
+    return 69;
 }
 
 function footerUrlMaxWidth(hasLogo) {
@@ -288,16 +294,14 @@ function fitFooterUrlFontSize(
     maxWidth,
     baseSize = FOOTER_URL_SIZE_PRIMARY,
 ) {
-    const sizes = [baseSize, 32, 28, 24, 22, 20, 18];
     const text = String(url ?? "");
+    const targetSize = FOOTER_HINT_SIZE;
 
-    for (const size of sizes) {
-        if (measureFooterUrlText(ctx, text, size) <= maxWidth) {
-            return size;
-        }
+    if (measureFooterUrlText(ctx, text, targetSize) <= maxWidth) {
+        return targetSize;
     }
 
-    return 22;
+    return targetSize;
 }
 
 function wrapUrlLines(ctx, url, maxWidth, fontSize) {
@@ -331,7 +335,7 @@ function wrapUrlLines(ctx, url, maxWidth, fontSize) {
 
 function footerAreaHeight(hasLogo) {
     const logoBoxHeight = LOGO_HEIGHT;
-    const textHeight = FOOTER_HINT_SIZE + FOOTER_URL_SIZE_PRIMARY + 12;
+    const textHeight = FOOTER_HINT_SIZE + FOOTER_HINT_SIZE + 12;
 
     return Math.max(logoBoxHeight, textHeight) + 18;
 }
@@ -451,7 +455,17 @@ function drawImageWatermarkIcon(
 
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(iconImage, sx, sy, sw, sh, zoomDrawX, zoomDrawY, drawSize, drawSize);
+    ctx.drawImage(
+        iconImage,
+        sx,
+        sy,
+        sw,
+        sh,
+        zoomDrawX,
+        zoomDrawY,
+        drawSize,
+        drawSize,
+    );
     ctx.restore();
 }
 
@@ -526,7 +540,7 @@ function buildCardHtml(data) {
             <div class="post-photocard-bottom" style="position:relative;width:${CARD_SIZE}px;height:${BOTTOM_HEIGHT}px;flex-shrink:0;background:${photocardBottomBoxBackgroundCss()};overflow:hidden;z-index:2;">
                 <div style="position:relative;z-index:2;height:100%;box-sizing:border-box;">
                     ${dateBlock}
-                    <h1 style="position:absolute;left:${TITLE_X_PADDING}px;right:${TITLE_X_PADDING}px;top:${titleTop}px;bottom:${titleBottom}px;margin:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:${fontSize}px;line-height:1.32;font-weight:700;color:#ffffff;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,0.45);">${title}</h1>
+                    <h1 style="position:absolute;left:${TITLE_X_PADDING}px;right:${TITLE_X_PADDING}px;top:${titleTop}px;bottom:${titleBottom}px;margin:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:${fontSize}px;line-height:1.32;font-weight:${TITLE_FONT_WEIGHT};color:#ffffff;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,0.45);">${title}</h1>
                     <div style="position:absolute;left:${SECTION_X_PADDING}px;right:${SECTION_X_PADDING}px;bottom:18px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;z-index:3;">
                         <div style="flex:1;min-width:0;text-align:left;color:#ffffff;">
                             <div style="font-size:${FOOTER_HINT_SIZE}px;font-weight:400;line-height:1.35;opacity:0.95;">${FOOTER_HINT_TEXT_PRIMARY}</div>
@@ -579,7 +593,7 @@ function buildAltCardHtml(data) {
             <div class="post-photocard-bottom" style="position:relative;width:${CARD_SIZE}px;height:${BOTTOM_HEIGHT}px;flex-shrink:0;background:${photocardBottomBoxBackgroundCss()};overflow:hidden;z-index:2;box-sizing:border-box;">
                 ${altBottomBoxTopBorderHtml()}
                 <div style="position:relative;z-index:2;height:100%;box-sizing:border-box;">
-                    <h1 style="position:absolute;left:${TITLE_X_PADDING}px;right:${TITLE_X_PADDING}px;top:${titleTop}px;bottom:${titleBottom}px;margin:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:${fontSize}px;line-height:1.32;font-weight:700;color:#ffffff;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,0.45);">${title}</h1>
+                    <h1 style="position:absolute;left:${TITLE_X_PADDING}px;right:${TITLE_X_PADDING}px;top:${titleTop}px;bottom:${titleBottom}px;margin:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:${fontSize}px;line-height:1.32;font-weight:${TITLE_FONT_WEIGHT};color:#ffffff;text-align:center;text-shadow:0 2px 8px rgba(0,0,0,0.45);">${title}</h1>
                     <div style="position:absolute;left:0;right:0;bottom:0;z-index:3;box-sizing:border-box;background:${ALT_BOTTOM_BAR_BG};padding:${ALT_BOTTOM_BAR_PADDING_Y}px ${FOOTER_BAR_X_PADDING}px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
                         <div style="flex:1;min-width:0;text-align:left;color:#ffffff;">
                             ${dateBlock}
@@ -794,7 +808,7 @@ async function renderPhotocardCanvas(data) {
 
     const measureCanvas = document.createElement("canvas");
     const measureCtx = measureCanvas.getContext("2d");
-    measureCtx.font = `700 ${fontSize}px ${PHOTOCARD_FONT}`;
+    measureCtx.font = `${TITLE_FONT_WEIGHT} ${fontSize}px ${PHOTOCARD_FONT}`;
     const titleLines = wrapTextLines(measureCtx, title, titleMaxWidth);
     const titleContentHeight = titleLines.length * lineHeight;
     const titleStartY =
@@ -848,7 +862,7 @@ async function renderPhotocardCanvas(data) {
     }
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = `700 ${fontSize}px ${PHOTOCARD_FONT}`;
+    ctx.font = `${TITLE_FONT_WEIGHT} ${fontSize}px ${PHOTOCARD_FONT}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     ctx.shadowColor = "rgba(0,0,0,0.45)";
@@ -970,7 +984,7 @@ async function renderAltPhotocardCanvas(data) {
     const titleBlockBottom = CARD_SIZE - footerHeight - 12;
     const titleBlockHeight = Math.max(0, titleBlockBottom - titleBlockTop);
 
-    measureCtx.font = `700 ${fontSize}px ${PHOTOCARD_FONT}`;
+    measureCtx.font = `${TITLE_FONT_WEIGHT} ${fontSize}px ${PHOTOCARD_FONT}`;
     const titleLines = wrapTextLines(measureCtx, title, titleMaxWidth);
     const titleContentHeight = titleLines.length * lineHeight;
     const titleStartY =
@@ -1012,11 +1026,13 @@ async function renderAltPhotocardCanvas(data) {
             size: ALT_SEAM_ICON_SIZE,
         },
         ALT_SEAM_ICON_OPACITY,
-        iconImage ? iconRenderZoom(iconImage, ALT_SEAM_ICON_SIZE) : ALT_SEAM_ICON_ZOOM,
+        iconImage
+            ? iconRenderZoom(iconImage, ALT_SEAM_ICON_SIZE)
+            : ALT_SEAM_ICON_ZOOM,
     );
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = `700 ${fontSize}px ${PHOTOCARD_FONT}`;
+    ctx.font = `${TITLE_FONT_WEIGHT} ${fontSize}px ${PHOTOCARD_FONT}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     ctx.shadowColor = "rgba(0,0,0,0.45)";

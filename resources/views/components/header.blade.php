@@ -226,14 +226,9 @@
                 </form>
 
                 <!-- Top Utility Bar -->
-                <div class="flex justify-between items-center text-slate-800 text-sm md:text-base font-medium mb-0 hidden md:flex relative">
+                <div class="flex justify-between items-center text-slate-800 text-sm md:text-base font-normal mb-0 hidden md:flex relative">
                     <div class="flex items-center gap-2 md:gap-2.5 header-date">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-5 md:h-5 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
+                        <x-icons.calendar-days class="w-4 h-4 md:w-5 md:h-5 shrink-0 text-slate-900 block" />
                         @php
                         $en_d = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
                         $bn_d = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
@@ -352,9 +347,9 @@
                             </svg>
                         </button>
 
-                        <a href="{{ front_home_url() }}" class="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-white text-primary font-normal serif text-lg md:text-xl shadow border border-black/5 hover:bg-primary/5 transition-colors shrink-0 overflow-hidden" title="{{ optional($siteMeta)->site_name ?? 'হোম' }}">
+                        <a href="{{ front_home_url() }}" class="w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center bg-white text-primary font-normal serif text-lg md:text-xl shadow border border-black/5 hover:bg-primary/5 transition-colors shrink-0 overflow-hidden" title="{{ optional($siteMeta)->site_name ?? 'হোম' }}">
                             @if(!empty(optional($siteMeta)->site_icon))
-                            <img src="{{ storage_image_url($siteMeta->site_icon) }}" alt="" width="32" height="32" class="w-full h-full object-contain p-0.5" loading="lazy">
+                            <img src="{{ storage_image_url($siteMeta->site_icon) }}" alt="" width="32" height="32" class="w-full h-full object-cover rounded-full" loading="lazy">
                             @else
                             <span class="leading-none">D</span>
                             @endif
@@ -364,13 +359,13 @@
                     <div class="flex-1 overflow-x-auto overflow-y-hidden no-scrollbar py-0 flex items-center justify-between">
                         <ul class="flex justify-start items-center gap-4 md:gap-6 text-xl md:text-xl whitespace-nowrap py-0.5 md:py-0.5">
                             {{-- সর্বশেষ সর্বদা হেডার মেনুর বাম পাশের প্রথম আইটেম (স্থান অপরিবর্তিত) --}}
-                            <li><a href="{{ route('latest') }}" class="font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('latest') ? 'text-primary border-primary' : '' }}">সর্বশেষ</a></li>
-                            <li><a href="{{ route('special-news') }}" class="font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('special-news') ? 'text-primary border-primary' : '' }}">বিশেষ সংবাদ</a></li>
+                            <li><a href="{{ route('latest') }}" class="font-normal hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('latest') ? 'text-primary border-primary' : '' }}">সর্বশেষ</a></li>
+                            <li><a href="{{ route('special-news') }}" class="font-normal hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->routeIs('special-news') ? 'text-primary border-primary' : '' }}">বিশেষ সংবাদ</a></li>
                             @if(isset($headerCategories) && $headerCategories->isNotEmpty())
                             @foreach($headerCategories as $cat)
                             <li>
                                 <a href="{{ route('category.show', $cat->slug) }}"
-                                    class="font-medium hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->is('category/'.$cat->slug) ? 'text-primary border-primary' : '' }}">
+                                    class="font-normal hover:text-primary border-b-2 border-transparent hover:border-primary pb-1 transition-all {{ request()->is('category/'.$cat->slug) ? 'text-primary border-primary' : '' }}">
                                     {{ $cat->name }}
                                 </a>
                             </li>

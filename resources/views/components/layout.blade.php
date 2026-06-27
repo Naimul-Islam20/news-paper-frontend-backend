@@ -184,11 +184,19 @@
     @endif
     @endif
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @php
+    $adsenseClient = google_adsense_client();
     $__primary = optional($siteMeta)->primary_color ?? null;
     $__primaryOk = is_string($__primary) && preg_match('/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/', $__primary);
     @endphp
+    @if($adsenseClient)
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+    <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin>
+    <link rel="preload" href="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ e($adsenseClient) }}" as="script" crossorigin>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ e($adsenseClient) }}" crossorigin="anonymous"></script>
+    @endif
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @if ($__primaryOk)
     <style>
         :root {
