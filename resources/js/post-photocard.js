@@ -510,10 +510,6 @@ function buildCardHtml(data) {
         ? `<img ${imageTagAttributes(data.image)} style="display:block;width:100%;height:100%;object-fit:cover;object-position:center top;">`
         : `<div style="width:100%;height:100%;background:linear-gradient(135deg,${primary} 0%,#0f172a 100%);"></div>`;
 
-    const imageIconBlock = data.icon
-        ? `<img ${imageTagAttributes(data.icon)} data-photocard-icon aria-hidden="true" style="${imageWatermarkStyle()}">`
-        : "";
-
     const logoBlock = data.logo
         ? `<img ${imageTagAttributes(data.logo)} style="display:block;height:${LOGO_HEIGHT}px;max-width:${LOGO_MAX_WIDTH}px;object-fit:contain;">`
         : `<span style="display:block;font-size:36px;font-weight:700;color:#ffffff;line-height:1.2;text-align:right;">${siteName}</span>`;
@@ -531,7 +527,6 @@ function buildCardHtml(data) {
         <div class="post-photocard-export" style="position:relative;display:flex;flex-direction:column;width:${CARD_SIZE}px;height:${CARD_SIZE}px;flex-shrink:0;background:${OVERLAY_DARK_SOLID};font-family:'SolaimanLipi',sans-serif;overflow:hidden;box-shadow:0 10px 40px rgba(15,23,42,0.15);">
             <div class="post-photocard-image" style="position:relative;width:${CARD_SIZE}px;height:${IMAGE_HEIGHT}px;flex-shrink:0;overflow:hidden;line-height:0;">
                 ${imageBlock}
-                ${imageIconBlock}
             </div>
 
             <div class="post-photocard-bottom" style="position:relative;width:${CARD_SIZE}px;height:${BOTTOM_HEIGHT}px;flex-shrink:0;background:${photocardBottomBoxBackgroundCss()};overflow:hidden;z-index:2;">
@@ -781,10 +776,9 @@ async function renderPhotocardCanvas(data) {
     const lineHeight = Math.round(fontSize * 1.35);
     const titleMaxWidth = CARD_SIZE - TITLE_X_PADDING * 2;
 
-    const [postImage, logoImage, iconImage] = await Promise.all([
+    const [postImage, logoImage] = await Promise.all([
         loadImage(data.image),
         loadImage(data.logo),
-        loadImage(data.icon),
     ]);
 
     const bottomTop = IMAGE_HEIGHT;
@@ -833,14 +827,6 @@ async function renderPhotocardCanvas(data) {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, CARD_SIZE, IMAGE_HEIGHT);
     }
-
-    drawImageWatermarkIcon(
-        ctx,
-        iconImage,
-        null,
-        IMAGE_ICON_WATERMARK_OPACITY,
-        iconImage ? iconRenderZoom(iconImage, IMAGE_ICON_WATERMARK_SIZE) : 1,
-    );
 
     drawUnifiedOverlayGradient(ctx, CARD_SIZE);
 
