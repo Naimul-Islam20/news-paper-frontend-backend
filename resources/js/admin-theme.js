@@ -282,6 +282,22 @@ function markEditorForPaste(editor, extraMs = 60000) {
     ckeditorPasteState.until = Date.now() + extraMs;
 }
 
+function isNativeFormFieldOutsideCkeditor(target) {
+    if (!(target instanceof Element)) {
+        return false;
+    }
+
+    if (target.closest('.cke')) {
+        return false;
+    }
+
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+        return true;
+    }
+
+    return target.isContentEditable;
+}
+
 function registerGlobalPasteHandler() {
     if (ckeditorPasteState.bound) {
         return;
@@ -292,6 +308,16 @@ function registerGlobalPasteHandler() {
     document.addEventListener('paste', (e) => {
         const editor = ckeditorPasteState.editor;
         if (!editor || editor.status !== 'ready' || Date.now() > ckeditorPasteState.until) {
+            return;
+        }
+
+        if (isNativeFormFieldOutsideCkeditor(e.target)) {
+            ckeditorPasteState.editor = null;
+            ckeditorPasteState.until = 0;
+            return;
+        }
+
+        if (!editor.focusManager || !editor.focusManager.hasFocus) {
             return;
         }
 
@@ -319,7 +345,8 @@ function bindCkeditorDesktopPaste(editor) {
     });
 
     editor.on('blur', () => {
-        ckeditorPasteState.until = Date.now() + 10000;
+        ckeditorPasteState.editor = null;
+        ckeditorPasteState.until = 0;
     });
 
     editor.on('contentDom', () => {

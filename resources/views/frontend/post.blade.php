@@ -108,12 +108,18 @@ $postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
                                     }
                                 }
 
-                                /* পোস্ট বিবরণ — প্রথম প্যারা bold, বাকি normal */
-                                .post-description > p:first-of-type {
+                                /* পোস্ট বিবরণ — প্রথম প্যারা bold, বাকি normal (লাইভে CSS build ছাড়াও) */
+                                .post-description p.post-desc-p-first,
+                                .post-description p:first-of-type {
                                     font-weight: 700 !important;
                                 }
 
-                                .post-description > p:not(:first-of-type) {
+                                .post-description p.post-desc-p-rest,
+                                .post-description p:not(.post-desc-p-first):not(:first-of-type) {
+                                    font-weight: 400 !important;
+                                }
+
+                                .post-description p.post-desc-p-rest :is(b, strong) {
                                     font-weight: 400 !important;
                                 }
 

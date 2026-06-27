@@ -866,9 +866,37 @@ if (! function_exists('inject_post_detail_ads_between_paragraphs')) {
     }
 }
 
+if (! function_exists('normalize_post_description_rest_paragraph_inner_html')) {
+    /**
+     * প্রথম প্যারা ছাড়া বাকি প্যারার ভিতরের bold (<b>/<strong>/inline style) সরায়।
+     */
+    function normalize_post_description_rest_paragraph_inner_html(string $inner): string
+    {
+        $prev = null;
+        while ($prev !== $inner) {
+            $prev = $inner;
+            $inner = preg_replace('/<(b|strong)\b[^>]*>(.*?)<\/\1>/is', '$2', $inner) ?? $inner;
+        }
+
+        return preg_replace_callback(
+            '/\sstyle=(["\'])(.*?)\1/i',
+            static function (array $m): string {
+                $style = preg_replace('/(?:^|;\s*)font-weight\s*:\s*(?:bold|700|800|900)\s*/i', '', $m[2]) ?? $m[2];
+                $style = trim($style, '; ');
+                if ($style === '') {
+                    return '';
+                }
+
+                return ' style="'.$style.'"';
+            },
+            $inner
+        ) ?? $inner;
+    }
+}
+
 if (! function_exists('tighten_post_description_paragraph_spacing')) {
     /**
-     * পোস্ট বিবরণ — প্যারা থেকে প্যারার মাঝের gap কমায় (প্রতিটি <p>-এ inline, build ছাড়াও কাজ করে)।
+     * পোস্ট বিবরণ — প্রথম প্যারা bold, বাকি normal (inline + class; CSS build ছাড়াও কাজ করে)।
      */
     function tighten_post_description_paragraph_spacing(string $html): string
     {
@@ -879,27 +907,30 @@ if (! function_exists('tighten_post_description_paragraph_spacing')) {
         $index = 0;
 
         return preg_replace_callback(
-            '/<p\b[^>]*>/i',
+            '/<p\b([^>]*)>(.*?)<\/p>/is',
             static function (array $match) use (&$index): string {
                 $index++;
+                $isFirst = $index === 1;
+                $className = $isFirst ? 'post-desc-p-first' : 'post-desc-p-rest';
+                $inner = $isFirst
+                    ? $match[2]
+                    : normalize_post_description_rest_paragraph_inner_html($match[2]);
+
                 $style = 'margin:0!important;padding:0!important;';
-                if ($index === 1) {
-                    $style .= 'font-weight:700!important;';
-                } else {
-                    $style .= 'font-weight:400!important;padding-top:0.7em!important;';
+                $style .= $isFirst
+                    ? 'font-weight:700!important;'
+                    : 'font-weight:400!important;padding-top:0.7em!important;';
+
+                $attrs = trim($match[1]);
+                $attrs = trim(preg_replace('/\sstyle=(["\']).*?\1/i', '', ' '.$attrs) ?? $attrs);
+                $attrs = trim(preg_replace('/\sclass=(["\']).*?\1/i', '', ' '.$attrs) ?? $attrs);
+
+                $attrStr = ' class="'.$className.'" style="'.$style.'"';
+                if ($attrs !== '') {
+                    $attrStr .= ' '.$attrs;
                 }
 
-                $tag = $match[0];
-                if (preg_match('/style=(["\'])(.*?)\1/i', $tag)) {
-                    return preg_replace(
-                        '/style=(["\'])(.*?)\1/i',
-                        'style=$1'.$style.'$1',
-                        $tag,
-                        1
-                    );
-                }
-
-                return preg_replace('/<p\b/i', '<p style="'.$style.'"', $tag, 1);
+                return '<p'.$attrStr.'>'.$inner.'</p>';
             },
             $html
         ) ?? $html;
