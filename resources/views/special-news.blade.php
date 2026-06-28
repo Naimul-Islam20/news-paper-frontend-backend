@@ -213,29 +213,57 @@
 
                     <!-- মাঝের কলাম: হিরোর ৪টার পর বাকি বিশেষ সংবাদ -->
                     <div class="bg-white px-0 md:p-4 flex flex-col gap-0">
+                        <div id="special-news-posts-list" class="flex flex-col gap-0">
+                            @if($belowPosts->count() > 0)
+                                @include('frontend.partials.special-news-posts', ['posts' => $belowPosts])
+                            @endif
+                        </div>
 
-                        @if($belowPosts->count() > 0)
-                            @foreach($belowPosts as $post)
-                                <article class="flex flex-row-reverse md:flex-row-reverse gap-2 md:gap-4 py-3 md:py-4 border-b border-gray-100 last:border-0">
-                                    <a href="{{ news_url($post) }}" class="flex-shrink-0">
-                                        <div class="img-placeholder w-36 h-24 md:w-[305px] md:h-[170px]"><img src="{{ storage_image_url($post->image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover" onload="this.parentElement.classList.remove('img-placeholder')"></div>
-                                    </a>
-                                    <div class="flex flex-col justify-start gap-1 md:gap-2 pt-0 md:pt-1 md:px-0 flex-1">
-                                        <a href="{{ news_url($post) }}">
-                                            <h3 class="text-lg md:text-xl font-bold serif text-title leading-snug hover:text-primary transition-colors line-clamp-1">{{ $post->title }}</h3>
-                                        </a>
-                                        <p class="hidden md:block text-sm md:text-base font-normal text-desc leading-relaxed line-clamp-1">{{ html_entity_decode(\Illuminate\Support\Str::limit(strip_tags($post->description), 100)) }}</p>
-                                        <div class="flex items-center gap-1.5 mt-auto text-gray-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                            <span class="text-[10px] md:text-xs font-medium text-gray-500">{{ $post->created_at->diffForHumans() }}</span>
-                                        </div>
-                                    </div>
-                                </article>
-                            @endforeach
-                        @endif
-
-                        @if($belowPosts->hasPages())
-                        <div class="mt-6 flex justify-center">{{ $belowPosts->links() }}</div>
+                        @if(!empty($hasMore) && !empty($nextPageUrl))
+                        <div class="mt-6 flex justify-center" id="load-more-wrap">
+                            <button type="button" id="load-more-btn" data-next-url="{{ $nextPageUrl }}"
+                                class="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-lg transition-colors shadow-sm">
+                                আরও
+                            </button>
+                        </div>
+                        <script>
+                        (function() {
+                            var btn = document.getElementById('load-more-btn');
+                            var list = document.getElementById('special-news-posts-list');
+                            var wrap = document.getElementById('load-more-wrap');
+                            if (!btn || !list) return;
+                            btn.addEventListener('click', function() {
+                                var url = btn.getAttribute('data-next-url');
+                                if (!url) return;
+                                btn.disabled = true;
+                                btn.textContent = 'লোড হচ্ছে...';
+                                var xhr = new XMLHttpRequest();
+                                xhr.open('GET', url, true);
+                                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                                xhr.setRequestHeader('Accept', 'application/json');
+                                xhr.onload = function() {
+                                    btn.disabled = false;
+                                    btn.textContent = 'আরও';
+                                    if (xhr.status !== 200) return;
+                                    try {
+                                        var res = JSON.parse(xhr.responseText);
+                                        if (res.html) {
+                                            var div = document.createElement('div');
+                                            div.innerHTML = res.html.trim();
+                                            while (div.firstChild) list.appendChild(div.firstChild);
+                                        }
+                                        if (res.next_page_url) {
+                                            btn.setAttribute('data-next-url', res.next_page_url);
+                                        } else {
+                                            wrap.style.display = 'none';
+                                        }
+                                    } catch (e) {}
+                                };
+                                xhr.onerror = function() { btn.disabled = false; btn.textContent = 'আরও'; };
+                                xhr.send();
+                            });
+                        })();
+                        </script>
                         @endif
 
                     </div>

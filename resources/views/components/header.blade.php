@@ -123,6 +123,13 @@
                                 </svg>
                             </a>
                             @endif
+                            @if(!empty(optional($siteMeta)->map_link))
+                            <a href="{{ $siteMeta->map_link }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:opacity-80 transition-opacity" title="{{ optional($siteMeta)->map_desc ?: 'অবস্থান' }}" aria-label="{{ optional($siteMeta)->map_desc ?: 'অবস্থান' }}">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 512 512" aria-hidden="true">
+                                    <path d="M256 48C141.13 48 48 141.13 48 256c0 47.84 17.14 91.67 45.66 126.17L256 464l162.34-81.83C446.86 347.67 464 303.84 464 256 464 141.13 370.87 48 256 48zm0 272a48 48 0 1 1 48-48 48 48 0 0 1-48 48z" />
+                                </svg>
+                            </a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -315,6 +322,13 @@
                         <a href="{{ $siteMeta->youtube_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-primary transition-colors" title="YouTube" aria-label="YouTube">
                             <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+                            </svg>
+                        </a>
+                        @endif
+                        @if(!empty(optional($siteMeta)->map_link))
+                        <a href="{{ $siteMeta->map_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-primary transition-colors" title="{{ optional($siteMeta)->map_desc ?: 'অবস্থান' }}" aria-label="{{ optional($siteMeta)->map_desc ?: 'অবস্থান' }}">
+                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 512 512" aria-hidden="true">
+                                <path d="M256 48C141.13 48 48 141.13 48 256c0 47.84 17.14 91.67 45.66 126.17L256 464l162.34-81.83C446.86 347.67 464 303.84 464 256 464 141.13 370.87 48 256 48zm0 272a48 48 0 1 1 48-48 48 48 0 0 1-48 48z" />
                             </svg>
                         </a>
                         @endif

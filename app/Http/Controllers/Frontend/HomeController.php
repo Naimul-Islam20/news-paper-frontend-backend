@@ -8,6 +8,7 @@ use App\Models\HomeLayoutSection;
 use App\Models\Post;
 use App\Models\Topic;
 use App\Models\Video;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -15,7 +16,7 @@ class HomeController extends Controller
     /**
      * বিশেষ সংবাদ পেজ – is_special_news পোস্টগুলো, নতুন প্রথমে।
      */
-    public function specialNews(): View
+    public function specialNews(): View|JsonResponse
     {
         $baseQuery = Post::with(['reporter.subEditor', 'categories.parent'])
             ->where('is_special_news', true)
@@ -25,11 +26,9 @@ class HomeController extends Controller
         // হিরো: সবসময় সর্বশেষ ৪টি — pagination এখানে নয়
         $heroPosts = (clone $baseQuery)->limit(4)->get();
 
-        // হিরোর বাইরের পুরনো পোস্টগুলো — হিরোর ৪টির আগের/বাদ পড়া ডাটা
-        $belowPosts = (clone $baseQuery)
-            ->whereNotIn('id', $heroPosts->pluck('id'))
-            ->paginate(10)
-            ->withQueryString();
+        $belowQuery = (clone $baseQuery)->whereNotIn('id', $heroPosts->pluck('id'));
+
+        $loadMore = $this->specialNewsLoadMore($belowQuery, 10, 20);
 
         // হোম পেজের মতোই সর্বশেষ ও পঠিত – সব পোস্ট থেকে, একই ডাটা
         $latestSidebarPosts = Post::with('categories.parent')
@@ -44,7 +43,47 @@ class HomeController extends Controller
             ->limit(6)
             ->get();
 
-        return view('special-news', compact('heroPosts', 'belowPosts', 'latestSidebarPosts', 'popularSidebarPosts'));
+        if ($loadMore instanceof JsonResponse) {
+            return $loadMore;
+        }
+
+        return view('special-news', array_merge(
+            compact('heroPosts', 'latestSidebarPosts', 'popularSidebarPosts'),
+            $loadMore,
+        ));
+    }
+
+    /**
+     * বিশেষ সংবাদ: প্রথমে ১০টি, আরও ক্লিক করলে ২০টি করে (category পেজের মতো)।
+     */
+    private function specialNewsLoadMore($baseQuery, int $initialCount, int $moreCount): JsonResponse|array
+    {
+        $total = (clone $baseQuery)->count();
+        $morePage = (int) request()->input('more_page', 0);
+
+        if (request()->ajax() && $morePage >= 1) {
+            $offset = $initialCount + ($morePage - 1) * $moreCount;
+            $posts = (clone $baseQuery)->skip($offset)->take($moreCount)->get();
+            $hasMore = $total > $initialCount + $morePage * $moreCount;
+            $nextUrl = $hasMore ? $this->specialNewsLoadMoreUrl($morePage + 1) : null;
+
+            return response()->json([
+                'html'          => view('frontend.partials.special-news-posts', compact('posts'))->render(),
+                'next_page_url' => $nextUrl,
+                'has_more'      => $hasMore,
+            ]);
+        }
+
+        $belowPosts = (clone $baseQuery)->take($initialCount)->get();
+        $hasMore = $total > $initialCount;
+        $nextPageUrl = $hasMore ? $this->specialNewsLoadMoreUrl(1) : null;
+
+        return compact('belowPosts', 'hasMore', 'nextPageUrl');
+    }
+
+    private function specialNewsLoadMoreUrl(int $morePage): string
+    {
+        return request()->fullUrlWithQuery(['more_page' => $morePage]);
     }
 
     /**

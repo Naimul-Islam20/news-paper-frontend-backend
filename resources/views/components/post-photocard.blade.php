@@ -1,7 +1,7 @@
 @props(['post'])
 
 @php
-$siteDomain = photocard_site_domain(front_home_url(), true);
+$siteDomain = photocard_site_domain(front_home_url(), false);
 $imageBasename = $post->image ? pathinfo(basename($post->image), PATHINFO_FILENAME) : '';
 $photocardPayload = [
 'id' => $post->id,
