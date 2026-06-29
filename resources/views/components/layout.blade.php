@@ -213,24 +213,45 @@
     $shareTitle = $ogTitle ?? $title ?? site_name();
     $sharePageUrl = isset($shareUrl) && trim((string) $shareUrl) !== '' ? trim((string) $shareUrl) : url()->current();
     $shareDescription = isset($ogDescription) ? trim((string) $ogDescription) : '';
+    $shareImageUrlHttps = isset($metaImage) ? trim((string) $metaImage) : '';
+    if ($shareImageUrlHttps === '' && $hasShareMeta && ! empty(optional($siteMeta)->site_logo)) {
+        $shareImageUrlHttps = share_og_image_url($siteMeta->site_logo, 'site');
+    }
+    if ($shareImageUrlHttps !== '' && ! str_starts_with($shareImageUrlHttps, 'http://') && ! str_starts_with($shareImageUrlHttps, 'https://')) {
+        $shareImageUrlHttps = url($shareImageUrlHttps);
+    }
+    if ($shareImageUrlHttps !== '') {
+        $shareImageUrlHttps = str_replace('http://', 'https://', $shareImageUrlHttps);
+    }
+    $shareImageAlt = isset($ogImageAlt) ? trim((string) $ogImageAlt) : $shareTitle;
+    $shareImageWidth = isset($metaImageWidth) ? (int) trim((string) $metaImageWidth) : 0;
+    $shareImageHeight = isset($metaImageHeight) ? (int) trim((string) $metaImageHeight) : 0;
     @endphp
     @if($hasShareMeta)
     <link rel="canonical" href="{{ $sharePageUrl }}">
     <meta property="og:type" content="article">
     <meta property="og:url" content="{{ $sharePageUrl }}">
     <meta property="og:title" content="{{ $shareTitle }}">
+    <meta property="og:site_name" content="{{ site_name() }}">
     @if($shareDescription !== '')
     <meta property="og:description" content="{{ $shareDescription }}">
+    <meta name="description" content="{{ $shareDescription }}">
     @endif
-    @if(isset($metaImage) && trim($metaImage) !== '')
-    @php
-    $shareImageUrl = trim($metaImage);
-    $shareImageUrl = (str_starts_with($shareImageUrl, 'http://') || str_starts_with($shareImageUrl, 'https://')) ? $shareImageUrl : url($shareImageUrl);
-    $shareImageUrlHttps = str_replace('http://', 'https://', $shareImageUrl);
-    @endphp
+    @if($shareImageUrlHttps !== '')
     <meta property="og:image" content="{{ $shareImageUrlHttps }}">
     <meta property="og:image:secure_url" content="{{ $shareImageUrlHttps }}">
+    @if($shareImageWidth > 0 && $shareImageHeight > 0)
+    <meta property="og:image:width" content="{{ $shareImageWidth }}">
+    <meta property="og:image:height" content="{{ $shareImageHeight }}">
+    @endif
+    @if($shareImageAlt !== '')
+    <meta property="og:image:alt" content="{{ $shareImageAlt }}">
+    @endif
+    <link rel="image_src" href="{{ $shareImageUrlHttps }}">
     <meta name="twitter:image" content="{{ $shareImageUrlHttps }}">
+    @endif
+    @if(isset($articlePublishedTime) && trim((string) $articlePublishedTime) !== '')
+    <meta property="article:published_time" content="{{ trim((string) $articlePublishedTime) }}">
     @endif
     <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
     <meta name="twitter:card" content="summary_large_image">

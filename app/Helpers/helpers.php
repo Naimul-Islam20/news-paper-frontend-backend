@@ -85,6 +85,44 @@ if (! function_exists('storage_image_url')) {
     }
 }
 
+if (! function_exists('share_og_image_url')) {
+    /**
+     * Facebook/Open Graph শেয়ার ইমেজ — absolute HTTPS URL।
+     * একই ফাইল অনেক পোস্টে থাকলেও FB cache আলাদা রাখতে ?og=&v= যোগ।
+     */
+    function share_og_image_url(?string $path, int|string|null $entityKey = null, int|string|null $version = null): string
+    {
+        if (! $path) {
+            return '';
+        }
+
+        $url = storage_image_url($path);
+        if ($url === '') {
+            return '';
+        }
+
+        if (! Str::startsWith($url, ['http://', 'https://'])) {
+            $url = url($url);
+        }
+
+        $url = str_replace('http://', 'https://', $url);
+
+        $query = [];
+        if ($entityKey !== null && (string) $entityKey !== '') {
+            $query['og'] = (string) $entityKey;
+        }
+        if ($version !== null && (string) $version !== '') {
+            $query['v'] = (string) $version;
+        }
+
+        if ($query !== []) {
+            $url .= (str_contains($url, '?') ? '&' : '?') . http_build_query($query);
+        }
+
+        return $url;
+    }
+}
+
 if (! function_exists('storage_image_src')) {
     /**
      * ফ্রন্টএন্ড embed — storage_image_url এর মতোই path (live এ ভুল /storage/ path রোধ)।

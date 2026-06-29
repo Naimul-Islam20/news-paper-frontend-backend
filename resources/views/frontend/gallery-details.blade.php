@@ -3,15 +3,25 @@
 $categoryName = $gallery->category->name ?? 'গ্যালারি';
 
 $galleryShareTitle = $gallery->title . ' - ' . (site_name());
-$galleryShareImage = $gallery->images->first() ? trim(url(storage_image_url($gallery->images->first()->image))) : null;
+$galleryFirstImage = $gallery->images->first();
+$galleryOgVersion = $gallery->updated_at?->getTimestamp() ?? $gallery->id;
+$galleryShareImage = $galleryFirstImage
+    ? share_og_image_url($galleryFirstImage->image, $gallery->id, $galleryOgVersion)
+    : '';
+$galleryShareDescription = share_meta_description($gallery->description ?? '', $gallery->title);
 @endphp
 <x-layout>
     <x-slot:title>{{ $galleryShareTitle }}</x-slot>
-    @if($galleryShareImage)
+    @if($galleryShareImage !== '')
     <x-slot:metaImage>{{ $galleryShareImage }}</x-slot>
     @endif
     <x-slot:ogTitle>{{ $gallery->title }}</x-slot>
+    @if($galleryShareDescription !== '')
+    <x-slot:ogDescription>{{ $galleryShareDescription }}</x-slot>
+    @endif
+    <x-slot:ogImageAlt>{{ $gallery->title }}</x-slot>
     <x-slot:shareUrl>{{ route('gallery.show', $gallery->slug) }}</x-slot>
+    <x-slot:articlePublishedTime>{{ $gallery->created_at?->toIso8601String() }}</x-slot>
 
         <div class="py-4 md:py-10 min-h-screen bg-white">
             <div class="container">

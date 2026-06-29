@@ -1,14 +1,25 @@
 @php
 $postShareTitle = $post->title . ' - ' . (site_name());
-$postShareImage = $post->image ? trim(storage_image_url($post->image)) : null;
+$postOgVersion = $post->updated_at?->getTimestamp() ?? $post->id;
+$postShareImage = $post->image
+    ? share_og_image_url($post->image, $post->id, $postOgVersion)
+    : '';
+$postShareDescription = share_meta_description($post->description, $post->title);
 @endphp
 <x-layout>
     <x-slot:title>{{ $postShareTitle }}</x-slot>
-        @if($postShareImage)
-        <x-slot:metaImage>{{ $postShareImage }}</x-slot>
-            @endif
-            <x-slot:ogTitle>{{ $post->title }}</x-slot>
-                <x-slot:shareUrl>{{ news_url($post) }}</x-slot>
+    @if($postShareImage !== '')
+    <x-slot:metaImage>{{ $postShareImage }}</x-slot>
+    <x-slot:metaImageWidth>600</x-slot>
+    <x-slot:metaImageHeight>338</x-slot>
+    @endif
+    <x-slot:ogTitle>{{ $post->title }}</x-slot>
+    <x-slot:ogImageAlt>{{ $post->title }}</x-slot>
+    @if($postShareDescription !== '')
+    <x-slot:ogDescription>{{ $postShareDescription }}</x-slot>
+    @endif
+    <x-slot:shareUrl>{{ news_url($post) }}</x-slot>
+    <x-slot:articlePublishedTime>{{ $post->created_at?->toIso8601String() }}</x-slot>
 
                     <x-ad-slot-display slug="details_below_menu" variant="banner" wrapper-class="no-print" />
 

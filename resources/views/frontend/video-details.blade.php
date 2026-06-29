@@ -14,7 +14,11 @@ $videoThumb = $video->image ? storage_image_url($video->image) : null;
 if (!$videoThumb && $youtubeId) {
     $videoThumb = 'https://img.youtube.com/vi/'.$youtubeId.'/hqdefault.jpg';
 }
-$videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
+$videoOgVersion = $video->updated_at?->getTimestamp() ?? $video->id;
+$videoShareImage = $video->image
+    ? share_og_image_url($video->image, $video->id, $videoOgVersion)
+    : ($videoThumb ? str_replace('http://', 'https://', $videoThumb) : null);
+$videoShareDescription = share_meta_description($video->description ?? '', $video->title);
 @endphp
 <x-layout>
     <x-slot:title>{{ $videoShareTitle }}</x-slot>
@@ -22,7 +26,12 @@ $videoShareImage = $videoThumb ? trim(url($videoThumb)) : null;
     <x-slot:metaImage>{{ $videoShareImage }}</x-slot>
     @endif
     <x-slot:ogTitle>{{ $video->title }}</x-slot>
+    @if($videoShareDescription !== '')
+    <x-slot:ogDescription>{{ $videoShareDescription }}</x-slot>
+    @endif
+    <x-slot:ogImageAlt>{{ $video->title }}</x-slot>
     <x-slot:shareUrl>{{ route('videos.show', $video->slug) }}</x-slot>
+    <x-slot:articlePublishedTime>{{ $video->created_at?->toIso8601String() }}</x-slot>
 
         <div class="py-4 md:py-10 min-h-screen bg-white">
             <div class="container">
