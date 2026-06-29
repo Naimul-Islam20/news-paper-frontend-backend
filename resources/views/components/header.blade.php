@@ -125,8 +125,8 @@
                             @endif
                             @if(!empty(optional($siteMeta)->map_link))
                             <a href="{{ $siteMeta->map_link }}" target="_blank" rel="noopener noreferrer" class="text-primary hover:opacity-80 transition-opacity" title="{{ optional($siteMeta)->map_desc ?: 'অবস্থান' }}" aria-label="{{ optional($siteMeta)->map_desc ?: 'অবস্থান' }}">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 512 512" aria-hidden="true">
-                                    <path d="M256 48C141.13 48 48 141.13 48 256c0 47.84 17.14 91.67 45.66 126.17L256 464l162.34-81.83C446.86 347.67 464 303.84 464 256 464 141.13 370.87 48 256 48zm0 272a48 48 0 1 1 48-48 48 48 0 0 1-48 48z" />
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 384 512" aria-hidden="true">
+                                    <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" />
                                 </svg>
                             </a>
                             @endif
@@ -327,8 +327,8 @@
                         @endif
                         @if(!empty(optional($siteMeta)->map_link))
                         <a href="{{ $siteMeta->map_link }}" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-primary transition-colors" title="{{ optional($siteMeta)->map_desc ?: 'অবস্থান' }}" aria-label="{{ optional($siteMeta)->map_desc ?: 'অবস্থান' }}">
-                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 512 512" aria-hidden="true">
-                                <path d="M256 48C141.13 48 48 141.13 48 256c0 47.84 17.14 91.67 45.66 126.17L256 464l162.34-81.83C446.86 347.67 464 303.84 464 256 464 141.13 370.87 48 256 48zm0 272a48 48 0 1 1 48-48 48 48 0 0 1-48 48z" />
+                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 384 512" aria-hidden="true">
+                                <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" />
                             </svg>
                         </a>
                         @endif
